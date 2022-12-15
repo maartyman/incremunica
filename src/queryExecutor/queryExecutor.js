@@ -11,14 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryExecutor = void 0;
 const tslog_1 = require("tslog");
-const loggerSettings_1 = require("../../utils/loggerSettings");
+const loggerSettings_1 = require("../utils/loggerSettings");
 const reasoning_context_entries_1 = require("@comunica/reasoning-context-entries");
 const queryExecutorFactory_1 = require("./queryExecutorFactory");
 const actor_1 = require("../utils/actor-factory/actor");
+const guard_1 = require("../guard/guard");
 const guardPolling_1 = require("../guard/guardPolling");
 const localQueryEngineFactory_1 = require("../queryEngineFactory/localQueryEngineFactory");
 const node_worker_threads_1 = require("node:worker_threads");
-const jsonToBindings_1 = require("../../utils/jsonToBindings");
+const jsonToBindings_1 = require("../utils/jsonToBindings");
 class QueryExecutor extends actor_1.Actor {
     constructor(UUID, queryExplanation, guardingEnabled) {
         super(UUID);
@@ -32,6 +33,7 @@ class QueryExecutor extends actor_1.Actor {
         this.guardingEnabled = false;
         this.queryExplanation = queryExplanation;
         this.guardingEnabled = guardingEnabled;
+        this.setMaxListeners(Infinity);
         this.logger.debug("comunicaVersion = " + queryExplanation.comunicaVersion.toString());
         this.logger.debug("comunica context path = " + queryExplanation.comunicaContext.toString());
         localQueryEngineFactory_1.LocalQueryEngineFactory.getOrCreate(queryExplanation.comunicaVersion.toString(), queryExplanation.comunicaContext.toString()).then((queryEngine) => {
@@ -44,6 +46,9 @@ class QueryExecutor extends actor_1.Actor {
     }
     executeQuery() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isQueryEngineBuild()) {
+                return;
+            }
             this.queryFinished = false;
             this.guards.forEach((value) => {
                 value.used = false;
@@ -55,7 +60,9 @@ class QueryExecutor extends actor_1.Actor {
             if (this.queryEngine == undefined) {
                 throw new TypeError("queryEngine is undefined");
             }
-            this.logger.debug(`Starting comunica query, with reasoningRules: \n${this.queryExplanation.reasoningRules}`);
+            if (this.queryExplanation.reasoningRules !== "") {
+                this.logger.debug(`Starting comunica query, with reasoningRules: \n${this.queryExplanation.reasoningRules}`);
+            }
             /*
             TODO temporarily turning this off as it doesn't work => query explanation will give the used resources (I think)
             let parallelPromise = new Array<Promise<any>>();
@@ -122,25 +129,23 @@ class QueryExecutor extends actor_1.Actor {
                         });
                         break;
                     case "fetch":
-                        this.customFetch(value.message);
+                        this.makeGuard(value.message.input, value.message.headers);
                         break;
                 }
             });
         });
     }
-    customFetch(input) {
+    makeGuard(input, headers) {
         return __awaiter(this, void 0, void 0, function* () {
-            //TODO check used resources: delete the ones that aren't used add the new ones
-            //TODO possibly wait until the resource is actively guarded
             if (this.guardingEnabled) {
                 const originalInput = input.toString();
                 input = new URL(input.toString());
                 input = input.origin + input.pathname;
                 let guardObject = this.guards.get(input);
                 if (!guardObject) {
-                    guardObject = { guard: yield guardPolling_1.GuardPolling.factory.getOrCreate(input), used: true };
+                    guardObject = { guard: yield guardPolling_1.GuardPolling.factory.getOrCreate(input, guard_1.Guard, headers), used: true };
                     if (!guardObject) {
-                        throw new Error("guard couldn't be instantiated;");
+                        throw new Error("Guard couldn't be instantiated;");
                     }
                     guardObject.guard.on("ResourceChanged", this.resourceChanged.bind(this, originalInput));
                 }
@@ -194,8 +199,8 @@ class QueryExecutor extends actor_1.Actor {
     }
     afterQueryCleanup() {
         if (!this.initializationFinished) {
-            this.emit("queryEvent", "initialized");
             this.initializationFinished = true;
+            this.emit("queryEvent", "initialized");
         }
         this.guards.forEach((value, key) => {
             this.logger.debug("Resource: " + key + " is used: " + value.used);
@@ -213,7 +218,6 @@ class QueryExecutor extends actor_1.Actor {
                 this.results.delete(key);
             }
         });
-        //printMap(this.results);
         this.queryFinished = true;
         this.logger.debug(`Comunica query finished`);
         this.emit("queryEvent", "done");

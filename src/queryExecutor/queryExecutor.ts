@@ -11,6 +11,12 @@ import {LocalQueryEngineFactory} from "../queryEngineFactory/localQueryEngineFac
 import {Worker,MessageChannel} from "node:worker_threads";
 import {jsonStringToBindings} from "../utils/jsonToBindings";
 
+export declare interface QueryExecutor {
+  on(event: "binding", listener: (bindings: Bindings, newBinding: boolean) => void): this;
+  on(event: "queryEvent", listener: (arg: string) => void): this;
+}
+
+
 export class QueryExecutor extends Actor<string> {
   static factory = new QueryExecutorFactory();
   private readonly logger = new Logger(loggerSettings);
@@ -30,6 +36,7 @@ export class QueryExecutor extends Actor<string> {
     this.queryExplanation = queryExplanation;
     this.guardingEnabled = guardingEnabled;
 
+    this.setMaxListeners(Infinity);
 
     this.logger.debug("comunicaVersion = " + queryExplanation.comunicaVersion.toString());
     this.logger.debug("comunica context path = " + queryExplanation.comunicaContext.toString());
@@ -47,6 +54,10 @@ export class QueryExecutor extends Actor<string> {
   }
 
   private async executeQuery() {
+    if (!this.isQueryEngineBuild()) {
+      return;
+    }
+
     this.queryFinished = false;
 
     this.guards.forEach((value) => {
@@ -56,14 +67,15 @@ export class QueryExecutor extends Actor<string> {
       value.used = false;
     });
 
-
     this.logger.debug(`Starting comunica query, with query: \n${ this.queryExplanation.queryString.toString() }`);
 
     if (this.queryEngine == undefined) {
       throw new TypeError("queryEngine is undefined");
     }
 
-    this.logger.debug(`Starting comunica query, with reasoningRules: \n${ this.queryExplanation.reasoningRules }`);
+    if (this.queryExplanation.reasoningRules !== "") {
+      this.logger.debug(`Starting comunica query, with reasoningRules: \n${ this.queryExplanation.reasoningRules }`);
+    }
 
     /*
     TODO temporarily turning this off as it doesn't work => query explanation will give the used resources (I think)
@@ -145,16 +157,13 @@ export class QueryExecutor extends Actor<string> {
           });
           break;
         case "fetch":
-          this.customFetch(value.message);
+          this.makeGuard(value.message.input, value.message.headers);
           break;
       }
     });
   }
 
-  private async customFetch(input: RequestInfo | URL) {
-    //TODO check used resources: delete the ones that aren't used add the new ones
-    //TODO possibly wait until the resource is actively guarded
-
+  private async makeGuard(input: RequestInfo | URL, headers: any) {
     if (this.guardingEnabled) {
       const originalInput = input.toString();
 
@@ -164,10 +173,10 @@ export class QueryExecutor extends Actor<string> {
       let guardObject = this.guards.get(input);
 
       if (!guardObject) {
-        guardObject = {guard: await GuardPolling.factory.getOrCreate(input), used: true};
+        guardObject = {guard: await GuardPolling.factory.getOrCreate(input, Guard, headers), used: true};
 
         if (!guardObject) {
-          throw new Error("guard couldn't be instantiated;");
+          throw new Error("Guard couldn't be instantiated;");
         }
 
         guardObject.guard.on("ResourceChanged", this.resourceChanged.bind(this, originalInput));
@@ -228,8 +237,8 @@ export class QueryExecutor extends Actor<string> {
 
   private afterQueryCleanup() {
     if (!this.initializationFinished) {
-      this.emit("queryEvent", "initialized");
       this.initializationFinished = true;
+      this.emit("queryEvent", "initialized");
     }
     this.guards.forEach((value, key) => {
       this.logger.debug("Resource: " + key + " is used: " + value.used);
@@ -242,12 +251,12 @@ export class QueryExecutor extends Actor<string> {
       }
     });
     this.results.forEach((value, key) => {
-      if (!value.used){
+      if (!value.used) {
         this.emit("binding", value.bindings, false);
         this.results.delete(key);
       }
     });
-    //printMap(this.results);
+
     this.queryFinished = true;
     this.logger.debug(`Comunica query finished`);
     this.emit("queryEvent", "done");

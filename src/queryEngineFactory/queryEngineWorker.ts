@@ -1,6 +1,9 @@
 import {QueryEngine, QueryEngineFactory} from "@comunica/query-sparql";
 import {QueryStringContext} from "@comunica/types";
 import {Bindings} from "@comunica/bindings-factory";
+import {fetch} from "cross-fetch";
+import {loggerSettings} from "../utils/loggerSettings";
+import {Logger} from "tslog";
 
 const {workerData, parentPort} = require('node:worker_threads');
 
@@ -64,10 +67,12 @@ parentPort.on("message", async (value: string | [MessagePort, string, QueryStrin
 });
 
 async function customFetch(this: MessagePort, input: RequestInfo | URL, init?: RequestInit | undefined): Promise<Response> {
-  //TODO check used resources: delete the ones that aren't used add the new ones
-  //TODO possibly wait until the resource is actively guarded
-
-  this.postMessage({messageType: "fetch", message: input});
-
-  return fetch(input, init);
+  return fetch(input, init).then((res) => {
+    let headers: any = {};
+    res.headers.forEach((val, key) => {
+      headers[key] = val;
+    });
+    this.postMessage({messageType: "fetch", message: {input: input, headers: headers}});
+    return res;
+  });
 }

@@ -2,13 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuardWebSockets = void 0;
 const guard_1 = require("./guard");
+const websocket_1 = require("websocket");
 class GuardWebSockets extends guard_1.Guard {
     constructor(host) {
         super(host);
         this.pubRegEx = new RegExp(/pub (https?:\/\/\S+)/);
         this.ackRegEx = new RegExp(/ack (https?:\/\/\S+)/);
-        const WebSocketClient = require('websocket').client;
-        this.ws = new WebSocketClient();
+        this.ws = new websocket_1.client();
+        this.ws.setMaxListeners(Infinity);
         this.ws.on('connect', (connection) => {
             this.logger.debug("ws connected to pod");
             this.connection = connection;
@@ -32,7 +33,7 @@ class GuardWebSockets extends guard_1.Guard {
                 }
             });
         });
-        this.ws.connect("ws://" + host, 'solid-0.1');
+        this.ws.connect(host, 'solid-0.1');
     }
     evaluateResource(resource) {
         this.logger.debug("evaluateResource: " + resource);

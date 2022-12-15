@@ -7,7 +7,6 @@ import {loggerSettings} from "../utils/loggerSettings";
 import {Factory} from "../utils/actor-factory/factory";
 
 export class QueryExecutorFactory extends Factory<string, QueryExecutor> {
-  private readonly logger = new Logger(loggerSettings);
 
   constructor() {
     super(QueryExecutor);
@@ -17,37 +16,39 @@ export class QueryExecutorFactory extends Factory<string, QueryExecutor> {
     //TODO this probably can be done in a better way
     // standardize the query explanation and then use a hashmap to look for a uuid
 
+    let logger = new Logger(loggerSettings);
+
     let queryExecutor: QueryExecutor | undefined;
     this.getKeyValuePairs((value) => {
       if (!(value.queryExplanation.queryString === queryExplanation.queryString)) {
-        this.logger.debug("queryString");
+        logger.debug("queryString");
         return;
       }
       else if (!arrayEquality(value.queryExplanation.sources, queryExplanation.sources)) {
-        this.logger.debug("sources");
+        logger.debug("sources");
         return;
       }
       else if (!(value.queryExplanation.comunicaContext === queryExplanation.comunicaContext)) {
-        this.logger.debug("context");
+        logger.debug("context");
         return;
       }
       else if (!(value.queryExplanation.reasoningRules === queryExplanation.reasoningRules)) {
-        this.logger.debug("reasoningRules");
+        logger.debug("reasoningRules");
         return;
       }
       else if (!(value.queryExplanation.comunicaVersion === queryExplanation.comunicaVersion)) {
-        this.logger.debug("comunicaVersion");
+        logger.debug("comunicaVersion");
         return;
       }
       else if (value.queryExplanation.lenient != queryExplanation.lenient) {
-        this.logger.debug("lenient");
+        logger.debug("lenient");
         return;
       }
       queryExecutor = value;
       return;
     });
     if (queryExecutor) {
-      this.logger.info("query: \n"+ JSON.stringify(queryExplanation) +" \nalready exists!");
+      logger.info("query: \n"+ JSON.stringify(queryExplanation) +" \nalready exists!");
       return queryExecutor.key;
     }
     else {

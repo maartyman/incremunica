@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Guard = void 0;
 const actor_1 = require("../utils/actor-factory/actor");
 const tslog_1 = require("tslog");
-const loggerSettings_1 = require("../../utils/loggerSettings");
+const loggerSettings_1 = require("../utils/loggerSettings");
 class Guard extends actor_1.Actor {
     constructor(key) {
         super(key);

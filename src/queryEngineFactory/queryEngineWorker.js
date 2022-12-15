@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cross_fetch_1 = require("cross-fetch");
 const { workerData, parentPort } = require('node:worker_threads');
 const comunicaVersion = workerData[0];
 const comunicaContext = workerData[1];
@@ -54,9 +55,13 @@ parentPort.on("message", (value) => __awaiter(void 0, void 0, void 0, function* 
 }));
 function customFetch(input, init) {
     return __awaiter(this, void 0, void 0, function* () {
-        //TODO check used resources: delete the ones that aren't used add the new ones
-        //TODO possibly wait until the resource is actively guarded
-        this.postMessage({ messageType: "fetch", message: input });
-        return fetch(input, init);
+        return (0, cross_fetch_1.fetch)(input, init).then((res) => {
+            let headers = {};
+            res.headers.forEach((val, key) => {
+                headers[key] = val;
+            });
+            this.postMessage({ messageType: "fetch", message: { input: input, headers: headers } });
+            return res;
+        });
     });
 }

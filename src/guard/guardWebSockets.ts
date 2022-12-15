@@ -1,5 +1,6 @@
 import {connection, Message} from "websocket";
 import {Guard} from "./guard";
+import {client} from "websocket";
 
 export class GuardWebSockets extends Guard {
   private readonly ws;
@@ -9,8 +10,8 @@ export class GuardWebSockets extends Guard {
 
   constructor(host: string) {
     super(host);
-    const WebSocketClient = require('websocket').client;
-    this.ws = new WebSocketClient();
+    this.ws = new client();
+    this.ws.setMaxListeners(Infinity);
 
     this.ws.on('connect', (connection: connection) => {
       this.logger.debug("ws connected to pod");
@@ -36,7 +37,7 @@ export class GuardWebSockets extends Guard {
       });
     });
 
-    this.ws.connect("ws://" + host, 'solid-0.1');
+    this.ws.connect(host, 'solid-0.1');
   }
 
   evaluateResource(resource: string): void {

@@ -4,38 +4,51 @@ import {loggerSettings} from "../utils/loggerSettings";
 import {GuardPolling} from "./guardPolling";
 import {GuardWebSockets} from "./guardWebSockets";
 import {Guard} from "./guard";
-import {connection} from "websocket";
+import {connection, client} from "websocket";
 
 export class GuardFactory extends Factory<string, Guard> {
+  private guardWebSockets = new Map<string, GuardWebSockets>();
+
   constructor() {
     super(Guard);
   }
 
-  public async getOrCreate(key: string, actor?: new (key: string) => Guard) {
-    const url = new URL(key);
+  public async getOrCreate(key: string, actor?: new (key: string) => Guard, headers?: any) {
+    if (!headers) {
+      throw new Error("the field headers was not specified (this shouldn't happen)");
+    }
+    //check if there is already a guard, if so return it
+    let guard = this.map.get(key);
 
-    const guardPolling = this.map.get(key);
-
-    if (guardPolling) {
-      return guardPolling;
+    if (guard) {
+      return guard;
     }
 
-    const guardWebSocket = this.map.get(url.host) as GuardWebSockets;
+    //check if it has an updates-via field in the header, if not return a new polling guard
+    let webSocketHost = headers["updates-via"];
 
-    if (guardWebSocket) {
-      guardWebSocket.evaluateResource(key);
-      return guardWebSocket;
-    }
+    new Logger(loggerSettings).debug(webSocketHost);
 
-    let guard: Guard;
-
-    if (await this.checkWebSocketAvailability(url.host)) {
-      const guardWebSocket = new GuardWebSockets(url.host);
-      guardWebSocket.evaluateResource(key);
-      guard = guardWebSocket;
-    } else {
+    if (!webSocketHost) {
+      new Logger(loggerSettings).debug("Polling guard");
       guard = new GuardPolling(key);
+      this.map.set(key, guard);
+      return guard;
     }
+
+    //return a websocket guard
+    guard = this.guardWebSockets.get(webSocketHost);
+
+    if (!guard) {
+      new Logger(loggerSettings).debug("Websocket host doesn't exist yet: ", webSocketHost);
+      guard = new GuardWebSockets(webSocketHost);
+      this.guardWebSockets.set(webSocketHost, (guard as GuardWebSockets));
+    }
+
+    new Logger(loggerSettings).debug("Evaluating resource:", key);
+    (guard as GuardWebSockets).evaluateResource(key);
+
+    this.map.set(key, guard);
 
     return guard;
   }
@@ -78,33 +91,32 @@ export class GuardFactory extends Factory<string, Guard> {
     }
   }
 
-  private async checkWebSocketAvailability(host: string): Promise<boolean> {
-    //TODO is this the best solution?
-    new Logger(loggerSettings).debug("Checking pod availability");
-    const WebSocketClient = require('websocket').client;
-    const ws = new WebSocketClient();
+  private async checkWebSocketAvailability(webSocketHost: string): Promise<string | undefined> {
+    return new Promise<string | undefined>((resolve) => {
+      const ws = new client();
 
-    const promise = new Promise<boolean>( resolve => {
       ws.on('connect', (connection: connection) => {
         new Logger(loggerSettings).debug("Checking pod availability: connection succeeded");
         ws.abort();
-        resolve(true);
+        resolve(webSocketHost);
+        return;
       });
 
       ws.on("connectFailed", () => {
         new Logger(loggerSettings).debug("Checking pod availability: connection failed");
         ws.abort();
-        resolve(false);
+        resolve(undefined);
+        return;
       });
 
       setTimeout(() => {
         ws.abort();
-        resolve(false);
+        resolve(undefined);
+        return;
       }, 30000);
-    });
 
-    ws.connect("ws://" + host, 'solid-0.1');
-
-    return promise;
+      ws.connect(webSocketHost, 'solid-0.1');
+    })
   }
 }
+

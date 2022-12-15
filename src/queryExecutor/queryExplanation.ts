@@ -3,14 +3,14 @@ import {resolveUndefined} from "../utils/resolveUndefined";
 import * as path from "path";
 
 export class QueryExplanation {
-  public readonly queryString: String;
+  public readonly queryString: string;
   public readonly sources: [IDataSource, ...IDataSource[]];
   public readonly comunicaVersion: string;
   public readonly comunicaContext: string;
-  public readonly reasoningRules: String;
+  public readonly reasoningRules: string;
   public readonly lenient: boolean;
 
-  constructor(queryString: String, sources: [IDataSource, ...IDataSource[]], comunicaVersion?: TComunicaVersion, context?: TComunicaContext, reasoningRules?: String, lenient?: boolean) {
+  constructor(queryString: string, sources: [IDataSource, ...IDataSource[]], comunicaVersion?: TComunicaVersion, context?: TComunicaContext, reasoningRules?: string, lenient?: boolean) {
     this.queryString = queryString;
     this.sources = sources;
     switch (comunicaVersion) {
