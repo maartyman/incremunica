@@ -2,8 +2,6 @@ import {QueryEngine, QueryEngineFactory} from "@comunica/query-sparql";
 import {QueryStringContext} from "@comunica/types";
 import {Bindings} from "@comunica/bindings-factory";
 import {fetch} from "cross-fetch";
-import {loggerSettings} from "../utils/loggerSettings";
-import {Logger} from "tslog";
 
 const {workerData, parentPort} = require('node:worker_threads');
 
@@ -26,13 +24,18 @@ queryEnginePromise.then((queryEngineArg) => {
 })
 
 
-parentPort.on("message", async (value: string | [MessagePort, string, QueryStringContext]) => {
+parentPort.on("message", async (value: ["invalidateHttpCache", [string]] | [MessagePort, string, QueryStringContext]) => {
   if(queryEngine == undefined) {
     throw new Error("queryEngine undefined, this shouldn't happen!");
   }
 
-  if(value === "invalidateHttpCache"){
-    await queryEngine.invalidateHttpCache();
+  if(value[0] === "invalidateHttpCache"){
+    let parallelPromise = new Array<Promise<any>>();
+    for (const resource of value[1]) {
+      parallelPromise.push(queryEngine.invalidateHttpCache(resource));
+    }
+    await Promise.all(parallelPromise);
+    parentPort.postMessage("Cache ready");
   }
   else {
     const port = value[0] as MessagePort;

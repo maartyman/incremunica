@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocalQueryEngineFactory = void 0;
 const node_worker_threads_1 = require("node:worker_threads");
+const listenUntil_1 = require("../utils/listenUntil");
 class LocalQueryEngineFactory {
     static getOrCreate(comunicaVersion, comunicaContext) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,10 +27,8 @@ class LocalQueryEngineFactory {
                 ]
             });
             const workerPromise = new Promise((resolve) => {
-                worker.on("message", (value) => {
-                    if (value === "done") {
-                        resolve(worker);
-                    }
+                (0, listenUntil_1.listenUntil)(worker, "message", "done", () => {
+                    resolve(worker);
                 });
             });
             this.engines.set(comunicaVersion + comunicaContext, { count: 1, worker: workerPromise });

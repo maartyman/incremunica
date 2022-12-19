@@ -29,8 +29,13 @@ parentPort.on("message", (value) => __awaiter(void 0, void 0, void 0, function* 
     if (queryEngine == undefined) {
         throw new Error("queryEngine undefined, this shouldn't happen!");
     }
-    if (value === "invalidateHttpCache") {
-        yield queryEngine.invalidateHttpCache();
+    if (value[0] === "invalidateHttpCache") {
+        let parallelPromise = new Array();
+        for (const resource of value[1]) {
+            parallelPromise.push(queryEngine.invalidateHttpCache(resource));
+        }
+        yield Promise.all(parallelPromise);
+        parentPort.postMessage("Cache ready");
     }
     else {
         const port = value[0];

@@ -20,6 +20,7 @@ const guardPolling_1 = require("../guard/guardPolling");
 const localQueryEngineFactory_1 = require("../queryEngineFactory/localQueryEngineFactory");
 const node_worker_threads_1 = require("node:worker_threads");
 const jsonToBindings_1 = require("../utils/jsonToBindings");
+const listenUntil_1 = require("../utils/listenUntil");
 class QueryExecutor extends actor_1.Actor {
     constructor(UUID, queryExplanation, guardingEnabled) {
         super(UUID);
@@ -56,37 +57,29 @@ class QueryExecutor extends actor_1.Actor {
             this.results.forEach((value) => {
                 value.used = false;
             });
-            this.logger.debug(`Starting comunica query, with query: \n${this.queryExplanation.queryString.toString()}`);
             if (this.queryEngine == undefined) {
                 throw new TypeError("queryEngine is undefined");
             }
-            if (this.queryExplanation.reasoningRules !== "") {
-                this.logger.debug(`Starting comunica query, with reasoningRules: \n${this.queryExplanation.reasoningRules}`);
-            }
-            /*
-            TODO temporarily turning this off as it doesn't work => query explanation will give the used resources (I think)
-            let parallelPromise = new Array<Promise<any>>();
-            for (const resource of this.changedResources) {
-              parallelPromise.push(this.queryEngine.invalidateHttpCache(resource));
-            }
-            await Promise.all(parallelPromise);
-        
-             */
-            this.queryEngine.postMessage("invalidateHttpCache");
-            this.changedResources.splice(0);
-            /*
-            this.queryEngine.postMessage(
-              this.queryExplanation.queryString.toString(), {
-              sources: this.queryExplanation.sources,
-              [KeysRdfReason.implicitDatasetFactory.name]: () => new Store(),
-              [KeysRdfReason.rules.name]: this.queryExplanation.reasoningRules,
-              fetch: this.customFetch.bind(this),
-              lenient: this.queryExplanation.lenient
+            const cacheInvalidated = new Promise((resolve) => {
+                if (!this.queryEngine) {
+                    throw new Error("QueryEngine is undefined");
+                }
+                (0, listenUntil_1.listenUntil)(this.queryEngine, "message", "Cache ready", () => {
+                    this.logger.debug("Cache ready!");
+                    resolve(true);
+                });
             });
-            */
+            this.queryEngine.postMessage(["invalidateHttpCache", this.changedResources]);
+            this.changedResources.splice(0);
+            this.logger.debug("Making worker message channels");
             const messageChannel = new node_worker_threads_1.MessageChannel();
             const bindingsStream = messageChannel.port1;
             const messageChannelIn = messageChannel.port2;
+            yield cacheInvalidated;
+            this.logger.debug(`Starting comunica query, with query: \n${this.queryExplanation.queryString.toString()}`);
+            if (this.queryExplanation.reasoningRules !== "") {
+                this.logger.debug(`Starting comunica query, with reasoningRules: \n${this.queryExplanation.reasoningRules}`);
+            }
             this.queryEngine.postMessage([
                 messageChannelIn,
                 this.queryExplanation.queryString.toString(),

@@ -10,6 +10,7 @@ import {GuardPolling} from "../guard/guardPolling";
 import {LocalQueryEngineFactory} from "../queryEngineFactory/localQueryEngineFactory";
 import {Worker,MessageChannel} from "node:worker_threads";
 import {jsonStringToBindings} from "../utils/jsonToBindings";
+import {listenUntil} from "../utils/listenUntil";
 
 export declare interface QueryExecutor {
   on(event: "binding", listener: (bindings: Bindings, newBinding: boolean) => void): this;
@@ -63,46 +64,41 @@ export class QueryExecutor extends Actor<string> {
     this.guards.forEach((value) => {
       value.used = false;
     });
+
     this.results.forEach((value) => {
       value.used = false;
     });
-
-    this.logger.debug(`Starting comunica query, with query: \n${ this.queryExplanation.queryString.toString() }`);
 
     if (this.queryEngine == undefined) {
       throw new TypeError("queryEngine is undefined");
     }
 
-    if (this.queryExplanation.reasoningRules !== "") {
-      this.logger.debug(`Starting comunica query, with reasoningRules: \n${ this.queryExplanation.reasoningRules }`);
-    }
 
-    /*
-    TODO temporarily turning this off as it doesn't work => query explanation will give the used resources (I think)
-    let parallelPromise = new Array<Promise<any>>();
-    for (const resource of this.changedResources) {
-      parallelPromise.push(this.queryEngine.invalidateHttpCache(resource));
-    }
-    await Promise.all(parallelPromise);
+    const cacheInvalidated = new Promise<boolean>((resolve) => {
+      if (!this.queryEngine) {
+        throw new Error("QueryEngine is undefined");
+      }
+      listenUntil(this.queryEngine, "message", "Cache ready", () => {
+        this.logger.debug("Cache ready!");
+        resolve(true);
+      });
+    });
 
-     */
-    this.queryEngine.postMessage("invalidateHttpCache");
+    this.queryEngine.postMessage(["invalidateHttpCache", this.changedResources]);
     this.changedResources.splice(0);
 
-    /*
-    this.queryEngine.postMessage(
-      this.queryExplanation.queryString.toString(), {
-      sources: this.queryExplanation.sources,
-      [KeysRdfReason.implicitDatasetFactory.name]: () => new Store(),
-      [KeysRdfReason.rules.name]: this.queryExplanation.reasoningRules,
-      fetch: this.customFetch.bind(this),
-      lenient: this.queryExplanation.lenient
-    });
-    */
-
+    this.logger.debug("Making worker message channels");
     const messageChannel = new MessageChannel();
     const bindingsStream = messageChannel.port1;
     const messageChannelIn = messageChannel.port2;
+
+    await cacheInvalidated;
+
+    this.logger.debug(`Starting comunica query, with query: \n${ this.queryExplanation.queryString.toString() }`);
+
+    if (this.queryExplanation.reasoningRules !== "") {
+      this.logger.debug(`Starting comunica query, with reasoningRules: \n${ this.queryExplanation.reasoningRules }`);
+    }
 
     this.queryEngine.postMessage(
       [

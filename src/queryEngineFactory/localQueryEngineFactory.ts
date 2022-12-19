@@ -1,4 +1,5 @@
 import {Worker} from "node:worker_threads";
+import {listenUntil} from "../utils/listenUntil";
 
 export class LocalQueryEngineFactory {
   private static engines = new Map<string, {count: number, worker:Promise<Worker>}>();
@@ -22,10 +23,8 @@ export class LocalQueryEngineFactory {
     );
 
     const workerPromise = new Promise<Worker>((resolve) => {
-      worker.on("message", (value: string) => {
-        if (value === "done") {
-          resolve(worker);
-        }
+      listenUntil(worker, "message", "done", () => {
+        resolve(worker);
       });
     });
 
