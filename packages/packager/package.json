@@ -1,0 +1,41 @@
+{
+  "name": "@comunica/packager",
+  "version": "2.5.1",
+  "description": "A tool for packaging Comunica modules in a single NPM package",
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/packager"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "packager"
+  ],
+  "license": "MIT",
+  "bin": {
+    "comunica-package": "./bin/package.js"
+  },
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "bin/package.d.ts",
+    "bin/package.js",
+    "bin/package.js.map"
+  ],
+  "dependencies": {
+    "@types/minimist": "^1.2.2",
+    "componentsjs": "^5.3.2",
+    "minimist": "^1.2.7"
+  },
+  "scripts": {
+    "build": "node \"../../node_modules/typescript/bin/tsc\""
+  }
+}

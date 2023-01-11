@@ -1,0 +1,41 @@
+import type { IActorTest } from '@comunica/core';
+import type {
+  IActionHttpInvalidate,
+  IActorHttpInvalidateOutput,
+  IActorHttpInvalidateArgs,
+} from './ActorHttpInvalidate';
+import { ActorHttpInvalidate } from './ActorHttpInvalidate';
+
+/**
+ * An ActorHttpInvalidate actor that allows listeners to be attached.
+ *
+ * @see ActorHttpInvalidate
+ */
+export class ActorHttpInvalidateListenable extends ActorHttpInvalidate {
+  private readonly invalidateListeners: IInvalidateListener[] = [];
+
+  public constructor(args: IActorHttpInvalidateArgs) {
+    super(args);
+    this.invalidateListeners = [];
+  }
+
+  public addInvalidateListener(listener: IInvalidateListener): void {
+    this.invalidateListeners.push(listener);
+  }
+
+  public async test(action: IActionHttpInvalidate): Promise<IActorTest> {
+    return true;
+  }
+
+  public async run(action: IActionHttpInvalidate): Promise<IActorHttpInvalidateOutput> {
+    for (const listener of this.invalidateListeners) {
+      listener(action);
+    }
+    return {};
+  }
+}
+
+/**
+ * Called when a {@link IActionHttpInvalidate} is received.
+ */
+export type IInvalidateListener = (action: IActionHttpInvalidate) => void;

@@ -1,0 +1,69 @@
+{
+  "name": "@comunica/actor-init-query",
+  "version": "2.5.1",
+  "description": "A query init actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-init-query"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "init",
+    "query"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/actor-http-proxy": "^2.5.1",
+    "@comunica/bus-context-preprocess": "^2.5.1",
+    "@comunica/bus-http-invalidate": "^2.5.1",
+    "@comunica/bus-init": "^2.5.1",
+    "@comunica/bus-optimize-query-operation": "^2.5.1",
+    "@comunica/bus-query-operation": "^2.5.1",
+    "@comunica/bus-query-parse": "^2.5.1",
+    "@comunica/bus-query-result-serialize": "^2.5.1",
+    "@comunica/context-entries": "^2.5.1",
+    "@comunica/core": "^2.5.1",
+    "@comunica/logger-pretty": "^2.5.1",
+    "@comunica/runner": "^2.5.1",
+    "@comunica/types": "^2.5.1",
+    "@rdfjs/types": "*",
+    "@types/yargs": "^17.0.13",
+    "asynciterator": "^3.8.0",
+    "negotiate": "^1.0.1",
+    "rdf-quad": "^1.5.0",
+    "rdf-string": "^1.6.1",
+    "sparqlalgebrajs": "^4.0.5",
+    "streamify-string": "^1.0.1",
+    "yargs": "^17.6.2"
+  },
+  "optionalDependencies": {
+    "process": "^0.11.10"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "browser": {
+    "./lib/index.js": "./lib/index-browser.js"
+  }
+}

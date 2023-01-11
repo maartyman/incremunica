@@ -1,0 +1,46 @@
+{
+  "name": "@comunica/actor-query-operation-path-seq",
+  "version": "2.5.1",
+  "description": "A path-seq query-operation actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-query-operation-path-seq"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "query-operation",
+    "path-seq"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/actor-abstract-path": "^2.5.1",
+    "@comunica/bus-query-operation": "^2.5.1",
+    "@comunica/bus-rdf-join": "^2.5.1",
+    "@comunica/types": "^2.5.1",
+    "sparqlalgebrajs": "^4.0.5"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}

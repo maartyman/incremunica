@@ -1,0 +1,44 @@
+{
+  "name": "@comunica/actor-rdf-serialize-n3",
+  "version": "2.5.1",
+  "description": "A n3 rdf-serialize actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-rdf-serialize-n3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "rdf-serialize",
+    "n3"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/actor-rdf-serialize-n3/issues"
+  },
+  "homepage": "https://github.com/comunica/actor-rdf-serialize-n3#readme",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/bus-rdf-serialize": "^2.5.1",
+    "@comunica/types": "^2.5.1",
+    "n3": "^1.16.3"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}

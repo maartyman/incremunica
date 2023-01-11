@@ -1,0 +1,51 @@
+{
+  "name": "@comunica/actor-rdf-update-quads-hypermedia",
+  "version": "2.5.1",
+  "description": "A hypermedia rdf-update-quads actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-rdf-update-quads-hypermedia"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "rdf-update-quads",
+    "hypermedia"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/bus-dereference-rdf": "^2.5.1",
+    "@comunica/bus-http-invalidate": "^2.5.1",
+    "@comunica/bus-rdf-metadata": "^2.5.1",
+    "@comunica/bus-rdf-metadata-extract": "^2.5.1",
+    "@comunica/bus-rdf-update-hypermedia": "^2.5.1",
+    "@comunica/bus-rdf-update-quads": "^2.5.1",
+    "@comunica/core": "^2.5.1",
+    "@comunica/types": "^2.5.1",
+    "@types/lru-cache": "^5.1.1",
+    "lru-cache": "^6.0.0"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}

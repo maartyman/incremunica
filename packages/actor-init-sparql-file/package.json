@@ -1,0 +1,15 @@
+{
+  "name": "@comunica/actor-init-sparql-file",
+  "version": "2.0.1",
+  "description": "Deprecated: A SPARQL query engine for querying over local and remote RDF files",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-query-sparql-file"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "homepage": "https://comunica.dev/"
+}

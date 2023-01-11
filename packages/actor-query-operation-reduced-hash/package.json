@@ -1,0 +1,48 @@
+{
+  "name": "@comunica/actor-query-operation-reduced-hash",
+  "version": "2.5.1",
+  "description": "A reduced-hash query-operation actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-query-operation-reduced-hash"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "query-operation",
+    "reduced-hash"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/bus-hash-bindings": "^2.5.1",
+    "@comunica/bus-query-operation": "^2.5.1",
+    "@comunica/core": "^2.5.1",
+    "@comunica/types": "^2.5.1",
+    "@types/lru-cache": "^5.1.1",
+    "lru-cache": "^6.0.0",
+    "sparqlalgebrajs": "^4.0.5"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}
