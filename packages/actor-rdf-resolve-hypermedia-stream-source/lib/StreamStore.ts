@@ -1,10 +1,13 @@
-import {Quad, Term} from "@rdfjs/types";
+import {Term} from "@rdfjs/types";
 import { Store } from "n3";
 import {Stream, PassThrough, Duplex, Writable, Readable} from "readable-stream";
+import * as RdfTerms from "rdf-terms";
+import {Quad} from "@comunica/types/lib/Quad";
+const streamifyArray = require('streamify-array');
 
 export class StreamStore {
   private readonly store = new Store();
-  private readonly triplePatterns: indexedTriplePatterns = new indexedTriplePatterns();
+  private readonly triplePatterns: IndexedQuadPatterns = new IndexedQuadPatterns();
 
   constructor(stream?: Readable) {
     if (stream) {
@@ -15,24 +18,38 @@ export class StreamStore {
   public attachStream(stream: Readable) {
     let other = this;
     let findBindingStream = new Writable({
-      write(chunk: Quad, encoding: BufferEncoding | string, callback: (error?: (Error | null)) => void) {
+      write(quad: Quad, encoding: BufferEncoding | string, callback: (error?: (Error | null)) => void) {
         //this gets executed when a new triple arrives in the stream
         //first, check if the triple is bindable to any of the subscribed bindings if so send it in that stream
-        other.triplePatterns.get(chunk).write(chunk);
-        //then, add it to the store
-        other.store.add(chunk);
+        if (quad.diff!) {
+          quad.diff = true;
+        }
+        for (const stream of other.triplePatterns.get(quad)) {
+          stream.write(quad);
+        }
+        //then, add or remove it to the store it to the store
+        if (quad.diff) {
+          other.store.add(quad);
+        } else {
+          other.store.delete(quad);
+        }
+
         callback(null);
       },
       objectMode: true
     });
-    stream.pipe(findBindingStream)
+    stream.pipe(findBindingStream);
   }
 
   match(subject?: Term, predicate?: Term, object?: Term, graph?: Term): Stream {
-    // @ts-ignore
-    const storeResultStream = <Stream><any>this.store.match(subject, predicate, object, graph);
+    const storeResultStream = streamifyArray(this.store.getQuads(
+      subject? subject : null,
+      predicate? predicate : null,
+      object? object : null,
+      graph? graph : null
+    ));
 
-    const passThroughStream = new PassThrough();
+    const passThroughStream = new PassThrough({objectMode:true});
 
     this.triplePatterns.add(passThroughStream, subject, predicate, object, graph);
 
@@ -42,31 +59,80 @@ export class StreamStore {
 
 }
 
-class indexedTriplePatterns {
-  //subjectMap = new Map<Term, Map<Term, Map<Term, Map<Term, Duplex>>>>();
-  private subjectMap = new Array<{pattern:{subject?: Term, predicate?: Term, object?: Term, graph?: Term}, stream: Duplex}>();
+class IndexedQuadPatterns {
+  private triplePatternMap = new Map<string, Map<string, Map<string, Map<string, Duplex[]>>>>();
 
-  add(passThroughStream: Duplex, subject?: Term, predicate?: Term, object?: Term, graph?: Term) {
-    //TODO indexTP
-    this.subjectMap.push({pattern: {subject, predicate, object, graph} ,stream: passThroughStream});
+  private termToString(term?: Term) {
+    return (term && term.termType !== "Variable")? term.value : "Variable";
   }
 
-  get(quad: Quad): Duplex {
-    //TODO return triplePattern
-    this.subjectMap.forEach((object) => {
-      if (object.pattern.subject && !(object.pattern.subject.equals(quad.subject))) {
-        return
+  add(passThroughStream: Duplex, subject?: Term, predicate?: Term, object?: Term, graph?: Term) {
+    let subjectMap = this.triplePatternMap.get(this.termToString(subject));
+
+    if(!subjectMap) {
+      subjectMap = new Map<string, Map<string, Map<string, Duplex[]>>>()
+        .set(this.termToString(predicate), new Map<string, Map<string, Duplex[]>>()
+          .set(this.termToString(object), new Map<string, Duplex[]>()
+            .set(this.termToString(graph), [passThroughStream])));
+      this.triplePatternMap.set(this.termToString(subject), subjectMap);
+      return;
+    }
+
+    let predicateMap = subjectMap.get(this.termToString(predicate));
+
+    if(!predicateMap) {
+      predicateMap = new Map<string, Map<string, Duplex[]>>()
+          .set(this.termToString(object), new Map<string, Duplex[]>()
+            .set(this.termToString(graph), [passThroughStream]));
+      subjectMap.set(this.termToString(predicate), predicateMap);
+      return;
+    }
+
+    let objectMap = predicateMap.get(this.termToString(object));
+
+    if(!objectMap) {
+      objectMap = new Map<string, Duplex[]>()
+          .set(this.termToString(graph), [passThroughStream]);
+      predicateMap.set(this.termToString(object), objectMap);
+      return;
+    }
+
+    let graphMap = objectMap.get(this.termToString(graph));
+
+    if(!graphMap) {
+      objectMap.set(this.termToString(graph), [passThroughStream]);
+      return;
+    }
+
+    graphMap.push(passThroughStream);
+  }
+
+  get(quad: Quad): Duplex[] {
+    return this._get(RdfTerms.getTerms(quad), 0, this.triplePatternMap);
+  }
+
+  private _get(quad: Term[], index: number, map: Map<string, Map<string, any> | Duplex[]>) : Duplex[] {
+    let map1 = map.get(quad[index].value);
+    let map2 = map.get("Variable");
+
+    let duplexes = new Array<Duplex>();
+    if (index === 3) {
+      if (map1) {
+        duplexes.push(...<Duplex[]><any>map1);
       }
-      if (object.pattern.predicate && !(object.pattern.predicate.equals(quad.predicate))) {
-        return
+      if (map2) {
+        duplexes.push(...<Duplex[]><any>map2);
       }
-      if (object.pattern.object && !(object.pattern.object.equals(quad.object))) {
-        return
-      }
-      if (object.pattern.graph && !(object.pattern.graph.equals(quad.graph))) {
-        return
-      }
-    })
-    return new Duplex();
+      return duplexes;
+    }
+
+    if (map1) {
+      duplexes.push(...this._get(quad, index+1, <Map<string, any>><any>map1));
+    }
+    if (map2) {
+      duplexes.push(...this._get(quad, index+1, <Map<string, any>><any>map2));
+    }
+
+    return duplexes;
   }
 }
