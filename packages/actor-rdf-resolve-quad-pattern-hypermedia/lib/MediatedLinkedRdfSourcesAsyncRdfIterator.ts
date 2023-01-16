@@ -110,6 +110,11 @@ export class MediatedLinkedRdfSourcesAsyncRdfIterator extends LinkedRdfSourcesAs
       })).metadata;
       quads = rdfMetadataOutput.data;
 
+      //TODO: put in a metadata extractor
+      dereferenceRdfOutput.headers?.forEach((value, key) => {
+        metadata[key] = value;
+      });
+
       // Optionally filter the resulting data
       if (link.transform) {
         quads = await link.transform(quads);

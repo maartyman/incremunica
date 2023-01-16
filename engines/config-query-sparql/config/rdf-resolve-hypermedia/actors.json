@@ -23,7 +23,8 @@
     },
     {
       "@id": "urn:comunica:default:rdf-resolve-hypermedia/actors#stream-source",
-      "@type": "ActorRdfResolveHypermediaStreamSource"
+      "@type": "ActorRdfResolveHypermediaStreamSource",
+      "mediatorGuard": {"@id": "urn:comunica:default:guard/mediators#main" }
     }
   ]
 }

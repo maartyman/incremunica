@@ -15,6 +15,10 @@ export class StreamStore {
     }
   }
 
+  public hasQuad(quad: Quad) {
+    this.store.has(quad);
+  }
+
   public attachStream(stream: Readable) {
     let other = this;
     let findBindingStream = new Writable({

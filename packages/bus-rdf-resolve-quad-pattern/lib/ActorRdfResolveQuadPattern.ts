@@ -42,7 +42,7 @@ export interface IActorRdfResolveQuadPatternOutput extends IActorOutput {
    * This metadata object MUST implement IMetadata.
    * @see IMetadata
    */
-  data: AsyncIterator<RDF.Quad>;
+  data: AsyncIterator<RDF.Quad>; //TODO change to my Quad
 }
 
 export type IActorRdfResolveQuadPatternArgs = IActorArgs<

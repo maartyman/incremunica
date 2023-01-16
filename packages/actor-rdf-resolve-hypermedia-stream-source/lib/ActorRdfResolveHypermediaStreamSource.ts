@@ -5,15 +5,16 @@ import {
   IActorRdfResolveHypermediaArgs,
   IActorRdfResolveHypermediaTest
 } from '@comunica/bus-rdf-resolve-hypermedia';
-import {RdfJsQuadSource} from "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-source";
-import {storeStream} from "rdf-store-stream";
 import {RdfJsQuadStreamSource} from "./RdfJsQuadStreamSource";
+import {MediatorGuard} from "@comunica/bus-guard";
 
 /**
  * A comunica Stream Source RDF Resolve Hypermedia Actor.
  */
 export class ActorRdfResolveHypermediaStreamSource extends ActorRdfResolveHypermedia {
-  public constructor(args: IActorRdfResolveHypermediaArgs) {
+  public readonly mediatorGuard: MediatorGuard;
+
+  public constructor(args: IActorRdfResolveHypermediaStreamSourceArgs) {
     super(args, 'file');
   }
 
@@ -23,6 +24,20 @@ export class ActorRdfResolveHypermediaStreamSource extends ActorRdfResolveHyperm
 
   public async run(action: IActionRdfResolveHypermedia): Promise<IActorRdfResolveHypermediaOutput> {
     this.logInfo(action.context, `Identified as file source: ${action.url}`);
-    return { source: new RdfJsQuadStreamSource(action) };
+    let source = new RdfJsQuadStreamSource(action);
+
+    this.mediatorGuard.mediate({
+      context: action.context,
+      streamSource: source
+    });
+
+    return { source: source};
   }
+}
+
+export interface IActorRdfResolveHypermediaStreamSourceArgs extends IActorRdfResolveHypermediaArgs {
+  /**
+   * The Guard mediator
+   */
+  mediatorGuard: MediatorGuard;
 }

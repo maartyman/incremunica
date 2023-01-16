@@ -15,6 +15,18 @@
   "@type": "Runner",
   "actors": [
     {
+      "@id": "urn:comunica:default:rdf-metadata-extract/actors#hydra-controls",
+      "@type": "ActorRdfMetadataExtractHydraControls"
+    },
+    {
+      "@id": "urn:comunica:default:rdf-metadata-extract/actors#hydra-count",
+      "@type": "ActorRdfMetadataExtractHydraCount"
+    },
+    {
+      "@id": "urn:comunica:default:rdf-metadata-extract/actors#hydra-pagesize",
+      "@type": "ActorRdfMetadataExtractHydraPagesize"
+    },
+    {
       "@id": "urn:comunica:default:rdf-metadata-extract/actors#request-time",
       "@type": "ActorRdfMetadataExtractRequestTime"
     },
@@ -29,6 +41,10 @@
     {
       "@id": "urn:comunica:default:rdf-metadata-extract/actors#patch-sparql-update",
       "@type": "ActorRdfMetadataExtractPatchSparqlUpdate"
+    },
+    {
+      "@id": "urn:comunica:default:rdf-metadata-extract/actors#sparql-service",
+      "@type": "ActorRdfMetadataExtractSparqlService"
     }
   ]
 }

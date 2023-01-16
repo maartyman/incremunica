@@ -3,6 +3,8 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^2.0.0/components/context.jsonld"
   ],
   "import": [
+    "ccqs:config/guard/actors.json",
+    "ccqs:config/guard/mediators.json",
     "ccqs:config/context-preprocess/actors.json",
     "ccqs:config/context-preprocess/mediators.json",
     "ccqs:config/hash-bindings/actors.json",
