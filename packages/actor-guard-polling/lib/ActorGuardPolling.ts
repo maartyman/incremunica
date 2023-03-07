@@ -1,14 +1,16 @@
 import {ActorGuard, IActionGuard, IActorGuardOutput, IActorGuardArgs} from '@comunica/bus-guard';
 import { IActorTest } from '@comunica/core';
 import {MediatorHttp} from "@comunica/bus-http";
-import {MediatorDereference} from "@comunica/bus-dereference";
+import {Transform} from "readable-stream";
+import {Quad} from "@comunica/types/lib/Quad";
+import {MediatorDereferenceRdf} from "@comunica/bus-dereference-rdf";
 
 /**
  * A comunica Polling Guard Actor.
  */
 export class ActorGuardPolling extends ActorGuard {
   public readonly mediatorHttp: MediatorHttp;
-  public readonly mediatorDereference: MediatorDereference;
+  public readonly mediatorDereferenceRdf: MediatorDereferenceRdf;
 
   public constructor(args: IActorGuardPollingArgs) {
     super(args);
@@ -30,7 +32,7 @@ export class ActorGuardPolling extends ActorGuard {
     else {
       maxAge = 10;
     }
-    maxAge = 1;
+    maxAge = 5;
 
     let age = Number.parseInt(action.streamSource.source.metadata["age"]);
     if (age) {
@@ -45,7 +47,7 @@ export class ActorGuardPolling extends ActorGuard {
       });
     }
     setInterval(
-      this.checkForChanges,
+      this.checkForChanges.bind(this),
       maxAge*1000,
       action
     );
@@ -66,6 +68,7 @@ export class ActorGuardPolling extends ActorGuard {
   }
 
   private async checkForChanges(action: IActionGuard) {
+    //TODO: is it better to do get instead of head
     let response = await this.mediatorHttp.mediate(
       {
         context: action.context,
@@ -76,8 +79,44 @@ export class ActorGuardPolling extends ActorGuard {
       }
     );
 
-    console.log("old: ", action.streamSource.source.metadata["etag"]);
-    console.log("new: ", response.headers.get("etag"));
+    if (response.headers.get("etag") !== action.streamSource.source.metadata["etag"]) {
+      const store = action.streamSource.store.copyOfStore();
+      const matchStream = new Transform({
+        transform(quad: Quad, encoding: BufferEncoding, callback: (error?: (Error | null), data?: any) => void) {
+          if (quad.diff != undefined) {
+            callback(null, quad);
+            return;
+          }
+          if (store.has(quad)){
+            store.delete(quad);
+            callback(null, null);
+          } else {
+            quad.diff = true;
+            callback(null, quad);
+          }
+        },
+        objectMode: true
+      });
+
+      const response = await this.mediatorDereferenceRdf.mediate({
+        context: action.context,
+        url: action.streamSource.source.url,
+      });
+
+      response.data.on("end", () => {
+        for (const quad of store) {
+          (<Quad>quad).diff = false;
+          matchStream.write(quad);
+        }
+        matchStream.end();
+      });
+
+      action.streamSource.store.attachStream(response.data.pipe(matchStream, {end: false}));
+
+      response.headers?.forEach((value, key) => {
+        action.streamSource.source.metadata[key] = value;
+      });
+    }
   }
 }
 
@@ -89,5 +128,5 @@ export interface IActorGuardPollingArgs extends IActorGuardArgs {
   /**
    * The Dereference mediator
    */
-  mediatorDereference: MediatorDereference;
+  mediatorDereferenceRdf: MediatorDereferenceRdf;
 }

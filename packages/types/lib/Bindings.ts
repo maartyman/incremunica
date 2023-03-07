@@ -18,4 +18,4 @@ export type Bindings = RDF.Bindings & {
  * A stream of bindings.
  * @see Bindings
  */
-export type BindingsStream = AsyncIterator<RDF.Bindings> & RDF.ResultStream<Bindings>;
+export type BindingsStream = AsyncIterator<Bindings> & RDF.ResultStream<Bindings>;

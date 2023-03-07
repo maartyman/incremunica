@@ -1,6 +1,6 @@
 import {Term} from "@rdfjs/types";
 import { Store } from "n3";
-import {Stream, PassThrough, Duplex, Writable, Readable} from "readable-stream";
+import {Stream, PassThrough, Duplex, Writable, Transform} from "readable-stream";
 import * as RdfTerms from "rdf-terms";
 import {Quad} from "@comunica/types/lib/Quad";
 const streamifyArray = require('streamify-array');
@@ -9,23 +9,27 @@ export class StreamStore {
   private readonly store = new Store();
   private readonly triplePatterns: IndexedQuadPatterns = new IndexedQuadPatterns();
 
-  constructor(stream?: Readable) {
+  constructor(stream?: Transform) {
     if (stream) {
       this.attachStream(stream);
     }
   }
 
-  public hasQuad(quad: Quad) {
-    this.store.has(quad);
+  public copyOfStore(): Store {
+    const newStore = new Store();
+    for (const quad of this.store) {
+      newStore.add(quad);
+    }
+    return newStore;
   }
 
-  public attachStream(stream: Readable) {
+  public attachStream(stream: Transform) {
     let other = this;
     let findBindingStream = new Writable({
       write(quad: Quad, encoding: BufferEncoding | string, callback: (error?: (Error | null)) => void) {
         //this gets executed when a new triple arrives in the stream
-        //first, check if the triple is bindable to any of the subscribed bindings if so send it in that stream
-        if (quad.diff!) {
+        //first, check if the triple is bindable to any of the subscribed triple patterns if so send it in that stream
+        if (quad.diff == undefined) {
           quad.diff = true;
         }
         for (const stream of other.triplePatterns.get(quad)) {
@@ -59,8 +63,6 @@ export class StreamStore {
 
     return storeResultStream.pipe(passThroughStream, {end: false});
   }
-
-
 }
 
 class IndexedQuadPatterns {

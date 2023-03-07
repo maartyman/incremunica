@@ -22,9 +22,6 @@ export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorG
 }
 
 export interface IActionGuard extends IAction {
-  /*
-  HttpHeaders: Headers;
-  */
   /**
    * The URL of the source that was fetched.
    */

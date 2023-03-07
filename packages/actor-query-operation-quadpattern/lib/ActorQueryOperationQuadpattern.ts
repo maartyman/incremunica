@@ -15,6 +15,7 @@ import type { QuadTermName } from 'rdf-terms';
 import { getTerms, QUAD_TERM_NAMES, reduceTerms, TRIPLE_TERM_NAMES, uniqTerms } from 'rdf-terms';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
+import {Quad} from "@comunica/types/lib/Quad";
 
 const BF = new BindingsFactory();
 const DF = new DataFactory();
@@ -266,7 +267,7 @@ export class ActorQueryOperationQuadpattern extends ActorQueryOperationTyped<Alg
         });
       }
 
-      return filteredOutput.map(quad => BF.bindings(reduceTerms(quad, quadBindingsReducer, [])));
+      return filteredOutput.map(quad => BF.bindings(reduceTerms(quad, quadBindingsReducer, []), (<Quad>quad).diff));
     }, {
       autoStart: false,
       onClose: () => result.data.destroy(),

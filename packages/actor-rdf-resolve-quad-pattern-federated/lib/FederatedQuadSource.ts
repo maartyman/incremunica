@@ -15,6 +15,7 @@ import { DataFactory } from 'rdf-data-factory';
 import { mapTerms } from 'rdf-terms';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
+import {Quad} from "@comunica/types/lib/Quad";
 
 const DF = new DataFactory();
 
@@ -268,7 +269,11 @@ export class FederatedQuadSource implements IQuadSource {
       });
 
       // Determine the data stream from this source
-      const data = output.data.map(quad => FederatedQuadSource.skolemizeQuad(quad, sourceId));
+      const data = output.data.map(quad => {
+        let skolemizedQuad = FederatedQuadSource.skolemizeQuad<Quad>(quad as Quad, sourceId);
+        skolemizedQuad.diff = (<Quad>quad).diff;
+        return skolemizedQuad;
+      });
 
       // Forward errors to our final iterator
       data.on('error', error => it.emit('error', error));

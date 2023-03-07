@@ -7,13 +7,15 @@ import { bindingsToString } from './bindingsToString';
  */
 export class Bindings implements RDF.Bindings {
   public readonly type = 'bindings';
+  public diff;
 
   private readonly dataFactory: RDF.DataFactory;
   private readonly entries: Map<string, RDF.Term>;
 
-  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>) {
+  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>, diff: boolean) {
     this.dataFactory = dataFactory;
     this.entries = entries;
+    this.diff = diff;
   }
 
   public has(key: RDF.Variable | string): boolean {
@@ -25,11 +27,11 @@ export class Bindings implements RDF.Bindings {
   }
 
   public set(key: RDF.Variable | string, value: RDF.Term): Bindings {
-    return new Bindings(this.dataFactory, this.entries.set(typeof key === 'string' ? key : key.value, value));
+    return new Bindings(this.dataFactory, this.entries.set(typeof key === 'string' ? key : key.value, value), this.diff);
   }
 
   public delete(key: RDF.Variable | string): Bindings {
-    return new Bindings(this.dataFactory, this.entries.delete(typeof key === 'string' ? key : key.value));
+    return new Bindings(this.dataFactory, this.entries.delete(typeof key === 'string' ? key : key.value), this.diff);
   }
 
   public keys(): Iterable<RDF.Variable> {
@@ -83,12 +85,12 @@ export class Bindings implements RDF.Bindings {
 
   public filter(fn: (value: RDF.Term, key: RDF.Variable) => boolean): Bindings {
     return new Bindings(this.dataFactory, Map(<any> this.entries
-      .filter((value, key) => fn(value, this.dataFactory.variable!(key)))));
+      .filter((value, key) => fn(value, this.dataFactory.variable!(key)))), this.diff);
   }
 
   public map(fn: (value: RDF.Term, key: RDF.Variable) => RDF.Term): Bindings {
     return new Bindings(this.dataFactory, Map(<any> this.entries
-      .map((value, key) => fn(value, this.dataFactory.variable!(key)))));
+      .map((value, key) => fn(value, this.dataFactory.variable!(key)))), this.diff);
   }
 
   public merge(other: Bindings): Bindings | undefined {
@@ -110,7 +112,7 @@ export class Bindings implements RDF.Bindings {
       entries.push([ key, value ]);
     }
 
-    return new Bindings(this.dataFactory, Map(entries));
+    return new Bindings(this.dataFactory, Map(entries), this.diff);
   }
 
   public mergeWith(
@@ -138,7 +140,7 @@ export class Bindings implements RDF.Bindings {
       entries.push([ key, value ]);
     }
 
-    return new Bindings(this.dataFactory, Map(entries));
+    return new Bindings(this.dataFactory, Map(entries), this.diff);
   }
 
   public toString(): string {

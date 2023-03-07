@@ -4,7 +4,7 @@ import type { AsyncIterator } from 'asynciterator';
 import {wrap as wrapAsyncIterator} from 'asynciterator';
 import {IActionRdfResolveHypermedia} from "@comunica/bus-rdf-resolve-hypermedia";
 import {StreamStore} from "./StreamStore";
-import {Readable} from "readable-stream";
+import {Transform} from "readable-stream";
 import {Quad} from "@comunica/types/lib/Quad";
 
 /**
@@ -16,7 +16,7 @@ export class RdfJsQuadStreamSource implements IQuadSource {
 
   public constructor(source: IActionRdfResolveHypermedia) {
     this.source = source;
-    this.store = new StreamStore(<Readable><any>this.source.quads);
+    this.store = new StreamStore(<Transform><any>this.source.quads);
   }
 
   public static nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
