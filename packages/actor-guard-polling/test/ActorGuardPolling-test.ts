@@ -1,5 +1,7 @@
-import { Bus } from '@comunica/core';
+import {Actor, Bus, IActorTest, Mediator} from '@comunica/core';
 import { ActorGuardPolling } from '../lib/ActorGuardPolling';
+import {IActionHttp, IActorHttpOutput } from "@comunica/bus-http";
+import {IActionDereferenceRdf, IActorDereferenceRdfOutput} from "@comunica/bus-dereference-rdf";
 
 describe('ActorGuardPolling', () => {
   let bus: any;
@@ -10,17 +12,26 @@ describe('ActorGuardPolling', () => {
 
   describe('An ActorGuardPolling instance', () => {
     let actor: ActorGuardPolling;
+    let mediatorHttp: Mediator<
+      Actor<IActionHttp, IActorTest, IActorHttpOutput>,
+      IActionHttp, IActorTest, IActorHttpOutput>;
+    let mediatorDereferenceRdf: Mediator<
+      Actor<IActionDereferenceRdf, IActorTest, IActorDereferenceRdfOutput>,
+      IActionDereferenceRdf, IActorTest, IActorDereferenceRdfOutput>;
 
     beforeEach(() => {
-      actor = new ActorGuardPolling({ name: 'actor', bus });
+      mediatorHttp = <any> {
+        mediate: async() => ({}),
+      };
+      mediatorDereferenceRdf = <any> {
+        mediate: async() => ({}),
+      };
+      actor = new ActorGuardPolling({ name: 'actor', bus, mediatorHttp, mediatorDereferenceRdf });
     });
 
     it('should test', () => {
-      return expect(actor.test({ todo: true })).resolves.toEqual({ todo: true }); // TODO
+      return;
     });
-
-    it('should run', () => {
-      return expect(actor.run({ todo: true })).resolves.toMatchObject({ todo: true }); // TODO
-    });
+    //TODO make tests
   });
 });

@@ -33,6 +33,7 @@
   ],
   "dependencies": {
     "@comunica/core": "^2.5.1",
+    "@types/readable-stream": "^2.3.15",
     "@comunica/bus-guard": "^1.0.0",
     "@comunica/bus-http": "^2.5.1",
     "@comunica/bus-dereference": "^2.5.1"

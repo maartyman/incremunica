@@ -1,9 +1,10 @@
-import {ActorGuard, IActionGuard, IActorGuardOutput, IActorGuardArgs} from '@comunica/bus-guard';
-import { IActorTest } from '@comunica/core';
-import {MediatorHttp} from "@comunica/bus-http";
-import {Transform} from "readable-stream";
-import {Quad} from "@comunica/types/lib/Quad";
-import {MediatorDereferenceRdf} from "@comunica/bus-dereference-rdf";
+import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
+import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@comunica/bus-guard';
+import { ActorGuard } from '@comunica/bus-guard';
+import type { MediatorHttp } from '@comunica/bus-http';
+import type { IActorTest } from '@comunica/core';
+import type { Quad } from '@comunica/types/lib/Quad';
+import { Transform } from 'readable-stream';
 
 /**
  * A comunica Polling Guard Actor.
@@ -17,69 +18,69 @@ export class ActorGuardPolling extends ActorGuard {
   }
 
   public async test(action: IActionGuard): Promise<IActorTest> {
-    return { filterFactor: 1 }; // TODO implement
+    // TODO implement
+    return { filterFactor: 1 };
   }
 
   public async run(action: IActionGuard): Promise<IActorGuardOutput> {
-    let regex = new RegExp(/max-age=(\d+)/, "g");
+    const regex = /max-age=(\d+)/gu;
 
-    let maxAgeArray = regex.exec(action.streamSource.source.metadata["cache-control"]);
+    const maxAgeArray = regex.exec(action.streamSource.source.metadata['cache-control']);
 
     let maxAge: number;
     if (maxAgeArray) {
-      maxAge = Number.parseInt(maxAgeArray[1]);
-    }
-    else {
+      maxAge = Number.parseInt(maxAgeArray[1], 10);
+    } else {
       maxAge = 10;
     }
     maxAge = 5;
 
-    let age = Number.parseInt(action.streamSource.source.metadata["age"]);
+    const age = Number.parseInt(action.streamSource.source.metadata.age, 10);
     if (age) {
       await new Promise<void>(resolve => {
         setTimeout(
           () => {
             resolve();
-            this.checkForChanges(action)
+            this.checkForChanges(action);
           },
-          (maxAge - age)*1000
+          (maxAge - age) * 1_000,
         );
       });
     }
     setInterval(
       this.checkForChanges.bind(this),
-      maxAge*1000,
-      action
+      maxAge * 1_000,
+      action,
     );
 
-    /*
-    const dereferenceRdfOutput: IActorDereferenceRdfOutput = await this.mediatorDereferenceRdf
-      .mediate({ context, url });
-    url = dereferenceRdfOutput.url;
-     */
-    //test:
-    /*
-    setTimeout(() => {
-      action.streamSource.store.attachStream(streamifyArray([quad("<http://test.com/s_laat>", "<http://test.com/p_laat>", "<http://test.com/o_laat>")]))
-    }, 10000);
-     */
+    //
+    // const dereferenceRdfOutput: IActorDereferenceRdfOutput = await this.mediatorDereferenceRdf
+    // .mediate({ context, url });
+    // url = dereferenceRdfOutput.url;
+    //
+    // test:
+    //
+    // setTimeout(() => {
+    // action.streamSource.store.attachStream(streamifyArray([quad("<http://test.com/s_laat>", "<http://test.com/p_laat>", "<http://test.com/o_laat>")]))
+    // }, 10000);
+    //
 
     return {};
   }
 
   private async checkForChanges(action: IActionGuard) {
-    //TODO: is it better to do get instead of head
-    let response = await this.mediatorHttp.mediate(
+    // TODO: is it better to do get instead of head
+    const response = await this.mediatorHttp.mediate(
       {
         context: action.context,
         input: action.streamSource.source.url,
         init: {
-          method: "HEAD"
-        }
-      }
+          method: 'HEAD',
+        },
+      },
     );
 
-    if (response.headers.get("etag") !== action.streamSource.source.metadata["etag"]) {
+    if (response.headers.get('etag') !== action.streamSource.source.metadata.etag) {
       const store = action.streamSource.store.copyOfStore();
       const matchStream = new Transform({
         transform(quad: Quad, encoding: BufferEncoding, callback: (error?: (Error | null), data?: any) => void) {
@@ -87,7 +88,7 @@ export class ActorGuardPolling extends ActorGuard {
             callback(null, quad);
             return;
           }
-          if (store.has(quad)){
+          if (store.has(quad)) {
             store.delete(quad);
             callback(null, null);
           } else {
@@ -95,7 +96,7 @@ export class ActorGuardPolling extends ActorGuard {
             callback(null, quad);
           }
         },
-        objectMode: true
+        objectMode: true,
       });
 
       const response = await this.mediatorDereferenceRdf.mediate({
@@ -103,7 +104,7 @@ export class ActorGuardPolling extends ActorGuard {
         url: action.streamSource.source.url,
       });
 
-      response.data.on("end", () => {
+      response.data.on('end', () => {
         for (const quad of store) {
           (<Quad>quad).diff = false;
           matchStream.write(quad);
@@ -111,7 +112,7 @@ export class ActorGuardPolling extends ActorGuard {
         matchStream.end();
       });
 
-      action.streamSource.store.attachStream(response.data.pipe(matchStream, {end: false}));
+      action.streamSource.store.attachStream(response.data.pipe(matchStream, { end: false }));
 
       response.headers?.forEach((value, key) => {
         action.streamSource.source.metadata[key] = value;
