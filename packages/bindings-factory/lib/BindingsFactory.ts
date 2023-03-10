@@ -21,7 +21,7 @@ export class BindingsFactory {
     return this.bindings([ ...bindings ], bindings.diff);
   }
 
-  public fromRecord(record: Record<string, RDF.Term>, diff: boolean): Bindings {
+  public fromRecord(record: Record<string, RDF.Term>, diff: boolean = true): Bindings {
     return this.bindings(Object.entries(record).map(([ key, value ]) => [ this.dataFactory.variable!(key), value ]), diff);
   }
 }

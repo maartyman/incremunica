@@ -12,7 +12,7 @@ export class Bindings implements RDF.Bindings {
   private readonly dataFactory: RDF.DataFactory;
   private readonly entries: Map<string, RDF.Term>;
 
-  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>, diff: boolean) {
+  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>, diff: boolean = true) {
     this.dataFactory = dataFactory;
     this.entries = entries;
     this.diff = diff;
