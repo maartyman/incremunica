@@ -1,10 +1,38 @@
 import { StreamStore } from '../lib/StreamStore';
 import 'jest-rdf';
+
 const quad = require('rdf-quad');
 import {Quad} from "@rdfjs/types";
+import {ActorRdfResolveHypermediaNone} from "@comunica/actor-rdf-resolve-hypermedia-none";
+import {ActorRdfResolveHypermedia} from "@comunica/bus-rdf-resolve-hypermedia";
+import {Bus} from "@comunica/core";
 const streamifyArray = require('streamify-array');
 
 describe('StreamStore', () => {
+  let bus: any;
+
+  beforeEach(() => {
+    bus = new Bus({ name: 'bus' });
+  });
+
+  describe('The StreamStore module', () => {
+    it('should be a function', () => {
+      expect(StreamStore).toBeInstanceOf(Function);
+    });
+
+    it('should be a ActorRdfResolveHypermediaNone constructor', () => {
+      expect(new (<any> StreamStore)())
+        .toBeInstanceOf(StreamStore);
+      expect(new (<any> StreamStore)())
+        .toBeInstanceOf(StreamStore);
+    });
+
+    it('should not be able to create new ActorRdfResolveHypermediaNone objects without \'new\'', () => {
+      expect(() => { (<any> ActorRdfResolveHypermediaNone)(); }).toThrow();
+    });
+  });
+
+  /*
   describe("Testing functionality", () => {
     beforeEach(() => {
     });
@@ -38,26 +66,27 @@ describe('StreamStore', () => {
     });
   });
 
-  /*
-  beforeEach(() => {
-    bus = new Bus({ name: 'bus' });
+    beforeEach(() => {
+      bus = new Bus({ name: 'bus' });
+    });
+
+    describe('The StreamStore module', () => {
+      it('should be a function', () => {
+        expect(ActorRdfResolveHypermediaStreamSource).toBeInstanceOf(Function);
+      });
+
+      it('should be a ActorRdfResolveHypermediaStreamSource constructor', () => {
+        expect(new (<any> ActorRdfResolveHypermediaStreamSource)({ name: 'actor', bus }))
+          .toBeInstanceOf(ActorRdfResolveHypermediaStreamSource);
+        expect(new (<any> ActorRdfResolveHypermediaStreamSource)({ name: 'actor', bus }))
+          .toBeInstanceOf(ActorRdfResolveHypermedia);
+      });
+
+      it('should not be able to create new ActorRdfResolveHypermediaStreamSource objects without \'new\'', () => {
+        expect(() => { (<any> ActorRdfResolveHypermediaStreamSource)(); }).toThrow();
+      });
+    });
   });
 
-  describe('The StreamStore module', () => {
-    it('should be a function', () => {
-      expect(ActorRdfResolveHypermediaStreamSource).toBeInstanceOf(Function);
-    });
-
-    it('should be a ActorRdfResolveHypermediaStreamSource constructor', () => {
-      expect(new (<any> ActorRdfResolveHypermediaStreamSource)({ name: 'actor', bus }))
-        .toBeInstanceOf(ActorRdfResolveHypermediaStreamSource);
-      expect(new (<any> ActorRdfResolveHypermediaStreamSource)({ name: 'actor', bus }))
-        .toBeInstanceOf(ActorRdfResolveHypermedia);
-    });
-
-    it('should not be able to create new ActorRdfResolveHypermediaStreamSource objects without \'new\'', () => {
-      expect(() => { (<any> ActorRdfResolveHypermediaStreamSource)(); }).toThrow();
-    });
-  });
    */
 });

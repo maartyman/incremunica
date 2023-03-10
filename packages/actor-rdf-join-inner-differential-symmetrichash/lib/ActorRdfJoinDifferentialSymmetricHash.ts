@@ -11,7 +11,7 @@ import {IMediatorTypeJoinCoefficients} from "@comunica/mediatortype-join-coeffic
 /**
  * A comunica Inner Differential Symmetrichash RDF Join Actor.
  */
-export class ActorRdfJoinInnerDifferentialSymmetrichash extends ActorRdfJoin {
+export class ActorRdfJoinDifferentialSymmetricHash extends ActorRdfJoin {
   public constructor(args: IActorRdfJoinArgs) {
     super(args, {
       logicalType: 'inner',
@@ -26,7 +26,7 @@ export class ActorRdfJoinInnerDifferentialSymmetrichash extends ActorRdfJoin {
     const join = new DifferentialSymmetricHashJoin(
       action.entries[0].output.bindingsStream,
       action.entries[1].output.bindingsStream,
-      entry => ActorRdfJoinInnerDifferentialSymmetrichash.hash(entry, variables),
+      entry => ActorRdfJoinDifferentialSymmetricHash.hash(entry, variables),
       <any> ActorRdfJoin.joinBindings,
     );
     return {

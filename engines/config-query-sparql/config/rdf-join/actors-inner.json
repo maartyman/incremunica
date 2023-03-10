@@ -27,7 +27,20 @@
     },
     {
       "@id": "urn:comunica:default:rdf-join/actors#inner-differential-symmetrichash",
-      "@type": "ActorRdfJoinInnerDifferentialSymmetrichash"
+      "@type": "ActorRdfJoinDifferentialSymmetricHash",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
+    },
+    {
+      "@id": "urn:comunica:default:rdf-join/actors#inner-multi-empty",
+      "@type": "ActorRdfJoinMultiEmpty",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
+    },
+    {
+      "@id": "urn:comunica:default:rdf-join/actors#inner-multi-smallest",
+      "@type": "ActorRdfJoinMultiSmallest",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
+      "mediatorJoinEntriesSort": { "@id": "urn:comunica:default:rdf-join-entries-sort/mediators#main" },
+      "mediatorJoin": { "@id": "urn:comunica:default:rdf-join/mediators#main" }
     }
   ]
 }

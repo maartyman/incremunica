@@ -62,7 +62,9 @@
     "Factory",
 
     "UriTemplate",
-    "LRUCache"
+    "LRUCache",
+    "DifferentialSymmetricHashJoin",
+    "DifferentialMinusHashIterator"
   ],
   "modulePrefix": {
     "@comunica/actor-query-operation-service": "caqoser",

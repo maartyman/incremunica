@@ -1,2 +1,2 @@
-export * from './ActorRdfJoinInnerDifferentialSymmetrichash';
+export * from './ActorRdfJoinDifferentialSymmetricHash';
 export * from './DifferentialSymmetricHashJoin';

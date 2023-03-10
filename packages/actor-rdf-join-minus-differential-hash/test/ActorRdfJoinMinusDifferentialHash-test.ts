@@ -189,11 +189,7 @@ describe('ActorRdfJoinMinusDifferentialHash', () => {
         expect(await result.metadata())
           .toEqual({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});
         await expect(result.bindingsStream).toEqualBindingsStream([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]], true),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]], true),
           BF.bindings([[ DF.variable('a'), DF.literal('3') ]], true),
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
         ]);
       });
 

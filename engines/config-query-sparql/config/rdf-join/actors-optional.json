@@ -10,8 +10,8 @@
   "@type": "Runner",
   "actors": [
     {
-      "@id": "urn:comunica:default:rdf-join/actors#optional-differential-bind",
-      "@type": "ActorRdfJoinOptionalDifferentialBind",
+      "@id": "urn:comunica:default:rdf-join/actors#optional-differential",
+      "@type": "ActorRdfJoinOptionalDifferential",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
       "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
     }

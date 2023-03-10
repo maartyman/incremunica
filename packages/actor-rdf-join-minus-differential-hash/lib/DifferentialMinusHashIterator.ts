@@ -44,7 +44,6 @@ export class DifferentialMinusHashIterator extends AsyncIterator<Bindings> {
     // this needs to be here since it's possible the left/right streams only get ended after there are no more results left
     this.left.on ('end', () => { if (!this.hasResults()) this._end(); });
     this.right.on('end', () => { if (!this.hasResults()) this._end(); });
-
   }
 
   _cleanup ()
