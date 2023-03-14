@@ -1,0 +1,42 @@
+{
+  "name": "@comunica/config-query-sparql-incremental",
+  "version": "0.0.0",
+  "description": "default configuration files for Comunica SPARQL Incremental",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica",
+    "directory": "engines/config-query-sparql-incremental"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "sparql",
+    "engine",
+    "query",
+    "update",
+    "config",
+    "incremental"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "config",
+    "lib/**/*.d.ts",
+    "lib/**/*.js"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}
