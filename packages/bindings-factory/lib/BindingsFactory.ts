@@ -22,6 +22,11 @@ export class BindingsFactory implements RDF.BindingsFactory {
   }
 
   public fromRecord(record: Record<string, RDF.Term>, diff = true): Bindings {
-    return this.bindings(Object.entries(record).map(([ key, value ]) => [ this.dataFactory.variable!(key), value ]), diff);
+    return this.bindings(
+      Object
+        .entries(record)
+        .map(([ key, value ]) => [ this.dataFactory.variable!(key), value ])
+      , diff,
+    );
   }
 }

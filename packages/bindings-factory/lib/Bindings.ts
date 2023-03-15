@@ -7,12 +7,12 @@ import { bindingsToString } from './bindingsToString';
  */
 export class Bindings implements RDF.Bindings {
   public readonly type = 'bindings';
-  public diff: boolean = true;
+  public diff: boolean;
 
   private readonly dataFactory: RDF.DataFactory;
   private readonly entries: Map<string, RDF.Term>;
 
-  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>, diff: boolean) {
+  public constructor(dataFactory: RDF.DataFactory, entries: Map<string, RDF.Term>, diff = true) {
     this.dataFactory = dataFactory;
     this.entries = entries;
     this.diff = diff;
@@ -27,11 +27,19 @@ export class Bindings implements RDF.Bindings {
   }
 
   public set(key: RDF.Variable | string, value: RDF.Term): Bindings {
-    return new Bindings(this.dataFactory, this.entries.set(typeof key === 'string' ? key : key.value, value), this.diff);
+    return new Bindings(
+      this.dataFactory,
+      this.entries.set(typeof key === 'string' ? key : key.value, value),
+      this.diff,
+    );
   }
 
   public delete(key: RDF.Variable | string): Bindings {
-    return new Bindings(this.dataFactory, this.entries.delete(typeof key === 'string' ? key : key.value), this.diff);
+    return new Bindings(
+      this.dataFactory,
+      this.entries.delete(typeof key === 'string' ? key : key.value),
+      this.diff,
+    );
   }
 
   public keys(): Iterable<RDF.Variable> {
