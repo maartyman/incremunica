@@ -11,7 +11,8 @@
       "@id": "urn:comunica:default:guard/actors#polling",
       "@type": "ActorGuardPolling",
       "mediatorHttp": { "@id": "urn:comunica:default:http/mediators#main" },
-      "mediatorDereferenceRdf": { "@id": "urn:comunica:default:dereference-rdf/mediators#main" }
+      "mediatorDereferenceRdf": { "@id": "urn:comunica:default:dereference-rdf/mediators#main" },
+      "pollingFrequency": 10
     }
   ]
 }

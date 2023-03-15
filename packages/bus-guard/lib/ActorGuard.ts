@@ -13,12 +13,30 @@ import {RdfJsQuadStreamSource} from "@comunica/actor-rdf-resolve-hypermedia-stre
  * @see IActorGuardOutput
  */
 export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorGuardOutput> {
+  private static guards: Map<string, Guard>= new Map<string, Guard>();
   /**
   * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
   */
   public constructor(args: IActorGuardArgs) {
     super(args);
   }
+
+  static addGuard(url: string, guard: Guard) {
+    let originalGuard = ActorGuard.guards.get(url);
+    if (originalGuard) {
+      originalGuard.delete(url);
+    }
+    ActorGuard.guards.set(url, guard);
+  }
+
+  static deleteGuard(url: string) {
+    ActorGuard.guards.get(url)?.delete(url);
+    ActorGuard.guards.delete(url);
+  }
+}
+
+export interface Guard {
+  delete(url: string): void;
 }
 
 export interface IActionGuard extends IAction {

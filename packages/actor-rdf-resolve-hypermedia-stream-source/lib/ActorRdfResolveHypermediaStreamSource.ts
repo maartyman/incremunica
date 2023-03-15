@@ -26,7 +26,7 @@ export class ActorRdfResolveHypermediaStreamSource extends ActorRdfResolveHyperm
     this.logInfo(action.context, `Identified as file source: ${action.url}`);
     let source = new RdfJsQuadStreamSource(action);
 
-    this.mediatorGuard.mediate({
+    await this.mediatorGuard.mediate({
       context: action.context,
       streamSource: source
     });
