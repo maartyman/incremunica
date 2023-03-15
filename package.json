@@ -66,7 +66,7 @@
     "test-changed": "lerna run test --since HEAD",
     "build-changed": "lerna run build --since HEAD",
     "test": "jest",
-    "test-ci": "jest --ci --maxWorkers=4 --coverage",
+    "test:ci": "jest --ci --maxWorkers=4 --coverage",
     "lint": "eslint . --ext .ts --cache",
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "tsc",
