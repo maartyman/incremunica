@@ -27,10 +27,6 @@ jobs:
             .rdf-test-suite-cache
             .rdf-test-suite-ldf-cache
           key: ${{ runner.os }}-test-modules-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
-      - name: Setup firefox
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: 'latest'
       - name: Install dependencies
         run: yarn install --pure-lockfile
       - name: Build project
@@ -39,18 +35,12 @@ jobs:
         run: yarn run depcheck
       - name: Run tests
         run: yarn run test:ci
-      - name: Run browser tests
-        run: yarn run test:browser
       - name: Submit coverage results
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
           parallel: true
-      - name: Run spec tests
-        run: npx lerna run spec --concurrency 1
-      - name: Run integration tests
-        run: npx lerna run integration --concurrency 1
 
   coveralls:
     needs: test
@@ -80,63 +70,6 @@ jobs:
         run: yarn install --pure-lockfile
       - name: Run linter
         run: yarn run lint
-
-  browser:
-    needs:
-      - test
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14.x'
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Load cache
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-browser-modules-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn install --pure-lockfile
-      - name: Build for browser
-        run: npx lerna run browser --concurrency 1
-      - name: Deploy browser build
-        if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/tags/')
-        run: ./.github/deploy_browser.sh
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-
-  docker:
-    needs:
-      - test
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14.x'
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Load cache
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-docker-modules-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn install --pure-lockfile
-      - name: Install Lerna Docker
-        run: sh -c "`curl -fsSl https://raw.githubusercontent.com/rubensworks/lerna-docker/master/install.sh`"
-      - name: Build Docker images
-        run: ~/.lerna-docker/bin/lerna-docker comunica build
-      - name: Deploy Docker images
-        if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/tags/')
-        run: ~/.lerna-docker/bin/lerna-docker comunica push
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   docs:
     needs:

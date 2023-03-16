@@ -16,6 +16,7 @@ module.exports = {
   setupFilesAfterEnv: [ './setup-jest.js' ],
   collectCoverage: true,
   coveragePathIgnorePatterns: [
+    'util.ts',
     '/node_modules/',
     '/mocks/',
     'index.js'

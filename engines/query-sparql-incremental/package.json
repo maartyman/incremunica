@@ -43,6 +43,9 @@
     "bin/**/*.js",
     "engine-default.js"
   ],
+  "devDependencies": {
+    "arrayify-stream": "^2.0.1"
+  },
   "dependencies": {
     "@comunica/actor-context-preprocess-source-to-destination": "^2.0.1",
     "@comunica/actor-dereference-fallback": "^2.0.1",
