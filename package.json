@@ -8,8 +8,6 @@
   "devDependencies": {
     "@babel/core": "^7.20.2",
     "@babel/preset-env": "^7.20.2",
-    "@inrupt/solid-client-authn-core": "^1.12.2",
-    "@inrupt/solid-client-authn-node": "^1.12.2",
     "@pollyjs/adapter-node-http": "^6.0.5",
     "@pollyjs/core": "^6.0.5",
     "@pollyjs/persister-fs": "^6.0.5",
@@ -87,6 +85,7 @@
     "test": "jest",
     "test:ci": "jest --ci --maxWorkers=4 --coverage",
     "lint": "eslint . --ext .ts --cache",
+    "lint-fix": "eslint . --ext .ts --fix",
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "tsc",
     "build:components": "componentsjs-generator engines/* packages/*",

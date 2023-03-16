@@ -4,3 +4,8 @@ coverage
 **/*.js
 **/*.d.ts
 **/*.js.map
+
+engines/config-query-sparql-incremental/lib/index.ts
+engines/query-sparql-incremental/bin/query.ts
+engines/query-sparql-incremental/lib/QueryEngine.ts
+**/test/**

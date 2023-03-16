@@ -1,5 +1,6 @@
 import { QueryEngineBase } from '@comunica/actor-init-query';
 import type { ActorInitQueryBase } from '@comunica/actor-init-query';
+
 const engineDefault = require('../engine-default.js');
 
 /**

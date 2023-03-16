@@ -9,7 +9,6 @@ jobs:
         os: [ubuntu-latest]
         node-version:
           - 16.x
-          - 18.x
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
