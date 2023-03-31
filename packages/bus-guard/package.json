@@ -1,14 +1,14 @@
 {
-  "name": "@comunica/config-query-sparql-incremental",
+  "name": "@comunica/bus-guard",
   "version": "1.0.0",
-  "description": "default configuration files for Comunica SPARQL Incremental",
+  "description": "A comunica bus for guard events.",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maartyman/incremunica",
-    "directory": "engines/config-query-sparql-incremental"
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/bus-guard"
   },
   "publishConfig": {
     "access": "public"
@@ -16,24 +16,23 @@
   "sideEffects": false,
   "keywords": [
     "comunica",
-    "sparql",
-    "engine",
-    "query",
-    "update",
-    "config",
-    "incremental"
+    "bus",
+    "guard"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+    "url": "https://github.com/comunica/comunica/issues"
   },
   "homepage": "https://comunica.dev/",
   "files": [
     "components",
-    "config",
     "lib/**/*.d.ts",
-    "lib/**/*.js"
+    "lib/**/*.js",
+    "lib/**/*.js.map"
   ],
+  "dependencies": {
+    "@comunica/core": "^2.6.8"
+  },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",

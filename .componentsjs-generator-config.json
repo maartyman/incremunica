@@ -12,7 +12,9 @@
     "packages/data-factory",
     "packages/jest",
     "packages/packager",
-    "packages/runner-cli"
+    "packages/runner-cli",
+    "packages/rdf-streaming-store",
+    "packages/incremental-types"
   ],
   "ignoreComponents": [
     "Error",

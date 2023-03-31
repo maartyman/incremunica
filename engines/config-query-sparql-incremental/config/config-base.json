@@ -1,6 +1,7 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^2.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
   ],
   "import": [
     "ccqs:config/context-preprocess/actors.json",
@@ -24,7 +25,7 @@
     "ccqs:config/dereference/mediators.json",
     "ccqs:config/dereference-rdf/actors.json",
     "ccqs:config/dereference-rdf/mediators.json",
-    "ccqs:config/rdf-join/actors.json",
+    "ccqsi:config/rdf-join/actors.json",
     "ccqs:config/rdf-join/mediators.json",
     "ccqs:config/rdf-join-entries-sort/actors.json",
     "ccqs:config/rdf-join-entries-sort/mediators.json",
@@ -37,19 +38,22 @@
     "ccqs:config/rdf-parse/actors.json",
     "ccqs:config/rdf-parse/mediators.json",
     "ccqs:config/rdf-parse-html/actors.json",
-    "ccqs:config/rdf-resolve-hypermedia/actors.json",
+    "ccqsi:config/rdf-resolve-hypermedia/actors.json",
     "ccqs:config/rdf-resolve-hypermedia/mediators.json",
     "ccqs:config/rdf-resolve-hypermedia-links/actors.json",
     "ccqs:config/rdf-resolve-hypermedia-links/mediators.json",
     "ccqs:config/rdf-resolve-hypermedia-links-queue/actors.json",
     "ccqs:config/rdf-resolve-hypermedia-links-queue/mediators.json",
-    "ccqs:config/rdf-resolve-quad-pattern/actors.json",
+    "ccqsi:config/rdf-resolve-quad-pattern/actors.json",
     "ccqs:config/rdf-resolve-quad-pattern/mediators.json",
     "ccqs:config/rdf-serialize/actors.json",
     "ccqs:config/rdf-serialize/mediators.json",
     "ccqs:config/rdf-update-hypermedia/actors.json",
     "ccqs:config/rdf-update-hypermedia/mediators.json",
     "ccqs:config/rdf-update-quads/actors.json",
-    "ccqs:config/rdf-update-quads/mediators.json"
+    "ccqs:config/rdf-update-quads/mediators.json",
+
+    "ccqsi:config/guard/mediators.json",
+    "ccqsi:config/guard/actors.json"
   ]
 }

@@ -23,7 +23,7 @@ module.exports = {
     },
     'import/resolver': {
       'typescript': {
-        'alwaysTryTypes': true // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/rdf-js`
+        'alwaysTryTypes': true // always try to resolve incremental-types under `<root>@incremental-types` directory even it doesn't contain any source code, like `@incremental-types/rdf-js`
       },
     }
   },
@@ -36,6 +36,7 @@ module.exports = {
   },
   rules: {
     // Default
+    'import/group-exports': 'off',
     'class-methods-use-this': 'off', // Conflicts with functions from interfaces that sometimes don't require `this`
     'comma-dangle': ['error', 'always-multiline'],
     'dot-location': ['error', 'property'],

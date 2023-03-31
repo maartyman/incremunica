@@ -11,7 +11,6 @@
 <p align="center">
 <a href="https://github.com/maartyman/incremunica/actions?query=workflow%3ACI"><img src="https://github.com/maartyman/incremunica/workflows/CI/badge.svg" alt="Build Status"></a>
 <a href="https://coveralls.io/github/maartyman/incremunica?branch=master"><img src="https://coveralls.io/repos/github/maartyman/incremunica/badge.svg?branch=master" alt="Coverage Status"></a>
-<a href="https://gitter.im/comunica/Lobby"><img src="https://badges.gitter.im/comunica.png" alt="Gitter chat"></a>
 </p>
 
 **[Learn more about Comunica on our website](https://comunica.dev/).**

@@ -1,14 +1,14 @@
 {
-  "name": "@comunica/config-query-sparql-incremental",
+  "name": "@comunica/incremental-types",
   "version": "1.0.0",
-  "description": "default configuration files for Comunica SPARQL Incremental",
+  "description": "Types module for incremental Comunica",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maartyman/incremunica",
-    "directory": "engines/config-query-sparql-incremental"
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/incremental-types"
   },
   "publishConfig": {
     "access": "public"
@@ -16,24 +16,26 @@
   "sideEffects": false,
   "keywords": [
     "comunica",
-    "sparql",
-    "engine",
-    "query",
-    "update",
-    "config",
-    "incremental"
+    "types"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+    "url": "https://github.com/comunica/comunica/issues"
   },
   "homepage": "https://comunica.dev/",
   "files": [
     "components",
-    "config",
     "lib/**/*.d.ts",
-    "lib/**/*.js"
+    "lib/**/*.js",
+    "lib/**/*.js.map",
+    "bin/**/*.d.ts",
+    "bin/**/*.js",
+    "bin/**/*.js.map"
   ],
+  "dependencies": {
+    "@comunica/core": "^2.6.8",
+    "n3": "^1.16.3"
+  },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",

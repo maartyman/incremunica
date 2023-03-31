@@ -3,6 +3,8 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
   ],
   "import": [
-    "ccqsi:config/config-base.json"
+    "ccqsi:config/rdf-join/actors-inner.json",
+    "ccqsi:config/rdf-join/actors-minus.json",
+    "ccqsi:config/rdf-join/actors-optional.json"
   ]
 }
