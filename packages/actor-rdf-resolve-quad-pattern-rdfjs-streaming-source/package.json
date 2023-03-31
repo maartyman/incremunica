@@ -1,0 +1,48 @@
+{
+  "name": "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source",
+  "version": "1.0.0",
+  "description": "A rdfjs-streaming-source rdf-resolve-quad-pattern actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "rdf-resolve-quad-pattern",
+    "rdfjs-streaming-source"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
+    "@comunica/core": "^2.6.8",
+    "asynciterator": "^3.8.0",
+    "@comunica/rdf-streaming-store": "^1.0.0",
+    "@comunica/types": "^2.6.8",
+    "@comunica/incremental-types": "^1.0.0",
+    "@rdfjs/types": "*"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}
