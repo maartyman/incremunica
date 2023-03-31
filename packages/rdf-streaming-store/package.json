@@ -34,17 +34,16 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "n3": "^1.16.3",
-    "rdf-terms": "^1.9.1",
-    "rdf-string": "^1.6.2",
-    "readable-stream": "^4.3.0",
     "@rdfjs/types": "*",
     "@types/n3": "^1.10.4",
-    "@types/readable-stream": "^2.3.15"
+    "@types/readable-stream": "^2.3.15",
+    "n3": "^1.16.3",
+    "rdf-string": "^1.6.2",
+    "rdf-terms": "^1.9.1",
+    "readable-stream": "^4.3.0"
   },
   "devDependencies": {
-    "@comunica/core": "^2.6.8",
-    "event-emitter-promisify": "^1.1.0"
+    "@comunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

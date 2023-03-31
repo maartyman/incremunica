@@ -32,9 +32,9 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/core": "^2.6.8",
+    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
     "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
-    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0"
+    "@comunica/bus-guard": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
