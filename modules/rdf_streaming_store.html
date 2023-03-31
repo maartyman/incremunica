@@ -1,0 +1,297 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>rdf-streaming-store | Incremunica</title>
+	<meta name="description" content="Documentation for Incremunica">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Incremunica</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">Incremunica</a>
+				</li>
+				<li>
+					<a href="rdf_streaming_store.html">rdf-streaming-store</a>
+				</li>
+			</ul>
+			<h1>Module rdf-streaming-store</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<a href="#rdf-streaming-store" id="rdf-streaming-store" style="color: inherit; text-decoration: none;">
+						<h1>RDF Streaming Store</h1>
+					</a>
+					<p><a href="https://github.com/comunica/rdf-streaming-store.js/actions?query=workflow%3ACI"><img src="https://github.com/comunica/rdf-streaming-store.js/workflows/CI/badge.svg" alt="Build status"></a>
+						<a href="https://coveralls.io/github/comunica/rdf-streaming-store.js?branch=master"><img src="https://coveralls.io/repos/github/comunica/rdf-streaming-store.js/badge.svg?branch=master" alt="Coverage Status"></a>
+					<a href="https://www.npmjs.com/package/rdf-streaming-store"><img src="https://badge.fury.io/js/rdf-streaming-store.svg" alt="npm version"></a></p>
+					<p>A read-only <a href="https://rdf.js.org/stream-spec/#store-interface">RDF/JS store</a> that allows parallel data lookup and insertion.
+					It works in both JavaScript and TypeScript.</p>
+					<p>Concretely, this means that <code>match()</code> calls happening before <code>import()</code> calls, will still consider those triples that
+						are inserted later, which is done by keeping the response streams of <code>match()</code> open.
+						Only when the <code>end()</code> method is invoked, all response streams will close, and the StreamingStore will be considered
+					immutable.</p>
+					<p><strong>WARNING</strong>: <code>end()</code> MUST be called at some point, otherwise all <code>match</code> streams will remain unended.</p>
+					<p>If using TypeScript, it is recommended to use this in conjunction with <a href="https://www.npmjs.com/package/@rdfjs/types"><code>@rdfjs/types</code></a>.</p>
+					<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+						<h2>Installation</h2>
+					</a>
+					<pre><code class="language-bash"><span style="color: #000000">$ npm install rdf-streaming-store</span>
+</code></pre>
+					<p>or</p>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add rdf-streaming-store</span>
+</code></pre>
+					<p>This package also works out-of-the-box in browsers via tools such as <a href="https://webpack.js.org/">webpack</a> and <a href="http://browserify.org/">browserify</a>.</p>
+					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+						<h2>Usage</h2>
+					</a>
+					<p>A new <code>StreamingStore</code> can be created as follows:</p>
+					<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StreamingStore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rdf-streaming-store&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StreamingStore</span><span style="color: #000000">();</span>
+</code></pre>
+					<a href="#inserting-quads" id="inserting-quads" style="color: inherit; text-decoration: none;">
+						<h3>Inserting quads</h3>
+					</a>
+					<p>Following the <a href="https://rdf.js.org/stream-spec/#sink-interface">RDF/JS Sink</a> interface,
+					new quads can be added using the <code>import</code> method, which accepts a stream of quads:</p>
+					<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">quad</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;rdf-quad&#039;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">streamifyArray</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;streamify-array&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #008000">// Somehow create a quad stream</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">quadStream</span><span style="color: #000000"> = </span><span style="color: #795E26">streamifyArray</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #795E26">quad</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s3&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;p3&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;o3&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">  </span><span style="color: #795E26">quad</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s4&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;p4&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;o4&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">]);</span>
+
+<span style="color: #008000">// Import it into the store</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">import</span><span style="color: #000000">(</span><span style="color: #001080">quadStream</span><span style="color: #000000">);</span>
+</code></pre>
+					<p>After inserting your quads, you MUST call <code>end()</code> to make sure that <code>match</code> calls will end their response streams:</p>
+					<pre><code class="language-typescript"><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
+</code></pre>
+					<p>After calling <code>end()</code>, importing new quads is not allowed.</p>
+					<a href="#finding-quads" id="finding-quads" style="color: inherit; text-decoration: none;">
+						<h3>Finding quads</h3>
+					</a>
+					<p>Following the <a href="https://rdf.js.org/stream-spec/#source-interface">RDF/JS Source</a> interface,
+					quads can be found using the <code>match</code> method, which returns a stream of quads:</p>
+					<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #AF00DB">type</span><span style="color: #000000"> </span><span style="color: #0000FF">*</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #001080">RDF</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@rdfjs/types&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">DataFactory</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rdf-data-factory&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">DF</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">DataFactory</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">returnStream</span><span style="color: #000000"> = </span><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">match</span><span style="color: #000000">(</span><span style="color: #0000FF">undefined</span><span style="color: #000000">, </span><span style="color: #0070C1">DF</span><span style="color: #000000">.</span><span style="color: #795E26">namedNode</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;p3&#039;</span><span style="color: #000000">), </span><span style="color: #0070C1">DF</span><span style="color: #000000">.</span><span style="color: #795E26">namedNode</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;o3&#039;</span><span style="color: #000000">), </span><span style="color: #0000FF">undefined</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">returnStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;data&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">quad</span><span style="color: #000000">: </span><span style="color: #267F99">RDF</span><span style="color: #000000">.</span><span style="color: #267F99">Quad</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">quad</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+<span style="color: #001080">returnStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">error</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+<span style="color: #001080">returnStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;end&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Done!&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+</code></pre>
+					<p>Note that the <code>returnStream</code> will not end until the <code>store.end()</code> has been invoked.</p>
+					<a href="#match-can-be-called-before-import" id="match-can-be-called-before-import" style="color: inherit; text-decoration: none;">
+						<h3><code>match()</code> can be called before <code>import()</code></h3>
+					</a>
+					<p>Since <code>match()</code> calls will only end after calling <code>end()</code>,
+						quads that are imported <em>after</em> initiating the <code>match()</code> call,
+					can still be emitted in the created <code>match()</code> stream.</p>
+					<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StreamingStore</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">returnStream</span><span style="color: #000000"> = </span><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">match</span><span style="color: #000000">(</span><span style="color: #0000FF">undefined</span><span style="color: #000000">, </span><span style="color: #0070C1">DF</span><span style="color: #000000">.</span><span style="color: #795E26">namedNode</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;p3&#039;</span><span style="color: #000000">), </span><span style="color: #0070C1">DF</span><span style="color: #000000">.</span><span style="color: #795E26">namedNode</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;o3&#039;</span><span style="color: #000000">), </span><span style="color: #0000FF">undefined</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">returnStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;data&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">quad</span><span style="color: #000000">: </span><span style="color: #267F99">RDF</span><span style="color: #000000">.</span><span style="color: #267F99">Quad</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">quad</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+<span style="color: #001080">returnStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;end&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Done!&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #008000">// At this stage, the store is empty, so no quads will be printed yet</span>
+
+<span style="color: #008000">// After importing some quads into the store, the s3-p3-o3 triple will be printed</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">import</span><span style="color: #000000">(</span><span style="color: #795E26">streamifyArray</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #795E26">quad</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s3&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;p3&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;o3&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">  </span><span style="color: #795E26">quad</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s4&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;p4&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;o4&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">]));</span>
+
+<span style="color: #008000">// After importing some more triples, another triple will be printed</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">import</span><span style="color: #000000">(</span><span style="color: #795E26">streamifyArray</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #795E26">quad</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;sOther&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;p3&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;o3&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">]));</span>
+
+<span style="color: #008000">// Since we mark the store as ended, the returnStream will print `Done!`</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
+</code></pre>
+					<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+						<h2>License</h2>
+					</a>
+					<p>This software is written by Maarten Vandenbrande and <a href="https://rubensworks.net/">Ruben Taelman</a>.</p>
+					<p>This code is released under the <a href="http://opensource.org/licenses/MIT">MIT license</a>.</p>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_guard_polling_diff.html">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_hypermedia_stream_none.html">actor-<wbr>rdf-<wbr>resolve-<wbr>hypermedia-<wbr>stream-<wbr>none</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bindings_factory.html">bindings-<wbr>factory</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bus_guard.html">bus-<wbr>guard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_types.html">incremental-<wbr>types</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="query_sparql_incremental.html">query-<wbr>sparql-<wbr>incremental</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="rdf_streaming_store.html">rdf-<wbr>streaming-<wbr>store</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-module">
+						<a href="actor_guard_polling_diff.html" class="tsd-kind-icon">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_hypermedia_stream_none.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>hypermedia-<wbr>stream-<wbr>none</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bindings_factory.html" class="tsd-kind-icon">bindings-<wbr>factory</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bus_guard.html" class="tsd-kind-icon">bus-<wbr>guard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_types.html" class="tsd-kind-icon">incremental-<wbr>types</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="query_sparql_incremental.html" class="tsd-kind-icon">query-<wbr>sparql-<wbr>incremental</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-module">
+						<a href="rdf_streaming_store.html" class="tsd-kind-icon">rdf-<wbr>streaming-<wbr>store</a>
+						<ul>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="../classes/rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="../classes/rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
