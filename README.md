@@ -13,12 +13,12 @@
 <a href="https://coveralls.io/github/maartyman/incremunica?branch=master"><img src="https://coveralls.io/repos/github/maartyman/incremunica/badge.svg?branch=master" alt="Coverage Status"></a>
 </p>
 
-**[Learn more about Comunica on our website](https://comunica.dev/).**
 
+This is a monorepo that builds upon the core comunica packages to allow for incremental query evaluation. 
 
 ## Development Setup
 
-_(JSDoc: https://comunica.github.io/comunica/)_
+_(JSDoc: https://maartyman.github.io/incremunica/)_
 
 This repository should be used by Comunica module **developers** as it contains multiple Comunica modules that can be composed.
 This repository is managed as a [monorepo](https://github.com/babel/babel/blob/master/doc/design/monorepo.md)
@@ -34,8 +34,8 @@ Comunica is tested on OSX, Linux and Windows.
 This project can be setup by cloning and installing it as follows:
 
 ```bash
-$ git clone https://github.com/comunica/comunica.git
-$ cd comunica
+$ git clone https://github.com/maartyman/incremunica.git
+$ cd incremunica
 $ yarn install
 ```
 
