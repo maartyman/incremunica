@@ -7,18 +7,16 @@
 
 Comunica SPARQL INCREMENTAL is a SPARQL query engine for JavaScript that enables incremental querying.
 
-This module is part of the [Comunica framework](https://comunica.dev/).
-
 ## Install
 
 ```bash
-$ yarn add @comunica/query-sparql-incremental
+$ yarn add incremunica/query-sparql-incremental
 ```
 
 or
 
 ```bash
-$ npm install -g @comunica/query-sparql-incremental
+$ npm install -g incremunica/query-sparql-incremental
 ```
 
 ## Install a prerelease
@@ -26,13 +24,13 @@ $ npm install -g @comunica/query-sparql-incremental
 Since this package is still in testing phase, you may want to install a prerelease of this package, which you can do by appending `@next` to the package name during installation.
 
 ```bash
-$ yarn add @comunica/query-sparql-incremental@next
+$ yarn add incremunica/query-sparql-incremental@next
 ```
 
 or
 
 ```bash
-$ npm install -g @comunica/query-sparql-incremental@next
+$ npm install -g incremunica/query-sparql-incremental@next
 ```
 
 ## Usage
@@ -42,9 +40,6 @@ Show the help with all options:
 ```bash
 $ comunica-sparql-incremental --help
 ```
-
-Just like [Comunica SPARQL](https://github.com/comunica/comunica/tree/master/packages/query-sparql),
-a [dynamic variant](https://github.com/comunica/comunica/tree/master/packages/query-sparql#usage-from-the-command-line) (`comunica-dynamic-sparql-incremental`) also exists.
 
 _[**Read more** about querying from the command line](https://comunica.dev/docs/query/getting_started/query_cli/)._
 
