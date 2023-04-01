@@ -82,6 +82,7 @@
     "test"
   ],
   "scripts": {
+    "pre-commit": "yarn run build && yarn run lint && yarn run depcheck && yarn run test",
     "test-changed": "lerna run test --since HEAD",
     "build-changed": "lerna run build --since HEAD",
     "test": "jest",
