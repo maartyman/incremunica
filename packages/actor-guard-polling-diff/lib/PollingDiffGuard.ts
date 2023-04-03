@@ -19,6 +19,10 @@ export class PollingDiffGuard implements IGuard {
     this.action = action;
     this.actorGuardPolling = actorGuardPolling;
 
+    this.action.streamingSource.store.on('end', () => {
+      ActorGuard.deleteGuard(this.action.url);
+    });
+
     const maxAgeArray = PollingDiffGuard.regex.exec(action.metadata['cache-control']);
 
     if (maxAgeArray) {
@@ -56,10 +60,6 @@ export class PollingDiffGuard implements IGuard {
   }
 
   private async checkForChanges(): Promise<void> {
-    if (this.action.streamingSource.store.hasEnded()) {
-      ActorGuard.deleteGuard(this.action.url);
-      return;
-    }
     // TODO: is it better to do get instead of head
     const responseHead = await this.actorGuardPolling.mediatorHttp.mediate(
       {
