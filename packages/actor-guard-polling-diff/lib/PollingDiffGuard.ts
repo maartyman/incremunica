@@ -1,4 +1,5 @@
 import type { IGuard, IActionGuard } from '@comunica/bus-guard';
+import { ActorGuard } from '@comunica/bus-guard';
 import type { Quad } from '@comunica/incremental-types';
 import { Transform } from 'readable-stream';
 import type { ActorGuardPollingDiff } from './ActorGuardPollingDiff';
@@ -55,6 +56,10 @@ export class PollingDiffGuard implements IGuard {
   }
 
   private async checkForChanges(): Promise<void> {
+    if (this.action.streamingSource.store.hasEnded()) {
+      ActorGuard.deleteGuard(this.action.url);
+      return;
+    }
     // TODO: is it better to do get instead of head
     const responseHead = await this.actorGuardPolling.mediatorHttp.mediate(
       {
@@ -105,7 +110,7 @@ export class PollingDiffGuard implements IGuard {
     }
   }
 
-  public delete(url: string): void {
+  public delete(): void {
     this.flaggedForDeletion = true;
     clearInterval(this.promiseId);
     // TODO delete source

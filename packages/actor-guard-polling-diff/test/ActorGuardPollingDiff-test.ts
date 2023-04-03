@@ -8,6 +8,7 @@ import arrayifyStream from "arrayify-stream";
 import 'jest-rdf';
 import {Store} from "n3";
 import EventEmitter = require("events");
+import {PollingDiffGuard} from "../lib/PollingDiffGuard";
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -29,10 +30,10 @@ describe('ActorGuardPolling', () => {
       IActionDereferenceRdf, IActorTest, IActorDereferenceRdfOutput>;
     let action: IActionGuard;
     let quadArrayStore: any[];
-    let quadArray : any[];
+    let quadArray: any[];
     let headersObject: {
-      age: string|undefined,
-      'cache-control': string|undefined,
+      age: string | undefined,
+      'cache-control': string | undefined,
       etag: number,
     };
     let eventEmitter: EventEmitter;
@@ -47,14 +48,14 @@ describe('ActorGuardPolling', () => {
       eventEmitter = new EventEmitter();
       quadArrayStore = [];
 
-      mediatorHttp = <any> {
-        mediate: async(action: IActionHttp) => {
+      mediatorHttp = <any>{
+        mediate: async (action: IActionHttp) => {
           return {
             headers: {
               age: headersObject.age,
-                'cache-control': headersObject["cache-control"],
-                etag: headersObject.etag,
-                get: (key: string) => {
+              'cache-control': headersObject["cache-control"],
+              etag: headersObject.etag,
+              get: (key: string) => {
                 if (key == "etag") {
                   return headersObject.etag;
                 }
@@ -65,7 +66,7 @@ describe('ActorGuardPolling', () => {
         },
       };
 
-      mediatorDereferenceRdf = <any> {
+      mediatorDereferenceRdf = <any>{
         mediate: async (action: IActionDereferenceRdf) => {
           return {
             data: streamifyArray(quadArray),
@@ -91,15 +92,18 @@ describe('ActorGuardPolling', () => {
       });
 
       action = {
-        context: <any> {},
+        context: <any>{},
         url: "www.test.com",
         metadata: {
           etag: 0,
           "cache-control": undefined,
           age: undefined
         },
-        streamingSource: <any> {
+        streamingSource: <any>{
           store: {
+            hasEnded: () => {
+              return false
+            },
             import: (stream: Transform) => {
               eventEmitter.emit("data", stream);
               return stream;
@@ -113,12 +117,12 @@ describe('ActorGuardPolling', () => {
 
     });
 
-    afterEach(()=> {
+    afterEach(() => {
       ActorGuard.deleteGuard(action.url);
     })
 
     it('should test', () => {
-      return expect(actor.test(<any> {})).resolves.toBeTruthy();
+      return expect(actor.test(<any>{})).resolves.toBeTruthy();
     });
 
     it('should attach a positive changes stream', async () => {
@@ -245,6 +249,129 @@ describe('ActorGuardPolling', () => {
       expect(
         (<ActorGuardPollingDiff><any>ActorGuard.getGuard(action.url)).pollingFrequency
       ).toEqual(2);
+    });
+
+  });
+
+  describe('An ActorGuardPolling instance when the store has no listeners', () => {
+    let actor: ActorGuardPollingDiff;
+    let mediatorHttp: Mediator<
+      Actor<IActionHttp, IActorTest, IActorHttpOutput>,
+      IActionHttp, IActorTest, IActorHttpOutput>;
+    let mediatorDereferenceRdf: Mediator<
+      Actor<IActionDereferenceRdf, IActorTest, IActorDereferenceRdfOutput>,
+      IActionDereferenceRdf, IActorTest, IActorDereferenceRdfOutput>;
+    let action: IActionGuard;
+    let quadArrayStore: any[];
+    let quadArray: any[];
+    let headersObject: {
+      age: string | undefined,
+      'cache-control': string | undefined,
+      etag: number,
+    };
+    let eventEmitter: EventEmitter;
+
+    beforeEach(() => {
+      headersObject = {
+        age: undefined,
+        'cache-control': undefined,
+        etag: 0,
+      };
+      quadArray = [];
+      eventEmitter = new EventEmitter();
+      quadArrayStore = [];
+
+      mediatorHttp = <any>{
+        mediate: async (action: IActionHttp) => {
+          return {
+            headers: {
+              age: headersObject.age,
+              'cache-control': headersObject["cache-control"],
+              etag: headersObject.etag,
+              get: (key: string) => {
+                if (key == "etag") {
+                  return headersObject.etag;
+                }
+                return undefined;
+              }
+            }
+          }
+        },
+      };
+
+      mediatorDereferenceRdf = <any>{
+        mediate: async (action: IActionDereferenceRdf) => {
+          return {
+            data: streamifyArray(quadArray),
+            headers: {
+              age: headersObject.age,
+              'cache-control': headersObject["cache-control"],
+              etag: headersObject.etag,
+              forEach: (func: (val: any, key: any) => void) => {
+                func(headersObject.age, 'age');
+                func(headersObject["cache-control"], 'cache-control');
+                func(headersObject.etag, 'etag');
+              }
+            }
+          };
+        }
+      }
+
+      actor = new ActorGuardPollingDiff({
+        beforeActors: [],
+        mediatorHttp: mediatorHttp,
+        pollingFrequency: 1,
+        name: 'actor', bus, mediatorDereferenceRdf
+      });
+
+      action = {
+        context: <any>{},
+        url: "www.test.com",
+        metadata: {
+          etag: 0,
+          "cache-control": undefined,
+          age: undefined
+        },
+        streamingSource: <any>{
+          store: {
+            hasEnded: () => {
+              eventEmitter.emit("hasEnded");
+              return true
+            },
+            import: (stream: Transform) => {
+              eventEmitter.emit("data", stream);
+              return stream;
+            },
+            copyOfStore: () => {
+              return new Store(quadArrayStore);
+            }
+          }
+        }
+      }
+
+    });
+
+    it('should stop if hasEnded is true', async () => {
+      //set data of file by setting etag and store
+      action.metadata = {
+        etag: 0,
+        "cache-control": undefined,
+        age: undefined
+      }
+
+      await actor.run(action);
+
+      let promise = new Promise<void>((resolve) => {
+        eventEmitter.once("hasEnded", async () => {
+          resolve();
+        });
+      });
+
+      await promise;
+
+      expect(
+        (<PollingDiffGuard><any>ActorGuard.getGuard(action.url))
+      ).toBeUndefined();
     });
   });
 });
