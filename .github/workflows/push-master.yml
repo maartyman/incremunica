@@ -1,6 +1,6 @@
-name: "pull request"
+name: "push master"
 on:
-  pull_request:
+  push:
     branches:
       - master
 jobs:
