@@ -19,6 +19,7 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
   protected readonly store: S;
   protected readonly pendingStreams: PendingStreamsIndex<Q> = new PendingStreamsIndex();
   protected ended = false;
+  protected numberOfListeners = 0;
 
   public constructor(store: RDF.Store<Q> = new Store<Q>()) {
     this.store = <S> store;
@@ -38,6 +39,10 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
       pendingStream.push(null);
       (<any> pendingStream)._pipeSource.unpipe();
     }
+  }
+
+  public hasEnded(): boolean {
+    return this.ended;
   }
 
   public copyOfStore(): Store {
@@ -84,6 +89,7 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
     object?: RDF.Term | null,
     graph?: RDF.Term | null,
   ): RDF.Stream<Q> {
+    this.numberOfListeners++;
     const storeResult: Readable = <Readable> this.store.match(subject, predicate, object, graph);
     let stream: RDF.Stream<Q> = storeResult;
 
@@ -95,6 +101,15 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
       stream = storeResult.pipe(pendingStream, { end: false });
       (<any> stream)._pipeSource = storeResult;
     }
+
+    stream.on('close', () => {
+      if (this.numberOfListeners < 2) {
+        this.end();
+      } else {
+        this.numberOfListeners--;
+      }
+    });
+
     return stream;
   }
 
