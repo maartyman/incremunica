@@ -89,6 +89,7 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
     object?: RDF.Term | null,
     graph?: RDF.Term | null,
   ): RDF.Stream<Q> {
+    // TODO what if match is never called (=> streaming store should be removed) (Should not happen I think)
     this.numberOfListeners++;
     const storeResult: Readable = <Readable> this.store.match(subject, predicate, object, graph);
     let stream: RDF.Stream<Q> = storeResult;

@@ -57,6 +57,36 @@ describe('StreamStore', () => {
     ]);
   });
 
+  it('should return hasEnded', async() => {
+    expect(store.hasEnded()).toBeFalsy();
+    store.end();
+    expect(store.hasEnded()).toBeTruthy();
+  });
+
+  it('should end if match stream is destroyed', async() => {
+    let stream = <Readable>store.match();
+    expect(store.hasEnded()).toBeFalsy();
+    stream.destroy();
+    await new Promise<void>((resolve) => stream.on("close", () => resolve()))
+    expect(store.hasEnded()).toBeTruthy();
+  });
+
+  it('should only end if all match streams are destroyed', async() => {
+    let stream1 = <Readable>store.match();
+    let stream2 = <Readable>store.match();
+    let stream3 = <Readable>store.match();
+    expect(store.hasEnded()).toBeFalsy();
+    stream1.destroy();
+    await new Promise<void>((resolve) => stream1.on("close", () => resolve()));
+    expect(store.hasEnded()).toBeFalsy();
+    stream2.destroy();
+    await new Promise<void>((resolve) => stream2.on("close", () => resolve()));
+    expect(store.hasEnded()).toBeFalsy();
+    stream3.destroy();
+    await new Promise<void>((resolve) => stream3.on("close", () => resolve()));
+    expect(store.hasEnded()).toBeTruthy();
+  });
+
   it('handle deletion of quads', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
