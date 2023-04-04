@@ -1,4 +1,4 @@
-import type { EventEmitter } from 'events';
+import { EventEmitter } from 'events';
 import type { Quad } from '@comunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { Store } from 'n3';
@@ -15,13 +15,14 @@ import { PendingStreamsIndex } from './PendingStreamsIndex';
  * WARNING: `end()` MUST be called at some point, otherwise all `match` streams will remain unended.
  */
 export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
-implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
+  extends EventEmitter implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
   protected readonly store: S;
   protected readonly pendingStreams: PendingStreamsIndex<Q> = new PendingStreamsIndex();
   protected ended = false;
   protected numberOfListeners = 0;
 
   public constructor(store: RDF.Store<Q> = new Store<Q>()) {
+    super();
     this.store = <S> store;
   }
 
@@ -39,6 +40,8 @@ implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
       pendingStream.push(null);
       (<any> pendingStream)._pipeSource.unpipe();
     }
+
+    this.emit('end');
   }
 
   public hasEnded(): boolean {

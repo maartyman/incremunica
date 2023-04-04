@@ -101,6 +101,9 @@ describe('ActorGuardPolling', () => {
         },
         streamingSource: <any>{
           store: {
+            on: (str: string, fn: () => void) => {
+
+            },
             hasEnded: () => {
               return false
             },
@@ -270,6 +273,7 @@ describe('ActorGuardPolling', () => {
       etag: number,
     };
     let eventEmitter: EventEmitter;
+    let func = () => {}
 
     beforeEach(() => {
       headersObject = {
@@ -334,9 +338,11 @@ describe('ActorGuardPolling', () => {
         },
         streamingSource: <any>{
           store: {
+            on: (str: string, fn: () => void) => {
+              eventEmitter.on("end", fn);
+            },
             hasEnded: () => {
-              eventEmitter.emit("hasEnded");
-              return true
+              return false;
             },
             import: (stream: Transform) => {
               eventEmitter.emit("data", stream);
@@ -351,7 +357,7 @@ describe('ActorGuardPolling', () => {
 
     });
 
-    it('should stop if hasEnded is true', async () => {
+    it('should stop if on end is called', async () => {
       //set data of file by setting etag and store
       action.metadata = {
         etag: 0,
@@ -362,12 +368,19 @@ describe('ActorGuardPolling', () => {
       await actor.run(action);
 
       let promise = new Promise<void>((resolve) => {
-        eventEmitter.once("hasEnded", async () => {
+        eventEmitter.once("data", async (stream) => {
           resolve();
         });
       });
 
+      //set data of file by setting quadArray and etag
+      headersObject.etag = 1;
+      quadArray = [];
+
       await promise;
+
+      //after first get request delete guard
+      eventEmitter.emit("end");
 
       expect(
         (<PollingDiffGuard><any>ActorGuard.getGuard(action.url))
