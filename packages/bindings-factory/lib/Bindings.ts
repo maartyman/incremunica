@@ -120,7 +120,7 @@ export class Bindings implements RDF.Bindings {
       entries.push([ key, value ]);
     }
 
-    return new Bindings(this.dataFactory, Map(entries), this.diff);
+    return new Bindings(this.dataFactory, Map(entries), this.diff && other.diff);
   }
 
   public mergeWith(
