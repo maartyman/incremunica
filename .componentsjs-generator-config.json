@@ -1,9 +1,7 @@
 {
   "source": "lib",
   "ignorePackagePaths": [
-    "engines/query-sparql",
-    "engines/query-sparql-file",
-    "engines/query-sparql-rdfjs",
+    "engines/query-sparql-incremental",
     "packages/actor-init-sparql",
     "packages/actor-init-sparql-file",
     "packages/actor-init-sparql-rdfjs",
