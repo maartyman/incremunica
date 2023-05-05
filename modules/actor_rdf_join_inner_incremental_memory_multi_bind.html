@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>actor-rdf-resolve-quad-pattern-rdfjs-streaming-source | Incremunica</title>
+	<title>actor-rdf-join-inner-incremental-memory-multi-bind | Incremunica</title>
 	<meta name="description" content="Documentation for Incremunica">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">Incremunica</a>
 				</li>
 				<li>
-					<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html">actor-rdf-resolve-quad-pattern-rdfjs-streaming-source</a>
+					<a href="actor_rdf_join_inner_incremental_memory_multi_bind.html">actor-rdf-join-inner-incremental-memory-multi-bind</a>
 				</li>
 			</ul>
-			<h1>Module actor-rdf-resolve-quad-pattern-rdfjs-streaming-source</h1>
+			<h1>Module actor-rdf-join-inner-incremental-memory-multi-bind</h1>
 		</div>
 	</div>
 </header>
@@ -67,18 +67,18 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<a href="#comunica-rdfjs-streaming-source-rdf-resolve-quad-pattern-actor" id="comunica-rdfjs-streaming-source-rdf-resolve-quad-pattern-actor" style="color: inherit; text-decoration: none;">
-						<h1>Comunica RDFjs Streaming Source RDF Resolve Quad Pattern Actor</h1>
+					<a href="#comunica-inner-incremental-multi-bind-join-rdf-join-actor" id="comunica-inner-incremental-multi-bind-join-rdf-join-actor" style="color: inherit; text-decoration: none;">
+						<h1>Comunica Inner Incremental Multi Bind Join RDF Join Actor</h1>
 					</a>
-					<p><a href="https://www.npmjs.com/package/@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source"><img src="https://badge.fury.io/js/%40comunica%2Factor-rdf-resolve-quad-pattern-rdfjs-streaming-source.svg" alt="npm version"></a></p>
-					<p>A comunica RDFjs Streaming Source RDF Resolve Quad Pattern Actor.</p>
+					<p><a href="https://www.npmjs.com/package/@comunica/actor-rdf-join-inner-incremental-multi-bind"><img src="https://badge.fury.io/js/%40comunica%2Factor-rdf-join-inner-incremental-memory-multi-bind.svg" alt="npm version"></a></p>
+					<p>A comunica Inner Incremental Multi Bind RDF Join Actor.</p>
 					<p>This module is part of the <a href="https://github.com/comunica/comunica">Comunica framework</a>,
 					and should only be used by <a href="https://comunica.dev/docs/modify/">developers that want to build their own query engine</a>.</p>
 					<p><a href="https://comunica.dev/docs/query/">Click here if you just want to query with Comunica</a>.</p>
 					<a href="#install" id="install" style="color: inherit; text-decoration: none;">
 						<h2>Install</h2>
 					</a>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/actor-rdf-join-inner-incremental-memory-multi-bind</span>
 </code></pre>
 					<a href="#configure" id="configure" style="color: inherit; text-decoration: none;">
 						<h2>Configure</h2>
@@ -87,13 +87,16 @@
 					<pre><code class="language-text">{
   &quot;@context&quot;: [
     ...
-    &quot;https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source/^1.0.0/components/context.jsonld&quot;  
+    &quot;https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-memory-multi-bind/^1.0.0/components/context.jsonld&quot;  
   ],
   &quot;actors&quot;: [
     ...
     {
-      &quot;@id&quot;: &quot;urn:comunica:default:rdf-resolve-quad-pattern/actors#rdfjs-streaming-source&quot;,
-      &quot;@type&quot;: &quot;ActorRdfResolveQuadPatternRdfjsStreamingSource&quot;
+      &quot;@id&quot;: &quot;urn:comunica:default:rdf-join/actors#inner-incremental-memory-multi-bind&quot;,
+      &quot;@type&quot;: &quot;ActorRdfJoinIncrementalMultiBind&quot;,
+      &quot;mediatorJoinSelectivity&quot;: { &quot;@id&quot;: &quot;urn:comunica:default:rdf-join-selectivity/mediators#main&quot; },
+      &quot;mediatorJoinEntriesSort&quot;: { &quot;@id&quot;: &quot;urn:comunica:default:rdf-join-entries-sort/mediators#main&quot; },
+      &quot;mediatorQueryOperation&quot;: { &quot;@id&quot;: &quot;urn:comunica:default:query-operation/mediators#main&quot; }
     }
   ]
 }
@@ -114,8 +117,13 @@
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.ActorRdfResolveQuadPatternRdfjsStreamingSource.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Rdfjs<wbr>Streaming<wbr>Source</a></li>
-								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.RdfJsQuadStreamingSource.html" class="tsd-kind-icon">Rdf<wbr>JsQuad<wbr>Streaming<wbr>Source</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/actor_rdf_join_inner_incremental_memory_multi_bind.ActorRdfJoinInnerIncrementalMemoryMultiBind.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Join<wbr>Inner<wbr>Incremental<wbr>Memory<wbr>Multi<wbr>Bind</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/actor_rdf_join_inner_incremental_memory_multi_bind.IActorRdfJoinMultiBindArgs.html" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Join<wbr>Multi<wbr>Bind<wbr>Args</a></li>
 							</ul>
 						</section>
 					</div>
@@ -134,7 +142,7 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_query_operation_quadpattern.html">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_memory_multi_bind.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>memory-<wbr>multi-<wbr>bind</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -146,7 +154,7 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_resolve_quad_pattern_incremental_federated.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>incremental-<wbr>federated</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -180,9 +188,21 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_query_operation_quadpattern.html" class="tsd-kind-icon">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
 					</li>
-					<li class=" tsd-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_memory_multi_bind.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>memory-<wbr>multi-<wbr>bind</a>
+						<ul>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/actor_rdf_join_inner_incremental_memory_multi_bind.ActorRdfJoinInnerIncrementalMemoryMultiBind.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Join<wbr>Inner<wbr>Incremental<wbr>Memory<wbr>Multi<wbr>Bind</a>
+							</li>
+							<li class=" tsd-kind-interface tsd-parent-kind-module">
+								<a href="../interfaces/actor_rdf_join_inner_incremental_memory_multi_bind.IActorRdfJoinMultiBindArgs.html" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Join<wbr>Multi<wbr>Bind<wbr>Args</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_metadata_extract_guard_data.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>metadata-<wbr>extract-<wbr>guard-<wbr>data</a>
 					</li>
@@ -192,21 +212,9 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_resolve_quad_pattern_incremental_federated.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>incremental-<wbr>federated</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
-						<ul>
-							<li class=" tsd-kind-class tsd-parent-kind-module">
-								<a href="../classes/actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.ActorRdfResolveQuadPatternRdfjsStreamingSource.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Rdfjs<wbr>Streaming<wbr>Source</a>
-							</li>
-							<li class=" tsd-kind-class tsd-parent-kind-module">
-								<a href="../classes/actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.RdfJsQuadStreamingSource.html" class="tsd-kind-icon">Rdf<wbr>JsQuad<wbr>Streaming<wbr>Source</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-module">
 						<a href="bus_guard.html" class="tsd-kind-icon">bus-<wbr>guard</a>
 					</li>
