@@ -1,7 +1,7 @@
-import type { Bindings } from '@comunica/bindings-factory';
 import type { BindingsStream } from '@comunica/types';
 import arrayifyStream from 'arrayify-stream';
 import toEqualBindingsArray from './toEqualBindingsArray';
+import {Bindings} from "../../../incremental-bindings-factory";
 
 export default {
   async toEqualBindingsStream(received: BindingsStream, actual: Bindings[]) {

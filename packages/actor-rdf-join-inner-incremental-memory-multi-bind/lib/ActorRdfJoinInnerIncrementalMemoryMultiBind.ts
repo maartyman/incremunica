@@ -1,5 +1,3 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type {
@@ -10,6 +8,8 @@ import type {
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import { KeysQueryOperation } from '@comunica/context-entries';
+import { BindingsFactory } from '@comunica/incremental-bindings-factory';
+import type { Bindings } from '@comunica/incremental-bindings-factory';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream, IQueryOperationResultBindings,
   MetadataBindings, IActionContext, IJoinEntryWithMetadata } from '@comunica/types';

@@ -1,13 +1,13 @@
 {
-  "name": "@comunica/bindings-factory",
+  "name": "@comunica/incremental-bindings-factory",
   "version": "1.0.0",
-  "description": "Bindings factory module for Comunica",
+  "description": "Incremental bindings factory module for Comunica",
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/bindings-factory"
+    "directory": "packages/incremental-bindings-factory"
   },
   "publishConfig": {
     "access": "public"

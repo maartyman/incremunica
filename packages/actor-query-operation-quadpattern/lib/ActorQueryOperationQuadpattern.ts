@@ -1,9 +1,9 @@
-import { BindingsFactory } from '@comunica/bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperationTyped, ClosableTransformIterator } from '@comunica/bus-query-operation';
 import type { MediatorRdfResolveQuadPattern } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IActorArgs, IActorTest } from '@comunica/core';
+import { BindingsFactory } from '@comunica/incremental-bindings-factory';
 import type { Quad } from '@comunica/incremental-types';
 import type { BindingsStream,
   IQueryOperationResult,

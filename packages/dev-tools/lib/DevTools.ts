@@ -1,4 +1,4 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/incremental-bindings-factory';
 
 export const DevTools = {
   printBindings(bindings: Bindings) {

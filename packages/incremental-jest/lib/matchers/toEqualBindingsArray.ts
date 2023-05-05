@@ -1,6 +1,6 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { bindingsToString } from '@comunica/bindings-factory';
+import {Bindings, bindingsToString} from '@comunica/incremental-bindings-factory';
 import toEqualBindings from './toEqualBindings';
+import {DevTools} from "@comunica/dev-tools";
 
 function bindingsArrayToString(bindings: Bindings[]): string {
   return `[ ${bindings.map(term => bindingsToString(term, true)).join(', ')} ]`;
@@ -38,7 +38,7 @@ export default {
       };
     }
 
-    const actualCopy = [];
+    let actualCopy = [];
     for (const [ aI, aElement ] of actual.entries()) {
       actualCopy.push(aElement);
     }
@@ -47,13 +47,13 @@ export default {
       for (const [ aI, aElement ] of actualCopy.entries()) {
         const sub = toEqualBindings.toEqualBindings(element, aElement);
         if (sub.pass) {
-          actualCopy[aI] = actualCopy[actualCopy.length - 1];
+          actualCopy[aI] = actualCopy[actualCopy.length-1];
           actualCopy.pop();
           break;
         }
       }
     }
-    if (actualCopy.length > 0) {
+    if (actualCopy.length != 0) {
       return {
         message: () => `expected ${bindingsArrayToString(received)} to equal ${bindingsArrayToString(actual)}.`,
         pass: false,

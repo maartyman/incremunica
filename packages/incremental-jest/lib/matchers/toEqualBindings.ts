@@ -1,5 +1,5 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { bindingsToString } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/incremental-bindings-factory';
+import { bindingsToString } from '@comunica/incremental-bindings-factory';
 
 function fail(received: Bindings, actual: Bindings): any {
   return {

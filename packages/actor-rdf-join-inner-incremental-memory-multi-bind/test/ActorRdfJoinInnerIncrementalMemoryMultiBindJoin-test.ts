@@ -1,4 +1,4 @@
-import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
+import {Bindings, BindingsFactory} from '@comunica/incremental-bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';

@@ -17,7 +17,7 @@ $ yarn add @comunica/incremental-types
 
 ```typescript
 import {Quad} from '@comunica/incremental-types';
-import {BindingsFactory} from '@comunica/bindings-factory';
+import {BindingsFactory} from '@comunica/incremental-bindings-factory';
 
 // ...
 

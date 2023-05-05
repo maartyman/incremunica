@@ -5,7 +5,7 @@
     "packages/actor-init-sparql",
     "packages/actor-init-sparql-file",
     "packages/actor-init-sparql-rdfjs",
-    "packages/bindings-factory",
+    "packages/incremental-bindings-factory",
     "packages/context-entries",
     "packages/data-factory",
     "packages/jest",

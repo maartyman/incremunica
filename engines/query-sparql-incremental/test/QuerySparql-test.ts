@@ -2,17 +2,13 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
-import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import type { BindingsStream, QueryStringContext} from '@comunica/types';
 import {Factory} from 'sparqlalgebrajs';
 import {QueryEngine} from '../lib/QueryEngine';
-import {mockHttp, usePolly} from './util';
-import {Quad} from "@comunica/incremental-types";
+import {usePolly} from './util';
 import {EventEmitter} from "events";
 import * as http from "http";
-import {BindingsFactory} from "@comunica/bindings-factory";
-import {DevTools} from "@comunica/dev-tools";
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');

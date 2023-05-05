@@ -35,6 +35,6 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/bindings-factory": "^1.0.0"
+    "@comunica/incremental-bindings-factory": "^1.0.0"
   }
 }

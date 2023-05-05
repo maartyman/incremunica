@@ -50,7 +50,7 @@ import "@comunica/incremental-jest";
 All examples below make use of these helpers:
 
 ```js
-import { BindingsFactory } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/incremental-bindings-factory';
 import { DataFactory } from 'rdf-data-factory';
 
 const BF = new BindingsFactory();
