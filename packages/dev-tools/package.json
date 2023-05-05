@@ -1,0 +1,40 @@
+{
+  "name": "@comunica/dev-tools",
+  "version": "1.0.0",
+  "description": "Development tools for comunica/incremunica.",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/dev-tools"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "dev",
+    "utils"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/issues"
+  },
+  "homepage": "https://github.com/comunica",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/bindings-factory": "^1.0.0"
+  }
+}

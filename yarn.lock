@@ -2292,6 +2292,16 @@
     rdf-data-factory "^1.1.1"
     rdf-string "^1.6.1"
 
+"@comunica/bindings-factory@^2.0.1", "@comunica/bindings-factory@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@comunica/bindings-factory/-/bindings-factory-2.5.1.tgz#18fc7269dc8d11f8de28b8c8c21c80ea80464250"
+  integrity sha512-w8L9t17EaBibuyDXQAjSK04E4E3s/WWsSCNQz7QzG8dpLqscLfwiE0OBJpqpqGZ8pBkgQPt/JyC2WAqwPi5CHg==
+  dependencies:
+    "@rdfjs/types" "*"
+    immutable "^4.1.0"
+    rdf-data-factory "^1.1.1"
+    rdf-string "^1.6.1"
+
 "@comunica/bus-context-preprocess@^2.6.8":
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/@comunica/bus-context-preprocess/-/bus-context-preprocess-2.6.8.tgz#a7fc608f752b474b60b6854ef09e5e52e934e983"

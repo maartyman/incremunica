@@ -4,6 +4,7 @@ import { ActorQueryOperationTyped, ClosableTransformIterator } from '@comunica/b
 import type { MediatorRdfResolveQuadPattern } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IActorArgs, IActorTest } from '@comunica/core';
+import type { Quad } from '@comunica/incremental-types';
 import type { BindingsStream,
   IQueryOperationResult,
   IActionContext, MetadataBindings,
@@ -15,7 +16,6 @@ import type { QuadTermName } from 'rdf-terms';
 import { getTerms, QUAD_TERM_NAMES, reduceTerms, TRIPLE_TERM_NAMES, uniqTerms } from 'rdf-terms';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
-import {Quad} from "@comunica/incremental-types";
 
 const BF = new BindingsFactory();
 const DF = new DataFactory();
@@ -191,7 +191,7 @@ export class ActorQueryOperationQuadpattern extends ActorQueryOperationTyped<Alg
   }
 
   public async runOperation(pattern: Algebra.Pattern, context: IActionContext):
-    Promise<IQueryOperationResult> {
+  Promise<IQueryOperationResult> {
     // Apply the (optional) pattern-specific context
     if (pattern.context) {
       context = context.merge(pattern.context);
@@ -225,7 +225,7 @@ export class ActorQueryOperationQuadpattern extends ActorQueryOperationTyped<Alg
       },
       {});
     const quadBindingsReducer = (acc: [RDF.Variable, RDF.Term][], term: RDF.Term, key: QuadTermName):
-      [RDF.Variable, RDF.Term][] => {
+    [RDF.Variable, RDF.Term][] => {
       const variable: string = elementVariables[key];
       if (variable) {
         acc.push([ DF.variable(variable), term ]);
@@ -267,10 +267,7 @@ export class ActorQueryOperationQuadpattern extends ActorQueryOperationTyped<Alg
         });
       }
 
-      return filteredOutput.map((quad) => {
-        console.log("quadPattern resolve: ", <Quad><any>quad);
-        return BF.bindings(reduceTerms(quad, quadBindingsReducer, []), (<Quad>quad).diff)
-      });
+      return filteredOutput.map(quad => BF.bindings(reduceTerms(quad, quadBindingsReducer, []), (<Quad>quad).diff));
     }, {
       autoStart: false,
       onClose: () => result.data.destroy(),

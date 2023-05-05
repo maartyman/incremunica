@@ -7,6 +7,7 @@ import type {
 import { getDataSourceContext } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { BlankNodeScoped } from '@comunica/data-factory';
+import type { Quad } from '@comunica/incremental-types';
 import type { IActionContext, DataSources, IDataSource, MetadataQuads } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
@@ -15,7 +16,6 @@ import { DataFactory } from 'rdf-data-factory';
 import { mapTerms } from 'rdf-terms';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
-import {Quad} from "@comunica/incremental-types";
 
 const DF = new DataFactory();
 
@@ -36,8 +36,8 @@ export class IncrementalFederatedQuadSource implements IQuadSource {
   protected readonly algebraFactory: Factory;
 
   public constructor(mediatorResolveQuadPattern: MediatorRdfResolveQuadPattern,
-                     context: IActionContext, emptyPatterns: Map<IDataSource, RDF.Quad[]>,
-                     skipEmptyPatterns: boolean) {
+    context: IActionContext, emptyPatterns: Map<IDataSource, RDF.Quad[]>,
+    skipEmptyPatterns: boolean) {
     this.mediatorResolveQuadPattern = mediatorResolveQuadPattern;
     this.sources = context.get(KeysRdfResolveQuadPattern.sources)!;
     this.contextDefault = context.delete(KeysRdfResolveQuadPattern.sources);
@@ -194,7 +194,7 @@ export class IncrementalFederatedQuadSource implements IQuadSource {
 
     // Anonymous function to handle cardinality from metadata
     const checkEmitMetadata = (currentTotalItems: number, source: IDataSource,
-                               pattern: RDF.BaseQuad | undefined, lastMetadata?: MetadataQuads): void => {
+      pattern: RDF.BaseQuad | undefined, lastMetadata?: MetadataQuads): void => {
       if (this.skipEmptyPatterns && !currentTotalItems && pattern && !this.isSourceEmpty(source, pattern)) {
         this.emptyPatterns.get(source)!.push(pattern);
       }
@@ -270,7 +270,7 @@ export class IncrementalFederatedQuadSource implements IQuadSource {
 
       // Determine the data stream from this source
       const data = output.data.map(quad => {
-        let skolemizedQuad = IncrementalFederatedQuadSource.skolemizeQuad<Quad>(quad as Quad, sourceId);
+        const skolemizedQuad = IncrementalFederatedQuadSource.skolemizeQuad<Quad>(<Quad>quad, sourceId);
         skolemizedQuad.diff = (<Quad>quad).diff;
         return skolemizedQuad;
       });

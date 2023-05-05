@@ -1,24 +1,26 @@
 {
-  "name": "@comunica/actor-rdf-join-inner-incremental-multi-bind",
+  "name": "@comunica/incremental-jest",
   "version": "1.0.0",
-  "description": "A inner-incremental-multi-bind rdf-join actor",
-  "lsd:module": true,
+  "description": "Jest utilities for incremunica",
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/actor-rdf-join-inner-incremental-multi-bind"
+    "directory": "packages/incremental-jest"
   },
   "publishConfig": {
     "access": "public"
   },
   "sideEffects": false,
   "keywords": [
+    "jest",
+    "rdf",
     "comunica",
-    "actor",
-    "rdf-join",
-    "inner-incremental-multi-bind"
+    "testing",
+    "testing",
+    "matchers",
+    "extend"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,12 +34,13 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/core": "^2.6.8",
-    "@comunica/bus-rdf-join": "^2.6.8"
+    "@comunica/bindings-factory": "^1.0.0",
+    "@comunica/types": "^2.6.8",
+    "arrayify-stream": "^2.0.1",
+    "@rdfjs/types": "*"
   },
   "scripts": {
-    "build": "npm run build:ts && npm run build:components",
-    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
-    "build:components": "componentsjs-generator"
+    "build": "npm run build:ts",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\""
   }
 }

@@ -1,3 +1,5 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type {
@@ -11,22 +13,31 @@ import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream, IQueryOperationResultBindings,
   MetadataBindings, IActionContext, IJoinEntryWithMetadata } from '@comunica/types';
-import type { Bindings } from "@comunica/bindings-factory";
-import {ArrayIterator, EmptyIterator, MultiTransformIterator, TransformIterator, UnionIterator} from 'asynciterator';
+import type { AsyncIterator } from 'asynciterator';
+import {
+  ArrayIterator,
+  EmptyIterator,
+  UnionIterator,
+} from 'asynciterator';
 import { Factory, Algebra } from 'sparqlalgebrajs';
-import * as RDF from "rdf-js";
-import {transform} from "@babel/core";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
  */
-export class ActorRdfJoinIncrementalMultiBind extends ActorRdfJoin {
-  public readonly incrementalBindDeletionTechnique: IncrementalBindDeletionTechnique;
+export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
   public readonly selectivityModifier: number;
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
 
   public static readonly FACTORY = new Factory();
+
+  public static bindingHash(bindings: Bindings): string {
+    let hash = '';
+    for (const binding of bindings) {
+      hash += `${binding[0].value}:${binding[1].value}#`;
+    }
+    return hash;
+  }
 
   public constructor(args: IActorRdfJoinMultiBindArgs) {
     super(args, {
@@ -40,86 +51,141 @@ export class ActorRdfJoinIncrementalMultiBind extends ActorRdfJoin {
    * Create a new bindings stream that takes every binding of the base stream
    * and binds it to the remaining patterns, evaluates those patterns, and emits all their bindings.
    *
-   * @param incrementalBindDeletionTechnique The technique to propagate deletions.
    * @param baseStream The base stream.
    * @param operations The operations to bind with each binding of the base stream.
    * @param operationBinder A callback to retrieve the bindings stream of bound operations.
    * @param optional If the original bindings should be emitted when the resulting bindings stream is empty.
    * @return {BindingsStream}
    */
-  public static createBindStream(
-    incrementalBindDeletionTechnique: IncrementalBindDeletionTechnique,
+  public static async createBindStream(
     baseStream: BindingsStream,
     operations: Algebra.Operation[],
     operationBinder: (boundOperations: Algebra.Operation[], operationBindings: Bindings)
-      => Promise<BindingsStream>,
+    => Promise<BindingsStream>,
     optional: boolean,
-  ): BindingsStream {
-    let transformMap = new Map<string, TransformIterator<RDF.Bindings | undefined,RDF.Bindings | undefined>>();
+  ): Promise<BindingsStream> {
+    const transformMap = new Map<
+    string,
+    {
+      iterator: AsyncIterator<Bindings | undefined>;
+      memory: Map<
+      string,
+      {
+        bindings: Bindings;
+        count: number;
+      }>;
+      count: number;
+    }>();
 
     // Create bindings function
-    const binder = (bindings: Bindings): BindingsStream => {
-      for (const binding of bindings) {
-        console.log(binding[0].value, binding[1].value)
-      }
-      console.log(bindings.diff)
+    const binder = (bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): void => {
+      const hash = ActorRdfJoinInnerIncrementalMemoryMultiBind.bindingHash(bindings);
+      if (bindings.diff) {
+        const hashData = transformMap.get(hash);
+        if (hashData === undefined) {
+          const data = {
+            iterator: new EmptyIterator<Bindings>(),
+            memory: new Map<string, { bindings: Bindings; count: number }>(),
+            count: 1,
+          };
+          transformMap.set(hash, data);
 
-      if(incrementalBindDeletionTechnique == "computation" || bindings.diff) {
-        // We don't bind the filter because filters are always handled last,
-        // and we need to avoid binding filters of sub-queries, which are to be handled first. (see spec test bind10)
-        const subOperations = operations
-          .map(operation => materializeOperation(operation, bindings, { bindFilter: false }));
-        const bindingsMerger = (subBindings: Bindings): Bindings | undefined => subBindings.merge(bindings);
-        let transformIterator = new TransformIterator(async() => (await operationBinder(subOperations, bindings))
-          .transform({ map: bindingsMerger }), { maxBufferSize: 128, autoStart: false });
+          // We don't bind the filter because filters are always handled last,
+          // and we need to avoid binding filters of sub-queries, which are to be handled first. (see spec test bind10)
+          const subOperations = operations
+            .map(operation => materializeOperation(operation, bindings, { bindFilter: false }));
 
-        let hash: string = "";
-        for (const binding of bindings) {
-          hash += binding[0].value + ":" + binding[1].value + "#";
-        }
-
-        /*
-        if (incrementalBindDeletionTechnique == "memory") {
-          transformIterator = transformIterator.transform({
-            transform: ((item: (Bindings | undefined), done: () => void, push: (i: (Bindings | undefined)) => void) => {
-
-              push(item);
+          const transformFunc = (subBindings: Bindings, subDone: () => void, subPush: (i: Bindings) => void): void => {
+            const newBindings = subBindings.merge(bindings);
+            if (newBindings === undefined) {
+              subDone();
+              return;
             }
-          })
-        }
-         */
+            const bindingHash = ActorRdfJoinInnerIncrementalMemoryMultiBind.bindingHash(newBindings);
+            const bindingsData = data.memory.get(bindingHash);
+            if (newBindings.diff) {
+              if (bindingsData === undefined) {
+                data.memory.set(bindingHash, { bindings: newBindings, count: 1 });
+              } else {
+                bindingsData.count++;
+              }
+              for (let i = 0; i < data.count; i++) {
+                subPush(newBindings);
+              }
+            } else if (bindingsData !== undefined) {
+              if (bindingsData.count > 1) {
+                bindingsData.count--;
+              } else {
+                data.memory.delete(bindingHash);
+              }
+              for (let i = 0; i < data.count; i++) {
+                subPush(newBindings);
+              }
+            }
+            subDone();
+          };
 
-        if (bindings.diff) {
-          transformMap.set(hash, transformIterator);
-          return <BindingsStream>transformIterator;
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          operationBinder(subOperations, bindings).then(bindingStream => {
+            const transformIterator = bindingStream.transform({
+              transform: transformFunc,
+            });
+
+            // Maybe by the time operationBinder has finished the current bindings already has been deleted
+            // => count should be 0 then
+            // if (data.count == 0) {
+            //  transformIterator.destroy();
+            //  done();
+            //  return;
+            // }
+
+            data.iterator = transformIterator;
+
+            push(<BindingsStream>transformIterator);
+            done();
+          });
         } else {
-          let originalTransIt = transformMap.get(hash)
-          if (originalTransIt != undefined) {
-            originalTransIt.destroy()
+          hashData.count++;
+          push(new ArrayIterator(hashData.memory.values()).transform({
+            transform(item, arrayDone, arrayPush) {
+              for (let i = 0; i < item.count; i++) {
+                arrayPush(item.bindings);
+              }
+              arrayDone();
+            },
+          }));
+          done();
+        }
+      } else {
+        const hashData = transformMap.get(hash);
+        if (hashData !== undefined) {
+          if (hashData.count < 2) {
+            hashData.iterator.destroy();
+            hashData.count = 0;
             transformMap.delete(hash);
-            return <BindingsStream>transformIterator;
           } else {
-            return new EmptyIterator();
+            hashData.count--;
           }
+          const bindingsFactory = new BindingsFactory();
+          if (hashData.memory.size > 0) {
+            push(new ArrayIterator(hashData.memory.values()).transform({
+              transform(item, arrayDone, arrayPush) {
+                const transformBindings = bindingsFactory.fromBindings(item.bindings);
+                transformBindings.diff = false;
+                for (let i = 0; i < item.count; i++) {
+                  arrayPush(transformBindings);
+                }
+                arrayDone();
+              },
+            }));
+          }
+          done();
         }
-      }
-      else {
-        let hash: string = "";
-        for (const binding of bindings) {
-          hash += binding[0].value + ":" + binding[1].value + "#";
-        }
-        let transformIterator = transformMap.get(hash);
-        if(transformIterator != undefined) {
-          transformIterator.destroy();
-        }
-
-
-        return new TransformIterator();
       }
     };
 
     return new UnionIterator(baseStream.transform({
-      map: binder,
+      transform: binder,
       optional,
     }), { autoStart: false });
   }
@@ -201,12 +267,6 @@ export class ActorRdfJoinIncrementalMultiBind extends ActorRdfJoin {
     const entriesUnsorted = await ActorRdfJoin.getEntriesWithMetadatas(action.entries);
     const entries = await this.sortJoinEntries(entriesUnsorted, action.context);
 
-    /*
-    console.log(action.context,
-      'First entry for Bind Join: ',
-      () => ({ entry: entries[0].operation, metadata: entries[0].metadata }));
-     */
-
     for (const [ i, element ] of entries.entries()) {
       if (i !== 0) {
         element.output.bindingsStream.close();
@@ -222,15 +282,14 @@ export class ActorRdfJoinIncrementalMultiBind extends ActorRdfJoin {
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, entries[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream: BindingsStream = ActorRdfJoinIncrementalMultiBind.createBindStream(
-      this.incrementalBindDeletionTechnique,
+    const bindingsStream: BindingsStream = await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(
       smallestStream.bindingsStream,
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
         // Send the materialized patterns to the mediator for recursive join evaluation.
         const operation = operations.length === 1 ?
           operations[0] :
-          ActorRdfJoinIncrementalMultiBind.FACTORY.createJoin(operations);
+          ActorRdfJoinInnerIncrementalMemoryMultiBind.FACTORY.createJoin(operations);
         const output = ActorQueryOperation.getSafeBindings(await this.mediatorQueryOperation.mediate(
           { operation, context: subContext?.set(KeysQueryOperation.joinBindings, operationBindings) },
         ));
@@ -309,11 +368,6 @@ export class ActorRdfJoinIncrementalMultiBind extends ActorRdfJoin {
 
 export interface IActorRdfJoinMultiBindArgs extends IActorRdfJoinArgs {
   /**
-   * The technique to propagate deletions.
-   * @default {computation}
-   */
-  incrementalBindDeletionTechnique: IncrementalBindDeletionTechnique;
-  /**
    * Multiplier for selectivity values
    * @range {double}
    * @default {0.0001}
@@ -328,5 +382,3 @@ export interface IActorRdfJoinMultiBindArgs extends IActorRdfJoinArgs {
    */
   mediatorQueryOperation: MediatorQueryOperation;
 }
-
-export type IncrementalBindDeletionTechnique = 'memory' | 'computation';

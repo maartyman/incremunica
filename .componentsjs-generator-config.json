@@ -9,6 +9,8 @@
     "packages/context-entries",
     "packages/data-factory",
     "packages/jest",
+    "packages/incremental-jest",
+    "packages/dev-tools",
     "packages/packager",
     "packages/runner-cli",
     "packages/rdf-streaming-store",
