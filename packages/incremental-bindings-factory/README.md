@@ -1,4 +1,4 @@
-# Comunica Bindings Factory
+# Comunica Incremental Bindings Factory
 
 [![npm version](https://badge.fury.io/js/%40comunica%2Fbindings-factory.svg)](https://www.npmjs.com/package/@comunica/bindings-factory)
 
@@ -17,7 +17,7 @@ and should only be used by [developers that want to build their own query engine
 ## Install
 
 ```bash
-$ yarn add @comunica/bindings-factory
+$ yarn add @comunica/incremental-bindings-factory
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ $ yarn add @comunica/bindings-factory
 ```typescript
 import * as RDF from '@rdfjs/types';
 import { DataFactory } from '@comunica/data-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/incremental-bindings-factory';
 
 const DF = new DataFactory();
 const BF = new BindingsFactory(DF);

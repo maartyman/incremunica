@@ -1,0 +1,47 @@
+{
+  "name": "@comunica/incremental-jest",
+  "version": "1.0.0",
+  "description": "Jest utilities for incremunica",
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/comunica/comunica.git",
+    "directory": "packages/incremental-jest"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "jest",
+    "rdf",
+    "comunica",
+    "testing",
+    "testing",
+    "matchers",
+    "extend"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/comunica/comunica/issues"
+  },
+  "homepage": "https://comunica.dev/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/types": "^2.6.8",
+    "@rdfjs/types": "*",
+    "arrayify-stream": "^2.0.1",
+    "@comunica/incremental-bindings-factory": "^1.0.0",
+    "@comunica/dev-tools": "^1.0.0"
+  },
+  "scripts": {
+    "build": "npm run build:ts",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\""
+  }
+}

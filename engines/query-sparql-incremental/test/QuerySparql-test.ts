@@ -2,13 +2,11 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
-import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import type { BindingsStream, QueryStringContext} from '@comunica/types';
 import {Factory} from 'sparqlalgebrajs';
 import {QueryEngine} from '../lib/QueryEngine';
-import {mockHttp, usePolly} from './util';
-import {Quad} from "@comunica/incremental-types";
+import {usePolly} from './util';
 import {EventEmitter} from "events";
 import * as http from "http";
 
@@ -112,6 +110,7 @@ describe('System test: QuerySparql (without polly)', () => {
       await new Promise<void>(resolve => server.listen(6565, 'localhost', () => {
         resolve();
       }));
+      await engine.invalidateHttpCache()
     });
 
     afterEach(async () => {
@@ -141,6 +140,30 @@ describe('System test: QuerySparql (without polly)', () => {
 
       await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
         expect(true).toEqual(true);
+        resolve();
+      }));
+    });
+
+    it('simple deletion update query', async () => {
+      fetchData.dataString = "<s1> <p1> <o1> .";
+      fetchData.etag = "0";
+
+      bindingStream = await engine.queryBindings(`SELECT * WHERE {
+          ?s ?p ?o.
+          }`, {
+        sources: ['http://localhost:6565']
+      });
+
+      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
+        expect(bindings.diff).toEqual(true);
+        resolve();
+      }));
+
+      fetchData.dataString = "";
+      fetchData.etag = "1";
+
+      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
+        expect(bindings.diff).toEqual(false);
         resolve();
       }));
     });

@@ -68,7 +68,7 @@ export class Bindings implements RDF.Bindings {
     )[Symbol.iterator]();
   }
 
-  public equals(other: RDF.Bindings | null | undefined): boolean {
+  public equals(other: Bindings | null | undefined, checkDiff = false): boolean {
     if (!other) {
       return false;
     }
@@ -78,6 +78,11 @@ export class Bindings implements RDF.Bindings {
 
     // First check if size is equal
     if (this.size !== other.size) {
+      return false;
+    }
+
+    // Check Diff
+    if (checkDiff && this.diff !== other.diff) {
       return false;
     }
 
@@ -120,7 +125,7 @@ export class Bindings implements RDF.Bindings {
       entries.push([ key, value ]);
     }
 
-    return new Bindings(this.dataFactory, Map(entries), this.diff);
+    return new Bindings(this.dataFactory, Map(entries), this.diff && other.diff);
   }
 
   public mergeWith(

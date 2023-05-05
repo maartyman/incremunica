@@ -1,6 +1,6 @@
-# Comunica Incremental Types
+# Incremunica development tools
 
-A collection of reusable incremental Comunica Typescript interfaces and types.
+A collection of reusable incremunica Typescript functions for debugging.
 
 This module is part of the [Comunica framework](https://github.com/comunica/comunica),
 and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
@@ -10,18 +10,17 @@ and should only be used by [developers that want to build their own query engine
 ## Install
 
 ```bash
-$ yarn add @comunica/incremental-types
+$ yarn add @comunica/dev-tools
 ```
 
 ## Usage
 
 ```typescript
-import {Quad} from '@comunica/incremental-types';
-import {BindingsFactory} from '@comunica/incremental-bindings-factory';
+import {DevTools} from '@comunica/dev-tools';
 
 // ...
 
-const quad: Quad = new Quad();
+DevTools.printBindings(bindings);
 ```
 
 All types are available in [`index.ts`](https://github.com/comunica/comunica/blob/master/packages/context-entries/index.ts).
