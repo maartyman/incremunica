@@ -1,6 +1,6 @@
 import {ArrayIterator, AsyncIterator} from 'asynciterator';
 import '@comunica/incremental-jest';
-import {IncrementalInnerJoin} from "../lib";
+import {IncrementalInnerJoin, Side} from "../lib";
 import { Bindings } from '@comunica/incremental-types';
 import EventEmitter = require("events");
 
@@ -82,7 +82,7 @@ describe('IncrementalInnerJoin', () => {
       expect(extendedClass.readable).toBeFalsy();
     });
 
-    it('should be destroyed if one of the iterators throws an error', async () => {
+    it('should be destroyed if the left iterator throws an error', async () => {
       let extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
@@ -96,6 +96,25 @@ describe('IncrementalInnerJoin', () => {
       });
 
       leftIterator.emit("error", "test error");
+
+      expect(await error).toEqual("test error");
+      expect(extendedClass.ended).toBeTruthy();
+    });
+
+    it('should be destroyed if the right iterator throws an error', async () => {
+      let extendedClass = new ExtendedClass(
+        leftIterator,
+        rightIterator,
+        funJoin
+      );
+
+      let error = new Promise<string>((resolve) => {
+        extendedClass.once("error", (error) => {
+          resolve(error);
+        });
+      });
+
+      rightIterator.emit("error", "test error");
 
       expect(await error).toEqual("test error");
       expect(extendedClass.ended).toBeTruthy();
@@ -170,6 +189,23 @@ describe('IncrementalInnerJoin', () => {
 
       expect(leftIterator.destroyed).toBeTruthy();
       expect(rightIterator.destroyed).toBeTruthy();
+    });
+
+    it('should have all abstract functions', () => {
+      let extendedClass = new ExtendedClass(
+        leftIterator,
+        rightIterator,
+        funJoin
+      );
+
+      extendedClass._cleanup();
+      expect(cleanupMock).toBeCalled();
+
+      extendedClass.hasResults();
+      expect(hasResultMock).toBeCalled();
+
+      extendedClass.read();
+      expect(readMock).toBeCalled();
     });
 
   });

@@ -724,7 +724,52 @@ describe('ActorRdfJoinNestedLoop', () => {
       });
     });
 
+    it('should be symmetric', () => {
+      // Clean up the old bindings
+      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
 
+      action.entries[0].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]),
+      ]).transform({
+      transform: (item: Bindings, done: () => void, push: (i: RDF.Bindings) => void) => {
+          push(item);
+          setTimeout(() => {
+            push(item);
+            done();
+          }, 100)
+        }
+      });
+      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      action.entries[1].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]),
+      ]);
+      variables1 = [ DF.variable('a'), DF.variable('c') ];
+      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
+        const expected = [
+          BF.bindings([
+            [ DF.variable('a'), DF.literal('1') ],
+            [ DF.variable('b'), DF.literal('2') ],
+            [ DF.variable('c'), DF.literal('4') ],
+          ]),
+          BF.bindings([
+            [ DF.variable('a'), DF.literal('1') ],
+            [ DF.variable('b'), DF.literal('2') ],
+            [ DF.variable('c'), DF.literal('4') ],
+          ]),
+        ];
+        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+        expect((await arrayifyStream(output.bindingsStream)).map(bindingsToString).sort())
+          // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+          .toEqual(expected.map(bindingsToString).sort());
+      });
+    });
 
   });
 });
