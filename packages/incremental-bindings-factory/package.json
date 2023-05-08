@@ -32,7 +32,8 @@
     "@rdfjs/types": "*",
     "immutable": "^4.1.0",
     "rdf-data-factory": "^1.1.1",
-    "rdf-string": "^1.6.1"
+    "rdf-string": "^1.6.1",
+    "@comunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "node \"../../node_modules/typescript/bin/tsc\""

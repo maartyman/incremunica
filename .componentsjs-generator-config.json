@@ -11,6 +11,7 @@
     "packages/jest",
     "packages/incremental-jest",
     "packages/dev-tools",
+    "packages/incremental-inner-join",
     "packages/packager",
     "packages/runner-cli",
     "packages/rdf-streaming-store",

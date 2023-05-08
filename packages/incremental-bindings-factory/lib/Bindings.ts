@@ -1,3 +1,4 @@
+import type { Bindings as BindingsType } from '@comunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { Map } from 'immutable';
 import { bindingsToString } from './bindingsToString';
@@ -5,7 +6,7 @@ import { bindingsToString } from './bindingsToString';
 /**
  * An immutable.js-based Bindings object.
  */
-export class Bindings implements RDF.Bindings {
+export class Bindings implements BindingsType {
   public readonly type = 'bindings';
   public diff: boolean;
 
