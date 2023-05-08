@@ -1,14 +1,14 @@
 {
-  "name": "@comunica/incremental-types",
+  "name": "@comunica/actor-rdf-join-inner-incremental-nestedloop",
   "version": "1.0.0",
-  "description": "Types module for incremental Comunica",
+  "description": "A inner-incremental-nestedloop rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/incremental-types"
+    "directory": "packages/actor-rdf-join-inner-incremental-nestedloop"
   },
   "publishConfig": {
     "access": "public"
@@ -16,7 +16,9 @@
   "sideEffects": false,
   "keywords": [
     "comunica",
-    "types"
+    "actor",
+    "rdf-join",
+    "inner-incremental-nestedloop"
   ],
   "license": "MIT",
   "bugs": {
@@ -27,15 +29,14 @@
     "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
-    "lib/**/*.js.map",
-    "bin/**/*.d.ts",
-    "bin/**/*.js",
-    "bin/**/*.js.map"
+    "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@rdfjs/types": "*",
-    "asynciterator": "^3.8.0",
-    "n3": "^1.16.3"
+    "@comunica/bus-rdf-join": "^2.6.8",
+    "@comunica/mediatortype-join-coefficients": "^2.6.8",
+    "@comunica/types": "^2.6.8",
+    "@comunica/incremental-types": "^1.0.0",
+    "@comunica/incremental-inner-join": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
