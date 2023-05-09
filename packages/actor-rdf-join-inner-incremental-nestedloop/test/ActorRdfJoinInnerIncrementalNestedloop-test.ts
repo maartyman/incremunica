@@ -7,12 +7,10 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import arrayifyStream from 'arrayify-stream';
-import {ArrayIterator, WrappingIterator} from 'asynciterator';
+import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerIncrementalNestedloop } from '../lib/ActorRdfJoinInnerIncrementalNestedloop';
 import '@comunica/incremental-jest';
-import {Duplex, Readable} from "readable-stream";
-const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -393,9 +391,9 @@ describe('ActorRdfJoinNestedLoop', () => {
         expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
         // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
         // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream)).map(bindingsToString).sort())
-          // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-          .toEqual(expected.map(bindingsToString).sort());
+        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
+          expected
+        );
       });
     });
 
@@ -452,9 +450,9 @@ describe('ActorRdfJoinNestedLoop', () => {
         expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
         // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
         // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream)).map(bindingsToString).sort())
-          // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-          .toEqual(expected.map(bindingsToString).sort());
+        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
+          expected
+        );
       });
     });
 
@@ -765,9 +763,9 @@ describe('ActorRdfJoinNestedLoop', () => {
         ];
         // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
         // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream)).map(bindingsToString).sort())
-          // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-          .toEqual(expected.map(bindingsToString).sort());
+        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
+          expected
+        );
       });
     });
 
