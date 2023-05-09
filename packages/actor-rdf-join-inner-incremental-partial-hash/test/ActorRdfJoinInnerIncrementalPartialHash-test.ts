@@ -9,7 +9,7 @@ import type * as RDF from '@rdfjs/types';
 import arrayifyStream from 'arrayify-stream';
 import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { ActorRdfJoinInnerIncrementalNestedloop } from '../lib/ActorRdfJoinInnerIncrementalNestedloop';
+import { ActorRdfJoinInnerIncrementalPartialHash } from '../lib/ActorRdfJoinInnerIncrementalPartialHash';
 import '@comunica/incremental-jest';
 
 const DF = new DataFactory();
@@ -21,7 +21,7 @@ function bindingsToString(b: Bindings): string {
   return keys.map(k => `${k.value}:${b.get(k)!.value}`).toString();
 }
 
-describe('ActorRdfJoinNestedLoop', () => {
+describe('ActorRdfJoinPartialHash', () => {
   let bus: any;
   let context: IActionContext;
 
@@ -30,26 +30,26 @@ describe('ActorRdfJoinNestedLoop', () => {
     context = new ActionContext();
   });
 
-  describe('The ActorRdfJoinNestedLoop module', () => {
+  describe('The ActorRdfJoinPartialHash module', () => {
     it('should be a function', () => {
-      expect(ActorRdfJoinInnerIncrementalNestedloop).toBeInstanceOf(Function);
+      expect(ActorRdfJoinInnerIncrementalPartialHash).toBeInstanceOf(Function);
     });
 
-    it('should be a ActorRdfJoinNestedLoop constructor', () => {
-      expect(new (<any> ActorRdfJoinInnerIncrementalNestedloop)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoinInnerIncrementalNestedloop);
-      expect(new (<any> ActorRdfJoinInnerIncrementalNestedloop)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoin);
+    it('should be a ActorRdfJoinPartialHash constructor', () => {
+      expect(new (<any> ActorRdfJoinInnerIncrementalPartialHash)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoinInnerIncrementalPartialHash);
+      expect(new (<any> ActorRdfJoinInnerIncrementalPartialHash)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoin);
     });
 
-    it('should not be able to create new ActorRdfJoinNestedLoop objects without \'new\'', () => {
-      expect(() => { (<any> ActorRdfJoinInnerIncrementalNestedloop)(); }).toThrow();
+    it('should not be able to create new ActorRdfJoinPartialHash objects without \'new\'', () => {
+      expect(() => { (<any> ActorRdfJoinInnerIncrementalPartialHash)(); }).toThrow();
     });
   });
 
-  describe('An ActorRdfJoinNestedLoop instance', () => {
+  describe('An ActorRdfJoinPartialHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>;
-    let actor: ActorRdfJoinInnerIncrementalNestedloop;
+    let actor: ActorRdfJoinInnerIncrementalPartialHash;
     let action: IActionRdfJoin;
     let variables0: RDF.Variable[];
     let variables1: RDF.Variable[];
@@ -58,7 +58,7 @@ describe('ActorRdfJoinNestedLoop', () => {
       mediatorJoinSelectivity = <any> {
         mediate: async() => ({ selectivity: 1 }),
       };
-      actor = new ActorRdfJoinInnerIncrementalNestedloop({ name: 'actor', bus, mediatorJoinSelectivity });
+      actor = new ActorRdfJoinInnerIncrementalPartialHash({ name: 'actor', bus, mediatorJoinSelectivity });
       variables0 = [];
       variables1 = [];
       action = {
@@ -107,67 +107,44 @@ describe('ActorRdfJoinNestedLoop', () => {
         return expect(actor.test(action)).rejects.toBeTruthy();
       });
 
-      it('should handle undefs in left stream', () => {
-        action.entries[0].output.metadata = async() => ({
+      it('should fail on undefs in left stream', () => {
+        action.entries[0].output.metadata = () => Promise.resolve({
           cardinality: { type: 'estimate', value: 4 },
-          pageSize: 100,
-          requestTime: 10,
           canContainUndefs: true,
           variables: [],
         });
-        return expect(actor.test(action)).resolves
-          .toEqual({
-            iterations: 20,
-            persistedItems: 0,
-            blockingItems: 0,
-            requestTime: 1.4,
-          });
+        return expect(actor.test(action)).rejects
+          .toThrow(new Error('Actor actor can not join streams containing undefs'));
       });
 
-      it('should handle undefs in right stream', () => {
-        action.entries[1].output.metadata = async() => ({
-          cardinality: { type: 'estimate', value: 5 },
-          pageSize: 100,
-          requestTime: 20,
+      it('should fail on undefs in right stream', () => {
+        action.entries[1].output.metadata = () => Promise.resolve({
+          cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
         });
-        return expect(actor.test(action)).resolves
-          .toEqual({
-            iterations: 20,
-            persistedItems: 0,
-            blockingItems: 0,
-            requestTime: 1.4,
-          });
+        return expect(actor.test(action)).rejects
+          .toThrow(new Error('Actor actor can not join streams containing undefs'));
       });
 
-      it('should handle undefs in left and right stream', () => {
-        action.entries[0].output.metadata = async() => ({
+      it('should fail on undefs in left and right stream', () => {
+        action.entries[0].output.metadata = () => Promise.resolve({
           cardinality: { type: 'estimate', value: 4 },
-          pageSize: 100,
-          requestTime: 10,
           canContainUndefs: true,
           variables: [],
         });
-        action.entries[1].output.metadata = async() => ({
-          cardinality: { type: 'estimate', value: 5 },
-          pageSize: 100,
-          requestTime: 20,
+        action.entries[1].output.metadata = () => Promise.resolve({
+          cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
         });
-        return expect(actor.test(action)).resolves
-          .toEqual({
-            iterations: 20,
-            persistedItems: 0,
-            blockingItems: 0,
-            requestTime: 1.4,
-          });
+        return expect(actor.test(action)).rejects
+          .toThrow(new Error('Actor actor can not join streams containing undefs'));
       });
 
       it('should generate correct test metadata', async() => {
         await expect(actor.test(action)).resolves.toHaveProperty('iterations',
-          (await (<any> action.entries[0].output).metadata()).cardinality.value *
+          (await (<any> action.entries[0].output).metadata()).cardinality.value +
           (await (<any> action.entries[1].output).metadata()).cardinality.value);
       });
     });
@@ -397,65 +374,6 @@ describe('ActorRdfJoinNestedLoop', () => {
       });
     });
 
-    it('should join multiple bindings with undefs', () => {
-      // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
-
-      action.entries[0].output.bindingsStream = new ArrayIterator([
-        BF.bindings([
-          [ DF.variable('a'), DF.literal('1') ],
-          [ DF.variable('b'), DF.literal('2') ],
-        ]),
-        BF.bindings([
-          [ DF.variable('a'), DF.literal('2') ],
-          [ DF.variable('b'), DF.literal('3') ],
-        ]),
-      ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
-      action.entries[1].output.bindingsStream = new ArrayIterator([
-        BF.bindings([
-          [ DF.variable('a'), DF.literal('1') ],
-          [ DF.variable('c'), DF.literal('4') ],
-        ]),
-        BF.bindings([
-          [ DF.variable('c'), DF.literal('5') ],
-        ]),
-      ]);
-      action.entries[1].output.metadata = async() => ({
-        cardinality: { type: 'estimate', value: 5 },
-        pageSize: 100,
-        requestTime: 20,
-        canContainUndefs: true,
-        variables: variables1,
-      });
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('5') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('3') ],
-            [ DF.variable('c'), DF.literal('5') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
-    });
-
     it('should join multiple bindings with negative bindings (left)', () => {
       // Clean up the old bindings
       action.entries.forEach(output => output.output?.bindingsStream?.destroy());
@@ -626,7 +544,7 @@ describe('ActorRdfJoinNestedLoop', () => {
           [ DF.variable('b'), DF.literal('2') ],
         ]),
         BF.bindings([
-          [ DF.variable('a'), DF.literal('a') ],
+          [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
         ], false),
       ]);
@@ -681,7 +599,7 @@ describe('ActorRdfJoinNestedLoop', () => {
           [ DF.variable('b'), DF.literal('2') ],
         ]),
         BF.bindings([
-          [ DF.variable('a'), DF.literal('a') ],
+          [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
         ]),
       ]);
@@ -709,6 +627,11 @@ describe('ActorRdfJoinNestedLoop', () => {
             [ DF.variable('c'), DF.literal('4') ],
           ]),
           BF.bindings([
+            [ DF.variable('a'), DF.literal('1') ],
+            [ DF.variable('b'), DF.literal('b') ],
+            [ DF.variable('c'), DF.literal('4') ],
+          ]),
+          BF.bindings([
             [ DF.variable('a'), DF.literal('2') ],
             [ DF.variable('b'), DF.literal('2') ],
             [ DF.variable('c'), DF.literal('6') ],
@@ -732,7 +655,7 @@ describe('ActorRdfJoinNestedLoop', () => {
           [ DF.variable('b'), DF.literal('2') ],
         ]),
       ]).transform({
-      transform: (item: Bindings, done: () => void, push: (i: RDF.Bindings) => void) => {
+        transform: (item: Bindings, done: () => void, push: (i: RDF.Bindings) => void) => {
           push(item);
           setTimeout(() => {
             push(item);
