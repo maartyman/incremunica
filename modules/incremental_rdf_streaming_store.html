@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>rdf-streaming-store | Incremunica</title>
+	<title>incremental-rdf-streaming-store | Incremunica</title>
 	<meta name="description" content="Documentation for Incremunica">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">Incremunica</a>
 				</li>
 				<li>
-					<a href="rdf_streaming_store.html">rdf-streaming-store</a>
+					<a href="incremental_rdf_streaming_store.html">incremental-rdf-streaming-store</a>
 				</li>
 			</ul>
-			<h1>Module rdf-streaming-store</h1>
+			<h1>Module incremental-rdf-streaming-store</h1>
 		</div>
 	</div>
 </header>
@@ -67,12 +67,9 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<a href="#rdf-streaming-store" id="rdf-streaming-store" style="color: inherit; text-decoration: none;">
-						<h1>RDF Streaming Store</h1>
+					<a href="#incremental-rdf-streaming-store" id="incremental-rdf-streaming-store" style="color: inherit; text-decoration: none;">
+						<h1>Incremental RDF Streaming Store</h1>
 					</a>
-					<p><a href="https://github.com/comunica/rdf-streaming-store.js/actions?query=workflow%3ACI"><img src="https://github.com/comunica/rdf-streaming-store.js/workflows/CI/badge.svg" alt="Build status"></a>
-						<a href="https://coveralls.io/github/comunica/rdf-streaming-store.js?branch=master"><img src="https://coveralls.io/repos/github/comunica/rdf-streaming-store.js/badge.svg?branch=master" alt="Coverage Status"></a>
-					<a href="https://www.npmjs.com/package/rdf-streaming-store"><img src="https://badge.fury.io/js/rdf-streaming-store.svg" alt="npm version"></a></p>
 					<p>A read-only <a href="https://rdf.js.org/stream-spec/#store-interface">RDF/JS store</a> that allows parallel data lookup and insertion.
 					It works in both JavaScript and TypeScript.</p>
 					<p>Concretely, this means that <code>match()</code> calls happening before <code>import()</code> calls, will still consider those triples that
@@ -84,17 +81,17 @@
 					<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
 						<h2>Installation</h2>
 					</a>
-					<pre><code class="language-bash"><span style="color: #000000">$ npm install rdf-streaming-store</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ npm install @comunica/incremental-rdf-streaming-store</span>
 </code></pre>
 					<p>or</p>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add rdf-streaming-store</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/incremental-rdf-streaming-store</span>
 </code></pre>
 					<p>This package also works out-of-the-box in browsers via tools such as <a href="https://webpack.js.org/">webpack</a> and <a href="http://browserify.org/">browserify</a>.</p>
 					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 						<h2>Usage</h2>
 					</a>
 					<p>A new <code>StreamingStore</code> can be created as follows:</p>
-					<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StreamingStore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rdf-streaming-store&#039;</span><span style="color: #000000">;</span>
+					<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">StreamingStore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@comunica/incremental-rdf-streaming-store&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StreamingStore</span><span style="color: #000000">();</span>
 </code></pre>
@@ -187,8 +184,8 @@
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a></li>
-								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/incremental_rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter"><a href="../classes/incremental_rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a></li>
 							</ul>
 						</section>
 					</div>
@@ -243,14 +240,14 @@
 					<li class=" tsd-kind-module">
 						<a href="incremental_jest.html">incremental-<wbr>jest</a>
 					</li>
+					<li class="current tsd-kind-module">
+						<a href="incremental_rdf_streaming_store.html">incremental-<wbr>rdf-<wbr>streaming-<wbr>store</a>
+					</li>
 					<li class=" tsd-kind-module">
 						<a href="incremental_types.html">incremental-<wbr>types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="query_sparql_incremental.html">query-<wbr>sparql-<wbr>incremental</a>
-					</li>
-					<li class="current tsd-kind-module">
-						<a href="rdf_streaming_store.html">rdf-<wbr>streaming-<wbr>store</a>
 					</li>
 				</ul>
 			</nav>
@@ -298,27 +295,27 @@
 					<li class=" tsd-kind-module">
 						<a href="incremental_jest.html" class="tsd-kind-icon">incremental-<wbr>jest</a>
 					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-module">
+						<a href="incremental_rdf_streaming_store.html" class="tsd-kind-icon">incremental-<wbr>rdf-<wbr>streaming-<wbr>store</a>
+						<ul>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="../classes/incremental_rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="../classes/incremental_rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-module">
 						<a href="incremental_types.html" class="tsd-kind-icon">incremental-<wbr>types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="query_sparql_incremental.html" class="tsd-kind-icon">query-<wbr>sparql-<wbr>incremental</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-module">
-						<a href="rdf_streaming_store.html" class="tsd-kind-icon">rdf-<wbr>streaming-<wbr>store</a>
-						<ul>
-							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
-								<a href="../classes/rdf_streaming_store.PendingStreamsIndex.html" class="tsd-kind-icon">Pending<wbr>Streams<wbr>Index</a>
-							</li>
-							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
-								<a href="../classes/rdf_streaming_store.StreamingStore.html" class="tsd-kind-icon">Streaming<wbr>Store</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="after-current">
 				</ul>
 			</nav>
 		</div>
