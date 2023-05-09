@@ -35,7 +35,7 @@
     "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/core": "^2.6.8",
     "asynciterator": "^3.8.0",
-    "@comunica/rdf-streaming-store": "^1.0.0",
+    "@comunica/incremental-rdf-streaming-store": "^1.0.0",
     "@comunica/types": "^2.6.8",
     "@comunica/incremental-types": "^1.0.0",
     "@rdfjs/types": "*"

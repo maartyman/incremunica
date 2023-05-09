@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/rdf-streaming-store",
+  "name": "@comunica/incremental-rdf-streaming-store",
   "version": "1.0.0",
   "description": "An RDF Store where the match function gives a stream.",
   "lsd:module": true,
@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/rdf-streaming-store"
+    "directory": "packages/incremental-rdf-streaming-store"
   },
   "publishConfig": {
     "access": "public"
