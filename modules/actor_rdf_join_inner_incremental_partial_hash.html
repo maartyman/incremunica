@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>incremental-inner-join | Incremunica</title>
+	<title>actor-rdf-join-inner-incremental-partial-hash | Incremunica</title>
 	<meta name="description" content="Documentation for Incremunica">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">Incremunica</a>
 				</li>
 				<li>
-					<a href="incremental_inner_join.html">incremental-inner-join</a>
+					<a href="actor_rdf_join_inner_incremental_partial_hash.html">actor-rdf-join-inner-incremental-partial-hash</a>
 				</li>
 			</ul>
-			<h1>Module incremental-inner-join</h1>
+			<h1>Module actor-rdf-join-inner-incremental-partial-hash</h1>
 		</div>
 	</div>
 </header>
@@ -67,17 +67,36 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<a href="#comunica-inner-incremental-join" id="comunica-inner-incremental-join" style="color: inherit; text-decoration: none;">
-						<h1>Comunica Inner Incremental Join</h1>
+					<a href="#comunica-inner-incremental-partial-hash-rdf-join-actor" id="comunica-inner-incremental-partial-hash-rdf-join-actor" style="color: inherit; text-decoration: none;">
+						<h1>Comunica Inner Incremental Partial Hash RDF Join Actor</h1>
 					</a>
-					<p>A comunica Incremental Inner Join base class.</p>
+					<p><a href="https://www.npmjs.com/package/@comunica/actor-rdf-join-inner-incremental-partial-hash"><img src="https://badge.fury.io/js/%40comunica%2Factor-rdf-join-inner-incremental-partial-hash.svg" alt="npm version"></a></p>
+					<p>A comunica Inner Incremental Partial Hash RDF Join Actor.</p>
 					<p>This module is part of the <a href="https://github.com/comunica/comunica">Comunica framework</a>,
 					and should only be used by <a href="https://comunica.dev/docs/modify/">developers that want to build their own query engine</a>.</p>
 					<p><a href="https://comunica.dev/docs/query/">Click here if you just want to query with Comunica</a>.</p>
 					<a href="#install" id="install" style="color: inherit; text-decoration: none;">
 						<h2>Install</h2>
 					</a>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/incremental-inner-join</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/actor-rdf-join-inner-incremental-partial-hash</span>
+</code></pre>
+					<a href="#configure" id="configure" style="color: inherit; text-decoration: none;">
+						<h2>Configure</h2>
+					</a>
+					<p>After installing, this package can be added to your engine&#39;s configuration as follows:</p>
+					<pre><code class="language-text">{
+  &quot;@context&quot;: [
+    ...
+    &quot;https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-partial-hash/^1.0.0/components/context.jsonld&quot;  
+  ],
+  &quot;actors&quot;: [
+    ...
+    {
+      &quot;@id&quot;: &quot;urn:comunica:default:rdf-join/actors#inner-incremental-partial-hash&quot;,
+      &quot;@type&quot;: &quot;ActorRdfJoinInnerIncrementalPartialHash&quot;
+    }
+  ]
+}
 </code></pre>
 					<a href="#config-parameters" id="config-parameters" style="color: inherit; text-decoration: none;">
 						<h3>Config Parameters</h3>
@@ -93,15 +112,10 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Enumerations</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum tsd-parent-kind-module"><a href="../enums/incremental_inner_join.Side.html" class="tsd-kind-icon">Side</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/incremental_inner_join.IncrementalInnerJoin.html" class="tsd-kind-icon">Incremental<wbr>Inner<wbr>Join</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/actor_rdf_join_inner_incremental_partial_hash.ActorRdfJoinInnerIncrementalPartialHash.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Join<wbr>Inner<wbr>Incremental<wbr>Partial<wbr>Hash</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/actor_rdf_join_inner_incremental_partial_hash.IncrementalPartialHashJoin.html" class="tsd-kind-icon">Incremental<wbr>Partial<wbr>Hash<wbr>Join</a></li>
 							</ul>
 						</section>
 					</div>
@@ -126,7 +140,7 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_nestedloop.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>nestedloop</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_partial_hash.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>partial-<wbr>hash</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -150,7 +164,7 @@
 					<li class=" tsd-kind-module">
 						<a href="incremental_bindings_factory.html">incremental-<wbr>bindings-<wbr>factory</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="incremental_inner_join.html">incremental-<wbr>inner-<wbr>join</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -181,9 +195,21 @@
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_nestedloop.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>nestedloop</a>
 					</li>
-					<li class=" tsd-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-module">
 						<a href="actor_rdf_join_inner_incremental_partial_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>partial-<wbr>hash</a>
+						<ul>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/actor_rdf_join_inner_incremental_partial_hash.ActorRdfJoinInnerIncrementalPartialHash.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Join<wbr>Inner<wbr>Incremental<wbr>Partial<wbr>Hash</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/actor_rdf_join_inner_incremental_partial_hash.IncrementalPartialHashJoin.html" class="tsd-kind-icon">Incremental<wbr>Partial<wbr>Hash<wbr>Join</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-module">
 						<a href="actor_rdf_metadata_extract_guard_data.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>metadata-<wbr>extract-<wbr>guard-<wbr>data</a>
 					</li>
@@ -205,21 +231,9 @@
 					<li class=" tsd-kind-module">
 						<a href="incremental_bindings_factory.html" class="tsd-kind-icon">incremental-<wbr>bindings-<wbr>factory</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="incremental_inner_join.html" class="tsd-kind-icon">incremental-<wbr>inner-<wbr>join</a>
-						<ul>
-							<li class=" tsd-kind-enum tsd-parent-kind-module">
-								<a href="../enums/incremental_inner_join.Side.html" class="tsd-kind-icon">Side</a>
-							</li>
-							<li class=" tsd-kind-class tsd-parent-kind-module">
-								<a href="../classes/incremental_inner_join.IncrementalInnerJoin.html" class="tsd-kind-icon">Incremental<wbr>Inner<wbr>Join</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-module">
 						<a href="incremental_jest.html" class="tsd-kind-icon">incremental-<wbr>jest</a>
 					</li>
