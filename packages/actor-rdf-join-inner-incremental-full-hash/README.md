@@ -1,8 +1,6 @@
-# Comunica Inner Incremental Partial Hash RDF Join Actor
+# Comunica Inner Incremental Full Hash RDF Join Actor
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Factor-rdf-join-inner-incremental-partial-hash.svg)](https://www.npmjs.com/package/@comunica/actor-rdf-join-inner-incremental-partial-hash)
-
-A comunica Inner Incremental Partial Hash RDF Join Actor.
+A comunica Inner Incremental Full Hash RDF Join Actor.
 
 This module is part of the [Comunica framework](https://github.com/comunica/comunica),
 and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
@@ -12,7 +10,7 @@ and should only be used by [developers that want to build their own query engine
 ## Install
 
 ```bash
-$ yarn add @comunica/actor-rdf-join-inner-incremental-partial-hash
+$ yarn add @comunica/actor-rdf-join-inner-incremental-full-hash
 ```
 
 ## Configure
@@ -22,13 +20,13 @@ After installing, this package can be added to your engine's configuration as fo
 {
   "@context": [
     ...
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-partial-hash/^1.0.0/components/context.jsonld"  
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-full-hash/^1.0.0/components/context.jsonld"  
   ],
   "actors": [
     ...
     {
-      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-partial-hash",
-      "@type": "ActorRdfJoinInnerIncrementalPartialHash",
+      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-full-hash",
+      "@type": "ActorRdfJoinInnerIncrementalFullHash",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
     }
   ]
