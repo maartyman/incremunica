@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IActorQueryOperationQuadpatternArgs | Incremunica</title>
+	<title>IMapObject | Incremunica</title>
 	<meta name="description" content="Documentation for Incremunica">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,36 +55,33 @@
 					<a href="../modules.html">Incremunica</a>
 				</li>
 				<li>
-					<a href="../modules/actor_query_operation_quadpattern.html">actor-query-operation-quadpattern</a>
+					<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html">actor-rdf-join-inner-incremental-full-hash</a>
 				</li>
 				<li>
-					<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html">IActorQueryOperationQuadpatternArgs</a>
+					<a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html">IMapObject</a>
 				</li>
 			</ul>
-			<h1>Interface IActorQueryOperationQuadpatternArgs</h1>
+			<h1>Interface IMapObject&lt;T&gt;</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>T</h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="tsd-signature-type">IActorArgs</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IActionQueryOperation</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IActorTest</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IQueryOperationResult</span><span class="tsd-signature-symbol">&gt;</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">IActorQueryOperationQuadpatternArgs</span>
-							</li>
-						</ul>
+						<span class="target">IMapObject</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implemented by</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../classes/actor_query_operation_quadpattern.ActorQueryOperationQuadpattern.html" class="tsd-signature-type" data-tsd-kind="Class">ActorQueryOperationQuadpattern</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -94,11 +91,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#beforeActors" class="tsd-kind-icon">before<wbr>Actors</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#bus" class="tsd-kind-icon">bus</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#mediatorResolveQuadPattern" class="tsd-kind-icon">mediator<wbr>Resolve<wbr>Quad<wbr>Pattern</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#name" class="tsd-kind-icon">name</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#unionDefaultGraph" class="tsd-kind-icon">union<wbr>Default<wbr>Graph</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html#count" class="tsd-kind-icon">count</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html#value" class="tsd-kind-icon">value</a></li>
 							</ul>
 						</section>
 					</div>
@@ -106,94 +100,25 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-					<a name="beforeActors" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> before<wbr>Actors</h3>
-					<div class="tsd-signature tsd-kind-icon">before<wbr>Actors<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Actor</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IActionQueryOperation</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IActorTest</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IQueryOperationResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="count" class="tsd-anchor"></a>
+					<h3>count</h3>
+					<div class="tsd-signature tsd-kind-icon">count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from IActorArgs.beforeActors</p>
 						<ul>
-							<li>Defined in node_modules/@comunica/core/lib/Actor.d.ts:104</li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/32931db/packages/actor-rdf-join-inner-incremental-full-hash/lib/DualKeyHashMap.ts#L3">packages/actor-rdf-join-inner-incremental-full-hash/lib/DualKeyHashMap.ts:3</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Actor that must be registered in the bus before this actor.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-					<a name="bus" class="tsd-anchor"></a>
-					<h3>bus</h3>
-					<div class="tsd-signature tsd-kind-icon">bus<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Bus</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Actor</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IActionQueryOperation</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IActorTest</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IQueryOperationResult</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IActionQueryOperation</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IActorTest</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IQueryOperationResult</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from IActorArgs.bus</p>
-						<ul>
-							<li>Defined in node_modules/@comunica/core/lib/Actor.d.ts:100</li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The bus this actor subscribes to.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="mediatorResolveQuadPattern" class="tsd-anchor"></a>
-					<h3>mediator<wbr>Resolve<wbr>Quad<wbr>Pattern</h3>
-					<div class="tsd-signature tsd-kind-icon">mediator<wbr>Resolve<wbr>Quad<wbr>Pattern<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">MediatorRdfResolveQuadPattern</span></div>
+					<a name="value" class="tsd-anchor"></a>
+					<h3>value</h3>
+					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/32931db/packages/actor-query-operation-quadpattern/lib/ActorQueryOperationQuadpattern.ts#L285">packages/actor-query-operation-quadpattern/lib/ActorQueryOperationQuadpattern.ts:285</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/32931db/packages/actor-rdf-join-inner-incremental-full-hash/lib/DualKeyHashMap.ts#L2">packages/actor-rdf-join-inner-incremental-full-hash/lib/DualKeyHashMap.ts:2</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The quad pattern resolve mediator</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from IActorArgs.name</p>
-						<ul>
-							<li>Defined in node_modules/@comunica/core/lib/Actor.d.ts:96</li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The name for this actor.</p>
-						</div>
-						<dl class="tsd-comment-tags">
-							<dt>default</dt>
-							<dd><p>{<a href="rdf:subject">rdf:subject</a>}</p>
-							</dd>
-						</dl>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="unionDefaultGraph" class="tsd-anchor"></a>
-					<h3>union<wbr>Default<wbr>Graph</h3>
-					<div class="tsd-signature tsd-kind-icon">union<wbr>Default<wbr>Graph<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/32931db/packages/actor-query-operation-quadpattern/lib/ActorQueryOperationQuadpattern.ts#L291">packages/actor-query-operation-quadpattern/lib/ActorQueryOperationQuadpattern.ts:291</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>If the default graph should also contain the union of all named graphs.
-							This can be overridden by {@link KeysQueryOperation#unionDefaultGraph}.</p>
-						</div>
-						<dl class="tsd-comment-tags">
-							<dt>default</dt>
-							<dd><p>{false}</p>
-							</dd>
-						</dl>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -206,10 +131,10 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/actor_guard_polling_diff.html">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/actor_query_operation_quadpattern.html">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -264,31 +189,31 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/actor_guard_polling_diff.html" class="tsd-kind-icon">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
 					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/actor_query_operation_quadpattern.html" class="tsd-kind-icon">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-module">
-						<a href="../modules/actor_query_operation_quadpattern.html" class="tsd-kind-icon">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
+						<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
 						<ul>
 							<li class=" tsd-kind-class tsd-parent-kind-module">
-								<a href="../classes/actor_query_operation_quadpattern.ActorQueryOperationQuadpattern.html" class="tsd-kind-icon">Actor<wbr>Query<wbr>Operation<wbr>Quadpattern</a>
+								<a href="../classes/actor_rdf_join_inner_incremental_full_hash.ActorRdfJoinInnerIncrementalFullHash.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Join<wbr>Inner<wbr>Incremental<wbr>Full<wbr>Hash</a>
 							</li>
-							<li class="current tsd-kind-interface tsd-parent-kind-module">
-								<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html" class="tsd-kind-icon">IActor<wbr>Query<wbr>Operation<wbr>Quadpattern<wbr>Args</a>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="../classes/actor_rdf_join_inner_incremental_full_hash.DualKeyHashMap.html" class="tsd-kind-icon">Dual<wbr>Key<wbr>Hash<wbr>Map</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module">
+								<a href="../classes/actor_rdf_join_inner_incremental_full_hash.IncrementalFullHashJoin.html" class="tsd-kind-icon">Incremental<wbr>Full<wbr>Hash<wbr>Join</a>
+							</li>
+							<li class="current tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html" class="tsd-kind-icon">IMap<wbr>Object</a>
 								<ul>
-									<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-										<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#beforeActors" class="tsd-kind-icon">before<wbr>Actors</a>
-									</li>
-									<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-										<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#bus" class="tsd-kind-icon">bus</a>
+									<li class=" tsd-kind-property tsd-parent-kind-interface">
+										<a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html#count" class="tsd-kind-icon">count</a>
 									</li>
 									<li class=" tsd-kind-property tsd-parent-kind-interface">
-										<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#mediatorResolveQuadPattern" class="tsd-kind-icon">mediator<wbr>Resolve<wbr>Quad<wbr>Pattern</a>
-									</li>
-									<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
-										<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#name" class="tsd-kind-icon">name</a>
-									</li>
-									<li class=" tsd-kind-property tsd-parent-kind-interface">
-										<a href="actor_query_operation_quadpattern.IActorQueryOperationQuadpatternArgs.html#unionDefaultGraph" class="tsd-kind-icon">union<wbr>Default<wbr>Graph</a>
+										<a href="actor_rdf_join_inner_incremental_full_hash.IMapObject.html#value" class="tsd-kind-icon">value</a>
 									</li>
 								</ul>
 							</li>
@@ -296,9 +221,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-module">
-						<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
-					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/actor_rdf_join_inner_incremental_memory_multi_bind.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>memory-<wbr>multi-<wbr>bind</a>
 					</li>
