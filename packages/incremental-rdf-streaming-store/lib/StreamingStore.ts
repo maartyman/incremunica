@@ -20,6 +20,8 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
   protected readonly pendingStreams: PendingStreamsIndex<Q> = new PendingStreamsIndex();
   protected ended = false;
   protected numberOfListeners = 0;
+  protected halted = false;
+  protected haltBuffer = new Array<Q>();
 
   public constructor(store: RDF.Store<Q> = new Store<Q>()) {
     super();
@@ -48,12 +50,76 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
     return this.ended;
   }
 
+  public halt(): void {
+    this.halted = true;
+  }
+
+  public resume(): void {
+    for (const quad of this.haltBuffer) {
+      for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
+        if (!this.ended) {
+          pendingStream.push(quad);
+        }
+      }
+      if (quad.diff) {
+        this.store.import(new Readable({
+          read(size: number) {
+            this.push(quad);
+            this.destroy();
+          },
+          objectMode: true,
+        }));
+      } else {
+        this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+      }
+    }
+    this.halted = false;
+  }
+
+  public isHalted(): boolean {
+    return this.halted;
+  }
+
   public copyOfStore(): Store {
     const newStore = new Store();
     this.store.match().on('data', quad => {
       newStore.add(quad);
     });
     return newStore;
+  }
+
+  public remove(stream: RDF.Stream<Q>): EventEmitter {
+    if (this.ended) {
+      throw new Error('Attempted to remove out of an ended StreamingStore');
+    }
+
+    stream.on('data', (quad: Q) => {
+      if (quad.diff === undefined) {
+        quad.diff = false;
+      }
+      if (this.halted) {
+        this.haltBuffer.push(quad);
+        return;
+      }
+      for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
+        if (!this.ended) {
+          pendingStream.push(quad);
+        }
+      }
+      if (quad.diff) {
+        this.store.import(new Readable({
+          read(size: number) {
+            this.push(quad);
+            this.destroy();
+          },
+          objectMode: true,
+        }));
+      } else {
+        this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+      }
+    });
+
+    return stream;
   }
 
   public import(stream: RDF.Stream<Q>): EventEmitter {
@@ -64,6 +130,10 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
     stream.on('data', (quad: Q) => {
       if (quad.diff === undefined) {
         quad.diff = true;
+      }
+      if (this.halted) {
+        this.haltBuffer.push(quad);
+        return;
       }
       for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
         if (!this.ended) {
