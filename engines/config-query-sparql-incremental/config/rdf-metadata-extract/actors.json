@@ -44,10 +44,6 @@
       "@type": "ActorRdfMetadataExtractPatchSparqlUpdate"
     },
     {
-      "@id": "urn:comunica:default:rdf-metadata-extract/actors#sparql-service",
-      "@type": "ActorRdfMetadataExtractSparqlService"
-    },
-    {
       "@id": "urn:comunica:default:rdf-metadata-extract/actors#guard-data",
       "@type": "ActorRdfMetadataExtractGuardData"
     }
