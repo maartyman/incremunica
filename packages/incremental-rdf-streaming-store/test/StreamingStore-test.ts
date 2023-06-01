@@ -536,4 +536,185 @@ describe('StreamStore', () => {
         quad('s4', 'p4', 'o', 'g'),
       ]);
   });
+
+  it('handles multiple matches with removes before and after end', async() => {
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ])));
+    await promisifyEventEmitter(store.remove(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+    ])));
+    const match1 = store.match();
+    const match2 = store.match();
+    const posQuad = quad('s5', 'p5', 'o5');
+    posQuad.diff = true
+    setImmediate(async() => {
+      await promisifyEventEmitter(store.remove(streamifyArray([
+        quad('s2', 'p2', 'o2'),
+      ])));
+      setImmediate(async() => {
+        await promisifyEventEmitter(store.remove(streamifyArray([
+          quad('s3', 'p3', 'o3'),
+          quad('s4', 'p4', 'o4'),
+          posQuad
+        ])));
+        setImmediate(() => store.end());
+      });
+    });
+
+    expect(await arrayifyStream(match1))
+      .toBeRdfIsomorphic([
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+        quad('s4', 'p4', 'o4'),
+        quad('s5', 'p5', 'o5'),
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+        quad('s4', 'p4', 'o4'),
+      ]);
+    expect(await arrayifyStream(match2))
+      .toBeRdfIsomorphic([
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+        quad('s4', 'p4', 'o4'),
+        quad('s5', 'p5', 'o5'),
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+        quad('s4', 'p4', 'o4'),
+      ]);
+  });
+
+  it('handles multiple async matches with removes before and after end', async() => {
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ])));
+    await promisifyEventEmitter(store.remove(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+    ])));
+    const match1 = store.match();
+    setImmediate(async() => {
+      await promisifyEventEmitter(store.remove(streamifyArray([
+        quad('s2', 'p2', 'o2'),
+      ])));
+      setImmediate(async() => {
+        await promisifyEventEmitter(store.remove(streamifyArray([
+          quad('s3', 'p3', 'o3'),
+          quad('s4', 'p4', 'o4'),
+        ])));
+        setImmediate(() => store.end());
+      });
+
+      setImmediate(async() => {
+        expect(await arrayifyStream(store.match()))
+          .toBeRdfIsomorphic([]);
+      });
+    });
+
+    expect(await arrayifyStream(match1))
+      .toBeRdfIsomorphic([
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+        quad('s4', 'p4', 'o4'),
+      ]);
+  });
+
+  it('trows error for remove after end', async() => {
+    store.end();
+
+    expect(() => {
+      store.remove(streamifyArray([
+        quad('s1', 'p1', 'o1'),
+      ]));
+    }).toThrow("Attempted to remove out of an ended StreamingStore")
+  });
+
+  it('handles halting', async () => {
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ])));
+
+    const matchStream = store.match();
+
+    expect(store.isHalted()).toBeFalsy()
+    store.halt();
+    expect(store.isHalted()).toBeTruthy()
+
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ])));
+
+    await promisifyEventEmitter(store.remove(streamifyArray([
+      quad('s4', 'p4', 'o4'),
+    ])));
+
+    expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ]);
+
+    store.resume();
+
+    expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+      quad('s3', 'p3', 'o3'),
+    ]);
+
+    store.end();
+
+    expect(await arrayifyStream(matchStream)).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+      quad('s4', 'p4', 'o4'),
+    ])
+  });
+
+  it('handles end during halting', async () => {
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ])));
+
+    const matchStream = store.match();
+
+    expect(store.isHalted()).toBeFalsy()
+    store.halt();
+    expect(store.isHalted()).toBeTruthy()
+
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ])));
+
+    store.end()
+
+    expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ]);
+
+    store.resume();
+
+    expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ]);
+
+    expect(await arrayifyStream(matchStream)).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ]);
+  });
 });
