@@ -125,6 +125,8 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#ended" class="tsd-kind-icon">ended</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#haltBuffer" class="tsd-kind-icon">halt<wbr>Buffer</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#halted" class="tsd-kind-icon">halted</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#numberOfListeners" class="tsd-kind-icon">number<wbr>OfListeners</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#pendingStreams" class="tsd-kind-icon">pending<wbr>Streams</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.StreamingStore.html#store" class="tsd-kind-icon">store</a></li>
@@ -144,8 +146,10 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#eventNames" class="tsd-kind-icon">event<wbr>Names</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#getMaxListeners" class="tsd-kind-icon">get<wbr>Max<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#getStore" class="tsd-kind-icon">get<wbr>Store</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#halt" class="tsd-kind-icon">halt</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#hasEnded" class="tsd-kind-icon">has<wbr>Ended</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#import" class="tsd-kind-icon">import</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#isHalted" class="tsd-kind-icon">is<wbr>Halted</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#listenerCount" class="tsd-kind-icon">listener<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#listeners" class="tsd-kind-icon">listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#match" class="tsd-kind-icon">match</a></li>
@@ -155,8 +159,10 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#prependListener" class="tsd-kind-icon">prepend<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#prependOnceListener" class="tsd-kind-icon">prepend<wbr>Once<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#rawListeners" class="tsd-kind-icon">raw<wbr>Listeners</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#remove" class="tsd-kind-icon">remove</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#removeAllListeners" class="tsd-kind-icon">remove<wbr>All<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#removeListener" class="tsd-kind-icon">remove<wbr>Listener</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.StreamingStore.html#resume" class="tsd-kind-icon">resume</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#setMaxListeners" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#getEventListeners" class="tsd-kind-icon">get<wbr>Event<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="incremental_rdf_streaming_store.StreamingStore.html#listenerCount-1" class="tsd-kind-icon">listener<wbr>Count</a></li>
@@ -181,7 +187,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L24">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L26">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -212,7 +218,27 @@
 					<div class="tsd-signature tsd-kind-icon">ended<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L21">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L21">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="haltBuffer" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> halt<wbr>Buffer</h3>
+					<div class="tsd-signature tsd-kind-icon">halt<wbr>Buffer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L24">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:24</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="halted" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> halted</h3>
+					<div class="tsd-signature tsd-kind-icon">halted<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L23">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -222,7 +248,7 @@
 					<div class="tsd-signature tsd-kind-icon">number<wbr>OfListeners<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L22">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L22">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -232,7 +258,7 @@
 					<div class="tsd-signature tsd-kind-icon">pending<wbr>Streams<span class="tsd-signature-symbol">:</span> <a href="incremental_rdf_streaming_store.PendingStreamsIndex.html" class="tsd-signature-type" data-tsd-kind="Class">PendingStreamsIndex</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L20">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L20">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -242,7 +268,7 @@
 					<div class="tsd-signature tsd-kind-icon">store<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">S</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L19">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L19">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -373,7 +399,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L51">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L83">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Store</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Quad</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Quad</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Quad</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Quad</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -460,7 +486,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L35">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L37">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -553,7 +579,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L123">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L193">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:193</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -562,6 +588,23 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">S</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="halt" class="tsd-anchor"></a>
+					<h3>halt</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">halt<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L53">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:53</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -575,7 +618,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L47">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L49">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:49</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -593,7 +636,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of RDF.Sink.import</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L59">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L125">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:125</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -603,6 +646,23 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">EventEmitter</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="isHalted" class="tsd-anchor"></a>
+					<h3>is<wbr>Halted</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Halted<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L79">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:79</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -694,7 +754,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of RDF.Source.match</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/7d9c8a6/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L89">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L159">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:159</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1120,6 +1180,29 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="remove" class="tsd-anchor"></a>
+					<h3>remove</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">remove<span class="tsd-signature-symbol">(</span>stream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Stream</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L91">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:91</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>stream: <span class="tsd-signature-type">Stream</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">EventEmitter</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 					<a name="removeAllListeners" class="tsd-anchor"></a>
 					<h3>remove<wbr>All<wbr>Listeners</h3>
@@ -1274,6 +1357,23 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="incremental_rdf_streaming_store.StreamingStore.html" class="tsd-signature-type" data-tsd-kind="Class">StreamingStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="resume" class="tsd-anchor"></a>
+					<h3>resume</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">resume<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/4c8f699/packages/incremental-rdf-streaming-store/lib/StreamingStore.ts#L57">packages/incremental-rdf-streaming-store/lib/StreamingStore.ts:57</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1824,6 +1924,12 @@
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#ended" class="tsd-kind-icon">ended</a>
 									</li>
 									<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#haltBuffer" class="tsd-kind-icon">halt<wbr>Buffer</a>
+									</li>
+									<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#halted" class="tsd-kind-icon">halted</a>
+									</li>
+									<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#numberOfListeners" class="tsd-kind-icon">number<wbr>OfListeners</a>
 									</li>
 									<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
@@ -1866,10 +1972,16 @@
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#getStore" class="tsd-kind-icon">get<wbr>Store</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#halt" class="tsd-kind-icon">halt</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#hasEnded" class="tsd-kind-icon">has<wbr>Ended</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#import" class="tsd-kind-icon">import</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#isHalted" class="tsd-kind-icon">is<wbr>Halted</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#listenerCount" class="tsd-kind-icon">listener<wbr>Count</a>
@@ -1898,11 +2010,17 @@
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#rawListeners" class="tsd-kind-icon">raw<wbr>Listeners</a>
 									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#remove" class="tsd-kind-icon">remove</a>
+									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#removeAllListeners" class="tsd-kind-icon">remove<wbr>All<wbr>Listeners</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#removeListener" class="tsd-kind-icon">remove<wbr>Listener</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class">
+										<a href="incremental_rdf_streaming_store.StreamingStore.html#resume" class="tsd-kind-icon">resume</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="incremental_rdf_streaming_store.StreamingStore.html#setMaxListeners" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a>
