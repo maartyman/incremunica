@@ -1,0 +1,652 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>sparqlalgebrajs | Incremunica</title>
+	<meta name="description" content="Documentation for Incremunica">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Incremunica</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">Incremunica</a>
+				</li>
+				<li>
+					<a href="sparqlalgebrajs.html">sparqlalgebrajs</a>
+				</li>
+			</ul>
+			<h1>Module sparqlalgebrajs</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<a href="#sparql-to-sparql-algebra-converter" id="sparql-to-sparql-algebra-converter" style="color: inherit; text-decoration: none;">
+						<h1>SPARQL to SPARQL Algebra converter</h1>
+					</a>
+					<p><a href="https://www.npmjs.com/package/sparqlalgebrajs"><img src="https://badge.fury.io/js/sparqlalgebrajs.svg" alt="npm version"></a>
+					<a href="https://github.com/joachimvh/SPARQLAlgebra.js/actions?query=workflow%3ACI"><img src="https://github.com/joachimvh/SPARQLAlgebra.js/workflows/CI/badge.svg" alt="Build status"></a></p>
+					<p>2 components get exposed: the <strong>translate</strong> function and the <strong>Algebra</strong> object,
+					which contains all the output types that can occur.</p>
+					<p>Note that this is still a work in progress so naming conventions could change.
+						There is also support for &#39;non-algebra&#39; entities such as ASK, FROM, etc.
+					to make sure the output contains all relevant information from the query.</p>
+					<a href="#translate" id="translate" style="color: inherit; text-decoration: none;">
+						<h2>Translate</h2>
+					</a>
+					<p>Input for the translate function should either be a SPARQL string
+					or a result from calling <a href="https://github.com/RubenVerborgh/SPARQL.js">SPARQL.js</a>.</p>
+					<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">translate</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;sparqlalgebrajs&#039;</span><span style="color: #000000">);</span>
+<span style="color: #795E26">translate</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;SELECT * WHERE { ?x ?y ?z }&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+					<p>Returns:</p>
+					<pre><code class="language-json"><span style="color: #000000">{ </span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;project&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;bgp&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;patterns&quot;</span><span style="color: #000000">: [{</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;pattern&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Quad&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;y&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;DefaultGraph&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">      }]</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;y&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">  ]</span>
+<span style="color: #000000">}</span>
+
+</code></pre>
+					<p>Translating back to SPARQL can be done with the <code>toSparql</code> (or <code>toSparqlJs</code>) function.</p>
+					<a href="#algebra-object" id="algebra-object" style="color: inherit; text-decoration: none;">
+						<h2>Algebra object</h2>
+					</a>
+					<p>The algebra object contains a <code>types</code> object,
+						which contains all possible values for the <code>type</code> field in the output results.
+						Besides that it also contains all the TypeScript interfaces of the possible output results.
+					The output of the <code>translate</code> function will always be an <code>Algebra.Operation</code> instance.</p>
+					<p>The best way to see what output would be generated is to look in the <code>test</code> folder,
+					where we have many SPARQL queries and their corresponding algebra output.</p>
+					<a href="#deviations-from-the-spec" id="deviations-from-the-spec" style="color: inherit; text-decoration: none;">
+						<h2>Deviations from the spec</h2>
+					</a>
+					<p>This implementation tries to stay as close to the SPARQL 1.1
+						<a href="https://www.w3.org/TR/sparql11-query/#sparqlDefinition">specification</a>,
+						but some changes were made for ease of use.
+						These are mostly based on the Jena ARQ <a href="https://jena.apache.org/documentation/query/">implementation</a>.
+					What follows is a non-exhaustive list of deviations:</p>
+					<a href="#named-parameters" id="named-parameters" style="color: inherit; text-decoration: none;">
+						<h4>Named parameters</h4>
+					</a>
+					<p>This is the biggest visual change.
+						The functions no longer take an ordered list of parameters but a named list instead.
+						The reason for this is to prevent having to memorize the order of parameters and also
+					due to seeing some differences between the spec and the Jena ARQ SSE output when ordering parameters.</p>
+					<a href="#multisetlist-conversion" id="multisetlist-conversion" style="color: inherit; text-decoration: none;">
+						<h4>Multiset/List conversion</h4>
+					</a>
+					<p>The functions <code>toMultiset</code> and <code>toList</code> have been removed for brevity.
+					Conversions between the two are implied by the operations used.</p>
+					<a href="#quads" id="quads" style="color: inherit; text-decoration: none;">
+						<h4>Quads</h4>
+					</a>
+					<p>The <code>translate</code> function has an optional second parameter
+						indicating whether patterns should be translated to triple or quad patterns.
+						In the case of quads the <code>graph</code> operation will be removed
+						and embedded into the patterns it contained.
+					The default value for this parameter is <code>false</code>.</p>
+					<pre><code><span style="color: #000000">PREFIX : &lt;</span><span style="color: #267F99">http</span><span style="color: #000000">:</span><span style="color: #008000">//www.example.org/&gt;</span>
+
+<span style="color: #267F99">SELECT</span><span style="color: #000000"> ?</span><span style="color: #267F99">x</span><span style="color: #000000"> </span><span style="color: #267F99">WHERE</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #267F99">GRAPH</span><span style="color: #000000"> ?</span><span style="color: #267F99">g</span><span style="color: #000000"> {?</span><span style="color: #267F99">x</span><span style="color: #000000"> ?</span><span style="color: #267F99">y</span><span style="color: #000000"> ?</span><span style="color: #001080">z</span><span style="color: #000000">}</span>
+<span style="color: #000000">}</span>
+</code></pre>
+					<p>Default result:</p>
+					<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;project&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;graph&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;bgp&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;patterns&quot;</span><span style="color: #000000">: [{</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;pattern&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Quad&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;y&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">          </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;DefaultGraph&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">        }]</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;name&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;g&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [{ </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> }]</span>
+<span style="color: #000000">}</span>
+
+</code></pre>
+					<p>With quads:</p>
+					<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;project&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;bgp&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;patterns&quot;</span><span style="color: #000000">: [{</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;pattern&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Quad&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;y&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;g&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">      }]</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [{ </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> }]</span>
+<span style="color: #000000">}</span>
+
+</code></pre>
+					<a href="#flattened-operators" id="flattened-operators" style="color: inherit; text-decoration: none;">
+						<h3>Flattened operators</h3>
+					</a>
+					<p>Several binary operators that can be nested,
+						such as the path operators,
+						can take an array of input entries to simply this notation.
+					For example, the following SPARQL:</p>
+					<pre><code class="language-sparql"><span style="color: #AF00DB">SELECT</span><span style="color: #000000"> </span><span style="color: #267F99">*</span><span style="color: #000000"> </span><span style="color: #AF00DB">WHERE</span><span style="color: #000000"> { ?x </span><span style="color: #267F99">&lt;a:a&gt;|&lt;b:b&gt;|&lt;c:c&gt;</span><span style="color: #000000"> ?z }</span>
+</code></pre>
+					<p>outputs the following algebra:</p>
+					<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;project&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;path&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;alt&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">        { </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;link&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;iri&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;a:a&quot;</span><span style="color: #000000"> }},</span>
+<span style="color: #000000">        { </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;link&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;iri&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;b:b&quot;</span><span style="color: #000000"> }},</span>
+<span style="color: #000000">        { </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;link&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;iri&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;c:c&quot;</span><span style="color: #000000"> }}</span>
+<span style="color: #000000">      ]</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;DefaultGraph&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;x&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;z&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">  ]</span>
+<span style="color: #000000">}</span>
+
+</code></pre>
+					<a href="#sparql" id="sparql" style="color: inherit; text-decoration: none;">
+						<h4>SPARQL*</h4>
+					</a>
+					<p><a href="https://blog.liu.se/olafhartig/2019/01/10/position-statement-rdf-star-and-sparql-star/">SPARQL*</a> queries can be parsed by setting <code>sparqlStar</code> to true in the <code>translate</code> options.</p>
+					<a href="#values" id="values" style="color: inherit; text-decoration: none;">
+						<h4>VALUES</h4>
+					</a>
+					<p>For the VALUES block we return the following output:</p>
+					<pre><code><span style="color: #0070C1">PREFIX</span><span style="color: #000000"> dc:   &lt;</span><span style="color: #267F99">http</span><span style="color: #000000">:</span><span style="color: #008000">//purl.org/dc/elements/1.1/&gt; </span>
+<span style="color: #267F99">PREFIX</span><span style="color: #000000"> :     &lt;</span><span style="color: #267F99">http</span><span style="color: #000000">:</span><span style="color: #008000">//example.org/book/&gt; </span>
+<span style="color: #267F99">PREFIX</span><span style="color: #000000"> </span><span style="color: #267F99">ns</span><span style="color: #000000">:   &lt;</span><span style="color: #267F99">http</span><span style="color: #000000">:</span><span style="color: #008000">//example.org/ns#&gt; </span>
+
+<span style="color: #267F99">SELECT</span><span style="color: #000000"> ?</span><span style="color: #267F99">book</span><span style="color: #000000"> ?</span><span style="color: #267F99">title</span><span style="color: #000000"> ?</span><span style="color: #267F99">price</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">   </span><span style="color: #267F99">VALUES</span><span style="color: #000000"> ?</span><span style="color: #267F99">book</span><span style="color: #000000"> { :</span><span style="color: #267F99">book1</span><span style="color: #000000"> :</span><span style="color: #267F99">book3</span><span style="color: #000000"> }</span>
+<span style="color: #000000">   ?</span><span style="color: #267F99">book</span><span style="color: #000000"> </span><span style="color: #001080">dc</span><span style="color: #000000">:</span><span style="color: #267F99">title</span><span style="color: #000000"> ?</span><span style="color: #267F99">title</span><span style="color: #000000"> ;</span>
+<span style="color: #000000">         </span><span style="color: #001080">ns</span><span style="color: #000000">:</span><span style="color: #267F99">price</span><span style="color: #000000"> ?</span><span style="color: #267F99">price</span><span style="color: #000000"> .</span>
+<span style="color: #000000">}</span>
+</code></pre>
+					<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;project&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;join&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;input&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">      {</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;values&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [{ </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;book&quot;</span><span style="color: #000000"> }],</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;bindings&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">          { </span><span style="color: #0451A5">&quot;?book&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;http://example.org/book/book1&quot;</span><span style="color: #000000"> }},</span>
+<span style="color: #000000">          { </span><span style="color: #0451A5">&quot;?book&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;http://example.org/book/book3&quot;</span><span style="color: #000000"> }}</span>
+<span style="color: #000000">        ]</span>
+<span style="color: #000000">      },</span>
+<span style="color: #000000">      {</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;bgp&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;patterns&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">          {</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;pattern&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Quad&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;book&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;http://purl.org/dc/elements/1.1/title&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;title&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;DefaultGraph&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">          },</span>
+<span style="color: #000000">          {</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;type&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;pattern&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Quad&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;subject&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;book&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;predicate&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;NamedNode&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;http://example.org/ns#price&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;object&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;price&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">            </span><span style="color: #0451A5">&quot;graph&quot;</span><span style="color: #000000">: { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;DefaultGraph&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">          }</span>
+<span style="color: #000000">        ]</span>
+<span style="color: #000000">      }</span>
+<span style="color: #000000">    ]</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #0451A5">&quot;variables&quot;</span><span style="color: #000000">: [</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;book&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;title&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">    { </span><span style="color: #0451A5">&quot;termType&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;Variable&quot;</span><span style="color: #000000">, </span><span style="color: #0451A5">&quot;value&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;price&quot;</span><span style="color: #000000"> }</span>
+<span style="color: #000000">  ]</span>
+<span style="color: #000000">}</span>
+
+</code></pre>
+					<a href="#differences-from-jena-arq" id="differences-from-jena-arq" style="color: inherit; text-decoration: none;">
+						<h4>Differences from Jena ARQ</h4>
+					</a>
+					<p>Some differences from Jena (again, non-exhaustive):
+						no prefixes are used (all uris get expanded)
+					and the project operation always gets used (even in the case of <code>SELECT *</code>).</p>
+					<a href="#a-note-on-tests" id="a-note-on-tests" style="color: inherit; text-decoration: none;">
+						<h2>A note on tests</h2>
+					</a>
+					<p>Every test consists of a sparql file and a corresponding json file containing the algebra result.
+					Tests ending with <code>(quads)</code> in their name are tested/generated with <code>quads: true</code> in the options.</p>
+					<p>If you need to regenerate the parsed JSON files in bulk, you can invoke <code>node test/generate-json.js</code>.</p>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Namespaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-namespace tsd-parent-kind-module tsd-is-external"><a href="sparqlalgebrajs.sparqlalgebrajs-1.html" class="tsd-kind-icon">sparqlalgebrajs</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-is-external"><a href="../classes/sparqlalgebrajs.Factory.html" class="tsd-kind-icon">Factory</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module tsd-is-external"><a href="../classes/sparqlalgebrajs.Util.html" class="tsd-kind-icon">Util</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-external"><a href="sparqlalgebrajs.html#toSparql" class="tsd-kind-icon">to<wbr>Sparql</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-external"><a href="sparqlalgebrajs.html#toSparqlJs" class="tsd-kind-icon">to<wbr>Sparql<wbr>Js</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-external"><a href="sparqlalgebrajs.html#translate" class="tsd-kind-icon">translate</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-external">
+					<a name="toSparql" class="tsd-anchor"></a>
+					<h3>to<wbr>Sparql</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Sparql<span class="tsd-signature-symbol">(</span>op<span class="tsd-signature-symbol">: </span><a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in node_modules/sparqlalgebrajs/lib/sparql.d.ts:2</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>op: <a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-symbol">{}</span></h5>
+									<ul class="tsd-parameters">
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-external">
+					<a name="toSparqlJs" class="tsd-anchor"></a>
+					<h3>to<wbr>Sparql<wbr>Js</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Sparql<wbr>Js<span class="tsd-signature-symbol">(</span>op<span class="tsd-signature-symbol">: </span><a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in node_modules/sparqlalgebrajs/lib/sparql.d.ts:3</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>op: <a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-external">
+					<a name="translate" class="tsd-anchor"></a>
+					<h3>translate</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">translate<span class="tsd-signature-symbol">(</span>sparql<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SparqlQuery</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>baseIRI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>blankToVariable<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>dataFactory<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">RDF.DataFactory</span><span class="tsd-signature-symbol">; </span>prefixes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>quads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>sparqlStar<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in node_modules/sparqlalgebrajs/lib/sparqlAlgebra.d.ts:14</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Translates the given SPARQL query to SPARQL Algebra.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>sparql: <span class="tsd-signature-type">SparqlQuery</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Either a SPARQL string or an object generated by sparql.js</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-symbol">{ </span>baseIRI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>blankToVariable<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>dataFactory<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">RDF.DataFactory</span><span class="tsd-signature-symbol">; </span>prefixes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>quads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>sparqlStar<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional options object. Current options:
+											* dataFactory: The Datafactory used to generate terms. Default @rdfjs/data-model.
+											* quads: Boolean indicating whether triples should be converted to Quads (consumes GRAPH statements). Default false.
+											* prefixes: Pre-defined prefixes for the given query. Default empty.
+										* baseIRI: Base IRI that should be used for the query. Default undefined (throws error if required).</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> baseIRI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> blank<wbr>ToVariable<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> data<wbr>Factory<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">RDF.DataFactory</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefixes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span></h5>
+											<ul class="tsd-parameters">
+												<li class="tsd-parameter-index-signature">
+													<h5><span class="tsd-signature-symbol">[</span>prefix: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+												</li>
+											</ul>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> quads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> sparql<wbr>Star<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="sparqlalgebrajs.sparqlalgebrajs-1.html#Operation" class="tsd-signature-type" data-tsd-kind="Type alias">Operation</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Internals</span>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_guard_polling_diff.html">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_query_operation_quadpattern.html">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_full_hash.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_memory_multi_bind.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>memory-<wbr>multi-<wbr>bind</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_multi_delta_query.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>multi-<wbr>delta-<wbr>query</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_nestedloop.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>nestedloop</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_partial_hash.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>partial-<wbr>hash</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_metadata_extract_guard_data.html">actor-<wbr>rdf-<wbr>metadata-<wbr>extract-<wbr>guard-<wbr>data</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_hypermedia_stream_none.html">actor-<wbr>rdf-<wbr>resolve-<wbr>hypermedia-<wbr>stream-<wbr>none</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_incremental_federated.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>incremental-<wbr>federated</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bus_guard.html">bus-<wbr>guard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="dev_tools.html">dev-<wbr>tools</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_bindings_factory.html">incremental-<wbr>bindings-<wbr>factory</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_inner_join.html">incremental-<wbr>inner-<wbr>join</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_jest.html">incremental-<wbr>jest</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_rdf_streaming_store.html">incremental-<wbr>rdf-<wbr>streaming-<wbr>store</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_types.html">incremental-<wbr>types</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="query_sparql_incremental.html">query-<wbr>sparql-<wbr>incremental</a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Externals</span>
+					</li>
+					<li class="current tsd-kind-module tsd-is-external">
+						<a href="sparqlalgebrajs.html">sparqlalgebrajs</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module tsd-is-external">
+								<a href="sparqlalgebrajs.sparqlalgebrajs-1.html">sparqlalgebrajs</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-module">
+						<a href="actor_guard_polling_diff.html" class="tsd-kind-icon">actor-<wbr>guard-<wbr>polling-<wbr>diff</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_query_operation_quadpattern.html" class="tsd-kind-icon">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_full_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_memory_multi_bind.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>memory-<wbr>multi-<wbr>bind</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_multi_delta_query.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>multi-<wbr>delta-<wbr>query</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_nestedloop.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>nestedloop</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_join_inner_incremental_partial_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>partial-<wbr>hash</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_metadata_extract_guard_data.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>metadata-<wbr>extract-<wbr>guard-<wbr>data</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_hypermedia_stream_none.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>hypermedia-<wbr>stream-<wbr>none</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_incremental_federated.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>incremental-<wbr>federated</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bus_guard.html" class="tsd-kind-icon">bus-<wbr>guard</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="dev_tools.html" class="tsd-kind-icon">dev-<wbr>tools</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_bindings_factory.html" class="tsd-kind-icon">incremental-<wbr>bindings-<wbr>factory</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_inner_join.html" class="tsd-kind-icon">incremental-<wbr>inner-<wbr>join</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_jest.html" class="tsd-kind-icon">incremental-<wbr>jest</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_rdf_streaming_store.html" class="tsd-kind-icon">incremental-<wbr>rdf-<wbr>streaming-<wbr>store</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="incremental_types.html" class="tsd-kind-icon">incremental-<wbr>types</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="query_sparql_incremental.html" class="tsd-kind-icon">query-<wbr>sparql-<wbr>incremental</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-module tsd-is-external">
+						<a href="sparqlalgebrajs.html" class="tsd-kind-icon">sparqlalgebrajs</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module tsd-is-external">
+								<a href="sparqlalgebrajs.sparqlalgebrajs-1.html" class="tsd-kind-icon">sparqlalgebrajs</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-is-external">
+								<a href="../classes/sparqlalgebrajs.Factory.html" class="tsd-kind-icon">Factory</a>
+							</li>
+							<li class=" tsd-kind-class tsd-parent-kind-module tsd-is-external">
+								<a href="../classes/sparqlalgebrajs.Util.html" class="tsd-kind-icon">Util</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-external">
+								<a href="sparqlalgebrajs.html#toSparql" class="tsd-kind-icon">to<wbr>Sparql</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-external">
+								<a href="sparqlalgebrajs.html#toSparqlJs" class="tsd-kind-icon">to<wbr>Sparql<wbr>Js</a>
+							</li>
+							<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-external">
+								<a href="sparqlalgebrajs.html#translate" class="tsd-kind-icon">translate</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
