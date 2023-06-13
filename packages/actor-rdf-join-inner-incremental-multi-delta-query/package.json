@@ -1,14 +1,14 @@
 {
-  "name": "@comunica/actor-rdf-resolve-hypermedia-stream-none",
+  "name": "@comunica/actor-rdf-join-inner-incremental-multi-delta-query",
   "version": "1.0.0",
-  "description": "A stream-none rdf-resolve-hypermedia actor",
+  "description": "A inner-incremental-multi-delta-query rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/actor-rdf-resolve-hypermedia-stream-none"
+    "directory": "packages/actor-rdf-join-inner-incremental-multi-delta-query"
   },
   "publishConfig": {
     "access": "public"
@@ -17,8 +17,8 @@
   "keywords": [
     "comunica",
     "actor",
-    "rdf-resolve-hypermedia",
-    "stream-none"
+    "rdf-join",
+    "inner-incremental-multi-delta-query"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,10 +32,17 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
-    "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
-    "@comunica/bus-guard": "^1.0.0",
-    "@comunica/incremental-rdf-streaming-store": "^1.0.0"
+    "@comunica/actor-query-operation-construct": "^2.7.1",
+    "@comunica/bus-query-operation": "^2.7.1",
+    "@comunica/bus-rdf-join": "^2.6.8",
+    "@comunica/context-entries": "^2.7.0",
+    "@comunica/core": "^2.7.0",
+    "@comunica/incremental-types": "^1.0.0",
+    "@comunica/mediatortype-join-coefficients": "^2.6.8",
+    "@comunica/types": "^2.6.8",
+    "asynciterator": "^3.8.0",
+    "n3": "^1.16.4",
+    "sparqlalgebrajs": "^4.1.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
