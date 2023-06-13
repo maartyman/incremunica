@@ -1,5 +1,5 @@
+import type { Bindings } from '@comunica/incremental-types';
 import { termToString } from 'rdf-string';
-import type { Bindings } from './Bindings';
 
 /**
  * Stringify a bindings object.

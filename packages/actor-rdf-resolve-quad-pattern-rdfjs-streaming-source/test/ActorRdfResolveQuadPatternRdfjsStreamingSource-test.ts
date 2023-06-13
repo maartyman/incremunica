@@ -10,6 +10,8 @@ import {Store} from "n3";
 import 'jest-rdf';
 import { ArrayIterator } from 'asynciterator';
 import { Readable } from 'stream';
+import {StreamingStore} from "@comunica/incremental-rdf-streaming-store";
+const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
 
@@ -46,6 +48,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
     beforeEach(() => {
       actor = new ActorRdfResolveQuadPatternRdfjsStreamingSource({ name: 'actor', bus });
       source = { match: () => <any> null };
+      Object.setPrototypeOf(source, StreamingStore.prototype);
     });
 
     it('should test', () => {
@@ -62,6 +65,14 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
           { [KeysRdfResolveQuadPattern.source.name]: source },
         ) }))
         .resolves.toBeTruthy();
+    });
+
+    it('should not test with a normal store', () => {
+      return expect(actor.test({ pattern: <any> null,
+        context: new ActionContext(
+          { [KeysRdfResolveQuadPattern.source.name]: { type: 'rdfjsSource', value: new Store() }},
+        ) }))
+        .rejects.toEqual(new Error("actor didn't receive a StreamingStore."))
     });
 
     it('should not test without a source', () => {
@@ -114,19 +125,23 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
     it('should get the source', () => {
       return expect((<any> actor).getSource(new ActionContext({ [KeysRdfResolveQuadPattern.source.name]:
           { type: 'rdfjsSource', value: source }})))
-        .resolves.toMatchObject(new RdfJsQuadStreamingSource(<any>source.match()));
+        .resolves.toMatchObject(new RdfJsQuadStreamingSource(<any>source));
     });
 
     it('should get the source on raw source form', () => {
       return expect((<any> actor).getSource(new ActionContext({ [KeysRdfResolveQuadPattern.source.name]: source })))
-        .resolves.toMatchObject(new RdfJsQuadStreamingSource(<any>source.match()));
+        .resolves.toMatchObject(new RdfJsQuadStreamingSource(<any>source));
     });
 
     it('should run with a real store', async() => {
-      const store = new Store();
-      store.addQuad(DF.quad(DF.namedNode('s1'), DF.namedNode('p'), DF.namedNode('o1')));
-      store.addQuad(DF.quad(DF.namedNode('s2'), DF.namedNode('p'), DF.namedNode('o2')));
-      store.addQuad(DF.quad(DF.namedNode('s3'), DF.namedNode('px'), DF.namedNode('o3')));
+      const store = new StreamingStore();
+
+      store.import(streamifyArray([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p'), DF.namedNode('o1')),
+        DF.quad(DF.namedNode('s2'), DF.namedNode('p'), DF.namedNode('o2')),
+        DF.quad(DF.namedNode('s3'), DF.namedNode('px'), DF.namedNode('o3'))
+      ]));
+
       context = new ActionContext({ [KeysRdfResolveQuadPattern.source.name]: store });
       const pattern: any = {
         subject: DF.variable('s'),
@@ -134,15 +149,12 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         object: DF.variable('o'),
         graph: DF.variable('g'),
       };
+      //make sure the store imports the quads
+      await new Promise<void>(resolve=>setTimeout(()=>resolve(), 100));
+      store.end();
+
       const { data } = await actor.run({ pattern, context });
 
-      let number = store.countQuads(null, pattern.predicate, null, null)
-      data.on("data", () => {
-        number--;
-        if (number == 0) {
-          data.close();
-        }
-      });
 
       expect(await arrayifyStream(data)).toEqualRdfQuadArray([
         DF.quad(DF.namedNode('s1'), DF.namedNode('p'), DF.namedNode('o1')),
@@ -150,6 +162,12 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       ]);
       expect(await new Promise(resolve => data.getProperty('metadata', resolve)))
         .toEqual({ cardinality: { type: 'exact', value: 1 }, canContainUndefs: false });
+    });
+
+    it('should run without a store', async() => {
+      const source = new RdfJsQuadStreamingSource();
+      source.store.end()
+      expect(await arrayifyStream(source.store.match())).toEqualRdfQuadArray([]);
     });
 
     /*

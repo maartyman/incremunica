@@ -6,12 +6,13 @@ import { wrap as wrapAsyncIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 
 export class RdfJsQuadStreamingSource implements IQuadSource {
-  public store;
+  public store: StreamingStore<Quad>;
 
-  public constructor(stream: RDF.Stream<Quad>) {
-    this.store = new StreamingStore();
-    if (stream) {
-      this.store.import(stream);
+  public constructor(store?: StreamingStore<Quad>) {
+    if (store !== undefined) {
+      this.store = store;
+    } else {
+      this.store = new StreamingStore();
     }
   }
 
