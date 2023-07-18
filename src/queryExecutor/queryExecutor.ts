@@ -136,6 +136,8 @@ export class QueryExecutor extends Actor<string> {
           break;
         case "error":
           //TODO solve error
+          throw new Error("query failed");
+          /*
           this.logger.error(value.message);
           LocalQueryEngineFactory.deleteWorker(
             this.queryExplanation.comunicaVersion.toString(),
@@ -151,6 +153,7 @@ export class QueryExecutor extends Actor<string> {
             this.emit("queryEngineEvent", "build");
             this.executeQuery();
           });
+           */
           break;
         case "fetch":
           this.makeGuard(value.message.input, value.message.headers);

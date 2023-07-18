@@ -2,6 +2,7 @@ import * as http from "http";
 import {GuardingConfig} from "./guardingConfig";
 import {Guard} from "./guard";
 import {GuardFactory} from "./guardFactory";
+import {fetch} from "cross-fetch";
 
 export class GuardPolling extends Guard {
   private ETag?: string;
@@ -11,9 +12,9 @@ export class GuardPolling extends Guard {
   constructor(resource: string) {
     super(resource);
 
-    this.getHead((res: http.IncomingMessage) => {
-      const lastModifiedServer = res.headers["last-modified"];
-      const ETagServer = res.headers.etag;
+    this.getHead((res: Response) => {
+      const lastModifiedServer = res.headers.get("last-modified");
+      const ETagServer = res.headers.get("etag");
       if (ETagServer) {
         this.ETag = ETagServer;
       }
@@ -31,15 +32,16 @@ export class GuardPolling extends Guard {
   }
 
   private polHeadResource() {
-    this.getHead((res: http.IncomingMessage) => {
+    this.getHead((res:Response) => {
       if (this.ETag) {
-        if (res.headers.etag !== this.ETag) {
-          this.ETag = res.headers.etag;
+        let tempEtag = res.headers.get("etag");
+        if (tempEtag !== this.ETag) {
+          this.ETag = (tempEtag == null)? undefined : tempEtag;
           this.dataChanged(this.key);
         }
       }
       else if (this.lastModified) {
-        const lastModifiedServer = res.headers["last-modified"];
+        const lastModifiedServer = res.headers.get("last-modified");
         if (lastModifiedServer) {
           const lastModifiedDateServer = new Date(lastModifiedServer).valueOf();
           if (lastModifiedDateServer != this.lastModified) {
@@ -55,10 +57,9 @@ export class GuardPolling extends Guard {
     setTimeout(this.polHeadResource.bind(this), GuardingConfig.pollingInterval);
   }
 
-  private getHead(callback: (res: http.IncomingMessage) => void) {
-    const req = http.request(this.key, {
+  private getHead(callback: (res: Response) => void) {
+    fetch(this.key, {
       method: "HEAD"
-    }, callback);
-    req.end();
+    }).then((res) => callback(res));
   }
 }

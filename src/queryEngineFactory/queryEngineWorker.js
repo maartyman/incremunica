@@ -44,15 +44,19 @@ parentPort.on("message", (value) => __awaiter(void 0, void 0, void 0, function* 
             fetch: customFetch.bind(port)
         };
         queryContext = Object.assign(Object.assign({}, queryContext), extra);
-        const bindingsStream = yield queryEngine.queryBindings(value[1], queryContext);
-        bindingsStream.on('data', (binding) => {
-            port.postMessage({ messageType: "data", message: JSON.stringify(binding) });
-        });
-        bindingsStream.on('end', () => {
-            port.postMessage({ messageType: "end", message: "" });
-            port.close();
-        });
-        bindingsStream.on('error', (error) => {
+        queryEngine.queryBindings(value[1], queryContext).then((bindingsStream) => {
+            bindingsStream.on('data', (binding) => {
+                port.postMessage({ messageType: "data", message: JSON.stringify(binding) });
+            });
+            bindingsStream.on('end', () => {
+                port.postMessage({ messageType: "end", message: "" });
+                port.close();
+            });
+            bindingsStream.on('error', (error) => {
+                port.postMessage({ messageType: "error", message: error });
+                port.close();
+            });
+        }, (error) => {
             port.postMessage({ messageType: "error", message: error });
             port.close();
         });
@@ -60,6 +64,7 @@ parentPort.on("message", (value) => __awaiter(void 0, void 0, void 0, function* 
 }));
 function customFetch(input, init) {
     return __awaiter(this, void 0, void 0, function* () {
+        init.headers = {};
         return (0, cross_fetch_1.fetch)(input, init).then((res) => {
             let headers = {};
             res.headers.forEach((val, key) => {

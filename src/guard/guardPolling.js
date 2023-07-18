@@ -1,39 +1,16 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuardPolling = void 0;
-const http = __importStar(require("http"));
 const guardingConfig_1 = require("./guardingConfig");
 const guard_1 = require("./guard");
 const guardFactory_1 = require("./guardFactory");
+const cross_fetch_1 = require("cross-fetch");
 class GuardPolling extends guard_1.Guard {
     constructor(resource) {
         super(resource);
         this.getHead((res) => {
-            const lastModifiedServer = res.headers["last-modified"];
-            const ETagServer = res.headers.etag;
+            const lastModifiedServer = res.headers.get("last-modified");
+            const ETagServer = res.headers.get("etag");
             if (ETagServer) {
                 this.ETag = ETagServer;
             }
@@ -50,13 +27,14 @@ class GuardPolling extends guard_1.Guard {
     polHeadResource() {
         this.getHead((res) => {
             if (this.ETag) {
-                if (res.headers.etag !== this.ETag) {
-                    this.ETag = res.headers.etag;
+                let tempEtag = res.headers.get("etag");
+                if (tempEtag !== this.ETag) {
+                    this.ETag = (tempEtag == null) ? undefined : tempEtag;
                     this.dataChanged(this.key);
                 }
             }
             else if (this.lastModified) {
-                const lastModifiedServer = res.headers["last-modified"];
+                const lastModifiedServer = res.headers.get("last-modified");
                 if (lastModifiedServer) {
                     const lastModifiedDateServer = new Date(lastModifiedServer).valueOf();
                     if (lastModifiedDateServer != this.lastModified) {
@@ -72,10 +50,9 @@ class GuardPolling extends guard_1.Guard {
         setTimeout(this.polHeadResource.bind(this), guardingConfig_1.GuardingConfig.pollingInterval);
     }
     getHead(callback) {
-        const req = http.request(this.key, {
+        (0, cross_fetch_1.fetch)(this.key, {
             method: "HEAD"
-        }, callback);
-        req.end();
+        }).then((res) => callback(res));
     }
 }
 exports.GuardPolling = GuardPolling;

@@ -48,28 +48,32 @@ parentPort.on("message", async (value: ["invalidateHttpCache", [string]] | [Mess
 
     queryContext = {...queryContext, ...extra};
 
-    const bindingsStream = await queryEngine.queryBindings(
+    queryEngine.queryBindings(
       value[1],
       queryContext
-    );
+    ).then((bindingsStream) => {
+      bindingsStream.on('data', (binding: Bindings) => {
+        port.postMessage({messageType: "data", message: JSON.stringify(binding)});
+      });
 
-    bindingsStream.on('data', (binding: Bindings) => {
-      port.postMessage({messageType: "data", message: JSON.stringify(binding)});
-    });
+      bindingsStream.on('end', () => {
+        port.postMessage({messageType: "end", message: ""});
+        port.close();
+      });
 
-    bindingsStream.on('end', () => {
-      port.postMessage({messageType: "end", message: ""});
-      port.close();
-    });
-
-    bindingsStream.on('error', (error: any) => {
+      bindingsStream.on('error', (error: any) => {
+        port.postMessage({messageType: "error", message: error});
+        port.close();
+      });
+    }, (error) => {
       port.postMessage({messageType: "error", message: error});
       port.close();
-    });
+    })
   }
 });
 
 async function customFetch(this: MessagePort, input: RequestInfo | URL, init?: RequestInit | undefined): Promise<Response> {
+  init!.headers = {};
   return fetch(input, init).then((res) => {
     let headers: any = {};
     res.headers.forEach((val, key) => {

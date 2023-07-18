@@ -111,15 +111,24 @@ class QueryExecutor extends actor_1.Actor {
                         break;
                     case "error":
                         //TODO solve error
+                        throw new Error("query failed");
+                        /*
                         this.logger.error(value.message);
-                        localQueryEngineFactory_1.LocalQueryEngineFactory.deleteWorker(this.queryExplanation.comunicaVersion.toString(), this.queryExplanation.comunicaContext.toString());
-                        localQueryEngineFactory_1.LocalQueryEngineFactory.getOrCreate(this.queryExplanation.comunicaVersion.toString(), this.queryExplanation.comunicaContext.toString()).then((queryEngine) => {
-                            this.queryEngine = queryEngine;
-                            this.logger.debug(`Comunica engine build`);
-                            this.queryEngineBuild = true;
-                            this.emit("queryEngineEvent", "build");
-                            this.executeQuery();
+                        LocalQueryEngineFactory.deleteWorker(
+                          this.queryExplanation.comunicaVersion.toString(),
+                          this.queryExplanation.comunicaContext.toString()
+                        );
+                        LocalQueryEngineFactory.getOrCreate(
+                          this.queryExplanation.comunicaVersion.toString(),
+                          this.queryExplanation.comunicaContext.toString()
+                        ).then((queryEngine: Worker) => {
+                          this.queryEngine = queryEngine;
+                          this.logger.debug(`Comunica engine build`);
+                          this.queryEngineBuild = true;
+                          this.emit("queryEngineEvent", "build");
+                          this.executeQuery();
                         });
+                         */
                         break;
                     case "fetch":
                         this.makeGuard(value.message.input, value.message.headers);
