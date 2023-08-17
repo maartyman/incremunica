@@ -31,6 +31,6 @@ export class ActorRdfResolveQuadPatternRdfjsStreamingSource extends ActorRdfReso
 
   protected async getSource(context: IActionContext): Promise<IQuadSource> {
     const source: any = <any> getContextSource(context);
-    return new RdfJsQuadStreamingSource('match' in source ? source.match() : source.value.match());
+    return new RdfJsQuadStreamingSource('match' in source ? source : source.value, context);
   }
 }

@@ -9,6 +9,7 @@ import type {
 import {
   ActorRdfResolveHypermedia,
 } from '@comunica/bus-rdf-resolve-hypermedia';
+import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
 
 /**
  * A comunica Stream None RDF Resolve Hypermedia Actor.
@@ -26,7 +27,9 @@ export class ActorRdfResolveHypermediaStreamNone extends ActorRdfResolveHypermed
 
   public async run(action: IActionRdfResolveHypermedia): Promise<IActorRdfResolveHypermediaOutput> {
     this.logInfo(action.context, `Identified as file source: ${action.url}`);
-    const source = new RdfJsQuadStreamingSource(<any>action.quads);
+    const store = new StreamingStore();
+    store.import(<any>action.quads);
+    const source = new RdfJsQuadStreamingSource(store);
 
     await this.mediatorGuard.mediate({
       context: action.context,

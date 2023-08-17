@@ -1,18 +1,22 @@
 import type { IQuadSource } from '@comunica/bus-rdf-resolve-quad-pattern';
-import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
+import { ActionContextKey } from '@comunica/core/lib/ActionContext';
+import type { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
 import type { Quad } from '@comunica/incremental-types';
+import type { IActionContext } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 
 export class RdfJsQuadStreamingSource implements IQuadSource {
   public store;
+  public context;
 
-  public constructor(stream: RDF.Stream<Quad>) {
-    this.store = new StreamingStore();
-    if (stream) {
-      this.store.import(stream);
-    }
+  public constructor(
+    store: StreamingStore<Quad>,
+    context?: IActionContext | undefined,
+  ) {
+    this.store = store;
+    this.context = context;
   }
 
   public static nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
@@ -20,12 +24,27 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
   }
 
   public match(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term, graph: RDF.Term): AsyncIterator<Quad> {
+    const matchOptions = {
+      stopMatch() {
+        throw new Error('stopMatch function has not been replaced in streaming store.');
+      },
+    };
     const rawStream = this.store.match(
       RdfJsQuadStreamingSource.nullifyVariables(subject),
       RdfJsQuadStreamingSource.nullifyVariables(predicate),
       RdfJsQuadStreamingSource.nullifyVariables(object),
       RdfJsQuadStreamingSource.nullifyVariables(graph),
+      matchOptions,
     );
+
+    if (this.context) {
+      const matchOptionsArray: ({ stopMatch: () => void })[] | undefined = this.context.get(
+        new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'),
+      );
+      if (matchOptionsArray !== undefined) {
+        matchOptionsArray.push(matchOptions);
+      }
+    }
 
     const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
 
