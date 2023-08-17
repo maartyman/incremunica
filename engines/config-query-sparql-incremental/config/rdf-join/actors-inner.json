@@ -1,6 +1,7 @@
 {
   "@context": [
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-memory-multi-bind/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-computational-multi-bind/^1.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-nestedloop/^1.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-partial-hash/^1.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-full-hash/^1.0.0/components/context.jsonld",
@@ -64,6 +65,13 @@
       "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-multi-delta-query",
       "@type": "ActorRdfJoinInnerIncrementalMultiDeltaQuery",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
+    },
+    {
+      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-computational-multi-bind",
+      "@type": "ActorRdfJoinInnerIncrementalComputationalMultiBind",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
+      "mediatorJoinEntriesSort": { "@id": "urn:comunica:default:rdf-join-entries-sort/mediators#main" },
       "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
     }
   ]
