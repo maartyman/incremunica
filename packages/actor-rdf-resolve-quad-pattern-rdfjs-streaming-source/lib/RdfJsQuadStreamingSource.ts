@@ -12,10 +12,14 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
   public context;
 
   public constructor(
-    store: StreamingStore<Quad>,
+    store?: StreamingStore<Quad>,
     context?: IActionContext | undefined,
   ) {
-    this.store = store;
+    if (store !== undefined) {
+      this.store = store;
+    } else {
+      this.store = new StreamingStore();
+    }
     this.context = context;
   }
 

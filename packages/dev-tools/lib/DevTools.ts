@@ -1,4 +1,6 @@
-import type { Bindings } from '@comunica/incremental-types';
+import type {Bindings, BindingsStream} from '@comunica/incremental-types';
+import {bindingsToString} from "@comunica/incremental-bindings-factory";
+import {Quad} from "@comunica/incremental-types";
 
 export const DevTools = {
   printBindings(bindings: Bindings) {
@@ -9,4 +11,11 @@ export const DevTools = {
     // eslint-disable-next-line no-console
     console.log(string);
   },
+
+  printBindingsStream(bindingsStream: BindingsStream) {
+    return bindingsStream.map((bindings) => {
+      this.printBindings(bindings);
+      return bindings;
+    });
+  }
 };

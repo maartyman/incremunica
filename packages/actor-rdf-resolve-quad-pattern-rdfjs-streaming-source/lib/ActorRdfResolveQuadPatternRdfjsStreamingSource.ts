@@ -7,6 +7,7 @@ import {
   ActorRdfResolveQuadPatternSource, getContextSource, hasContextSingleSourceOfType,
 } from '@comunica/bus-rdf-resolve-quad-pattern';
 import type { IActorTest } from '@comunica/core';
+import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
 import type { IActionContext } from '@comunica/types';
 import { RdfJsQuadStreamingSource } from './RdfJsQuadStreamingSource';
 
@@ -25,6 +26,9 @@ export class ActorRdfResolveQuadPatternRdfjsStreamingSource extends ActorRdfReso
     const source = getContextSource(action.context);
     if (!source || typeof source === 'string' || (!('match' in source) && !source.value.match)) {
       throw new Error(`${this.name} received an invalid rdfjsSource.`);
+    }
+    if (!(source instanceof StreamingStore) && !(!('match' in source) && (source.value instanceof StreamingStore))) {
+      throw new Error(`${this.name} didn't receive a StreamingStore.`);
     }
     return true;
   }

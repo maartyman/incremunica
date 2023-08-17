@@ -11,6 +11,7 @@ import 'jest-rdf';
 import { ArrayIterator } from 'asynciterator';
 import { Readable } from 'stream';
 import {StreamingStore} from "@comunica/incremental-rdf-streaming-store";
+
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 
@@ -51,6 +52,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
     beforeEach(() => {
       actor = new ActorRdfResolveQuadPatternRdfjsStreamingSource({ name: 'actor', bus });
       source = { match: () => <any> null };
+      Object.setPrototypeOf(source, StreamingStore.prototype);
     });
 
     it('should test', () => {
@@ -67,6 +69,14 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
           { [KeysRdfResolveQuadPattern.source.name]: source },
         ) }))
         .resolves.toBeTruthy();
+    });
+
+    it('should not test with a normal store', () => {
+      return expect(actor.test({ pattern: <any> null,
+        context: new ActionContext(
+          { [KeysRdfResolveQuadPattern.source.name]: { type: 'rdfjsSource', value: new Store() }},
+        ) }))
+        .rejects.toEqual(new Error("actor didn't receive a StreamingStore."))
     });
 
     it('should not test without a source', () => {
@@ -165,6 +175,10 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         object: DF.variable('o'),
         graph: DF.variable('g'),
       };
+      //make sure the store imports the quads
+      await new Promise<void>(resolve=>setTimeout(()=>resolve(), 100));
+      store.end();
+
       const { data } = await actor.run({ pattern, context });
 
       let number = 2;
@@ -188,6 +202,12 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       }
       expect(stopMatches.length).toEqual(1);
       expect(stopMatches[0].stopMatch).not.toThrowError()
+    });
+
+    it('should run without a store', async() => {
+      const source = new RdfJsQuadStreamingSource();
+      source.store.end()
+      expect(await arrayifyStream(source.store.match())).toEqualRdfQuadArray([]);
     });
 
     /*
