@@ -15,12 +15,6 @@ import '@comunica/incremental-jest';
 const DF = new DataFactory();
 const BF = new BindingsFactory();
 
-function bindingsToString(b: Bindings): string {
-  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-  const keys = [ ...b.keys() ].sort();
-  return keys.map(k => `${k.value}:${b.get(k)!.value}`).toString();
-}
-
 describe('ActorRdfJoinFullHash', () => {
   let bus: any;
   let context: IActionContext;
