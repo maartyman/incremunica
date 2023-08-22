@@ -154,7 +154,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
           this.readable = true;
         });
 
-        this.currentSource = bindingsStream;
+        this.currentSource = <BindingsStream><unknown>bindingsStream;
       }).catch(() => {
         this.pending = false;
         this.currentSource = undefined;
