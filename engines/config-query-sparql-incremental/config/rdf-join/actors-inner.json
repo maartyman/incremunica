@@ -40,6 +40,17 @@
       "mediatorJoin": { "@id": "urn:comunica:default:rdf-join/mediators#main" }
     },
     {
+      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-full-hash",
+      "@type": "ActorRdfJoinInnerIncrementalFullHash",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
+    },
+    {
+      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-multi-delta-query",
+      "@type": "ActorRdfJoinInnerIncrementalMultiDeltaQuery",
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
+    },
+    {
       "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-memory-multi-bind",
       "@type": "ActorRdfJoinInnerIncrementalMemoryMultiBind",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
@@ -55,17 +66,6 @@
       "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-partial-hash",
       "@type": "ActorRdfJoinInnerIncrementalPartialHash",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
-    },
-    {
-      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-full-hash",
-      "@type": "ActorRdfJoinInnerIncrementalFullHash",
-      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
-    },
-    {
-      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-multi-delta-query",
-      "@type": "ActorRdfJoinInnerIncrementalMultiDeltaQuery",
-      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
-      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
     },
     {
       "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-computational-multi-bind",

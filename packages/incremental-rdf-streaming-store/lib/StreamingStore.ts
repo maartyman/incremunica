@@ -3,7 +3,7 @@ import type { Quad } from '@comunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
 import { Store } from 'n3';
-import type { Readable } from 'readable-stream';
+import { Readable } from 'readable-stream';
 import { PassThrough } from 'readable-stream';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
 
@@ -25,7 +25,7 @@ export class StreamingStore<Q extends Quad>
   protected halted = false;
   protected haltBuffer = new Array<Q>();
 
-  public constructor(store = new Store()) {
+  public constructor(store = new Store<Q>()) {
     super();
     this.store = store;
   }
@@ -80,7 +80,7 @@ export class StreamingStore<Q extends Quad>
   }
 
   public copyOfStore(): Store {
-    const newStore = new Store();
+    const newStore = new Store<Quad>();
     this.store.forEach(quad => {
       newStore.add(quad);
     }, null, null, null, null);
@@ -150,18 +150,27 @@ export class StreamingStore<Q extends Quad>
     graph?: RDF.Term | null,
     options?: { stopMatch: () => void },
   ): RDF.Stream<Q> {
-    // Console.log("match")
-
     // TODO what if match is never called (=> streaming store should be removed) (Should not happen I think)
     this.numberOfListeners++;
     const unionStream = new PassThrough({ objectMode: true });
 
-    const storeResult: Readable = <Readable> <any> this.store.match(
+    let storedQuads = this.store.getQuads(
       <Term>subject,
       <Term>predicate,
       <Term>object,
       <Term>graph,
     );
+    const storeResult = new Readable({
+      objectMode: true,
+      read() {
+        if (storedQuads.length) {
+          storeResult.push(storedQuads.pop());
+        }
+        if (!storedQuads.length) {
+          storeResult.push(null);
+        }
+      }
+    })
     storeResult.pipe(unionStream, { end: false });
 
     // If the store hasn't ended yet, also create a new pendingStream
@@ -179,14 +188,14 @@ export class StreamingStore<Q extends Quad>
       pendingStream.pipe(unionStream, { end: false });
 
       pendingStream.on('close', () => {
-        // Console.log("passThrough ended:");
+        //console.log("passThrough ended");
         if (storeResult.closed) {
           unionStream.end();
         }
       });
 
       storeResult.on('close', () => {
-        // Console.log("storeResult ended");
+        //console.log("storeResult ended");
         if (pendingStream.closed) {
           unionStream.end();
         }
@@ -199,7 +208,7 @@ export class StreamingStore<Q extends Quad>
     }
 
     unionStream.on('close', () => {
-      // Console.log("unionStream ended");
+      //console.log("unionStream ended");
       if (this.numberOfListeners < 2) {
         this.end();
       } else {

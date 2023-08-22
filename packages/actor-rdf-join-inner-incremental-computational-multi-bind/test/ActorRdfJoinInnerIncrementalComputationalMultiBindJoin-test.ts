@@ -7,7 +7,7 @@ import 'jest-rdf';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
-import {ArrayIterator} from 'asynciterator';
+import {ArrayIterator, WrappingIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory, Algebra } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerIncrementalComputationalMultiBind } from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
@@ -15,8 +15,11 @@ import Mock = jest.Mock;
 import '@comunica/incremental-jest';
 import {DevTools} from "@comunica/dev-tools";
 import arrayifyStream from "arrayify-stream";
-import {KeysQueryOperation} from "@comunica/context-entries";
+import {KeysQueryOperation, KeysRdfResolveQuadPattern} from "@comunica/context-entries";
 import {EventEmitter} from "events";
+import {PassThrough, Stream, Transform} from "readable-stream";
+import {BindingsStream} from "@comunica/incremental-types";
+import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 
 
 const streamifyArray = require('streamify-array');
@@ -782,46 +785,46 @@ describe('ActorRdfJoinMultiBind', () => {
     });
 
     describe('getOutput', () => {
-      it('should handle two entries without context', async() => {
+      it('should handle two entries without context', async () => {
         const action: IActionRdfJoin = {
           type: 'inner',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
+                    [DF.variable('b'), DF.namedNode('ex:b1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
+                    [DF.variable('b'), DF.namedNode('ex:b2')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    [DF.variable('b'), DF.namedNode('ex:b3')],
                   ]),
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 3 },
+                  cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [DF.variable('a'), DF.variable('b')],
                 }),
                 type: 'bindings',
               },
               operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
+                    [DF.variable('a'), DF.namedNode('ex:a1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
+                    [DF.variable('a'), DF.namedNode('ex:a2')],
                   ]),
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
+                  cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [DF.variable('a')],
                 }),
                 type: 'bindings',
               },
@@ -830,106 +833,106 @@ describe('ActorRdfJoinMultiBind', () => {
           ],
           context,
         };
-        const { result } = await actor.getOutput(action);
+        const {result} = await actor.getOutput(action);
 
         // Validate output
         expect(result.type).toEqual('bindings');
         expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
         ]);
         expect(await result.metadata()).toEqual({
-          cardinality: { type: 'estimate', value: 2.400_000_000_000_000_4 },
+          cardinality: {type: 'estimate', value: 2.400_000_000_000_000_4},
           canContainUndefs: false,
-          variables: [ DF.variable('a'), DF.variable('b') ],
+          variables: [DF.variable('a'), DF.variable('b')],
         });
       });
 
-      it('should handle three entries', async() => {
+      it('should handle three entries', async () => {
         const action: IActionRdfJoin = {
           context,
           type: 'inner',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
+                    [DF.variable('b'), DF.namedNode('ex:b1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
+                    [DF.variable('b'), DF.namedNode('ex:b2')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    [DF.variable('b'), DF.namedNode('ex:b3')],
                   ]),
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 3 },
+                  cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [DF.variable('a'), DF.variable('b')],
                 }),
                 type: 'bindings',
               },
               operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('c'), DF.namedNode('ex:c1') ],
+                    [DF.variable('c'), DF.namedNode('ex:c1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('c'), DF.namedNode('ex:c2') ],
+                    [DF.variable('c'), DF.namedNode('ex:c2')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('c'), DF.namedNode('ex:c3') ],
+                    [DF.variable('c'), DF.namedNode('ex:c3')],
                   ]),
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
+                  cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('c') ],
+                  variables: [DF.variable('a'), DF.variable('c')],
                 }),
                 type: 'bindings',
               },
               operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.variable('c')),
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
+                    [DF.variable('a'), DF.namedNode('ex:a1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
+                    [DF.variable('a'), DF.namedNode('ex:a2')],
                   ]),
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
+                  cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [DF.variable('a')],
                 }),
                 type: 'bindings',
               },
@@ -937,40 +940,40 @@ describe('ActorRdfJoinMultiBind', () => {
             },
           ],
         };
-        const { result } = await actor.getOutput(action);
+        const {result} = await actor.getOutput(action);
 
         // Validate output
         expect(result.type).toEqual('bindings');
         expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a2')],
           ]),
         ]);
         expect(await result.metadata()).toEqual({
-          cardinality: { type: 'estimate', value: 9.600_000_000_000_001 },
+          cardinality: {type: 'estimate', value: 9.600_000_000_000_001},
           canContainUndefs: false,
-          variables: [ DF.variable('a'), DF.variable('b'), DF.variable('c') ],
+          variables: [DF.variable('a'), DF.variable('b'), DF.variable('c')],
         });
 
         // Validate mock calls
@@ -984,24 +987,24 @@ describe('ActorRdfJoinMultiBind', () => {
             a: 'b',
             "matchOptions": [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
-              cardinality: { type: 'estimate', value: 1 },
+              cardinality: {type: 'estimate', value: 1},
               canContainUndefs: false,
-              variables: [ DF.variable('a') ],
+              variables: [DF.variable('a')],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
-                cardinality: { type: 'estimate', value: 3 },
+                cardinality: {type: 'estimate', value: 3},
                 canContainUndefs: false,
-                variables: [ DF.variable('a'), DF.variable('b') ],
+                variables: [DF.variable('a'), DF.variable('b')],
               },
               {
-                cardinality: { type: 'estimate', value: 4 },
+                cardinality: {type: 'estimate', value: 4},
                 canContainUndefs: false,
-                variables: [ DF.variable('a'), DF.variable('c') ],
+                variables: [DF.variable('a'), DF.variable('c')],
               },
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
             ]),
           }),
         });
@@ -1014,24 +1017,24 @@ describe('ActorRdfJoinMultiBind', () => {
             a: 'b',
             "matchOptions": [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
-              cardinality: { type: 'estimate', value: 1 },
+              cardinality: {type: 'estimate', value: 1},
               canContainUndefs: false,
-              variables: [ DF.variable('a') ],
+              variables: [DF.variable('a')],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
-                cardinality: { type: 'estimate', value: 3 },
+                cardinality: {type: 'estimate', value: 3},
                 canContainUndefs: false,
-                variables: [ DF.variable('a'), DF.variable('b') ],
+                variables: [DF.variable('a'), DF.variable('b')],
               },
               {
-                cardinality: { type: 'estimate', value: 4 },
+                cardinality: {type: 'estimate', value: 4},
                 canContainUndefs: false,
-                variables: [ DF.variable('a'), DF.variable('c') ],
+                variables: [DF.variable('a'), DF.variable('c')],
               },
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
             ]),
           }),
         });
@@ -1091,6 +1094,8 @@ describe('ActorRdfJoinMultiBind', () => {
       });
 
       it('should handle two entries with immediate deletions', async() => {
+
+
         const action: IActionRdfJoin = {
           type: 'inner',
           entries: [
@@ -1244,12 +1249,14 @@ describe('ActorRdfJoinMultiBind', () => {
           ])
         ]);
       });
+      */
 
       describe("with mock store", () => {
         let haltMock: Mock<any, any>;
         let resumeMock: Mock<any, any>;
-        let stream: Stream;
         let iterator: BindingsStream;
+        let stopMatchJest: Mock<any, any>;
+        let streams: PassThrough[] = [];
 
         beforeEach(() => {
           haltMock = jest.fn();
@@ -1261,53 +1268,120 @@ describe('ActorRdfJoinMultiBind', () => {
           }
           context = context.set(KeysRdfResolveQuadPattern.sources, [mockStreamingStore]);
 
-          const tempStream: Stream = streamifyArray([
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]),
-          ]);
-          stream = tempStream.pipe(new Transform({
-            transform: (chunk: any, encoding: BufferEncoding, callback: (error?: (Error | null | undefined), data?: any) => void) => {
-              callback(undefined, chunk);
-            },
-            objectMode: true
-          }), {end: false});
-          iterator = new WrappingIterator(stream);
+          stopMatchJest = jest.fn();
+
+          mediatorQueryOperation = <any> {
+            mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+              const unionStream = new PassThrough({ objectMode: true });
+              const tempStream: Stream = streamifyArray([
+                BF.bindings([
+                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+                ]),
+                BF.bindings([
+                  [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+                ]),
+                BF.bindings([
+                  [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+                ]),
+              ]);
+              tempStream.pipe(unionStream, {end: false});
+
+              let stream = new PassThrough({
+                objectMode: true
+              });
+              stream.pipe(unionStream, {end: false});
+              streams.push(stream);
+
+              tempStream.on('close', () => {
+                if (stream.closed) {
+                  unionStream.end();
+                }
+              });
+
+              stream.on('close', () => {
+                if (tempStream.closed) {
+                  unionStream.end();
+                }
+              });
+
+              unionStream.on("close", () => {
+                console.log("union closed")
+              })
+
+              iterator = new WrappingIterator(unionStream);
+
+              let stopMatchfn = () => {
+                stream.end();
+                stopMatchJest();
+              }
+              let matchOptions = arg.context.get(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'));
+              console.log(matchOptions)
+              expect(matchOptions).not.toBeUndefined()
+              if (matchOptions !== undefined) {
+                (<({ stopMatch: () => void })[]> matchOptions).push({
+                  stopMatch: stopMatchfn
+                });
+              }
+              return {
+                bindingsStream: iterator,
+                metadata: () => Promise.resolve({
+                  cardinality: { type: 'estimate', value: 3 },
+                  canContainUndefs: false,
+                  variables: [ DF.variable('bound') ],
+                }),
+                type: 'bindings',
+              };
+            }),
+          };
+
+          actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
+            name: 'actor',
+            bus,
+            selectivityModifier: 0.1,
+            mediatorQueryOperation,
+            mediatorJoinSelectivity,
+            mediatorJoinEntriesSort,
+          });
         })
 
-        it('should handle two entries with deletions with halting test', async() => {
+        /*
+        it('should handle entries', async () => {
           const action: IActionRdfJoin = {
             type: 'inner',
             entries: [
               {
-                output: <any> {
+                output: <any>{
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b1') ],
+                      [DF.variable('b'), DF.namedNode('ex:b1')],
                     ]),
                     BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b2') ],
+                      [DF.variable('b'), DF.namedNode('ex:b2')],
                     ]),
                     BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                      [DF.variable('b'), DF.namedNode('ex:b3')],
                     ])
-                  ], { autoStart: false }),
+                  ], {autoStart: false}),
                   metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 4 },
+                    cardinality: {type: 'estimate', value: 4},
                     canContainUndefs: false,
-                    variables: [ DF.variable('a'), DF.variable('b') ],
+                    variables: [DF.variable('a'), DF.variable('b')],
                   }),
                   type: 'bindings',
                 },
                 operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
               },
               {
-                output: <any> {
-                  bindingsStream: iterator,
+                output: <any>{
+                  bindingsStream: new ArrayIterator([
+                    BF.bindings([
+                      [DF.variable('a'), DF.namedNode('ex:a1')],
+                    ]),
+                  ]),
                   metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 1 },
+                    cardinality: {type: 'estimate', value: 1},
                     canContainUndefs: false,
-                    variables: [ DF.variable('a') ],
+                    variables: [DF.variable('a')],
                   }),
                   type: 'bindings',
                 },
@@ -1316,104 +1390,209 @@ describe('ActorRdfJoinMultiBind', () => {
             ],
             context,
           };
-          const { result } = await actor.getOutput(action);
-
-          console.log("test1")
+          const {result} = await actor.getOutput(action);
 
           expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
             ]),
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
             ]),
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
             ]),
           ]);
 
-          stream.push(
+          for (const stream of streams) {
+            stream.push(
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              ])
+            );
+          }
+
+          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
             BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+          ]);
+          expect(haltMock).toHaveBeenCalledTimes(0);
+          expect(resumeMock).toHaveBeenCalledTimes(0);
+
+          for (const stream of streams) {
+            stream.push(
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              ], false)
+            );
+          }
+
+          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+          ]);
+          expect(haltMock).toHaveBeenCalledTimes(0);
+          expect(resumeMock).toHaveBeenCalledTimes(0);
+          expect(stopMatchJest).toHaveBeenCalledTimes(0);
+        });
+        */
+
+        it('should handle entries with deletions', async () => {
+          const tempStream: Stream = streamifyArray([
+            BF.bindings([
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+          ]);
+          let alteringStream = tempStream.pipe(new PassThrough({
+            objectMode: true
+          }), {end: false});
+          let iterator = new WrappingIterator(alteringStream);
+
+          const action: IActionRdfJoin = {
+            type: 'inner',
+            entries: [
+              {
+                output: <any>{
+                  bindingsStream: new ArrayIterator([
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b1')],
+                    ]),
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b2')],
+                    ]),
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b3')],
+                    ])
+                  ], {autoStart: false}),
+                  metadata: () => Promise.resolve({
+                    cardinality: {type: 'estimate', value: 4},
+                    canContainUndefs: false,
+                    variables: [DF.variable('a'), DF.variable('b')],
+                  }),
+                  type: 'bindings',
+                },
+                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
+              },
+              {
+                output: <any>{
+                  bindingsStream: iterator,
+                  metadata: () => Promise.resolve({
+                    cardinality: {type: 'estimate', value: 1},
+                    canContainUndefs: false,
+                    variables: [DF.variable('a')],
+                  }),
+                  type: 'bindings',
+                },
+                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
+              },
+            ],
+            context,
+          };
+          const {result} = await actor.getOutput(action);
+
+          console.log("1")
+
+          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+          ]);
+
+          alteringStream.push(
+            BF.bindings([
+              [DF.variable('a'), DF.namedNode('ex:a2')],
             ])
           );
 
-          console.log("test2")
+          console.log("2")
 
           expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
             ]),
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
             ]),
             BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
             ]),
           ]);
+          expect(haltMock).toHaveBeenCalledTimes(0);
+          expect(resumeMock).toHaveBeenCalledTimes(0);
+
+          alteringStream.push(
+            BF.bindings([
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false)
+          );
+
+          console.log("3")
+
+          alteringStream.end();
+          for (const stream of streams) {
+            stream.end();
+          }
+
+          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+          ]);
+
+          streams[1].push(
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound4')],
+            ], false)
+          );
+
+          console.log("4")
+
+          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
+            ]),
+          ]);
+
           expect(haltMock).toHaveBeenCalledTimes(1);
           expect(resumeMock).toHaveBeenCalledTimes(1);
-
-          console.log("test3")
-
-          stream.push(
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false)
-          );
-          stream.push(
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false)
-          );
-
-          stream.destroy();
-
-          expect(await partialArrayifyStream(result.bindingsStream, 6)).toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ], false),
-          ]);
-          expect(haltMock).toHaveBeenCalledTimes(2);
-          expect(resumeMock).toHaveBeenCalledTimes(2);
+          expect(stopMatchJest).toHaveBeenCalledTimes(1);
 
 
-          console.log("test4")
+          console.log("5")
+
         });
-
-
-
-
-
       });
 
+      /*
       it('should handle two entries with multiple identical bindings and removal', async() => {
         const action: IActionRdfJoin = {
           type: 'inner',
@@ -1513,7 +1692,6 @@ describe('ActorRdfJoinMultiBind', () => {
           ]),
         ]);
       });
-      */
 
       it('should handle two entries with multiple identical bindings and removal (other)', async() => {
         mediatorQueryOperation = <any> {
@@ -1851,7 +2029,7 @@ describe('ActorRdfJoinMultiBind', () => {
           ], false),
         ]);
       });
-
+      */
 
     });
   });

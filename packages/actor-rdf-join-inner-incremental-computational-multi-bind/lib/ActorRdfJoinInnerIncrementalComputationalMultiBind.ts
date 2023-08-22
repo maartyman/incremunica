@@ -110,14 +110,14 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           transformMap.set(hash, hashData);
         }
 
-        const bindingsMerger = (subBindings: Bindings): Bindings | undefined => subBindings.merge(bindings);
+        const bindingsMerger = (subBindings: Bindings): Bindings | null => {
+          let subBindingsOrUndefined = subBindings.merge(bindings);
+          return (subBindingsOrUndefined === undefined)? null : subBindingsOrUndefined;
+        }
 
         const [ bindingStream, stopFunction ] = await operationBinder(hashData.subOperations, bindings);
         hashData.stopFunctions.push(stopFunction);
-        hashData.iterators.push(new TransformIterator(
-          () => bindingStream.map(bindingsMerger),
-          { maxBufferSize: 128, autoStart: false },
-        ));
+        hashData.iterators.push(bindingStream.map(bindingsMerger));
 
         return hashData.iterators[hashData.iterators.length - 1];
       }
@@ -132,8 +132,13 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           return new EmptyIterator();
         }
 
+        let activeIteratorStopped = false;
+        let newIteratorStopped = false;
         activeIterator.on('end', () => {
-          ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+          activeIteratorStopped = true;
+          if (newIteratorStopped) {
+            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+          }
         });
 
         activeStopFunction();
@@ -142,6 +147,12 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
         const [ newIterator, newStopFunction ] = await operationBinder(hashData.subOperations, bindings);
         newStopFunction();
+        newIterator.on("end", () => {
+          newIteratorStopped = true;
+          if (activeIteratorStopped) {
+            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+          }
+        });
         return new TransformIterator(
           () => newIterator.map(bindingsMerger),
           { maxBufferSize: 128, autoStart: false },
@@ -256,10 +267,10 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
         // Send the materialized patterns to the mediator for recursive join evaluation.
-        const MatchOptions: ({ stopMatch: () => void })[] = [];
+        const matchOptions: ({ stopMatch: () => void })[] = [];
         const currentSubContext = subContext
           .set(KeysQueryOperation.joinBindings, operationBindings)
-          .set(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'), MatchOptions);
+          .set(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'), matchOptions);
         const operation = operations.length === 1 ?
           operations[0] :
           ActorRdfJoinInnerIncrementalComputationalMultiBind.FACTORY.createJoin(operations);
@@ -267,7 +278,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           { operation, context: currentSubContext },
         ));
         const stopFunction = (): void => {
-          for (const MatchOption of MatchOptions) {
+          for (const MatchOption of matchOptions) {
             MatchOption.stopMatch();
           }
         };
