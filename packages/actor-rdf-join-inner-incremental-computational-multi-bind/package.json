@@ -1,14 +1,14 @@
 {
-  "name": "@comunica/actor-rdf-join-inner-incremental-memory-multi-bind",
+  "name": "@comunica/actor-rdf-join-inner-incremental-computational-multi-bind",
   "version": "1.0.0",
-  "description": "A inner-incremental-memory-multi-bind rdf-join actor",
+  "description": "A inner-incremental-computational-multi-bind rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/comunica/comunica.git",
-    "directory": "packages/actor-rdf-join-inner-incremental-memory-multi-bind"
+    "directory": "packages/actor-rdf-join-inner-incremental-computational-multi-bind"
   },
   "publishConfig": {
     "access": "public"
@@ -18,7 +18,7 @@
     "comunica",
     "actor",
     "rdf-join",
-    "inner-incremental-memory-multi-bind"
+    "inner-incremental-computational-multi-bind"
   ],
   "license": "MIT",
   "bugs": {
@@ -35,7 +35,9 @@
     "@comunica/bus-query-operation": "^2.6.8",
     "@comunica/bus-rdf-join": "^2.6.8",
     "@comunica/bus-rdf-join-entries-sort": "^2.6.8",
+    "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/context-entries": "^2.6.8",
+    "@comunica/core": "^2.6.8",
     "@comunica/incremental-bindings-factory": "^1.0.0",
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
     "@comunica/types": "^2.6.8",
