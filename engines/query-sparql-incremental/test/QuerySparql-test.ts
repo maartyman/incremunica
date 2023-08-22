@@ -2,6 +2,7 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
+import '@comunica/incremental-jest';
 import { DataFactory } from 'rdf-data-factory';
 import type { BindingsStream, QueryStringContext} from '@comunica/types';
 import {Factory} from 'sparqlalgebrajs';
@@ -9,11 +10,30 @@ import {QueryEngine} from '../lib/QueryEngine';
 import {usePolly} from './util';
 import {EventEmitter} from "events";
 import * as http from "http";
+import {StreamingStore} from "@comunica/incremental-rdf-streaming-store";
+import {Quad} from "@comunica/incremental-types";
+import arrayifyStream from "arrayify-stream";
+import {BindingsFactory} from "@comunica/incremental-bindings-factory";
+import {DevTools} from "@comunica/dev-tools";
+
+async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
+  let array: any[] = [];
+  for (let i = 0; i < num; i++) {
+    await new Promise<void>((resolve) => stream.once("data", (bindings: any) => {
+      array.push(bindings);
+      resolve();
+    }));
+  }
+  return array;
+}
+
+const BF = new BindingsFactory();
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
 }
 
+const quad = require('rdf-quad');
 const stringifyStream = require('stream-to-string');
 
 const DF = new DataFactory();
@@ -23,6 +43,108 @@ describe('System test: QuerySparql (without polly)', () => {
   let engine: QueryEngine;
   beforeEach(() => {
     engine = new QueryEngine();
+  });
+
+  describe("using Streaming Store", () => {
+    let streamingStore: StreamingStore<Quad>;
+
+    beforeEach(async () => {
+      streamingStore = new StreamingStore<Quad>();
+    })
+
+    it('simple query', async () => {
+      streamingStore.addQuad(quad("s1", "p1", "o1"));
+      streamingStore.addQuad(quad("s2", "p2", "o2"));
+
+      let bindingStream = await engine.queryBindings(`SELECT * WHERE {
+          ?s ?p ?o.
+          }`, {
+        sources: [streamingStore]
+      });
+
+      expect(await partialArrayifyStream(bindingStream, 2)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s1')],
+          [DF.variable('p'), DF.namedNode('p1')],
+          [DF.variable('o'), DF.namedNode('o1')],
+        ]),
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s2')],
+          [DF.variable('p'), DF.namedNode('p2')],
+          [DF.variable('o'), DF.namedNode('o2')],
+        ]),
+      ]);
+
+      streamingStore.addQuad(quad("s3", "p3", "o3"));
+
+      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s3')],
+          [DF.variable('p'), DF.namedNode('p3')],
+          [DF.variable('o'), DF.namedNode('o3')],
+        ])
+      ]);
+
+      streamingStore.removeQuad(quad("s3", "p3", "o3"));
+
+      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s3')],
+          [DF.variable('p'), DF.namedNode('p3')],
+          [DF.variable('o'), DF.namedNode('o3')],
+        ], false)
+      ]);
+
+      streamingStore.end();
+    });
+
+    it('query with joins', async () => {
+      streamingStore.addQuad(quad("s1", "p1", "o1"));
+      streamingStore.addQuad(quad("o1", "p2", "o2"));
+
+      let bindingStream = await engine.queryBindings(`SELECT * WHERE {
+          ?s1 ?p1 ?o1.
+          ?o1 ?p2 ?o2.
+          }`, {
+        sources: [streamingStore]
+      });
+
+      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s1'), DF.namedNode('s1')],
+          [DF.variable('p1'), DF.namedNode('p1')],
+          [DF.variable('o1'), DF.namedNode('o1')],
+          [DF.variable('p2'), DF.namedNode('p2')],
+          [DF.variable('o2'), DF.namedNode('o2')],
+        ]),
+      ]);
+
+      streamingStore.addQuad(quad("o1", "p3", "o3"));
+
+      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s1'), DF.namedNode('s1')],
+          [DF.variable('p1'), DF.namedNode('p1')],
+          [DF.variable('o1'), DF.namedNode('o1')],
+          [DF.variable('p2'), DF.namedNode('p3')],
+          [DF.variable('o2'), DF.namedNode('o3')],
+        ])
+      ]);
+
+      streamingStore.removeQuad(quad("o1", "p3", "o3"));
+
+      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s1'), DF.namedNode('s1')],
+          [DF.variable('p1'), DF.namedNode('p1')],
+          [DF.variable('o1'), DF.namedNode('o1')],
+          [DF.variable('p2'), DF.namedNode('p3')],
+          [DF.variable('o2'), DF.namedNode('o3')],
+        ], false)
+      ]);
+
+      streamingStore.end();
+    });
   });
 
   describe('simple static queries', () => {

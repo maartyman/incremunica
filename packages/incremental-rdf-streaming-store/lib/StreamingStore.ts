@@ -143,6 +143,66 @@ export class StreamingStore<Q extends Quad>
     return stream;
   }
 
+  public addQuad(quad: Q): this {
+    if (this.ended) {
+      throw new Error('Attempted to add a quad into an ended StreamingStore.');
+    }
+    if (quad.diff === undefined) {
+      quad.diff = true;
+    }
+    if (this.halted) {
+      this.haltBuffer.push(quad);
+      return this;
+    }
+    for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
+      if (!this.ended) {
+        pendingStream.push(quad);
+      }
+    }
+    if (quad.diff) {
+      this.store.import(new Readable({
+        read(size: number) {
+          this.push(quad);
+          this.destroy();
+        },
+        objectMode: true,
+      }));
+    } else {
+      this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+    }
+    return this;
+  }
+
+  public removeQuad(quad: Q): this {
+    if (this.ended) {
+      throw new Error('Attempted to remove a quad of an ended StreamingStore.');
+    }
+    if (quad.diff === undefined) {
+      quad.diff = false;
+    }
+    if (this.halted) {
+      this.haltBuffer.push(quad);
+      return this;
+    }
+    for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
+      if (!this.ended) {
+        pendingStream.push(quad);
+      }
+    }
+    if (quad.diff) {
+      this.store.import(new Readable({
+        read(size: number) {
+          this.push(quad);
+          this.destroy();
+        },
+        objectMode: true,
+      }));
+    } else {
+      this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+    }
+    return this;
+  }
+
   public match(
     subject?: RDF.Term | null,
     predicate?: RDF.Term | null,
