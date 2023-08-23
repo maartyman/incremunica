@@ -1,10 +1,6 @@
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
-import type {
-  IActionRdfJoin,
-  IActorRdfJoinOutputInner,
-  IActorRdfJoinArgs,
-} from '@comunica/bus-rdf-join';
+import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
@@ -13,15 +9,16 @@ import { ActionContextKey } from '@comunica/core/lib/ActionContext';
 import type { Bindings } from '@comunica/incremental-bindings-factory';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
-  BindingsStream, IQueryOperationResultBindings,
-  MetadataBindings, IActionContext, IJoinEntryWithMetadata, DataSources,
+  BindingsStream,
+  DataSources,
+  IActionContext,
+  IJoinEntryWithMetadata,
+  IQueryOperationResultBindings,
+  MetadataBindings,
 } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
-import {
-  EmptyIterator, TransformIterator,
-  UnionIterator,
-} from 'asynciterator';
-import { Factory, Algebra } from 'sparqlalgebrajs';
+import { TransformIterator, UnionIterator } from 'asynciterator';
+import { Algebra, Factory } from 'sparqlalgebrajs';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -87,20 +84,21 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const transformMap = new Map<
     string,
     {
-      iterators: AsyncIterator<Bindings>[];
-      stopFunctions: (() => void)[];
+      elements: {
+        iterator: AsyncIterator<Bindings>;
+        stopFunction: (() => void);
+      }[];
       subOperations: Algebra.Operation[];
     }>();
 
     // Create bindings function
-    const binder = async(bindings: Bindings): Promise<BindingsStream> => {
+    const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
       const hash = ActorRdfJoinInnerIncrementalComputationalMultiBind.bindingHash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.diff) {
         if (hashData === undefined) {
           hashData = {
-            iterators: [],
-            stopFunctions: [],
+            elements: [],
             subOperations: operations.map(operation => materializeOperation(
               operation,
               bindings,
@@ -111,59 +109,64 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         }
 
         const bindingsMerger = (subBindings: Bindings): Bindings | null => {
-          let subBindingsOrUndefined = subBindings.merge(bindings);
-          return (subBindingsOrUndefined === undefined)? null : subBindingsOrUndefined;
-        }
+          const subBindingsOrUndefined = subBindings.merge(bindings);
+          return subBindingsOrUndefined === undefined ? null : subBindingsOrUndefined;
+        };
 
         const [ bindingStream, stopFunction ] = await operationBinder(hashData.subOperations, bindings);
-        hashData.stopFunctions.push(stopFunction);
-        hashData.iterators.push(bindingStream.map(bindingsMerger));
+        hashData.elements.push({
+          stopFunction,
+          iterator: bindingStream.map(bindingsMerger),
+        });
 
-        return hashData.iterators[hashData.iterators.length - 1];
+        push(hashData.elements[hashData.elements.length - 1].iterator);
+        done();
+        return;
       }
-      if (hashData !== undefined) {
+      if (hashData !== undefined && hashData.elements.length > 0) {
+        const activeElement = hashData.elements[hashData.elements.length - 1];
+        hashData.elements.pop();
+
         ActorRdfJoinInnerIncrementalComputationalMultiBind.haltSources(sources);
-
-        const activeIterator = hashData.iterators.pop();
-        const activeStopFunction = hashData.stopFunctions.pop();
-
-        if (activeIterator === undefined || activeStopFunction === undefined) {
-          transformMap.delete(hash);
-          return new EmptyIterator();
-        }
 
         let activeIteratorStopped = false;
         let newIteratorStopped = false;
-        activeIterator.on('end', () => {
+
+        activeElement.iterator.on('end', () => {
           activeIteratorStopped = true;
           if (newIteratorStopped) {
             ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
           }
         });
-
-        activeStopFunction();
+        activeElement.stopFunction();
 
         const bindingsMerger = (subBindings: Bindings): Bindings | undefined => subBindings.merge(bindings);
 
         const [ newIterator, newStopFunction ] = await operationBinder(hashData.subOperations, bindings);
         newStopFunction();
-        newIterator.on("end", () => {
+        newIterator.on('end', () => {
           newIteratorStopped = true;
           if (activeIteratorStopped) {
             ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
           }
         });
-        return new TransformIterator(
+
+        if (hashData.elements.length === 0) {
+          transformMap.delete(hash);
+        }
+
+        push(new TransformIterator(
           () => newIterator.map(bindingsMerger),
           { maxBufferSize: 128, autoStart: false },
-        );
+        ));
+        done();
+        return;
       }
-
-      return new EmptyIterator();
+      done();
     };
 
     return new UnionIterator(baseStream.transform({
-      map: binder,
+      transform: binder,
       optional,
     }), { autoStart: false });
   }

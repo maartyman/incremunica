@@ -177,7 +177,6 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       };
       //make sure the store imports the quads
       await new Promise<void>(resolve=>setTimeout(()=>resolve(), 100));
-      store.end();
 
       const { data } = await actor.run({ pattern, context });
 
@@ -189,7 +188,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         }
       });
 
-      expect(await arrayifyStream(data)).toEqualRdfQuadArray([
+      expect(await arrayifyStream(data)).toBeRdfIsomorphic([
         DF.quad(DF.namedNode('s1'), DF.namedNode('p'), DF.namedNode('o1')),
         DF.quad(DF.namedNode('s2'), DF.namedNode('p'), DF.namedNode('o2')),
       ]);
@@ -201,7 +200,8 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         throw new Error("stopMatches in context is undefined")
       }
       expect(stopMatches.length).toEqual(1);
-      expect(stopMatches[0].stopMatch).not.toThrowError()
+      expect(stopMatches[0].stopMatch).not.toThrowError();
+      store.end();
     });
 
     it('should run without a store', async() => {

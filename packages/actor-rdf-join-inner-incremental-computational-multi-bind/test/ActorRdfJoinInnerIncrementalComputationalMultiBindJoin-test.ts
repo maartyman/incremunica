@@ -7,7 +7,7 @@ import 'jest-rdf';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
-import {ArrayIterator, WrappingIterator} from 'asynciterator';
+import {ArrayIterator, AsyncIterator, union, WrappingIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory, Algebra } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerIncrementalComputationalMultiBind } from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
@@ -20,6 +20,7 @@ import {EventEmitter} from "events";
 import {PassThrough, Stream, Transform} from "readable-stream";
 import {BindingsStream} from "@comunica/incremental-types";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";
+import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 
 
 const streamifyArray = require('streamify-array');
@@ -1040,7 +1041,6 @@ describe('ActorRdfJoinMultiBind', () => {
         });
       });
 
-      /*
       it('should handle two entries with one wrong binding (should not happen)', async() => {
         const action: IActionRdfJoin = {
           type: 'inner',
@@ -1093,51 +1093,151 @@ describe('ActorRdfJoinMultiBind', () => {
         expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([]);
       });
 
-      it('should handle two entries with immediate deletions', async() => {
+      it("should work if the active iterator ends first", async () => {
+        let haltMock: Mock<any, any>;
+        let resumeMock: Mock<any, any>;
+        let iterator: BindingsStream;
+        let stopMatchJest: Mock<any, any>;
+        let streams: PassThrough[] = [];
+        let num = 0;
 
+        haltMock = jest.fn();
+        resumeMock = jest.fn();
+
+        let mockStreamingStore = {
+          halt: haltMock,
+          resume: resumeMock
+        }
+        context = context.set(KeysRdfResolveQuadPattern.sources, [mockStreamingStore]);
+
+        stopMatchJest = jest.fn();
+
+        mediatorQueryOperation = <any>{
+          mediate: jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+            const unionStream = new PassThrough({objectMode: true});
+            const tempStream: Stream = streamifyArray([
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              ]),
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              ]),
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              ]),
+            ]);
+            tempStream.pipe(unionStream, {end: false});
+
+            let stream = new PassThrough({
+              objectMode: true
+            });
+            stream.pipe(unionStream, {end: false});
+            streams.push(stream);
+
+            let tempEnd = false;
+            let streamEnd = false;
+
+            tempStream.on('close', () => {
+              tempEnd = true;
+              if (streamEnd) {
+                unionStream.end();
+              }
+            });
+
+            stream.on('close', () => {
+              streamEnd = true;
+              if (tempEnd) {
+                unionStream.end();
+              }
+            });
+
+            iterator = new WrappingIterator(unionStream);
+
+            let streamNum = num;
+            num++;
+            let stopMatchfn = () => {
+              if (streamNum == 0) {
+                iterator.close();
+                iterator.on("end", () => {
+                  for (const streami of streams) {
+                    if (!streami.closed) {
+                      streami.end();
+                    }
+                  }
+                });
+              }
+              stopMatchJest();
+            }
+            let matchOptions = arg.context.get(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'));
+            -expect(matchOptions).not.toBeUndefined()
+            if (matchOptions !== undefined) {
+              (<({ stopMatch: () => void })[]>matchOptions).push({
+                stopMatch: stopMatchfn
+              });
+            }
+            return {
+              bindingsStream: iterator,
+              metadata: () => Promise.resolve({
+                cardinality: {type: 'estimate', value: 3},
+                canContainUndefs: false,
+                variables: [DF.variable('bound')],
+              }),
+              type: 'bindings',
+            };
+          }),
+        };
+
+        actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
+          name: 'actor',
+          bus,
+          selectivityModifier: 0.1,
+          mediatorQueryOperation,
+          mediatorJoinSelectivity,
+          mediatorJoinEntriesSort,
+        });
+
+        const tempStream: Stream = streamifyArray([
+          BF.bindings([
+            [DF.variable('a'), DF.namedNode('ex:a1')],
+          ]),
+        ]);
+        let alteringStream = tempStream.pipe(new PassThrough({
+          objectMode: true
+        }), {end: false});
+        let wrapIterator = new WrappingIterator(alteringStream);
 
         const action: IActionRdfJoin = {
           type: 'inner',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
+                    [DF.variable('b'), DF.namedNode('ex:b1')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
+                    [DF.variable('b'), DF.namedNode('ex:b2')],
                   ]),
                   BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    [DF.variable('b'), DF.namedNode('ex:b3')],
                   ])
-                ], { autoStart: false }),
+                ], {autoStart: false}),
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
+                  cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [DF.variable('a'), DF.variable('b')],
                 }),
                 type: 'bindings',
               },
               operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
             },
             {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ], false),
-                ], { autoStart: false }),
+              output: <any>{
+                bindingsStream: wrapIterator,
                 metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
+                  cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [DF.variable('a')],
                 }),
                 type: 'bindings',
               },
@@ -1146,110 +1246,53 @@ describe('ActorRdfJoinMultiBind', () => {
           ],
           context,
         };
-        const { result } = await actor.getOutput(action);
 
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+        const {result} = await actor.getOutput(action);
+
+        expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
           ]),
         ]);
-      });
 
-      it('should handle two entries with deletions', async() => {
-        const action: IActionRdfJoin = {
-          type: 'inner',
-          entries: [
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ])
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-            },
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a3') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ], false),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-            },
-          ],
-          context,
-        };
-        const { result } = await actor.getOutput(action);
+        alteringStream.push(
+          BF.bindings([
+            [DF.variable('a'), DF.namedNode('ex:a1')],
+          ], false)
+        );
 
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+        expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
+            [DF.variable('bound'), DF.namedNode('ex:bound1')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
+          ], false),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
+            [DF.variable('bound'), DF.namedNode('ex:bound2')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
+          ], false),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ])
+            [DF.variable('bound'), DF.namedNode('ex:bound3')],
+            [DF.variable('a'), DF.namedNode('ex:a1')],
+          ], false),
         ]);
-      });
-      */
+
+        alteringStream.end();
+
+        await promisifyEventEmitter(result.bindingsStream)
+
+        expect(haltMock).toHaveBeenCalledTimes(1);
+        expect(resumeMock).toHaveBeenCalledTimes(1);
+        expect(stopMatchJest).toHaveBeenCalledTimes(2);
+      })
 
       describe("with mock store", () => {
         let haltMock: Mock<any, any>;
@@ -1292,21 +1335,22 @@ describe('ActorRdfJoinMultiBind', () => {
               stream.pipe(unionStream, {end: false});
               streams.push(stream);
 
+              let tempEnd = false;
+              let streamEnd = false;
+
               tempStream.on('close', () => {
-                if (stream.closed) {
+                tempEnd = true;
+                if (streamEnd) {
                   unionStream.end();
                 }
               });
 
               stream.on('close', () => {
-                if (tempStream.closed) {
+                streamEnd = true;
+                if (tempEnd) {
                   unionStream.end();
                 }
               });
-
-              unionStream.on("close", () => {
-                console.log("union closed")
-              })
 
               iterator = new WrappingIterator(unionStream);
 
@@ -1315,8 +1359,7 @@ describe('ActorRdfJoinMultiBind', () => {
                 stopMatchJest();
               }
               let matchOptions = arg.context.get(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'));
-              console.log(matchOptions)
-              expect(matchOptions).not.toBeUndefined()
+-              expect(matchOptions).not.toBeUndefined()
               if (matchOptions !== undefined) {
                 (<({ stopMatch: () => void })[]> matchOptions).push({
                   stopMatch: stopMatchfn
@@ -1344,7 +1387,6 @@ describe('ActorRdfJoinMultiBind', () => {
           });
         })
 
-        /*
         it('should handle entries', async () => {
           const action: IActionRdfJoin = {
             type: 'inner',
@@ -1442,7 +1484,6 @@ describe('ActorRdfJoinMultiBind', () => {
           expect(resumeMock).toHaveBeenCalledTimes(0);
           expect(stopMatchJest).toHaveBeenCalledTimes(0);
         });
-        */
 
         it('should handle entries with deletions', async () => {
           const tempStream: Stream = streamifyArray([
@@ -1497,7 +1538,6 @@ describe('ActorRdfJoinMultiBind', () => {
           };
           const {result} = await actor.getOutput(action);
 
-          console.log("1")
 
           expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
             BF.bindings([
@@ -1519,8 +1559,6 @@ describe('ActorRdfJoinMultiBind', () => {
               [DF.variable('a'), DF.namedNode('ex:a2')],
             ])
           );
-
-          console.log("2")
 
           expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
             BF.bindings([
@@ -1545,12 +1583,127 @@ describe('ActorRdfJoinMultiBind', () => {
             ], false)
           );
 
-          console.log("3")
+          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false),
+          ]);
 
+          for (const stream of streams) {
+            stream.push(
+              BF.bindings([
+                [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              ], false)
+            );
+          }
+
+          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a2')],
+            ], false),
+          ]);
+
+          let promisses = [];
           alteringStream.end();
           for (const stream of streams) {
-            stream.end();
+            if (!stream.closed) {
+              stream.end();
+              promisses.push(promisifyEventEmitter(stream));
+            }
           }
+
+          //await Promise.all(promisses);
+
+          await promisifyEventEmitter(result.bindingsStream)
+
+          expect(haltMock).toHaveBeenCalledTimes(1);
+          expect(resumeMock).toHaveBeenCalledTimes(1);
+          expect(stopMatchJest).toHaveBeenCalledTimes(2);
+        });
+
+        it('should handle entries with too many deletions', async () => {
+          const tempStream: Stream = streamifyArray([
+            BF.bindings([
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+          ]);
+          let alteringStream = tempStream.pipe(new PassThrough({
+            objectMode: true
+          }), {end: false});
+          let iterator = new WrappingIterator(alteringStream);
+
+          const action: IActionRdfJoin = {
+            type: 'inner',
+            entries: [
+              {
+                output: <any>{
+                  bindingsStream: new ArrayIterator([
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b1')],
+                    ]),
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b2')],
+                    ]),
+                    BF.bindings([
+                      [DF.variable('b'), DF.namedNode('ex:b3')],
+                    ])
+                  ], {autoStart: false}),
+                  metadata: () => Promise.resolve({
+                    cardinality: {type: 'estimate', value: 4},
+                    canContainUndefs: false,
+                    variables: [DF.variable('a'), DF.variable('b')],
+                  }),
+                  type: 'bindings',
+                },
+                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
+              },
+              {
+                output: <any>{
+                  bindingsStream: iterator,
+                  metadata: () => Promise.resolve({
+                    cardinality: {type: 'estimate', value: 1},
+                    canContainUndefs: false,
+                    variables: [DF.variable('a')],
+                  }),
+                  type: 'bindings',
+                },
+                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
+              },
+            ],
+            context,
+          };
+          const {result} = await actor.getOutput(action);
+
+          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound1')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound2')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+            BF.bindings([
+              [DF.variable('bound'), DF.namedNode('ex:bound3')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ]),
+          ]);
+
+          alteringStream.push(
+            BF.bindings([
+              [DF.variable('a'), DF.namedNode('ex:a1')],
+            ], false)
+          );
 
           expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
             BF.bindings([
@@ -1567,470 +1720,31 @@ describe('ActorRdfJoinMultiBind', () => {
             ], false),
           ]);
 
-          streams[1].push(
+          alteringStream.push(
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound4')],
+              [DF.variable('a'), DF.namedNode('ex:a1')],
             ], false)
           );
 
-          console.log("4")
+          let promisses = [];
+          alteringStream.end();
+          for (const stream of streams) {
+            if (!stream.closed) {
+              stream.end();
+              promisses.push(promisifyEventEmitter(stream));
+            }
+          }
+          await Promise.all(promisses);
 
-          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound4')],
-              [DF.variable('a'), DF.namedNode('ex:a2')],
-            ]),
+          expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+
           ]);
 
           expect(haltMock).toHaveBeenCalledTimes(1);
           expect(resumeMock).toHaveBeenCalledTimes(1);
-          expect(stopMatchJest).toHaveBeenCalledTimes(1);
-
-
-          console.log("5")
-
+          expect(stopMatchJest).toHaveBeenCalledTimes(2);
         });
       });
-
-      /*
-      it('should handle two entries with multiple identical bindings and removal', async() => {
-        const action: IActionRdfJoin = {
-          type: 'inner',
-          entries: [
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ])
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-            },
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ],false),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-            },
-          ],
-          context,
-        };
-        const { result } = await actor.getOutput(action);
-
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-        ]);
-      });
-
-      it('should handle two entries with multiple identical bindings and removal (other)', async() => {
-        mediatorQueryOperation = <any> {
-          mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-            return {
-              bindingsStream: new ArrayIterator([
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ],false),
-              ], { autoStart: false }),
-              metadata: () => Promise.resolve({
-                cardinality: { type: 'estimate', value: 3 },
-                canContainUndefs: false,
-                variables: [ DF.variable('bound') ],
-              }),
-              type: 'bindings',
-            };
-          }),
-        };
-
-        actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
-          name: 'actor',
-          bus,
-          selectivityModifier: 0.1,
-          mediatorQueryOperation,
-          mediatorJoinSelectivity,
-          mediatorJoinEntriesSort,
-        });
-
-        const action: IActionRdfJoin = {
-          type: 'inner',
-          entries: [
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('b'), DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-            },
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-            },
-          ],
-          context,
-        };
-        const { result } = await actor.getOutput(action);
-
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ], false),
-        ]);
-      });
-
-      it('should handle two entries with deletions (other)', async() => {
-        mediatorQueryOperation = <any> {
-          mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-            return {
-              bindingsStream: new ArrayIterator([
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ],false),
-              ], { autoStart: false }),
-              metadata: () => Promise.resolve({
-                cardinality: { type: 'estimate', value: 3 },
-                canContainUndefs: false,
-                variables: [ DF.variable('bound') ],
-              }),
-              type: 'bindings',
-            };
-          }),
-        };
-
-        actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
-          name: 'actor',
-          bus,
-          selectivityModifier: 0.1,
-          mediatorQueryOperation,
-          mediatorJoinSelectivity,
-          mediatorJoinEntriesSort,
-        });
-
-        const action: IActionRdfJoin = {
-          type: 'inner',
-          entries: [
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ])
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-            },
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-            },
-          ],
-          context,
-        };
-        const { result } = await actor.getOutput(action);
-
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ],false),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ], false),
-        ]);
-      });
-
-      it('should handle two entries with immediate deletions (other)', async() => {
-        mediatorQueryOperation = <any> {
-          mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-            return {
-              bindingsStream: new ArrayIterator([
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ]),
-                BF.bindings([
-                  [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ],false),
-              ], { autoStart: false }),
-              metadata: () => Promise.resolve({
-                cardinality: { type: 'estimate', value: 3 },
-                canContainUndefs: false,
-                variables: [ DF.variable('bound') ],
-              }),
-              type: 'bindings',
-            };
-          }),
-        };
-
-        actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
-          name: 'actor',
-          bus,
-          selectivityModifier: 0.1,
-          mediatorQueryOperation,
-          mediatorJoinSelectivity,
-          mediatorJoinEntriesSort,
-        });
-
-
-        const action: IActionRdfJoin = {
-          type: 'inner',
-          entries: [
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ])
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-            },
-            {
-              output: <any> {
-                bindingsStream: new ArrayIterator([
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
-                  BF.bindings([
-                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
-                ], { autoStart: false }),
-                metadata: () => Promise.resolve({
-                  cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
-                }),
-                type: 'bindings',
-              },
-              operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-            },
-          ],
-          context,
-        };
-        const { result } = await actor.getOutput(action);
-
-        // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ], false),
-        ]);
-      });
-      */
-
     });
   });
 });
