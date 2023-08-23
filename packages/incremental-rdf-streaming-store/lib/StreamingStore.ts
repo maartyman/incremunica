@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import type { Quad } from '@comunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
+import type { Term } from 'n3';
 import { Store } from 'n3';
 import { Readable, PassThrough } from 'readable-stream';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
@@ -14,18 +15,18 @@ import { PendingStreamsIndex } from './PendingStreamsIndex';
  *
  * WARNING: `end()` MUST be called at some point, otherwise all `match` streams will remain unended.
  */
-export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
+export class StreamingStore<Q extends Quad>
   extends EventEmitter implements RDF.Source<Q>, RDF.Sink<RDF.Stream<Q>, EventEmitter> {
-  protected readonly store: S;
+  protected readonly store: Store;
   protected readonly pendingStreams: PendingStreamsIndex<Q> = new PendingStreamsIndex();
   protected ended = false;
   protected numberOfListeners = 0;
   protected halted = false;
   protected haltBuffer = new Array<Q>();
 
-  public constructor(store: RDF.Store<Q> = new Store<Q>()) {
+  public constructor(store = new Store<Q>()) {
     super();
-    this.store = <S> store;
+    this.store = store;
   }
 
   /**
@@ -38,9 +39,10 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
     this.ended = true;
 
     // Mark all pendingStreams as ended.
-    for (const pendingStream of this.pendingStreams.allStreams) {
-      pendingStream.push(null);
-      (<any> pendingStream)._pipeSource.unpipe();
+    for (const pendingStreams of this.pendingStreams.indexedStreams.values()) {
+      for (const pendingStream of pendingStreams) {
+        pendingStream.end();
+      }
     }
 
     this.emit('end');
@@ -62,15 +64,9 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
         }
       }
       if (quad.diff) {
-        this.store.import(new Readable({
-          read(size: number) {
-            this.push(quad);
-            this.destroy();
-          },
-          objectMode: true,
-        }));
+        this.store.add(quad);
       } else {
-        this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+        this.store.delete(quad);
       }
     }
     this.halted = false;
@@ -81,10 +77,10 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
   }
 
   public copyOfStore(): Store {
-    const newStore = new Store();
-    this.store.match().on('data', quad => {
+    const newStore = new Store<Quad>();
+    this.store.forEach(quad => {
       newStore.add(quad);
-    });
+    }, null, null, null, null);
     return newStore;
   }
 
@@ -107,18 +103,11 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
         }
       }
       if (quad.diff) {
-        this.store.import(new Readable({
-          read(size: number) {
-            this.push(quad);
-            this.destroy();
-          },
-          objectMode: true,
-        }));
+        this.store.add(quad);
       } else {
-        this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+        this.store.delete(quad);
       }
     });
-
     return stream;
   }
 
@@ -141,18 +130,11 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
         }
       }
       if (quad.diff) {
-        this.store.import(new Readable({
-          read(size: number) {
-            this.push(quad);
-            this.destroy();
-          },
-          objectMode: true,
-        }));
+        this.store.add(quad);
       } else {
-        this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+        this.store.removeQuad(quad);
       }
     });
-
     return stream;
   }
 
@@ -173,15 +155,9 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
       }
     }
     if (quad.diff) {
-      this.store.import(new Readable({
-        read(size: number) {
-          this.push(quad);
-          this.destroy();
-        },
-        objectMode: true,
-      }));
+      this.store.add(quad);
     } else {
-      this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+      this.store.removeQuad(quad);
     }
     return this;
   }
@@ -203,15 +179,9 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
       }
     }
     if (quad.diff) {
-      this.store.import(new Readable({
-        read(size: number) {
-          this.push(quad);
-          this.destroy();
-        },
-        objectMode: true,
-      }));
+      this.store.add(quad);
     } else {
-      this.store.removeMatches(quad.subject, quad.predicate, quad.object, quad.graph);
+      this.store.removeQuad(quad);
     }
     return this;
   }
@@ -221,22 +191,67 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
     predicate?: RDF.Term | null,
     object?: RDF.Term | null,
     graph?: RDF.Term | null,
+    options?: { stopMatch: () => void },
   ): RDF.Stream<Q> {
     // TODO what if match is never called (=> streaming store should be removed) (Should not happen I think)
     this.numberOfListeners++;
-    const storeResult: Readable = <Readable> this.store.match(subject, predicate, object, graph);
-    let stream: RDF.Stream<Q> = storeResult;
+    const unionStream = new PassThrough({ objectMode: true });
+
+    const storedQuads = this.store.getQuads(
+      <Term>subject,
+      <Term>predicate,
+      <Term>object,
+      <Term>graph,
+    );
+    const storeResult = new Readable({
+      objectMode: true,
+      read() {
+        if (storedQuads.length > 0) {
+          storeResult.push(storedQuads.pop());
+        }
+        if (storedQuads.length === 0) {
+          storeResult.push(null);
+        }
+      },
+    });
+    storeResult.pipe(unionStream, { end: false });
 
     // If the store hasn't ended yet, also create a new pendingStream
     if (!this.ended) {
       // The new pendingStream remains open, until the store is ended.
       const pendingStream = new PassThrough({ objectMode: true });
+      if (options) {
+        options.stopMatch = () => {
+          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
+          pendingStream.end();
+        };
+      }
       this.pendingStreams.addPatternListener(pendingStream, subject, predicate, object, graph);
-      stream = storeResult.pipe(pendingStream, { end: false });
-      (<any> stream)._pipeSource = storeResult;
+      pendingStream.pipe(unionStream, { end: false });
+
+      let pendingStreamEnded = false;
+      let storeResultEnded = false;
+
+      pendingStream.on('close', () => {
+        pendingStreamEnded = true;
+        if (storeResultEnded) {
+          unionStream.end();
+        }
+      });
+
+      storeResult.on('close', () => {
+        storeResultEnded = true;
+        if (pendingStreamEnded) {
+          unionStream.end();
+        }
+      });
+    } else {
+      storeResult.on('close', () => {
+        unionStream.end();
+      });
     }
 
-    stream.on('close', () => {
+    unionStream.on('close', () => {
       if (this.numberOfListeners < 2) {
         this.end();
       } else {
@@ -244,13 +259,13 @@ export class StreamingStore<Q extends Quad, S extends RDF.Store<Q> = Store<Q>>
       }
     });
 
-    return stream;
+    return unionStream;
   }
 
   /**
    * The internal store with all imported quads.
    */
-  public getStore(): S {
+  public getStore(): Store {
     return this.store;
   }
 }

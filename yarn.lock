@@ -2599,15 +2599,15 @@
     sparqlalgebrajs "^4.0.5"
 
 "@comunica/context-entries@^2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@comunica/context-entries/-/context-entries-2.7.0.tgz#ab62718546ab1d3ee09ca74150d597f6a55449df"
-  integrity sha512-TTRuhJxD+PmbgtdPh3LyS6bAKCxAW7jZnk28mEJqMpE2Ljt5OEuZaZHfVfWCapnWRUDWsh+kxsSGbu9En/FyUQ==
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@comunica/context-entries/-/context-entries-2.8.2.tgz#d1c8e46756c05e84232679f53d35a7f4006e9998"
+  integrity sha512-Ycub6tUiK3qYjKaT74DiThv4IKq3M4SAvDB0AdFvcevwcU6OK8Z6H7M7uA5LehJiEKoBwiO4Ff8iuv3xqAF+tw==
   dependencies:
-    "@comunica/core" "^2.7.0"
-    "@comunica/types" "^2.7.0"
+    "@comunica/core" "^2.8.2"
+    "@comunica/types" "^2.8.2"
     "@rdfjs/types" "*"
     jsonld-context-parser "^2.2.2"
-    sparqlalgebrajs "^4.0.5"
+    sparqlalgebrajs "^4.2.0"
 
 "@comunica/core@^2.0.1", "@comunica/core@^2.6.8":
   version "2.6.8"
@@ -2617,12 +2617,12 @@
     "@comunica/types" "^2.6.8"
     immutable "^4.1.0"
 
-"@comunica/core@^2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@comunica/core/-/core-2.7.0.tgz#6450203adb551bfe571d7c7ef2db63383941f98f"
-  integrity sha512-HyOrP4+WgmclUYUb5ik1LHpDjaVP8nf7td5VXrfdg/3/7yj2q21JRwuAnaNmr8gHBmvliUcFAtHvv1y6ChDdvQ==
+"@comunica/core@^2.7.0", "@comunica/core@^2.8.2":
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@comunica/core/-/core-2.8.2.tgz#ed1006d076ccd8f87180cc66e0b242a92c527815"
+  integrity sha512-8UrhEilUDxRTltFCI4uxz3nch02lGK1KFHBUCUxp/9EmnnQUYvwbMCMS6sLxYHTqJ18/SMFFEwgBMsTX/N+wuA==
   dependencies:
-    "@comunica/types" "^2.7.0"
+    "@comunica/types" "^2.8.2"
     immutable "^4.1.0"
 
 "@comunica/data-factory@^2.5.1":
@@ -2768,15 +2768,15 @@
     asynciterator "^3.8.0"
     sparqlalgebrajs "^4.0.5"
 
-"@comunica/types@^2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@comunica/types/-/types-2.7.0.tgz#4b224aea85e7356f38150312c69a1a24c869164c"
-  integrity sha512-P/aD3W9wqTtZx9SOWPldihmyrf02PK3lDUUP7QG76+1MlDxBna3UrXaIWS6VdV4dWzEULsnvZUIq+23o5A3WCg==
+"@comunica/types@^2.7.0", "@comunica/types@^2.8.2":
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@comunica/types/-/types-2.8.2.tgz#b910c1ed767118958184e47432c9cc47e9c4c884"
+  integrity sha512-gF/wlBtr0Q1VVozYna7DLYlIU528vqinpc0MJ67uvFALJJHP9uqhjOsmVokdoEirf1WIut5GkEp33IGyBvOv5Q==
   dependencies:
     "@rdfjs/types" "*"
     "@types/yargs" "^17.0.13"
-    asynciterator "^3.8.0"
-    sparqlalgebrajs "^4.0.5"
+    asynciterator "^3.8.1"
+    sparqlalgebrajs "^4.2.0"
 
 "@dabh/diagnostics@^2.0.2":
   version "2.0.3"
@@ -5060,6 +5060,11 @@ asynciterator@^3.6.0, asynciterator@^3.8.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.0.tgz#d9246a3d39ce2a9e4b020834d7f352adf35b49d8"
   integrity sha512-bD34LqKHJnkB77MHjL3hOAUOcy9dbB+3lHvL+EiJpD3k2Nyq3i1dCk5adMisB2rwlrHVu/+XRhOdPZL9hzpsfw==
+
+asynciterator@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.1.tgz#80be735b252332494e186ee733544e5b21dd2123"
+  integrity sha512-SmdG0FUY3pYGOZZGdYq8Qb/DCRDXBFZUk08V1/4lbBXdAQvcC3Kxzz9FUDPBTik7VAVltt4cZirAPtJv3gOpEw==
 
 asyncjoin@^1.1.1:
   version "1.1.2"
@@ -12592,6 +12597,13 @@ rdf-data-factory@^1.0.1, rdf-data-factory@^1.1.0, rdf-data-factory@^1.1.1:
   dependencies:
     "@rdfjs/types" "*"
 
+rdf-data-factory@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/rdf-data-factory/-/rdf-data-factory-1.1.2.tgz#d47550d2649d0d64f8cae3fcc9efae7a8a895d9a"
+  integrity sha512-TfQD63Lokabd09ES1jAtKK8AA6rkr9rwyUBGo6olOt1CE0Um36CUQIqytyf0am2ouBPR0l7SaHxCiMcPGHkt1A==
+  dependencies:
+    "@rdfjs/types" "*"
+
 rdf-isomorphic@^1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/rdf-isomorphic/-/rdf-isomorphic-1.3.1.tgz#cd6d433cd85bf79d903d5f0fdeea42a40eb27265"
@@ -12703,6 +12715,15 @@ rdf-string@^1.5.0, rdf-string@^1.6.0, rdf-string@^1.6.1, rdf-string@^1.6.2:
   dependencies:
     "@rdfjs/types" "*"
     rdf-data-factory "^1.1.0"
+
+rdf-terms@^1.10.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/rdf-terms/-/rdf-terms-1.11.0.tgz#0c2e3a2b43f1042959c9263af27dab08dc4b084d"
+  integrity sha512-iKlVgnMopRKl9pHVNrQrax7PtZKRCT/uJIgYqvuw1VVQb88zDvurtDr1xp0rt7N9JtKtFwUXoIQoEsjyRo20qQ==
+  dependencies:
+    "@rdfjs/types" "*"
+    rdf-data-factory "^1.1.0"
+    rdf-string "^1.6.0"
 
 rdf-terms@^1.7.0, rdf-terms@^1.9.1:
   version "1.9.1"
@@ -13794,10 +13815,10 @@ sparqlalgebrajs@^4.0.0, sparqlalgebrajs@^4.0.3, sparqlalgebrajs@^4.0.5:
     rdf-string "^1.6.0"
     sparqljs "^3.6.1"
 
-sparqlalgebrajs@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/sparqlalgebrajs/-/sparqlalgebrajs-4.1.0.tgz#fb95e1ab1400772d1bb9246709b2ba062b909282"
-  integrity sha512-Ir5uE1/25hssTv/hRwl8/S2E2Z/QLPsGkkqkUIUqLXSqPXI3tJTxbwQKtCw0Ki/b3UfxrQQmydP1jpWcTVL+hQ==
+sparqlalgebrajs@^4.1.0, sparqlalgebrajs@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/sparqlalgebrajs/-/sparqlalgebrajs-4.2.0.tgz#b70945bdd2ab2897a0bc22adb804dd1a2b0ec98c"
+  integrity sha512-tdlJdrvgQqgx9zubcl9iiyCxMOp4qRT2fs1Sne8X35QTm1Pj2ulB+gGEHunJJnw5FW7Uhtmw7J3px0sCmgJSbw==
   dependencies:
     "@rdfjs/types" "*"
     "@types/sparqljs" "^3.1.3"
@@ -13806,7 +13827,8 @@ sparqlalgebrajs@^4.1.0:
     rdf-data-factory "^1.1.0"
     rdf-isomorphic "^1.3.0"
     rdf-string "^1.6.0"
-    sparqljs "^3.6.1"
+    rdf-terms "^1.10.0"
+    sparqljs "^3.7.1"
 
 sparqlee@^2.2.0:
   version "2.3.2"
@@ -13834,6 +13856,13 @@ sparqljs@^3.1.2, sparqljs@^3.6.1:
   integrity sha512-KQEJPaOMeeDpdYYuiFb3JEErRLL8XqX4G7sdhZyHC6Qn4+PEMUff/EjUGkwcJ6aCC0JCTIgxDpRdE3+GFXpdxw==
   dependencies:
     rdf-data-factory "^1.1.1"
+
+sparqljs@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/sparqljs/-/sparqljs-3.7.1.tgz#5d121895d491d50214f2e38f2885a3a935b6c093"
+  integrity sha512-I1jYMtcwDkgCEqQ4eQuQIhB8hFAlRAJ6YDXDcV54XztaJaYRFqJlidHt77S3j8Mfh6kY6GK04dXPEIopxbEeuQ==
+  dependencies:
+    rdf-data-factory "^1.1.2"
 
 sparqljson-parse@^2.0.0, sparqljson-parse@^2.0.1, sparqljson-parse@^2.1.0:
   version "2.2.0"
