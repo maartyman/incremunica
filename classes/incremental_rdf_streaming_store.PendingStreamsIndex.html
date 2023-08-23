@@ -104,7 +104,6 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#allStreams" class="tsd-kind-icon">all<wbr>Streams</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#indexedStreams" class="tsd-kind-icon">indexed<wbr>Streams</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#ID_SEPARATOR" class="tsd-kind-icon">ID_<wbr>SEPARATOR</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#ID_VARIABLE" class="tsd-kind-icon">ID_<wbr>VARIABLE</a></li>
@@ -115,6 +114,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#addPatternListener" class="tsd-kind-icon">add<wbr>Pattern<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#getPendingStreamsForQuad" class="tsd-kind-icon">get<wbr>Pending<wbr>Streams<wbr>For<wbr>Quad</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#removeClosedPatternListener" class="tsd-kind-icon">remove<wbr>Closed<wbr>Pattern<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#termToString" class="tsd-kind-icon">term<wbr>ToString</a></li>
 							</ul>
 						</section>
@@ -147,22 +147,12 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="allStreams" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> all<wbr>Streams</h3>
-					<div class="tsd-signature tsd-kind-icon">all<wbr>Streams<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PassThrough</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L14">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:14</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="indexedStreams" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> indexed<wbr>Streams</h3>
-					<div class="tsd-signature tsd-kind-icon">indexed<wbr>Streams<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">PassThrough</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">indexed<wbr>Streams<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Duplex</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L13">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L13">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -172,7 +162,7 @@
 					<div class="tsd-signature tsd-kind-icon">ID_<wbr>SEPARATOR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;:&quot;</span><span class="tsd-signature-symbol"> = &#x27;:&#x27;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L11">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L11">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -182,7 +172,7 @@
 					<div class="tsd-signature tsd-kind-icon">ID_<wbr>VARIABLE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;?&quot;</span><span class="tsd-signature-symbol"> = &#x27;?&#x27;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L10">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L10">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -193,13 +183,13 @@
 					<a name="addPatternListener" class="tsd-anchor"></a>
 					<h3>add<wbr>Pattern<wbr>Listener</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Pattern<wbr>Listener<span class="tsd-signature-symbol">(</span>pendingStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PassThrough</span>, subject<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, predicate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, object<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, graph<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Pattern<wbr>Listener<span class="tsd-signature-symbol">(</span>pendingStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Duplex</span>, subject<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, predicate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, object<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, graph<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L28">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L27">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:27</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -210,7 +200,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>pendingStream: <span class="tsd-signature-type">PassThrough</span></h5>
+									<h5>pendingStream: <span class="tsd-signature-type">Duplex</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>A pending stream.</p>
 									</div>
@@ -248,13 +238,13 @@
 					<a name="getPendingStreamsForQuad" class="tsd-anchor"></a>
 					<h3>get<wbr>Pending<wbr>Streams<wbr>For<wbr>Quad</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Pending<wbr>Streams<wbr>For<wbr>Quad<span class="tsd-signature-symbol">(</span>quad<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PassThrough</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Pending<wbr>Streams<wbr>For<wbr>Quad<span class="tsd-signature-symbol">(</span>quad<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Duplex</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L55">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L77">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:77</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -271,7 +261,39 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">PassThrough</span><span class="tsd-signature-symbol">[]</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Duplex</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="removeClosedPatternListener" class="tsd-anchor"></a>
+					<h3>remove<wbr>Closed<wbr>Pattern<wbr>Listener</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Closed<wbr>Pattern<wbr>Listener<span class="tsd-signature-symbol">(</span>subject<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, predicate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, object<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span>, graph<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L47">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:47</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> subject: <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> predicate: <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> object: <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> graph: <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Term</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -285,7 +307,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/9d9a778/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L16">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/maartyman/incremunica/blob/028a4ae/packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts#L15">packages/incremental-rdf-streaming-store/lib/PendingStreamsIndex.ts:15</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -314,6 +336,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/actor_query_operation_quadpattern.html">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/actor_rdf_join_inner_incremental_computational_multi_bind.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>computational-<wbr>multi-<wbr>bind</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
@@ -383,6 +408,9 @@
 						<a href="../modules/actor_query_operation_quadpattern.html" class="tsd-kind-icon">actor-<wbr>query-<wbr>operation-<wbr>quadpattern</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/actor_rdf_join_inner_incremental_computational_multi_bind.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>computational-<wbr>multi-<wbr>bind</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/actor_rdf_join_inner_incremental_full_hash.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>join-<wbr>inner-<wbr>incremental-<wbr>full-<wbr>hash</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -436,9 +464,6 @@
 										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#constructor" class="tsd-kind-icon">constructor</a>
 									</li>
 									<li class=" tsd-kind-property tsd-parent-kind-class">
-										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#allStreams" class="tsd-kind-icon">all<wbr>Streams</a>
-									</li>
-									<li class=" tsd-kind-property tsd-parent-kind-class">
 										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#indexedStreams" class="tsd-kind-icon">indexed<wbr>Streams</a>
 									</li>
 									<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
@@ -452,6 +477,9 @@
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class">
 										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#getPendingStreamsForQuad" class="tsd-kind-icon">get<wbr>Pending<wbr>Streams<wbr>For<wbr>Quad</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class">
+										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#removeClosedPatternListener" class="tsd-kind-icon">remove<wbr>Closed<wbr>Pattern<wbr>Listener</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
 										<a href="incremental_rdf_streaming_store.PendingStreamsIndex.html#termToString" class="tsd-kind-icon">term<wbr>ToString</a>
