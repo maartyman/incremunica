@@ -31,7 +31,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/core": "^2.6.8",
+    "@comunica/core": "^2.8.2",
     "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0"
   },
   "scripts": {

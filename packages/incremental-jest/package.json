@@ -34,7 +34,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/types": "^2.6.8",
+    "@comunica/types": "^2.8.2",
     "@rdfjs/types": "*",
     "arrayify-stream": "^2.0.1",
     "@comunica/incremental-bindings-factory": "^1.0.0",

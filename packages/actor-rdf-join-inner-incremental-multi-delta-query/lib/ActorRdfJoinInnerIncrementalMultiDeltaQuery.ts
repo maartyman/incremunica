@@ -34,15 +34,12 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
       this.mediatorQueryOperation,
     );
 
+    const entries = await ActorRdfJoin.getEntriesWithMetadatas(action.entries);
     return {
       result: {
         type: 'bindings',
         bindingsStream: deltaQuery,
-        metadata: async() => await this.constructResultMetadata(
-          action.entries,
-          await ActorRdfJoin.getMetadatas(action.entries),
-          action.context,
-        ),
+        metadata: () => this.constructResultMetadata(entries, entries.map(entry => entry.metadata), action.context),
       },
     };
   }

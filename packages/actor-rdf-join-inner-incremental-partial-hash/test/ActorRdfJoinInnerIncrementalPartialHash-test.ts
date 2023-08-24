@@ -11,15 +11,10 @@ import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerIncrementalPartialHash } from '../lib/ActorRdfJoinInnerIncrementalPartialHash';
 import '@comunica/incremental-jest';
+import {MetadataValidationState} from "@comunica/metadata";
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
-
-function bindingsToString(b: Bindings): string {
-  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-  const keys = [ ...b.keys() ].sort();
-  return keys.map(k => `${k.value}:${b.get(k)!.value}`).toString();
-}
 
 describe('ActorRdfJoinPartialHash', () => {
   let bus: any;
@@ -73,6 +68,7 @@ describe('ActorRdfJoinPartialHash', () => {
                 requestTime: 10,
                 canContainUndefs: false,
                 variables: variables0,
+                state: new MetadataValidationState()
               }),
               type: 'bindings',
             },
@@ -87,6 +83,7 @@ describe('ActorRdfJoinPartialHash', () => {
                 requestTime: 20,
                 canContainUndefs: false,
                 variables: variables1,
+                state: new MetadataValidationState()
               }),
               type: 'bindings',
             },
@@ -112,6 +109,7 @@ describe('ActorRdfJoinPartialHash', () => {
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
+          state: new MetadataValidationState()
         });
         return expect(actor.test(action)).rejects
           .toThrow(new Error('Actor actor can not join streams containing undefs'));
@@ -122,6 +120,7 @@ describe('ActorRdfJoinPartialHash', () => {
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
+          state: new MetadataValidationState()
         });
         return expect(actor.test(action)).rejects
           .toThrow(new Error('Actor actor can not join streams containing undefs'));
@@ -132,11 +131,13 @@ describe('ActorRdfJoinPartialHash', () => {
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
+          state: new MetadataValidationState()
         });
         action.entries[1].output.metadata = () => Promise.resolve({
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
+          state: new MetadataValidationState()
         });
         return expect(actor.test(action)).rejects
           .toThrow(new Error('Actor actor can not join streams containing undefs'));

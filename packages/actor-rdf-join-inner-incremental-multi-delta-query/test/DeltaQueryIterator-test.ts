@@ -16,6 +16,7 @@ import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import * as RDF from "@rdfjs/types";
 import {Transform} from "readable-stream";
 import EventEmitter = require("events");
+import {MetadataValidationState} from "@comunica/metadata";
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
@@ -58,6 +59,7 @@ describe("DeltaQueryIterator", () => {
             cardinality: { type: 'estimate', value: 0 },
             canContainUndefs: false,
             variables: [ DF.variable('a'), DF.variable('a')],
+            state: new MetadataValidationState()
           }),
           type: 'bindings',
         }
@@ -86,6 +88,7 @@ describe("DeltaQueryIterator", () => {
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],
+          state: new MetadataValidationState()
         }),
         type: 'bindings',
       };
@@ -575,6 +578,7 @@ describe("DeltaQueryIterator", () => {
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],
+          state: new MetadataValidationState()
         }),
         type: 'bindings',
       };
@@ -640,6 +644,7 @@ describe("DeltaQueryIterator", () => {
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],
+          state: new MetadataValidationState()
         }),
         type: 'bindings',
       };
@@ -737,6 +742,7 @@ describe("DeltaQueryIterator", () => {
             cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
             variables: [ DF.variable('a'), DF.variable('b') ],
+            state: new MetadataValidationState()
           }),
           type: 'bindings',
         },

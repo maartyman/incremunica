@@ -15,6 +15,7 @@ import {IActionRdfJoin} from "@comunica/bus-rdf-join";
 import arrayifyStream from "arrayify-stream";
 import {KeysQueryOperation} from "@comunica/context-entries";
 import {ActorRdfJoinInnerIncrementalMultiDeltaQuery} from "../lib";
+import {MetadataValidationState} from "@comunica/metadata";
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -56,6 +57,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               cardinality: {type: 'estimate', value: 3},
               canContainUndefs: false,
               variables: [DF.variable('bound')],
+              state: new MetadataValidationState()
             }),
             type: 'bindings',
           };
@@ -98,6 +100,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               requestTime: 10,
               canContainUndefs: false,
               variables: [DF.variable('a')],
+              state: new MetadataValidationState()
             },
             {
               cardinality: {type: 'estimate', value: 2},
@@ -105,6 +108,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               requestTime: 20,
               canContainUndefs: false,
               variables: [DF.variable('a')],
+              state: new MetadataValidationState()
             },
             {
               cardinality: {type: 'estimate', value: 5},
@@ -112,6 +116,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               requestTime: 30,
               canContainUndefs: false,
               variables: [DF.variable('a')],
+              state: new MetadataValidationState()
             },
           ],
           //TODO
@@ -143,6 +148,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               requestTime: 10,
               canContainUndefs: false,
               variables: [DF.variable('a')],
+              state: new MetadataValidationState()
             },
           ],
         )).rejects.toEqual(new Error("Can't do two delta query joins after each other"))
@@ -171,6 +177,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -190,6 +197,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -232,6 +240,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           cardinality: {type: 'estimate', value: 2.400_000_000_000_000_4},
           canContainUndefs: false,
           variables: [DF.variable('a'), DF.variable('b')],
+          state: new MetadataValidationState()
         });
       });
 
@@ -257,6 +266,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -279,6 +289,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('c')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -298,6 +309,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -358,6 +370,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -375,6 +388,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('bound')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -410,6 +424,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -432,6 +447,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -504,6 +520,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -529,6 +546,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -613,6 +631,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },
@@ -641,6 +660,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
+                  state: new MetadataValidationState()
                 }),
                 type: 'bindings',
               },

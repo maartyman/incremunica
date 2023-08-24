@@ -5,6 +5,7 @@ import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { ActorRdfResolveQuadPatternIncrementalFederated } from '../lib/ActorRdfResolveQuadPatternIncrementalFederated';
 import 'jest-rdf';
+import {MetadataValidationState} from "@comunica/metadata";
 
 const squad = require('rdf-quad');
 
@@ -96,7 +97,11 @@ describe('ActorRdfResolveQuadPatternIncrementalFederated', () => {
       return actor.run({ pattern, context })
         .then(async output => {
           expect(await new Promise(resolve => output.data.getProperty('metadata', resolve)))
-            .toEqual({ cardinality: { type: 'estimate', value: 4 }, canContainUndefs: false });
+            .toEqual({
+              cardinality: { type: 'estimate', value: 4 },
+              canContainUndefs: false,
+              state: new MetadataValidationState()
+            });
           expect(await arrayifyStream(output.data)).toBeRdfIsomorphic([
             squad('s1', 'p1', 'o1'),
             squad('s1', 'p1', 'o1'),
@@ -118,7 +123,11 @@ describe('ActorRdfResolveQuadPatternIncrementalFederated', () => {
       return actor.run({ pattern, context })
         .then(async output => {
           expect(await new Promise(resolve => output.data.getProperty('metadata', resolve)))
-            .toEqual({ cardinality: { type: 'estimate', value: 4 }, canContainUndefs: false });
+            .toEqual({
+              cardinality: { type: 'estimate', value: 4 },
+              canContainUndefs: false,
+              state: new MetadataValidationState()
+            });
           expect(await arrayifyStream(output.data)).toBeRdfIsomorphic([
             squad('s1', 'p1', 'o1'),
             squad('s1', 'p1', 'o1'),
@@ -146,7 +155,11 @@ describe('ActorRdfResolveQuadPatternIncrementalFederated', () => {
       ]);
 
       await expect(new Promise(resolve => data.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 4 }, canContainUndefs: false });
+        .resolves.toEqual({
+          cardinality: { type: 'estimate', value: 4 },
+          canContainUndefs: false,
+          state: new MetadataValidationState()
+        });
     });
 
     it('should run when only data is called', () => {

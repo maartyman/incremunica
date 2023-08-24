@@ -33,7 +33,7 @@
   ],
   "dependencies": {
     "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
-    "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
+    "@comunica/bus-rdf-resolve-hypermedia": "^2.8.2",
     "@comunica/bus-guard": "^1.0.0",
     "@comunica/incremental-rdf-streaming-store": "^1.0.0"
   },
