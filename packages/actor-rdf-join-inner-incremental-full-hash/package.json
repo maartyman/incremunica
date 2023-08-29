@@ -1,6 +1,6 @@
 {
   "name": "@comunica/actor-rdf-join-inner-incremental-full-hash",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A inner-incremental-full-hash rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -33,11 +33,11 @@
   ],
   "dependencies": {
     "@comunica/bus-rdf-join": "^2.6.8",
+    "@comunica/incremental-bindings-factory": "^2.0.0",
+    "@comunica/incremental-inner-join": "^2.0.0",
+    "@comunica/incremental-types": "^2.0.0",
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
-    "@comunica/types": "^2.6.8",
-    "@comunica/incremental-inner-join": "^1.0.0",
-    "@comunica/incremental-types": "^1.0.0",
-    "@comunica/incremental-bindings-factory": "^1.0.0"
+    "@comunica/types": "^2.6.8"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
