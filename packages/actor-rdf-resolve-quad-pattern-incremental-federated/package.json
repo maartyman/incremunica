@@ -1,13 +1,13 @@
 {
   "name": "@comunica/actor-rdf-resolve-quad-pattern-incremental-federated",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "An incremental federated rdf-resolve-quad-pattern actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/actor-rdf-resolve-quad-pattern-incremental-federated"
   },
   "publishConfig": {
@@ -22,9 +22,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",

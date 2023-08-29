@@ -1,12 +1,12 @@
 {
   "name": "@comunica/incremental-jest",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Jest utilities for incremunica",
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/incremental-jest"
   },
   "publishConfig": {
@@ -24,9 +24,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -34,8 +34,8 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/dev-tools": "^2.0.0",
-    "@comunica/incremental-bindings-factory": "^2.0.0",
+    "@comunica/dev-tools": "^1.0.0",
+    "@comunica/incremental-bindings-factory": "^1.0.0",
     "@comunica/types": "^2.6.8",
     "@rdfjs/types": "*",
     "arrayify-stream": "^2.0.1"

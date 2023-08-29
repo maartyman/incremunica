@@ -15,7 +15,7 @@ and should only be used by [developers that want to build their own query engine
 ## Install
 
 ```bash
-$ yarn add @comunica/actor-query-operation-quadpattern
+$ yarn add @comunica/actor-query-operation-incremental-quadpattern
 ```
 
 ## Configure
@@ -25,7 +25,7 @@ After installing, this package can be added to your engine's configuration as fo
 {
   "@context": [
     ...
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-query-operation-quadpattern/^2.0.0/components/context.jsonld"  
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-query-operation-incremental-quadpattern/^1.0.0/components/context.jsonld"  
   ],
   "actors": [
     ...

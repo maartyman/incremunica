@@ -1,13 +1,13 @@
 {
   "name": "@comunica/actor-rdf-join-inner-incremental-computational-multi-bind",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "A inner-incremental-computational-multi-bind rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/actor-rdf-join-inner-incremental-computational-multi-bind"
   },
   "publishConfig": {
@@ -22,9 +22,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -38,7 +38,7 @@
     "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/context-entries": "^2.6.8",
     "@comunica/core": "^2.6.8",
-    "@comunica/incremental-bindings-factory": "^2.0.0",
+    "@comunica/incremental-bindings-factory": "^1.0.0",
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
     "@comunica/types": "^2.6.8",
     "asynciterator": "^3.8.0",

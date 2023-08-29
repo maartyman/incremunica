@@ -1,12 +1,12 @@
 {
   "name": "@comunica/incremental-bindings-factory",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Incremental bindings factory module for Comunica",
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/incremental-bindings-factory"
   },
   "publishConfig": {
@@ -19,9 +19,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -29,7 +29,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/incremental-types": "^2.0.0",
+    "@comunica/incremental-types": "^1.0.0",
     "@rdfjs/types": "*",
     "immutable": "^4.1.0",
     "rdf-data-factory": "^1.1.1",
