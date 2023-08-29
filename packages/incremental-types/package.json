@@ -1,6 +1,6 @@
 {
   "name": "@comunica/incremental-types",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Types module for incremental Comunica",
   "lsd:module": true,
   "main": "lib/index.js",

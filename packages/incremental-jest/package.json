@@ -1,6 +1,6 @@
 {
   "name": "@comunica/incremental-jest",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Jest utilities for incremunica",
   "main": "lib/index.js",
   "typings": "lib/index",
@@ -34,11 +34,11 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
+    "@comunica/dev-tools": "^2.0.0",
+    "@comunica/incremental-bindings-factory": "^2.0.0",
     "@comunica/types": "^2.6.8",
     "@rdfjs/types": "*",
-    "arrayify-stream": "^2.0.1",
-    "@comunica/incremental-bindings-factory": "^1.0.0",
-    "@comunica/dev-tools": "^1.0.0"
+    "arrayify-stream": "^2.0.1"
   },
   "scripts": {
     "build": "npm run build:ts",

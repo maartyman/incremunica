@@ -1,6 +1,6 @@
 {
   "name": "@comunica/actor-rdf-resolve-hypermedia-stream-none",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A stream-none rdf-resolve-hypermedia actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -32,10 +32,10 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
+    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^2.0.0",
+    "@comunica/bus-guard": "^2.0.0",
     "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
-    "@comunica/bus-guard": "^1.0.0",
-    "@comunica/incremental-rdf-streaming-store": "^1.0.0"
+    "@comunica/incremental-rdf-streaming-store": "^2.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
