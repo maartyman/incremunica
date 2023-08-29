@@ -33,9 +33,9 @@
   ],
   "dependencies": {
     "@comunica/bus-dereference-rdf": "^2.6.8",
-    "@incremunica/bus-guard": "^1.0.0",
     "@comunica/bus-http": "^2.6.9",
     "@comunica/core": "^2.6.8",
+    "@incremunica/bus-guard": "^1.0.0",
     "readable-stream": "^4.3.0"
   },
   "scripts": {
