@@ -1,13 +1,13 @@
 {
   "name": "@comunica/incremental-inner-join",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "An incremental-inner-join base class",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/incremental-inner-join"
   },
   "publishConfig": {
@@ -22,9 +22,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -32,7 +32,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/incremental-types": "^2.0.0",
+    "@comunica/incremental-types": "^1.0.0",
     "asynciterator": "^3.8.0"
   },
   "scripts": {

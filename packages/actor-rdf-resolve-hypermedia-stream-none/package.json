@@ -1,13 +1,13 @@
 {
   "name": "@comunica/actor-rdf-resolve-hypermedia-stream-none",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "A stream-none rdf-resolve-hypermedia actor",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/comunica/comunica.git",
+    "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/actor-rdf-resolve-hypermedia-stream-none"
   },
   "publishConfig": {
@@ -22,9 +22,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/comunica/comunica/issues"
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -32,10 +32,10 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^2.0.0",
-    "@comunica/bus-guard": "^2.0.0",
+    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
+    "@comunica/bus-guard": "^1.0.0",
     "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
-    "@comunica/incremental-rdf-streaming-store": "^2.0.0"
+    "@comunica/incremental-rdf-streaming-store": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

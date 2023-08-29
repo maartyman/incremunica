@@ -1,6 +1,6 @@
 {
   "name": "@comunica/config-query-sparql-incremental",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "default configuration files for Comunica SPARQL Incremental",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "homepage": "https://comunica.dev/",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "config",
