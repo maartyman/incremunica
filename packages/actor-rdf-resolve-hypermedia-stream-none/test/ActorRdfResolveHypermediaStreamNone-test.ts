@@ -1,6 +1,6 @@
 import { Bus } from '@comunica/core';
 import { ActorRdfResolveHypermediaStreamNone } from '../lib/ActorRdfResolveHypermediaStreamNone';
-import {MediatorGuard} from "@comunica/bus-guard";
+import {MediatorGuard} from "@incremunica/bus-guard";
 import {DataFactory} from "rdf-data-factory";
 import arrayifyStream from "arrayify-stream";
 import 'jest-rdf'

@@ -6,7 +6,6 @@ import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContextKey } from '@comunica/core/lib/ActionContext';
-import type { Bindings } from '@comunica/incremental-bindings-factory';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
@@ -16,6 +15,7 @@ import type {
   IQueryOperationResultBindings,
   MetadataBindings,
 } from '@comunica/types';
+import type { Bindings } from '@incremunica/incremental-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import { Algebra, Factory } from 'sparqlalgebrajs';

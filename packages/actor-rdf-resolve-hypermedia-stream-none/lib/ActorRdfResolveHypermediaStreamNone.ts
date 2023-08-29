@@ -1,5 +1,3 @@
-import { RdfJsQuadStreamingSource } from '@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
-import type { MediatorGuard } from '@comunica/bus-guard';
 import type {
   IActionRdfResolveHypermedia,
   IActorRdfResolveHypermediaOutput,
@@ -9,8 +7,10 @@ import type {
 import {
   ActorRdfResolveHypermedia,
 } from '@comunica/bus-rdf-resolve-hypermedia';
-import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
-import type { Quad } from '@comunica/incremental-types';
+import { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
+import type { MediatorGuard } from '@incremunica/bus-guard';
+import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 
 /**

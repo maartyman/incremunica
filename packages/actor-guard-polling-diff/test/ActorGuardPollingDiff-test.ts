@@ -2,7 +2,7 @@ import { Actor, Bus, IActorTest, Mediator} from '@comunica/core';
 import { ActorGuardPollingDiff } from '../lib/ActorGuardPollingDiff';
 import {IActionHttp, IActorHttpOutput } from "@comunica/bus-http";
 import {IActionDereferenceRdf, IActorDereferenceRdfOutput} from "@comunica/bus-dereference-rdf";
-import {ActorGuard, IActionGuard} from "@comunica/bus-guard";
+import {ActorGuard, IActionGuard} from "@incremunica/bus-guard";
 import {Transform} from "readable-stream";
 import arrayifyStream from "arrayify-stream";
 import 'jest-rdf';

@@ -1,5 +1,5 @@
-import { IncrementalInnerJoin } from '@comunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@comunica/incremental-types';
+import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
+import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
 
 export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();

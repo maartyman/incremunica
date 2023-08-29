@@ -1,4 +1,4 @@
-import {Bindings, BindingsFactory} from '@comunica/incremental-bindings-factory';
+import {BindingsFactory} from '@incremunica/incremental-bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
@@ -12,8 +12,7 @@ import { DataFactory } from 'rdf-data-factory';
 import { Factory, Algebra } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerIncrementalMemoryMultiBind } from '../lib/ActorRdfJoinInnerIncrementalMemoryMultiBind';
 import Mock = jest.Mock;
-import '@comunica/incremental-jest';
-import {DevTools} from "@comunica/dev-tools";
+import '@incremunica/incremental-jest';
 import arrayifyStream from "arrayify-stream";
 import {KeysQueryOperation} from "@comunica/context-entries";
 

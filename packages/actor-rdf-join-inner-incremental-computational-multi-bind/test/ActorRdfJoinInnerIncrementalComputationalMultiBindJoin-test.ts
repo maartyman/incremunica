@@ -1,4 +1,4 @@
-import { BindingsFactory} from '@comunica/incremental-bindings-factory';
+import { BindingsFactory} from '@incremunica/incremental-bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
@@ -7,18 +7,17 @@ import 'jest-rdf';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
-import {ArrayIterator, AsyncIterator, union, WrappingIterator} from 'asynciterator';
+import {ArrayIterator, WrappingIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory, Algebra } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerIncrementalComputationalMultiBind } from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
 import Mock = jest.Mock;
-import '@comunica/incremental-jest';
-import {DevTools} from "@comunica/dev-tools";
+import '@incremunica/incremental-jest';
 import arrayifyStream from "arrayify-stream";
 import {KeysQueryOperation, KeysRdfResolveQuadPattern} from "@comunica/context-entries";
 import {EventEmitter} from "events";
-import {PassThrough, Stream, Transform} from "readable-stream";
-import {BindingsStream} from "@comunica/incremental-types";
+import {PassThrough, Stream} from "readable-stream";
+import {BindingsStream} from "@incremunica/incremental-types";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 

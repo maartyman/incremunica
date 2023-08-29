@@ -2,7 +2,7 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
-import '@comunica/incremental-jest';
+import '@incremunica/incremental-jest';
 import { DataFactory } from 'rdf-data-factory';
 import type { BindingsStream, QueryStringContext} from '@comunica/types';
 import {Factory} from 'sparqlalgebrajs';
@@ -10,11 +10,9 @@ import {QueryEngine} from '../lib/QueryEngine';
 import {usePolly} from './util';
 import {EventEmitter} from "events";
 import * as http from "http";
-import {StreamingStore} from "@comunica/incremental-rdf-streaming-store";
-import {Quad} from "@comunica/incremental-types";
-import arrayifyStream from "arrayify-stream";
-import {BindingsFactory} from "@comunica/incremental-bindings-factory";
-import {DevTools} from "@comunica/dev-tools";
+import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
+import {Quad} from "@incremunica/incremental-types";
+import {BindingsFactory} from "@incremunica/incremental-bindings-factory";
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
   let array: any[] = [];

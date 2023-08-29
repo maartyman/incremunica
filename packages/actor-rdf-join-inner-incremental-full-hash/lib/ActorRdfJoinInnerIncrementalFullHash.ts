@@ -6,9 +6,9 @@ import type {
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
-import type { BindingsStream } from '@comunica/incremental-types';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { MetadataBindings } from '@comunica/types';
+import type { BindingsStream } from '@incremunica/incremental-types';
 import { IncrementalFullHashJoin } from './IncrementalFullHashJoin';
 
 /**

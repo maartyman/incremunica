@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source",
+  "name": "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source",
   "version": "1.0.0",
   "description": "A rdfjs-streaming-source rdf-resolve-quad-pattern actor",
   "lsd:module": true,
@@ -34,8 +34,8 @@
   "dependencies": {
     "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/core": "^2.6.8",
-    "@comunica/incremental-rdf-streaming-store": "^1.0.0",
-    "@comunica/incremental-types": "^1.0.0",
+    "@incremunica/incremental-rdf-streaming-store": "^1.0.0",
+    "@incremunica/incremental-types": "^1.0.0",
     "@comunica/types": "^2.6.8",
     "@rdfjs/types": "*",
     "asynciterator": "^3.8.0"

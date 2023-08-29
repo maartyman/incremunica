@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/actor-rdf-resolve-quad-pattern-incremental-federated",
+  "name": "@incremunica/actor-rdf-resolve-quad-pattern-incremental-federated",
   "version": "1.0.0",
   "description": "An incremental federated rdf-resolve-quad-pattern actor",
   "lsd:module": true,

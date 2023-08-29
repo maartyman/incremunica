@@ -1,6 +1,4 @@
-import type {Bindings, BindingsStream} from '@comunica/incremental-types';
-import {bindingsToString} from "@comunica/incremental-bindings-factory";
-import {Quad} from "@comunica/incremental-types";
+import type {Bindings, BindingsStream} from '@incremunica/incremental-types';
 
 export const DevTools = {
   printBindings(bindings: Bindings) {

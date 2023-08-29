@@ -1,4 +1,4 @@
-import type { Bindings } from '@comunica/incremental-types';
+import type { Bindings } from '@incremunica/incremental-types';
 import { termToString } from 'rdf-string';
 
 /**

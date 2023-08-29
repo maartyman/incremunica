@@ -7,8 +7,8 @@ import {
   ActorRdfResolveQuadPatternSource, getContextSource, hasContextSingleSourceOfType,
 } from '@comunica/bus-rdf-resolve-quad-pattern';
 import type { IActorTest } from '@comunica/core';
-import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
 import type { IActionContext } from '@comunica/types';
+import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import { RdfJsQuadStreamingSource } from './RdfJsQuadStreamingSource';
 
 /**

@@ -1,6 +1,5 @@
-import {Bindings, bindingsToString} from '@comunica/incremental-bindings-factory';
+import {Bindings, bindingsToString} from '@incremunica/incremental-bindings-factory';
 import toEqualBindings from './toEqualBindings';
-import {DevTools} from "@comunica/dev-tools";
 
 function bindingsArrayToString(bindings: Bindings[]): string {
   return `[ ${bindings.map(term => bindingsToString(term, true)).join(', ')} ]`;

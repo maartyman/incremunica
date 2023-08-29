@@ -3,12 +3,12 @@ import { ActorQueryOperationTyped, ClosableTransformIterator } from '@comunica/b
 import type { MediatorRdfResolveQuadPattern } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IActorArgs, IActorTest } from '@comunica/core';
-import { BindingsFactory } from '@comunica/incremental-bindings-factory';
-import type { Quad } from '@comunica/incremental-types';
 import type { BindingsStream,
   IQueryOperationResult,
   IActionContext, MetadataBindings,
   MetadataQuads, TermsOrder } from '@comunica/types';
+import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';

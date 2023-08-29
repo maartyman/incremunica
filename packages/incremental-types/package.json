@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/incremental-types",
+  "name": "@incremunica/incremental-types",
   "version": "1.0.0",
   "description": "Types module for incremental Comunica",
   "lsd:module": true,

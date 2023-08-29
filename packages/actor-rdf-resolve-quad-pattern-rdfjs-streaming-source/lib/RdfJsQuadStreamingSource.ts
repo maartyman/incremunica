@@ -1,8 +1,8 @@
 import type { IQuadSource } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { ActionContextKey } from '@comunica/core/lib/ActionContext';
-import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
-import type { Quad } from '@comunica/incremental-types';
 import type { IActionContext } from '@comunica/types';
+import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';

@@ -1,4 +1,4 @@
-import '@comunica/incremental-jest';
+import '@incremunica/incremental-jest';
 import {DualKeyHashMap} from "../lib/DualKeyHashMap";
 
 class TestObject {

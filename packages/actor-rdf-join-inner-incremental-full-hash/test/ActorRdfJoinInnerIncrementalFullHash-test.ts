@@ -1,4 +1,4 @@
-import { BindingsFactory } from '@comunica/incremental-bindings-factory';
+import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
@@ -10,7 +10,7 @@ import arrayifyStream from 'arrayify-stream';
 import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerIncrementalFullHash } from '../lib';
-import '@comunica/incremental-jest';
+import '@incremunica/incremental-jest';
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
