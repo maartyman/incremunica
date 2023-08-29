@@ -5,7 +5,7 @@ import { Store } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import { Readable } from 'readable-stream';
 import { StreamingStore } from '../lib/StreamingStore';
-import {Quad} from "@comunica/incremental-types";
+import {Quad} from '@incremunica/incremental-types';
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -712,7 +712,7 @@ describe('StreamStore', () => {
       quad('s2', 'p2', 'o2'),
     ]);
   });
-  
+
   it('stopMatch should stop match', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
@@ -796,7 +796,7 @@ describe('StreamStore', () => {
     ]);
 
     store.end();
-    
+
     expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
@@ -860,7 +860,7 @@ describe('StreamStore', () => {
 
     store.resume();
     store.end()
-    
+
     expect(await arrayifyStream(store.copyOfStore().match())).toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
@@ -984,7 +984,7 @@ describe('StreamStore', () => {
       await arrayifyStream(store.copyOfStore().match())
     ).toBeRdfIsomorphic([
     ]);
-    
+
     store.end();
 
     expect(await arrayifyStream(match)).toBeRdfIsomorphic([

@@ -1,6 +1,6 @@
-import type { IGuard, IActionGuard } from '@comunica/bus-guard';
-import { ActorGuard } from '@comunica/bus-guard';
-import type { Quad } from '@comunica/incremental-types';
+import type { IGuard, IActionGuard } from '@incremunica/bus-guard';
+import { ActorGuard } from '@incremunica/bus-guard';
+import type { Quad } from '@incremunica/incremental-types';
 import { Transform } from 'readable-stream';
 import type { ActorGuardPollingDiff } from './ActorGuardPollingDiff';
 

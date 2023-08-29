@@ -1,11 +1,9 @@
-import { BindingsFactory } from '@comunica/incremental-bindings-factory';
-import {ActionContext, Actor, Bus, IActorTest, Mediator} from '@comunica/core';
+import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import {ActionContext, Bus} from '@comunica/core';
 import { DataFactory } from 'rdf-data-factory';
-import '@comunica/incremental-jest';
-import {Algebra, Factory} from "sparqlalgebrajs";
+import '@incremunica/incremental-jest';
+import {Factory} from "sparqlalgebrajs";
 import {
-  IActionRdfJoinSelectivity,
-  IActorRdfJoinSelectivityOutput,
   MediatorRdfJoinSelectivity
 } from "@comunica/bus-rdf-join-selectivity";
 import {IActionContext, IQueryOperationResultBindings} from "@comunica/types";
@@ -13,7 +11,6 @@ import {IActionQueryOperation, MediatorQueryOperation} from "@comunica/bus-query
 import {ArrayIterator} from "asynciterator";
 import {IActionRdfJoin} from "@comunica/bus-rdf-join";
 import arrayifyStream from "arrayify-stream";
-import {KeysQueryOperation} from "@comunica/context-entries";
 import {ActorRdfJoinInnerIncrementalMultiDeltaQuery} from "../lib";
 
 const DF = new DataFactory();

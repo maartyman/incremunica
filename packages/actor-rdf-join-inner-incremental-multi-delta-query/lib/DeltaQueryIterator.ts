@@ -3,8 +3,8 @@ import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-o
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
-import type { BindingsStream, Quad, Bindings } from '@comunica/incremental-types';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
+import type { BindingsStream, Quad, Bindings } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';

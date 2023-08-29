@@ -1,8 +1,8 @@
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
-import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@comunica/bus-guard';
-import { ActorGuard } from '@comunica/bus-guard';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest } from '@comunica/core';
+import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremunica/bus-guard';
+import { ActorGuard } from '@incremunica/bus-guard';
 import { PollingDiffGuard } from './PollingDiffGuard';
 
 /**

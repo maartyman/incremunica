@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/actor-rdf-join-inner-incremental-computational-multi-bind",
+  "name": "@incremunica/actor-rdf-join-inner-incremental-computational-multi-bind",
   "version": "1.0.0",
   "description": "A inner-incremental-computational-multi-bind rdf-join actor",
   "lsd:module": true,
@@ -38,7 +38,7 @@
     "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/context-entries": "^2.6.8",
     "@comunica/core": "^2.6.8",
-    "@comunica/incremental-bindings-factory": "^1.0.0",
+    "@incremunica/incremental-bindings-factory": "^1.0.0",
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
     "@comunica/types": "^2.6.8",
     "asynciterator": "^3.8.0",

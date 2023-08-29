@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/dev-tools",
+  "name": "@incremunica/dev-tools",
   "version": "1.0.0",
   "description": "Development tools for comunica/incremunica.",
   "lsd:module": true,
@@ -35,7 +35,6 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/incremental-bindings-factory": "^1.0.0",
-    "@comunica/incremental-types": "^1.0.0"
+    "@incremunica/incremental-types": "^1.0.0"
   }
 }

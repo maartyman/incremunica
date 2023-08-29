@@ -7,8 +7,8 @@ import type {
 import { getDataSourceContext } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { BlankNodeScoped } from '@comunica/data-factory';
-import type { Quad } from '@comunica/incremental-types';
 import type { IActionContext, DataSources, IDataSource, MetadataQuads } from '@comunica/types';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { ArrayIterator, UnionIterator } from 'asynciterator';

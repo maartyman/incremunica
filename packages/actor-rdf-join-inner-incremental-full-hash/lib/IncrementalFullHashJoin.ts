@@ -1,6 +1,6 @@
-import { bindingsToString } from '@comunica/incremental-bindings-factory';
-import { IncrementalInnerJoin } from '@comunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@comunica/incremental-types';
+import { bindingsToString } from '@incremunica/incremental-bindings-factory';
+import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
+import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
 import type { IMapObject } from './DualKeyHashMap';
 import { DualKeyHashMap } from './DualKeyHashMap';
 

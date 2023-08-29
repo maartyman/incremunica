@@ -8,11 +8,11 @@ import type {
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import { KeysQueryOperation } from '@comunica/context-entries';
-import { BindingsFactory } from '@comunica/incremental-bindings-factory';
-import type { Bindings } from '@comunica/incremental-bindings-factory';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream, IQueryOperationResultBindings,
   MetadataBindings, IActionContext, IJoinEntryWithMetadata } from '@comunica/types';
+import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import type { Bindings } from '@incremunica/incremental-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import {
   ArrayIterator,

@@ -8,9 +8,7 @@ import arrayifyStream from 'arrayify-stream';
 import {RdfJsQuadStreamingSource} from "../lib";
 import {Store} from "n3";
 import 'jest-rdf';
-import { ArrayIterator } from 'asynciterator';
-import { Readable } from 'stream';
-import {StreamingStore} from "@comunica/incremental-rdf-streaming-store";
+import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";

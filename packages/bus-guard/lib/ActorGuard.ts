@@ -1,6 +1,6 @@
-import type { RdfJsQuadStreamingSource } from '@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
+import type { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
 
 /**
  * A comunica actor for guard events.

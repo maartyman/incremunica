@@ -1,4 +1,4 @@
-import type { Bindings as BindingsType } from '@comunica/incremental-types';
+import type { Bindings as BindingsType } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { Map } from 'immutable';
 import { bindingsToString } from './bindingsToString';

@@ -1,5 +1,5 @@
-import { IncrementalInnerJoin, Side } from '@comunica/incremental-inner-join';
-import type { Bindings } from '@comunica/incremental-types';
+import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
+import type { Bindings } from '@incremunica/incremental-types';
 
 export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Bindings[] = [];

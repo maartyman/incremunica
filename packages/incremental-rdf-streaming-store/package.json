@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/incremental-rdf-streaming-store",
+  "name": "@incremunica/incremental-rdf-streaming-store",
   "version": "1.0.0",
   "description": "An RDF Store where the match function gives a stream.",
   "lsd:module": true,
@@ -43,7 +43,7 @@
     "readable-stream": "^4.3.0"
   },
   "devDependencies": {
-    "@comunica/incremental-types": "^1.0.0"
+    "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

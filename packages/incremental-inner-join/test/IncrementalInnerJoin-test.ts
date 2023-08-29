@@ -1,8 +1,7 @@
 import {ArrayIterator, AsyncIterator} from 'asynciterator';
-import '@comunica/incremental-jest';
-import {IncrementalInnerJoin, Side} from "../lib";
-import { Bindings } from '@comunica/incremental-types';
-import EventEmitter = require("events");
+import '@incremunica/incremental-jest';
+import {IncrementalInnerJoin} from "../lib";
+import { Bindings } from '@incremunica/incremental-types';
 
 let cleanupMock = jest.fn();
 let hasResultMock = jest.fn();

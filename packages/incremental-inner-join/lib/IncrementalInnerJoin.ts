@@ -1,4 +1,4 @@
-import type { Bindings, BindingsStream } from '@comunica/incremental-types';
+import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {

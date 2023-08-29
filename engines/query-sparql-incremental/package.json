@@ -1,5 +1,5 @@
 {
-  "name": "@comunica/query-sparql-incremental",
+  "name": "@incremunica/query-sparql-incremental",
   "version": "1.0.0",
   "description": "A SPARQL query engine for incremental querying over decentralized RDF knowledge graphs on the Web",
   "main": "lib/index.js",
