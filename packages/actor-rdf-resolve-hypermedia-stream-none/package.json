@@ -32,9 +32,9 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
+    "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
     "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
     "@incremunica/bus-guard": "^1.0.0",
-    "@comunica/bus-rdf-resolve-hypermedia": "^2.6.8",
     "@incremunica/incremental-rdf-streaming-store": "^1.0.0"
   },
   "scripts": {

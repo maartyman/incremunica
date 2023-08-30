@@ -33,11 +33,11 @@
   ],
   "dependencies": {
     "@comunica/bus-rdf-join": "^2.6.8",
+    "@comunica/mediatortype-join-coefficients": "^2.6.8",
+    "@comunica/types": "^2.6.8",
     "@incremunica/incremental-bindings-factory": "^1.0.0",
     "@incremunica/incremental-inner-join": "^1.0.0",
-    "@incremunica/incremental-types": "^1.0.0",
-    "@comunica/mediatortype-join-coefficients": "^2.6.8",
-    "@comunica/types": "^2.6.8"
+    "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

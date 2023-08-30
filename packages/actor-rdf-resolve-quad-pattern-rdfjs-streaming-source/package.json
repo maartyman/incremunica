@@ -34,9 +34,9 @@
   "dependencies": {
     "@comunica/bus-rdf-resolve-quad-pattern": "^2.6.8",
     "@comunica/core": "^2.6.8",
+    "@comunica/types": "^2.6.8",
     "@incremunica/incremental-rdf-streaming-store": "^1.0.0",
     "@incremunica/incremental-types": "^1.0.0",
-    "@comunica/types": "^2.6.8",
     "@rdfjs/types": "*",
     "asynciterator": "^3.8.0"
   },
