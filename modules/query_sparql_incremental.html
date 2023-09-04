@@ -67,30 +67,27 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<a href="#comunica-sparql-incremental" id="comunica-sparql-incremental" style="color: inherit; text-decoration: none;">
-						<h1>Comunica SPARQL INCREMENTAL</h1>
+					<a href="#incremunica-sparql" id="incremunica-sparql" style="color: inherit; text-decoration: none;">
+						<h1>Incremunica SPARQL</h1>
 					</a>
-					<!--
-[![npm version](https://badge.fury.io/js/%40comunica%2Fquery-sparql-ostrich.svg)](https://www.npmjs.com/package/@comunica/query-sparql-ostrich)
-[![Docker Pulls](https://img.shields.io/docker/pulls/comunica/query-sparql-ostrich.svg)](https://hub.docker.com/r/comunica/query-sparql-ostrich/)
--->
-					<p>Comunica SPARQL INCREMENTAL is a SPARQL query engine for JavaScript that enables incremental querying.</p>
+					<p><a href="https://badge.fury.io/js/@incremunica%2Fquery-sparql-incremental"><img src="https://badge.fury.io/js/@incremunica%2Fquery-sparql-incremental.svg" alt="npm version"></a></p>
+					<p>Incremunica is an incremental SPARQL query engine build on top of <a href="https://github.com/comunica/comunica">comunica</a>.</p>
 					<a href="#install" id="install" style="color: inherit; text-decoration: none;">
 						<h2>Install</h2>
 					</a>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add incremunica/query-sparql-incremental</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ npm install -g @incremunica/query-sparql-incremental</span>
 </code></pre>
 					<p>or</p>
-					<pre><code class="language-bash"><span style="color: #000000">$ npm install -g incremunica/query-sparql-incremental</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @incremunica/query-sparql-incremental</span>
 </code></pre>
 					<a href="#install-a-prerelease" id="install-a-prerelease" style="color: inherit; text-decoration: none;">
 						<h2>Install a prerelease</h2>
 					</a>
 					<p>Since this package is still in testing phase, you may want to install a prerelease of this package, which you can do by appending <code>@next</code> to the package name during installation.</p>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add incremunica/query-sparql-incremental@next</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ npm install -g @incremunica/query-sparql-incremental@next</span>
 </code></pre>
 					<p>or</p>
-					<pre><code class="language-bash"><span style="color: #000000">$ npm install -g incremunica/query-sparql-incremental@next</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @incremunica/query-sparql-incremental@next</span>
 </code></pre>
 					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 						<h2>Usage</h2>
@@ -103,50 +100,74 @@
 						<h3>Usage within application</h3>
 					</a>
 					<p>This engine can be used in JavaScript/TypeScript applications as follows:</p>
-					<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">QueryEngine</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@comunica/query-sparql-incremental&#039;</span><span style="color: #000000">).</span><span style="color: #001080">QueryEngine</span><span style="color: #000000">;</span>
+					<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">QueryEngine</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@incremunica/query-sparql-incremental&#039;</span><span style="color: #000000">).</span><span style="color: #001080">QueryEngine</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEngine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">QueryEngine</span><span style="color: #000000">();</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">bindingsStream</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">myEngine</span><span style="color: #000000">.</span><span style="color: #795E26">queryBindings</span><span style="color: #000000">(</span><span style="color: #A31515">`</span>
-<span style="color: #A31515">  SELECT * WHERE {</span>
-<span style="color: #A31515">    GRAPH &lt;version:1&gt; {</span>
-<span style="color: #A31515">      ?s ?p ?o</span>
-<span style="color: #A31515">    }</span>
-<span style="color: #A31515">  } LIMIT 100`</span><span style="color: #000000">, {</span>
-<span style="color: #000000">    </span><span style="color: #001080">lenient:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
-<span style="color: #000000">});</span>
+<span style="color: #0000FF">async</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">main</span><span style="color: #000000">() {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">bindingsStream</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">myEngine</span><span style="color: #000000">.</span><span style="color: #795E26">queryBindings</span><span style="color: #000000">(</span><span style="color: #A31515">`</span>
+<span style="color: #A31515">    SELECT ?interest</span>
+<span style="color: #A31515">    WHERE {</span>
+<span style="color: #A31515">      &lt;https://ruben.verborgh.org/profile/#me&gt; foaf:topic_interest ?interest.</span>
+<span style="color: #A31515">      &lt;https://www.rubensworks.net/#me&gt; foaf:topic_interest ?interest.</span>
+<span style="color: #A31515">    }`</span><span style="color: #000000">, {</span>
+<span style="color: #000000">        </span><span style="color: #001080">sources:</span><span style="color: #000000"> [</span>
+<span style="color: #000000">            </span><span style="color: #A31515">&quot;https://ruben.verborgh.org/profile/&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            </span><span style="color: #A31515">&quot;https://www.rubensworks.net/&quot;</span>
+<span style="color: #000000">        ],</span>
+<span style="color: #000000">    });</span>
 
-<span style="color: #008000">// Consume results as a stream (best performance)</span>
-<span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;data&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">binding</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">toString</span><span style="color: #000000">()); </span><span style="color: #008000">// Quick way to print bindings for testing</span>
+<span style="color: #000000">    </span><span style="color: #008000">// Consume results as a stream</span>
+<span style="color: #000000">    </span><span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;data&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">binding</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;Is addition:&quot;</span><span style="color: #000000">, </span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #001080">diff</span><span style="color: #000000">); </span><span style="color: #008000">// If true: addition, if false: deletion.</span>
 
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">has</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s&#039;</span><span style="color: #000000">)); </span><span style="color: #008000">// Will be true</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">toString</span><span style="color: #000000">()); </span><span style="color: #008000">// Quick way to print bindings for testing</span>
 
-<span style="color: #000000">    </span><span style="color: #008000">// Obtaining values</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s&#039;</span><span style="color: #000000">).</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s&#039;</span><span style="color: #000000">).</span><span style="color: #001080">termType</span><span style="color: #000000">);</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;p&#039;</span><span style="color: #000000">).</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;o&#039;</span><span style="color: #000000">).</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
-<span style="color: #000000">});</span>
-<span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;end&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #008000">// The data-listener will not be called anymore once we get here.</span>
-<span style="color: #000000">});</span>
-<span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #001080">error</span><span style="color: #000000">);</span>
-<span style="color: #000000">});</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;Has variable &#039;interest&#039;:&quot;</span><span style="color: #000000">, </span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">has</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;interest&#039;</span><span style="color: #000000">)); </span><span style="color: #008000">// Will be true</span>
 
-<span style="color: #008000">// Consume results as an array (easier)</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">bindings</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">toArray</span><span style="color: #000000">();</span>
-<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">bindings</span><span style="color: #000000">[</span><span style="color: #098658">0</span><span style="color: #000000">].</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s&#039;</span><span style="color: #000000">).</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
-<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">bindings</span><span style="color: #000000">[</span><span style="color: #098658">0</span><span style="color: #000000">].</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;s&#039;</span><span style="color: #000000">).</span><span style="color: #001080">termType</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #008000">// Obtaining values</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;interest&#039;</span><span style="color: #000000">).</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">binding</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;interest&#039;</span><span style="color: #000000">).</span><span style="color: #001080">termType</span><span style="color: #000000">);</span>
+<span style="color: #000000">    });</span>
+
+<span style="color: #000000">    </span><span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;end&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// The data-listener will not be called anymore once we get here.</span>
+<span style="color: #000000">    });</span>
+<span style="color: #000000">    </span><span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #001080">error</span><span style="color: #000000">);</span>
+<span style="color: #000000">    });</span>
+
+<span style="color: #000000">    </span><span style="color: #008000">// As this is an incremental query engine, you need to end the query yourself otherwise it will keep checking for changes.</span>
+<span style="color: #000000">    </span><span style="color: #795E26">setTimeout</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">bindingsStream</span><span style="color: #000000">.</span><span style="color: #795E26">close</span><span style="color: #000000">(), </span><span style="color: #098658">3000</span><span style="color: #000000">);</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #795E26">main</span><span style="color: #000000">();</span>
 </code></pre>
-					<p><em><a href="https://comunica.dev/docs/query/getting_started/query_app/"><strong>Read more</strong> about querying an application</a>.</em></p>
-					<a href="#usage-as-a-sparql-endpoint" id="usage-as-a-sparql-endpoint" style="color: inherit; text-decoration: none;">
-						<h3>Usage as a SPARQL endpoint</h3>
-					</a>
-					<p>The SPARQL endpoint can only be started dynamically.
-					An alternative config file can be passed via the <code>COMUNICA_CONFIG</code> environment variable.</p>
-					<p>Use <code>bin/http.js</code> when running in the Comunica monorepo development environment.</p>
-					<p><em><a href="https://comunica.dev/docs/query/getting_started/setup_endpoint/"><strong>Read more</strong> about setting up a SPARQL endpoint</a>.</em></p>
+					<p>You can also use an <a href="https://www.npmjs.com/package/@incremunica/incremental-rdf-streaming-store">incremental triple store</a>.
+					This store allows you to change the dataset (additions and deletions) and show you the changes in the query results.</p>
+					<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">QueryEngine</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@incremunica/query-sparql-incremental&#039;</span><span style="color: #000000">).</span><span style="color: #001080">QueryEngine</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">StreamingStore</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@incremunica/incremental-rdf-streaming-store&quot;</span><span style="color: #000000">).</span><span style="color: #001080">StreamingStore</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEngine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">QueryEngine</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">streamingStore</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">StreamingStore</span><span style="color: #000000">();</span>
+
+<span style="color: #0000FF">async</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">main</span><span style="color: #000000">() {</span>
+<span style="color: #000000">    </span><span style="color: #001080">streamingStore</span><span style="color: #000000">.</span><span style="color: #795E26">import</span><span style="color: #000000">(</span><span style="color: #001080">quadStream</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">bindingsStream</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">myEngine</span><span style="color: #000000">.</span><span style="color: #795E26">queryBindings</span><span style="color: #000000">(</span><span style="color: #A31515">`</span>
+<span style="color: #A31515">    SELECT *</span>
+<span style="color: #A31515">    WHERE {</span>
+<span style="color: #A31515">        ?s ?p ?o.</span>
+<span style="color: #A31515">    }`</span><span style="color: #000000">, {</span>
+<span style="color: #000000">        </span><span style="color: #001080">sources:</span><span style="color: #000000"> [ </span><span style="color: #001080">streamingStore</span><span style="color: #000000"> ],</span>
+<span style="color: #000000">    });</span>
+
+<span style="color: #000000">    </span><span style="color: #001080">streamingStore</span><span style="color: #000000">.</span><span style="color: #795E26">addQuad</span><span style="color: #000000">(</span><span style="color: #001080">quad</span><span style="color: #000000">);</span>
+<span style="color: #000000">    </span><span style="color: #001080">streamingStore</span><span style="color: #000000">.</span><span style="color: #795E26">removeQuad</span><span style="color: #000000">(</span><span style="color: #001080">otherQuad</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">    </span><span style="color: #001080">streamingStore</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #795E26">main</span><span style="color: #000000">();</span>
+</code></pre>
 				</div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
