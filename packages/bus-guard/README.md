@@ -1,13 +1,8 @@
-# Comunica Bus Guard
+# Incremunica Bus Guard
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Fbus-guard.svg)](https://www.npmjs.com/package/@comunica/bus-guard)
+[![npm version](https://badge.fury.io/js/@incremunica%2Fbus-guard.svg)](https://badge.fury.io/js/@incremunica%2Fbus-guard)
 
-A comunica bus for guard events.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
+A comunica bus for guard events. 
 
 ## Install
 

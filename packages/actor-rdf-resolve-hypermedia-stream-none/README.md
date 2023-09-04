@@ -1,13 +1,8 @@
-# Comunica Stream None RDF Resolve Hypermedia Actor
+# Incremunica Stream None RDF Resolve Hypermedia Actor
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Factor-rdf-resolve-hypermedia-stream-none.svg)](https://www.npmjs.com/package/@comunica/actor-rdf-resolve-hypermedia-stream-none)
+[![npm version](https://badge.fury.io/js/@incremunica%2Factor-rdf-resolve-hypermedia-stream-none.svg)](https://badge.fury.io/js/@incremunica%2Factor-rdf-resolve-hypermedia-stream-none)
 
 A comunica Stream None RDF Resolve Hypermedia Actor.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
 
 ## Install
 
@@ -33,9 +28,3 @@ After installing, this package can be added to your engine's configuration as fo
   ]
 }
 ```
-
-### Config Parameters
-
-TODO: fill in parameters (this section can be removed if there are none)
-
-* `someParam`: Description of the param

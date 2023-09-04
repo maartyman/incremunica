@@ -4,8 +4,6 @@
 
 The default configuration files for [Comunica SPARQL Incremental](https://github.com/maartyman/incremental/tree/master/packages/incremental#readme).
 
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
-
 ## Installation
 
 ```bash

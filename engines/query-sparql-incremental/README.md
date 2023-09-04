@@ -1,36 +1,34 @@
-# Comunica SPARQL INCREMENTAL
+# Incremunica SPARQL
 
-<!--
-[![npm version](https://badge.fury.io/js/%40comunica%2Fquery-sparql-ostrich.svg)](https://www.npmjs.com/package/@comunica/query-sparql-ostrich)
-[![Docker Pulls](https://img.shields.io/docker/pulls/comunica/query-sparql-ostrich.svg)](https://hub.docker.com/r/comunica/query-sparql-ostrich/)
--->
+[![npm version](https://badge.fury.io/js/@incremunica%2Fquery-sparql-incremental.svg)](https://badge.fury.io/js/@incremunica%2Fquery-sparql-incremental)
 
-Comunica SPARQL INCREMENTAL is a SPARQL query engine for JavaScript that enables incremental querying.
+Incremunica is an incremental SPARQL query engine build on top of [comunica](https://github.com/comunica/comunica).
 
 ## Install
 
 ```bash
-$ yarn add incremunica/query-sparql-incremental
+$ npm install -g @incremunica/query-sparql-incremental
 ```
 
 or
 
 ```bash
-$ npm install -g incremunica/query-sparql-incremental
+$ yarn add @incremunica/query-sparql-incremental
 ```
 
 ## Install a prerelease
 
 Since this package is still in testing phase, you may want to install a prerelease of this package, which you can do by appending `@next` to the package name during installation.
 
+
 ```bash
-$ yarn add incremunica/query-sparql-incremental@next
+$ npm install -g @incremunica/query-sparql-incremental@next
 ```
 
 or
 
 ```bash
-$ npm install -g incremunica/query-sparql-incremental@next
+$ yarn add @incremunica/query-sparql-incremental@next
 ```
 
 ## Usage
@@ -48,50 +46,74 @@ _[**Read more** about querying from the command line](https://comunica.dev/docs/
 This engine can be used in JavaScript/TypeScript applications as follows:
 
 ```javascript
-const QueryEngine = require('@comunica/query-sparql-incremental').QueryEngine;
+const QueryEngine = require('@incremunica/query-sparql-incremental').QueryEngine;
 const myEngine = new QueryEngine();
 
-const bindingsStream = await myEngine.queryBindings(`
-  SELECT * WHERE {
-    GRAPH <version:1> {
-      ?s ?p ?o
-    }
-  } LIMIT 100`, {
-    lenient: true,
-});
+async function main() {
+    const bindingsStream = await myEngine.queryBindings(`
+    SELECT ?interest
+    WHERE {
+      <https://ruben.verborgh.org/profile/#me> foaf:topic_interest ?interest.
+      <https://www.rubensworks.net/#me> foaf:topic_interest ?interest.
+    }`, {
+        sources: [
+            "https://ruben.verborgh.org/profile/",
+            "https://www.rubensworks.net/"
+        ],
+    });
 
-// Consume results as a stream (best performance)
-bindingsStream.on('data', (binding) => {
-    console.log(binding.toString()); // Quick way to print bindings for testing
+    // Consume results as a stream
+    bindingsStream.on('data', (binding) => {
+        console.log("Is addition:", binding.diff); // If true: addition, if false: deletion.
 
-    console.log(binding.has('s')); // Will be true
+        console.log(binding.toString()); // Quick way to print bindings for testing
 
-    // Obtaining values
-    console.log(binding.get('s').value);
-    console.log(binding.get('s').termType);
-    console.log(binding.get('p').value);
-    console.log(binding.get('o').value);
-});
-bindingsStream.on('end', () => {
-    // The data-listener will not be called anymore once we get here.
-});
-bindingsStream.on('error', (error) => {
-    console.error(error);
-});
+        console.log("Has variable 'interest':", binding.has('interest')); // Will be true
 
-// Consume results as an array (easier)
-const bindings = await bindingsStream.toArray();
-console.log(bindings[0].get('s').value);
-console.log(bindings[0].get('s').termType);
+        // Obtaining values
+        console.log(binding.get('interest').value);
+        console.log(binding.get('interest').termType);
+    });
+
+    bindingsStream.on('end', () => {
+        // The data-listener will not be called anymore once we get here.
+    });
+    bindingsStream.on('error', (error) => {
+        console.error(error);
+    });
+
+    // As this is an incremental query engine, you need to end the query yourself otherwise it will keep checking for changes.
+    setTimeout(() => bindingsStream.close(), 3000);
+}
+
+main();
 ```
 
-_[**Read more** about querying an application](https://comunica.dev/docs/query/getting_started/query_app/)._
+You can also use an [incremental triple store](https://www.npmjs.com/package/@incremunica/incremental-rdf-streaming-store).
+This store allows you to change the dataset (additions and deletions) and show you the changes in the query results.
+```javascript
+const QueryEngine = require('@incremunica/query-sparql-incremental').QueryEngine;
+const StreamingStore = require("@incremunica/incremental-rdf-streaming-store").StreamingStore;
+const myEngine = new QueryEngine();
+const streamingStore = new StreamingStore();
 
-### Usage as a SPARQL endpoint
+async function main() {
+    streamingStore.import(quadStream);
 
-The SPARQL endpoint can only be started dynamically.
-An alternative config file can be passed via the `COMUNICA_CONFIG` environment variable.
+    const bindingsStream = await myEngine.queryBindings(`
+    SELECT *
+    WHERE {
+        ?s ?p ?o.
+    }`, {
+        sources: [ streamingStore ],
+    });
 
-Use `bin/http.js` when running in the Comunica monorepo development environment.
+    streamingStore.addQuad(quad);
+    streamingStore.removeQuad(otherQuad);
 
-_[**Read more** about setting up a SPARQL endpoint](https://comunica.dev/docs/query/getting_started/setup_endpoint/)._
+    streamingStore.end();
+}
+
+main();
+```
+

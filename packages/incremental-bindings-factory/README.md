@@ -1,6 +1,6 @@
-# Comunica Incremental Bindings Factory
+# Incremunica Incremental Bindings Factory
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Fbindings-factory.svg)](https://www.npmjs.com/package/@comunica/bindings-factory)
+[![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-bindings-factory.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-bindings-factory)
 
 This package provides a factory for `Bindings` objects, which allow variables to be mapped to RDF terms.
 This package implements the RDF/JS [`BindingsFactory`](http://rdf.js.org/query-spec/#bindingsfactory-interface)
@@ -8,11 +8,6 @@ and [`Bindings`](http://rdf.js.org/query-spec/#bindings-interface) interfaces.
 
 Internally, it makes use of [`immutable`](https://www.npmjs.com/package/immutable)
 to make sure that operations such as `set` and `delete` reuse internal memory when possible.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
 
 ## Install
 

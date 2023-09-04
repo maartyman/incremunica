@@ -1,16 +1,11 @@
-# Comunica Quadpattern Query Operation Actor
+# Incremunica Incremental Quadpattern Query Operation Actor
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Factor-query-operation-quadpattern.svg)](https://www.npmjs.com/package/@comunica/actor-query-operation-quadpattern)
+[![npm version](https://badge.fury.io/js/@incremunica%2Factor-query-operation-incremental-quadpattern.svg)](https://badge.fury.io/js/@incremunica%2Factor-query-operation-incremental-quadpattern)
 
 A [Query Operation](https://github.com/comunica/comunica/tree/master/packages/bus-query-operation) actor that handles [SPARQL triple/quad pattern](https://www.w3.org/TR/sparql11-query/#QSynTriples) operations
 by delegating to the [RDF Resolve Quad Pattern bus](https://github.com/comunica/comunica/tree/master/packages/bus-rdf-resolve-quad-pattern).
 
 This actor has been modified from the original [quad-pattern actor](https://github.com/comunica/comunica/tree/master/packages/actor-query-operation-quadpattern) to pass the state of the `diff` attribute from the quad to the binding.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
 
 ## Install
 

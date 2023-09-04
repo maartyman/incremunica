@@ -1,13 +1,8 @@
-# Comunica Inner Incremental Multi Bind Join RDF Join Actor
+# Incremunica Inner Incremental Multi Bind Join RDF Join Actor
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Factor-rdf-join-inner-incremental-memory-multi-bind.svg)](https://www.npmjs.com/package/@comunica/actor-rdf-join-inner-incremental-multi-bind)
+[![npm version](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-incremental-memory-multi-bind.svg)](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-incremental-memory-multi-bind)
 
 A comunica Inner Incremental Multi Bind RDF Join Actor.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
 
 ## Install
 
@@ -36,9 +31,3 @@ After installing, this package can be added to your engine's configuration as fo
   ]
 }
 ```
-
-### Config Parameters
-
-TODO: fill in parameters (this section can be removed if there are none)
-
-* `someParam`: Description of the param
