@@ -1,5 +1,7 @@
 # Incremental RDF Streaming Store
 
+[![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-rdf-streaming-store.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-rdf-streaming-store)
+
 A read-only [RDF/JS store](https://rdf.js.org/stream-spec/#store-interface) that allows parallel data lookup and insertion.
 It works in both JavaScript and TypeScript.
 
@@ -34,7 +36,7 @@ import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
 const store = new StreamingStore();
 ```
 
-### Inserting quads
+### Inserting/removing quads
 
 Following the [RDF/JS Sink](https://rdf.js.org/stream-spec/#sink-interface) interface,
 new quads can be added using the `import` method, which accepts a stream of quads:
@@ -48,9 +50,22 @@ const quadStream = streamifyArray([
   quad('s3', 'p3', 'o3'),
   quad('s4', 'p4', 'o4'),
 ]);
+store.import(quadStream); // Import it into the store
 
-// Import it into the store
-store.import(quadStream);
+store.addQuad(quad('s5', 'p5', 'o5')); // Singular quad insertions
+
+// Somehow create a quad stream
+const otherQuadStream = streamifyArray([
+  quad('s3', 'p3', 'o3'),
+]);
+store.remove(otherQuadStream); // Remove it from the store
+
+store.removeQuad(quad('s4', 'p4', 'o4')); // singular quad deletions
+
+const IncrementalQuad = require("@incremunica/incremental-types").Quad;
+let deletionQuad = <IncrementalQuad> quad('s5', 'p5', 'o5'); // Make an incremental quad
+deletionQuad.diff = false; // Set diff as false (marks the quad as deleted)
+store.addQuad(deletionQuad); // Will remove the quad from the store
 ```
 
 After inserting your quads, you MUST call `end()` to make sure that `match` calls will end their response streams:

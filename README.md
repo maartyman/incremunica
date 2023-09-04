@@ -1,20 +1,20 @@
-<p align="center">
-  <a href="https://comunica.dev/">
-    <img alt="Comunica" src="https://comunica.dev/img/comunica_red.svg" width="200">
-  </a>
-</p>
+<h1 align="center">
+    Incremunica
+</h1>
 
 <p align="center">
-  <strong>Incremental evaluation for Comunica</strong>
+  <strong>Incremental query evaluation for Comunica</strong>
 </p>
 
 <p align="center">
 <a href="https://github.com/maartyman/incremunica/actions?query=workflow%3ACI"><img src="https://github.com/maartyman/incremunica/workflows/CI/badge.svg" alt="Build Status"></a>
 <a href="https://coveralls.io/github/maartyman/incremunica?branch=master"><img src="https://coveralls.io/repos/github/maartyman/incremunica/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://maartyman.github.io/incremunica/"><img src="https://img.shields.io/badge/doc-code_documentation-blueviolet"/></a>
 </p>
 
-
 This is a monorepo that builds upon the core comunica packages to allow for incremental query evaluation. 
+
+**Important note: Not all SPARQL operators are currently supported. (only joins and projections (triple pattern queries))**
 
 ## Development Setup
 

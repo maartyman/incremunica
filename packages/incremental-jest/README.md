@@ -1,15 +1,10 @@
-# Comunica Jest helpers
+# Incremunica Jest helpers
 
-[![npm version](https://badge.fury.io/js/%40comunica%2Fjest.svg)](https://www.npmjs.com/package/@comunica/jest)
+[![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-jest.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-jest)
 
 Jest test helpers for Comunica. 
 This package is similar to the original one, 
 it adds support for checking the diff boolean in incremunica bindings.
-
-This module is part of the [Comunica framework](https://github.com/comunica/comunica),
-and should only be used by [developers that want to build their own query engine](https://comunica.dev/docs/modify/).
-
-[Click here if you just want to query with Comunica](https://comunica.dev/docs/query/).
 
 ## Install
 
