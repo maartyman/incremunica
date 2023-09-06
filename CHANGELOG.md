@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.0.3"></a>
+## [v1.0.3](https://github.com/maartyman/incremunica/compare/v1.0.2...v1.0.3) - 2023-09-05
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [fixed join config](https://github.com/maartyman/incremunica/commit/d978cc273596504e3713af1f6bf627c9b0df70a1)
+
 <a name="v1.0.2"></a>
 ## [v1.0.2](https://github.com/maartyman/incremunica/compare/v1.0.1...v1.0.2) - 2023-09-04
 
