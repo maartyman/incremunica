@@ -196,6 +196,8 @@
     "@comunica/runner": "2.6.8",
     "@comunica/runner-cli": "2.6.8",
     "@comunica/types": "2.6.8",
+    "@comunica/expression-evaluator": "2.9.0",
+
     "@incremunica/actor-guard-polling-diff": "^1.0.0",
     "@incremunica/actor-query-operation-incremental-quadpattern": "^1.0.0",
     "@incremunica/actor-rdf-join-inner-incremental-full-hash": "^1.0.0",
