@@ -1,0 +1,43 @@
+{
+  "name": "@incremunica/actor-query-operation-incremental-filter",
+  "version": "1.0.0",
+  "description": "A incremental-filter query-operation actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/actor-query-operation-incremental-filter"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "query-operation",
+    "incremental-filter"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/core": "^2.6.8",
+    "@comunica/bus-query-operation": "^2.6.8"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}
