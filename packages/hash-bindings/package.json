@@ -1,24 +1,22 @@
 {
-  "name": "@incremunica/actor-rdf-join-inner-incremental-full-hash",
+  "name": "@incremunica/hash-bindings",
   "version": "1.0.0",
-  "description": "A inner-incremental-full-hash rdf-join actor",
+  "description": "A hash bindings class",
   "lsd:module": true,
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/actor-rdf-join-inner-incremental-full-hash"
+    "directory": "packages/hash-bindings"
   },
   "publishConfig": {
     "access": "public"
   },
   "sideEffects": false,
   "keywords": [
-    "comunica",
-    "actor",
-    "rdf-join",
-    "inner-incremental-full-hash"
+    "incremunica",
+    "hash-bindings"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,12 +30,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/bus-rdf-join": "^2.6.8",
-    "@comunica/mediatortype-join-coefficients": "^2.6.8",
-    "@comunica/types": "^2.6.8",
-    "@incremunica/incremental-inner-join": "^1.0.0",
-    "@incremunica/incremental-types": "^1.0.0",
-    "@incremunica/hash-bindings": "^1.0.0"
+    "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

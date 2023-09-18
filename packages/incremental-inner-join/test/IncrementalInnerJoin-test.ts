@@ -25,7 +25,7 @@ class ExtendedClass extends IncrementalInnerJoin {
 }
 
 describe('IncrementalInnerJoin', () => {
-  describe('The IncrementalInnerJoin module', () => {
+  describe('The HashBindings module', () => {
     let leftIterator: AsyncIterator<Bindings>;
     let rightIterator: AsyncIterator<Bindings>;
     let funJoin = () => null;
@@ -35,7 +35,7 @@ describe('IncrementalInnerJoin', () => {
       rightIterator = new ArrayIterator([<any>{}], {autoStart: false});
     });
 
-    it('should be a IncrementalInnerJoin constructor', () => {
+    it('should be a HashBindings constructor', () => {
       expect(new (<any> ExtendedClass)(
         leftIterator,
         rightIterator,
@@ -49,7 +49,7 @@ describe('IncrementalInnerJoin', () => {
     });
   });
 
-  describe('An IncrementalInnerJoin instance', () => {
+  describe('An HashBindings instance', () => {
     let leftIterator: AsyncIterator<Bindings>;
     let rightIterator: AsyncIterator<Bindings>;
     let funJoin = () => null;

@@ -1,4 +1,4 @@
-import { bindingsToString } from '@incremunica/incremental-bindings-factory';
+import { HashBindings } from '@incremunica/hash-bindings';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
 import type { IMapObject } from './DualKeyHashMap';
@@ -12,6 +12,7 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   private otherElement: IMapObject<Bindings> | null = null;
   private count = 0;
   private readonly funHash: (entry: Bindings) => string;
+  private readonly hashBindings = new HashBindings();
 
   public constructor(
     left: BindingsStream,
@@ -37,10 +38,10 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, joinHash: string, memory: DualKeyHashMap<Bindings>): boolean {
     if (item.diff) {
-      memory.set(bindingsToString(<any>item), joinHash, item);
+      memory.set(this.hashBindings.hash(item), joinHash, item);
       return true;
     }
-    return memory.delete(bindingsToString(<any>item), joinHash);
+    return memory.delete(this.hashBindings.hash(item), joinHash);
   }
 
   public read(): Bindings | null {

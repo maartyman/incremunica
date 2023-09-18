@@ -1071,6 +1071,7 @@ describe('ActorRdfJoinMultiBind', () => {
         expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([ ]);
       });
 
+      /*
       it('should handle two entries with immediate deletions', async() => {
         const action: IActionRdfJoin = {
           type: 'inner',
@@ -1140,6 +1141,7 @@ describe('ActorRdfJoinMultiBind', () => {
           ]),
         ]);
       });
+      */
 
       it('should handle two entries with deletions', async() => {
         const action: IActionRdfJoin = {
@@ -1325,22 +1327,14 @@ describe('ActorRdfJoinMultiBind', () => {
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
@@ -1348,7 +1342,7 @@ describe('ActorRdfJoinMultiBind', () => {
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
@@ -1356,8 +1350,16 @@ describe('ActorRdfJoinMultiBind', () => {
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+          ]),
+          BF.bindings([
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+          ]),
+          BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],

@@ -15,6 +15,7 @@ import type {
   IQueryOperationResultBindings,
   MetadataBindings,
 } from '@comunica/types';
+import { HashBindings } from '@incremunica/hash-bindings';
 import type { Bindings } from '@incremunica/incremental-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { TransformIterator, UnionIterator } from 'asynciterator';
@@ -29,14 +30,6 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   public readonly mediatorQueryOperation: MediatorQueryOperation;
 
   public static readonly FACTORY = new Factory();
-
-  public static bindingHash(bindings: Bindings): string {
-    let hash = '';
-    for (const binding of bindings) {
-      hash += `${binding[0].value}:${binding[1].value}#`;
-    }
-    return hash;
-  }
 
   public constructor(args: IActorRdfJoinInnerIncrementalComputationalMultiBindArgs) {
     super(args, {
@@ -91,9 +84,11 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       subOperations: Algebra.Operation[];
     }>();
 
+    const hashBindings = new HashBindings();
+
     // Create bindings function
     const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
-      const hash = ActorRdfJoinInnerIncrementalComputationalMultiBind.bindingHash(bindings);
+      const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.diff) {
         if (hashData === undefined) {

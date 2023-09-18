@@ -11,6 +11,7 @@ import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream, IQueryOperationResultBindings,
   MetadataBindings, IActionContext, IJoinEntryWithMetadata } from '@comunica/types';
+import { HashBindings } from '@incremunica/hash-bindings';
 import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
 import type { Bindings } from '@incremunica/incremental-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
@@ -30,14 +31,6 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
   public readonly mediatorQueryOperation: MediatorQueryOperation;
 
   public static readonly FACTORY = new Factory();
-
-  public static bindingHash(bindings: Bindings): string {
-    let hash = '';
-    for (const binding of bindings) {
-      hash += `${binding[0].value}:${binding[1].value}#`;
-    }
-    return hash;
-  }
 
   public constructor(args: IActorRdfJoinInnerIncrementalMemoryMultiBindArgs) {
     super(args, {
@@ -77,9 +70,11 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
       count: number;
     }>();
 
+    const hashBindings = new HashBindings();
+
     // Create bindings function
     const binder = (bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): void => {
-      const hash = ActorRdfJoinInnerIncrementalMemoryMultiBind.bindingHash(bindings);
+      const hash = hashBindings.hash(bindings);
       if (bindings.diff) {
         const hashData = transformMap.get(hash);
         if (hashData === undefined) {
@@ -101,11 +96,11 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               subDone();
               return;
             }
-            const bindingHash = ActorRdfJoinInnerIncrementalMemoryMultiBind.bindingHash(newBindings);
-            const bindingsData = data.memory.get(bindingHash);
+            const bindingsHash = hashBindings.hash(newBindings);
+            const bindingsData = data.memory.get(bindingsHash);
             if (newBindings.diff) {
               if (bindingsData === undefined) {
-                data.memory.set(bindingHash, { bindings: newBindings, count: 1 });
+                data.memory.set(bindingsHash, { bindings: newBindings, count: 1 });
               } else {
                 bindingsData.count++;
               }
@@ -116,7 +111,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               if (bindingsData.count > 1) {
                 bindingsData.count--;
               } else {
-                data.memory.delete(bindingHash);
+                data.memory.delete(bindingsHash);
               }
               for (let i = 0; i < data.count; i++) {
                 subPush(newBindings);
