@@ -224,9 +224,9 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     }
 
     // Reject if no entries have common variables
-    //if (multiOccurrenceVariables.length === 0) {
+    // if (multiOccurrenceVariables.length === 0) {
     //  throw new Error(`Bind join can only join entries with at least one common variable`);
-    //}
+    // }
 
     // Determine entries without common variables
     // These will be placed in the back of the sorted array

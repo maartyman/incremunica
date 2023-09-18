@@ -11,6 +11,8 @@ import type { Algebra } from 'sparqlalgebrajs';
 import { Factory, translate } from 'sparqlalgebrajs';
 import { ActorQueryOperationIncrementalFilter } from '../lib';
 import '@comunica/jest';
+import '@incremunica/incremental-jest';
+import arrayifyStream from "arrayify-stream";
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -212,10 +214,13 @@ describe('ActorQueryOperationFilterSparqlee', () => {
         const op: any = { operation: { type: 'filter', input: {}, expression: parse("NOT EXISTS {?a a ?a}") },
           context: new ActionContext() };
         const output: IQueryOperationResultBindings = <any> await actor.run(op);
-        await expect(output.bindingsStream).toEqualBindingsStream([
+        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray([
           BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
           BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
           BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]], false),
         ]);
         expect(await output.metadata())
           .toMatchObject({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});

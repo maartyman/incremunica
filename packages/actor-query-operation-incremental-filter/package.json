@@ -32,8 +32,14 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
+    "@comunica/bus-query-operation": "^2.6.8",
     "@comunica/core": "^2.6.8",
-    "@comunica/bus-query-operation": "^2.6.8"
+    "@comunica/expression-evaluator": "^2.9.0",
+    "@comunica/types": "^2.6.8",
+    "@incremunica/hash-bindings": "^1.0.0",
+    "@incremunica/incremental-bindings-factory": "^1.0.0",
+    "asynciterator": "^3.8.0",
+    "sparqlalgebrajs": "^4.2.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

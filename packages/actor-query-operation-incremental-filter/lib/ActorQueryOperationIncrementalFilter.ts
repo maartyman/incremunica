@@ -1,4 +1,3 @@
-import { bindingsToString } from '@comunica/bindings-factory';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
 import { ActorQueryOperation,
   ActorQueryOperationTypedMediated,
@@ -6,12 +5,12 @@ import { ActorQueryOperation,
 import type { IActorTest } from '@comunica/core';
 import { AsyncEvaluator, isExpressionError } from '@comunica/expression-evaluator';
 import type { IActionContext, IQueryOperationResult } from '@comunica/types';
+import { HashBindings } from '@incremunica/hash-bindings';
 import type { Bindings } from '@incremunica/incremental-bindings-factory';
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import { BindingsFactory, bindingsToString } from '@incremunica/incremental-bindings-factory';
 import type { BindingsStream } from '@incremunica/incremental-types';
 import { EmptyIterator, SingletonIterator, UnionIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
-import {DevTools} from "@incremunica/dev-tools";
 
 /**
  * A comunica Filter Sparqlee Query Operation Actor.
@@ -31,14 +30,6 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       return true;
     }
     throw new Error(`Filter expression (${operation.expression.expressionType}) not yet supported!`);
-  }
-
-  public static bindingHash(bindings: Bindings): string {
-    let hash = '';
-    for (const binding of bindings) {
-      hash += `${binding[0].value}:${binding[1].value}#`;
-    }
-    return hash;
   }
 
   public async runOperation(operation: Algebra.Filter, context: IActionContext):
@@ -74,7 +65,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
             // In order to help users debug this, we should report these errors via the logger as warnings.
             this.logWarn(context, 'Error occurred while filtering.', () => ({
               error,
-              bindings: bindingsToString(item)
+              bindings: bindingsToString(item),
             }));
           } else {
             bindingsStream.emit('error', error);
@@ -91,8 +82,11 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       iterator: BindingsStream;
       currentState: boolean;
     }>();
+
+    const hashBindings = new HashBindings();
+
     const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
-      const hash = ActorQueryOperationIncrementalFilter.bindingHash(bindings);
+      const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.diff) {
         if (hashData === undefined) {
@@ -104,7 +98,10 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           transformMap.set(hash, hashData);
 
           const materializedOperation = materializeOperation(operation.expression.input, bindings);
-          const intermediateOutputRaw = await this.mediatorQueryOperation.mediate({ operation: materializedOperation, context });
+          const intermediateOutputRaw = await this.mediatorQueryOperation.mediate({
+            operation: materializedOperation,
+            context,
+          });
           const intermediateOutput = ActorQueryOperation.getSafeBindings(intermediateOutputRaw);
 
           // A `destroy` could be called on the EmptyIterator before QueryOperation mediator has finished
@@ -129,7 +126,11 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           }
           let count = 0;
 
-          const transform = (item: Bindings, doneTransform: () => void, pushTransform: (val: Bindings) => void): void => {
+          const transform = (
+            item: Bindings,
+            doneTransform: () => void,
+            pushTransform: (val: Bindings) => void,
+          ): void => {
             if (item.diff) {
               if (count === 0) {
                 if (hashData === undefined) {
@@ -156,9 +157,9 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
             doneTransform();
           };
 
-          let it = intermediateOutput.bindingsStream.transform({
+          const it = intermediateOutput.bindingsStream.transform({
             transform,
-            prepend: operation.expression.not? [ bindings ] : undefined,
+            prepend: operation.expression.not ? [ bindings ] : undefined,
           });
 
           hashData.iterator = it;
