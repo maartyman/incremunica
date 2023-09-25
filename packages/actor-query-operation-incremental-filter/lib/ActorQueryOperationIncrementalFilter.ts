@@ -34,15 +34,32 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
 
   public async runOperation(operation: Algebra.Filter, context: IActionContext):
   Promise<IQueryOperationResult> {
-    const outputRaw = await this.mediatorQueryOperation.mediate({ operation: operation.input, context });
+    let input = operation.input;
+    let currentOperation = operation.expression;
+    if (operation.expression.expressionType === 'operator' && operation.expression.operator === '&&') {
+      currentOperation = operation.expression.args[1];
+      // @ts-expect-error
+      input = {
+        type: operation.type,
+        input: operation.input,
+        expression: {
+          type: operation.expression.args[0].type,
+          expressionType: operation.expression.args[0].expressionType,
+          operator: operation.expression.args[0].operator,
+          args: operation.expression.args[0].args,
+        },
+      };
+    }
+
+    const outputRaw = await this.mediatorQueryOperation.mediate({ operation: input, context });
     const output = ActorQueryOperation.getSafeBindings(outputRaw);
     ActorQueryOperation.validateQueryOutput(output, 'bindings');
 
     const BF = new BindingsFactory();
 
-    if (operation.expression.expressionType === 'operator') {
+    if (currentOperation.expressionType === 'operator') {
       const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation) };
-      const evaluator = new AsyncEvaluator(operation.expression, config);
+      const evaluator = new AsyncEvaluator(currentOperation, config);
 
       const transform = async(item: Bindings, done: any, push: (bindings: Bindings) => void): Promise<void> => {
         try {
@@ -97,7 +114,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           };
           transformMap.set(hash, hashData);
 
-          const materializedOperation = materializeOperation(operation.expression.input, bindings);
+          const materializedOperation = materializeOperation(currentOperation.input, bindings);
           const intermediateOutputRaw = await this.mediatorQueryOperation.mediate({
             operation: materializedOperation,
             context,
@@ -114,7 +131,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           let negBindings: Bindings;
           let posBindings: Bindings;
 
-          if (operation.expression.not) {
+          if (currentOperation.not) {
             negBindings = BF.fromBindings(bindings);
             hashData.currentState = true;
             posBindings = BF.fromBindings(bindings);
@@ -136,7 +153,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
                 if (hashData === undefined) {
                   throw new Error('hashData undefined, should not happen');
                 }
-                hashData.currentState = !operation.expression.not;
+                hashData.currentState = !currentOperation.not;
                 for (let i = 0; i < hashData.count; i++) {
                   pushTransform(posBindings);
                 }
@@ -149,7 +166,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
               if (hashData === undefined) {
                 throw new Error('hashData undefined, should not happen');
               }
-              hashData.currentState = operation.expression.not;
+              hashData.currentState = currentOperation.not;
               for (let i = 0; i < hashData.count; i++) {
                 pushTransform(negBindings);
               }
@@ -159,7 +176,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
 
           const it = intermediateOutput.bindingsStream.transform({
             transform,
-            prepend: operation.expression.not ? [ bindings ] : undefined,
+            prepend: currentOperation.not ? [ bindings ] : undefined,
           });
 
           hashData.iterator = it;
@@ -175,12 +192,12 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           done();
           return;
         }
-        if (hashData.count === 1) {
-          hashData.iterator.destroy();
-          transformMap.delete(hash);
-        }
         if (hashData.currentState) {
           push(new SingletonIterator(bindings));
+        }
+        if (hashData.count === 1) {
+          hashData.iterator.close();
+          transformMap.delete(hash);
         }
         hashData.count--;
       }
