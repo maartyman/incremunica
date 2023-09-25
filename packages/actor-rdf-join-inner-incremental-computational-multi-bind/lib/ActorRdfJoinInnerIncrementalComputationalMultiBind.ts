@@ -133,6 +133,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           if (newIteratorStopped) {
             ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
           }
+          activeElement.iterator.removeAllListeners();
         });
         activeElement.stopFunction();
 
@@ -145,6 +146,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           if (activeIteratorStopped) {
             ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
           }
+          newIterator.removeAllListeners();
         });
 
         if (hashData.elements.length === 0) {
@@ -153,7 +155,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
         push(new TransformIterator(
           () => newIterator.map(bindingsMerger),
-          { maxBufferSize: 128, autoStart: false },
+          { maxBufferSize: 0, autoStart: false },
         ));
         done();
         return;
@@ -164,7 +166,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     return new UnionIterator(baseStream.transform({
       transform: binder,
       optional,
-    }), { autoStart: false });
+    }), { autoStart: false, maxBufferSize: 0 });
   }
 
   /**
