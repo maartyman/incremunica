@@ -8,7 +8,7 @@ import {BindingsFactory} from "@incremunica/incremental-bindings-factory";
 import {Factory} from "sparqlalgebrajs";
 import {DeltaQueryIterator} from "../lib/DeltaQueryIterator";
 import {BindingsStream} from "@incremunica/incremental-types";
-import {getContextSources} from "@comunica/bus-rdf-resolve-quad-pattern";
+import {getContextSource} from "@comunica/bus-rdf-resolve-quad-pattern";
 import {Store} from "n3";
 import arrayifyStream from "arrayify-stream";
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
@@ -46,7 +46,7 @@ describe("DeltaQueryIterator", () => {
     context = new ActionContext();
 
     mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-      const sources = getContextSources(arg.context);
+      const sources = getContextSource(arg.context);
 
       expect(sources).not.toBeUndefined();
       if (sources === undefined) {
@@ -62,7 +62,7 @@ describe("DeltaQueryIterator", () => {
         }
       }
 
-      const bindingstream: BindingsStream = new ArrayIterator((<Store>sources[0]).match(
+      const bindingstream: BindingsStream = new ArrayIterator((<Store>sources).match(
         // @ts-ignore
         nullifyVariables(arg.operation.subject),
         nullifyVariables(arg.operation.predicate),

@@ -27,9 +27,12 @@ export class ActorRdfResolveQuadPatternRdfjsStreamingSource extends ActorRdfReso
     if (!source || typeof source === 'string' || (!('match' in source) && !source.value.match)) {
       throw new Error(`${this.name} received an invalid rdfjsSource.`);
     }
+    /*
+    don't check if it's a streaming store
     if (!(source instanceof StreamingStore) && !(!('match' in source) && (source.value instanceof StreamingStore))) {
       throw new Error(`${this.name} didn't receive a StreamingStore.`);
     }
+     */
     return true;
   }
 

@@ -29,7 +29,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     super();
     this.entries = entries;
     this.subContext = new ActionContext()
-      .set(KeysRdfResolveQuadPattern.sources, [ this.store ])
+      .set(KeysRdfResolveQuadPattern.source, this.store )
       .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
@@ -131,7 +131,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
         // Figure out diff (change diff if needed)
         let bindingsStream: BindingsStream | undefined = <BindingsStream><unknown>output.bindingsStream.map(
           (resultBindings: Bindings) => {
-            const tempBindings = <Bindings>resultBindings.merge(constBindings);
+            const tempBindings = <Bindings>constBindings.merge(resultBindings);
             if (tempBindings === undefined) {
               return null;
             }
