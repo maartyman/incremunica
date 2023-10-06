@@ -8,7 +8,6 @@ import {
 } from '@comunica/bus-rdf-resolve-quad-pattern';
 import type { IActorTest } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
-import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import { RdfJsQuadStreamingSource } from './RdfJsQuadStreamingSource';
 
 /**
@@ -27,12 +26,12 @@ export class ActorRdfResolveQuadPatternRdfjsStreamingSource extends ActorRdfReso
     if (!source || typeof source === 'string' || (!('match' in source) && !source.value.match)) {
       throw new Error(`${this.name} received an invalid rdfjsSource.`);
     }
-    /*
-    don't check if it's a streaming store
-    if (!(source instanceof StreamingStore) && !(!('match' in source) && (source.value instanceof StreamingStore))) {
-      throw new Error(`${this.name} didn't receive a StreamingStore.`);
-    }
-     */
+    //
+    // don't check if it's a streaming store
+    // if (!(source instanceof StreamingStore) && !(!('match' in source) && (source.value instanceof StreamingStore))) {
+    // throw new Error(`${this.name} didn't receive a StreamingStore.`);
+    // }
+    //
     return true;
   }
 

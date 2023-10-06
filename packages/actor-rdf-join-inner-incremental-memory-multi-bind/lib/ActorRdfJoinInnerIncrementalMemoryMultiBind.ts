@@ -262,7 +262,11 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
   public async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
     // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
     const entriesUnsorted = await ActorRdfJoin.getEntriesWithMetadatas(action.entries);
-    const entries = await this.sortJoinEntries(entriesUnsorted, action.context);
+    const entries = (await this.mediatorJoinEntriesSort.mediate({
+      entries: entriesUnsorted,
+      context: action.context,
+    })).entries;
+    // Await this.sortJoinEntries(entriesUnsorted, action.context);
 
     for (const [ i, element ] of entries.entries()) {
       if (i !== 0) {

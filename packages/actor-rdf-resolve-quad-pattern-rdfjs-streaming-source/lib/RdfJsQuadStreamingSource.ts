@@ -24,8 +24,8 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
     this.context = context;
   }
 
-  public static nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
-    return !term || term.termType === 'Variable' ? undefined : term;
+  public static nullifyVariables(term?: RDF.Term): RDF.Term | null {
+    return !term || term.termType === 'Variable' ? null : term;
   }
 
   public match(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term, graph: RDF.Term): AsyncIterator<Quad> {

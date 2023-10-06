@@ -50,7 +50,6 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
     action: IActionRdfJoin,
     metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
-    // Throw when the previous join was a delta query join or when it is a static query
     if (action.context
       .get(KeysDeltaQueryJoin.fromDeltaQuery)) {
       throw new Error('Can\'t do two delta query joins after each other');

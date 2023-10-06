@@ -71,6 +71,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         .resolves.toBeTruthy();
     });
 
+    /*
     it('should not test with a normal store', () => {
       return expect(actor.test({ pattern: <any> null,
         context: new ActionContext(
@@ -78,6 +79,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         ) }))
         .rejects.toEqual(new Error("actor didn't receive a StreamingStore."))
     });
+    */
 
     it('should not test without a source', () => {
       return expect(actor.test({ pattern: <any> null, context: new ActionContext({}) })).rejects.toBeTruthy();

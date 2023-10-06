@@ -46,7 +46,7 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
     };
   }
 
-  protected async getJoinCoefficients(
+  public async getJoinCoefficients(
     action: IActionRdfJoin,
     metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
