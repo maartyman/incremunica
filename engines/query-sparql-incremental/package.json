@@ -204,6 +204,7 @@
     "@incremunica/actor-rdf-resolve-quad-pattern-incremental-federated": "^1.0.0",
     "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.0.0",
     "@incremunica/bus-guard": "^1.0.0",
+    "@incremunica/hash-bindings": "^1.0.0",
     "@incremunica/incremental-bindings-factory": "^1.0.0",
     "@incremunica/incremental-inner-join": "^1.0.0",
     "@incremunica/incremental-rdf-streaming-store": "^1.0.0",
