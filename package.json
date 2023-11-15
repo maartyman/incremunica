@@ -85,12 +85,12 @@
     "test-changed": "lerna run test --since HEAD",
     "build-changed": "lerna run build --since HEAD",
     "test": "jest",
-    "test:ci": "jest --ci --maxWorkers=4 --coverage",
+    "test-ci": "jest --ci --maxWorkers=4 --coverage",
     "lint": "eslint . --ext .ts --cache",
     "lint-fix": "eslint . --ext .ts --fix",
-    "build": "npm run build:ts && npm run build:components",
-    "build:ts": "tsc",
-    "build:components": "componentsjs-generator engines/* packages/*",
+    "build": "npm run build-ts && npm run build-components",
+    "build-ts": "tsc",
+    "build-components": "componentsjs-generator engines/* packages/*",
     "build-watch": "nodemon -e ts --ignore '*.d.ts' --exec yarn run build",
     "build-watch:ts": "tsc --watch",
     "build-watch:components": "nodemon -e d.ts --exec yarn run build:components",
@@ -102,7 +102,7 @@
     "postinstall": "yarn run build && lerna run prepare",
     "version": "manual-git-changelog onversion",
     "depcheck": "lerna-script depcheckTask",
-    "depcheck:fix": "lerna-script depfixTask"
+    "depcheck-fix": "lerna-script depfixTask"
   },
   "resolutions": {
     "@rdfjs/types": "1.1.0"
