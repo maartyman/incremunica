@@ -11,7 +11,10 @@ export class HashBindings {
 
     let hash = '';
     for (const key of this.variables.keys()) {
-      hash += `${key}:${bindings.get(key)?.value}\n`;
+      const binding = bindings.get(key);
+      if (binding) {
+        hash += `${key}:<${binding.value}>\n`;
+      }
     }
 
     return hash;
