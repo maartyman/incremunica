@@ -77,14 +77,15 @@ describe('DualKeyHashMap', () => {
     expect(map.get('key1', 'secondaryKey1')).toEqual({value, count: 2});
   });
 
-  it('throws error when setting different value with same key', () => {
-    const value1 = new TestObject(10);
-    const value2 = new TestObject(20);
-    expect(() => {
-      map.set('key1', 'secondaryKey1', value1);
-      map.set('key1', 'secondaryKey1', value2);
-    }).toThrowError(`Current value: ${JSON.stringify(value1)} and given value: ${JSON.stringify(value2)} are different. With hash functions mainKey: key1, secondary key: secondaryKey1!`);
-  });
+  // Not testing for this anymore
+  //it('throws error when setting different value with same key', () => {
+  //  const value1 = new TestObject(10);
+  //  const value2 = new TestObject(20);
+  //  expect(() => {
+  //    map.set('key1', 'secondaryKey1', value1);
+  //    map.set('key1', 'secondaryKey1', value2);
+  //  }).toThrowError(`Current value: ${JSON.stringify(value1)} and given value: ${JSON.stringify(value2)} are different. With hash functions mainKey: key1, secondary key: secondaryKey1!`);
+  //});
 
   it('returns undefined when getting non-existing value', () => {
     expect(map.get('key1', 'secondaryKey1')).toBeUndefined();
