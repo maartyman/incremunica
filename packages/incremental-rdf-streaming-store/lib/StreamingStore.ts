@@ -52,22 +52,29 @@ export class StreamingStore<Q extends Quad>
     return this.ended;
   }
 
+  private handleQuad(quad: Q): void {
+    if ((quad.diff && this.store.has(quad)) || (!quad.diff && !this.store.has(quad))) {
+      return;
+    }
+    for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
+      if (!this.ended) {
+        pendingStream.push(quad);
+      }
+    }
+    if (quad.diff) {
+      this.store.add(quad);
+    } else {
+      this.store.delete(quad);
+    }
+  }
+
   public halt(): void {
     this.halted = true;
   }
 
   public resume(): void {
     for (const quad of this.haltBuffer) {
-      for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
-        if (!this.ended) {
-          pendingStream.push(quad);
-        }
-      }
-      if (quad.diff) {
-        this.store.add(quad);
-      } else {
-        this.store.delete(quad);
-      }
+      this.handleQuad(quad);
     }
     this.halted = false;
   }
@@ -95,17 +102,8 @@ export class StreamingStore<Q extends Quad>
       }
       if (this.halted) {
         this.haltBuffer.push(quad);
-        return;
-      }
-      for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
-        if (!this.ended) {
-          pendingStream.push(quad);
-        }
-      }
-      if (quad.diff) {
-        this.store.add(quad);
       } else {
-        this.store.delete(quad);
+        this.handleQuad(quad);
       }
     });
     return stream;
@@ -122,17 +120,8 @@ export class StreamingStore<Q extends Quad>
       }
       if (this.halted) {
         this.haltBuffer.push(quad);
-        return;
-      }
-      for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
-        if (!this.ended) {
-          pendingStream.push(quad);
-        }
-      }
-      if (quad.diff) {
-        this.store.add(quad);
       } else {
-        this.store.removeQuad(quad);
+        this.handleQuad(quad);
       }
     });
     return stream;
@@ -147,17 +136,8 @@ export class StreamingStore<Q extends Quad>
     }
     if (this.halted) {
       this.haltBuffer.push(quad);
-      return this;
-    }
-    for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
-      if (!this.ended) {
-        pendingStream.push(quad);
-      }
-    }
-    if (quad.diff) {
-      this.store.add(quad);
     } else {
-      this.store.removeQuad(quad);
+      this.handleQuad(quad);
     }
     return this;
   }
@@ -171,17 +151,8 @@ export class StreamingStore<Q extends Quad>
     }
     if (this.halted) {
       this.haltBuffer.push(quad);
-      return this;
-    }
-    for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
-      if (!this.ended) {
-        pendingStream.push(quad);
-      }
-    }
-    if (quad.diff) {
-      this.store.add(quad);
     } else {
-      this.store.removeQuad(quad);
+      this.handleQuad(quad);
     }
     return this;
   }
