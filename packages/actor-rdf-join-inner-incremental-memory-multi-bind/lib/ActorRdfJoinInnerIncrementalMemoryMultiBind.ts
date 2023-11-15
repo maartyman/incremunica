@@ -20,7 +20,8 @@ import {
   EmptyIterator,
   UnionIterator,
 } from 'asynciterator';
-import { Factory, Algebra } from 'sparqlalgebrajs';
+import type { Algebra } from 'sparqlalgebrajs';
+import { Factory } from 'sparqlalgebrajs';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -309,54 +310,11 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     action: IActionRdfJoin,
     metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
-    // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
-    const entries = await this.sortJoinEntries(action.entries
-      .map((entry, i) => ({ ...entry, metadata: metadatas[i] })), action.context);
-    metadatas = entries.map(entry => entry.metadata);
-
-    const requestInitialTimes = ActorRdfJoin.getRequestInitialTimes(metadatas);
-    const requestItemTimes = ActorRdfJoin.getRequestItemTimes(metadatas);
-
-    // Determine first stream and remaining ones
-    const remainingEntries = [ ...entries ];
-    const remainingRequestInitialTimes = [ ...requestInitialTimes ];
-    const remainingRequestItemTimes = [ ...requestItemTimes ];
-    remainingEntries.splice(0, 1);
-    remainingRequestInitialTimes.splice(0, 1);
-    remainingRequestItemTimes.splice(0, 1);
-
-    // Reject binding on some operation types
-    if (remainingEntries
-      .some(entry => entry.operation.type === Algebra.types.EXTEND || entry.operation.type === Algebra.types.GROUP)) {
-      throw new Error(`Actor ${this.name} can not bind on Extend and Group operations`);
-    }
-
-    // Determine selectivities of smallest entry with all other entries
-    const selectivities = await Promise.all(remainingEntries
-      .map(async entry => (await this.mediatorJoinSelectivity.mediate({
-        entries: [ entries[0], entry ],
-        context: action.context,
-      })).selectivity * this.selectivityModifier));
-
-    // Determine coefficients for remaining entries
-    const cardinalityRemaining = remainingEntries
-      .map((entry, i) => entry.metadata.cardinality.value * selectivities[i])
-      .reduce((sum, element) => sum + element, 0);
-    const receiveInitialCostRemaining = remainingRequestInitialTimes
-      .reduce((sum, element, i) => sum + (element * selectivities[i]), 0);
-    const receiveItemCostRemaining = remainingRequestItemTimes
-      .reduce((sum, element, i) => sum + (element * selectivities[i]), 0);
-
     return {
-      iterations: metadatas[0].cardinality.value * cardinalityRemaining,
+      iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
-      requestTime: requestInitialTimes[0] +
-        metadatas[0].cardinality.value * (
-          requestItemTimes[0] +
-          receiveInitialCostRemaining +
-          cardinalityRemaining * receiveItemCostRemaining
-        ),
+      requestTime: 0,
     };
   }
 }

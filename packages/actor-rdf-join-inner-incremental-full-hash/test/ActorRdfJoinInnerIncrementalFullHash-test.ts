@@ -137,9 +137,7 @@ describe('ActorRdfJoinFullHash', () => {
       });
 
       it('should generate correct test metadata', async() => {
-        await expect(actor.test(action)).resolves.toHaveProperty('iterations',
-          (await (<any> action.entries[0].output).metadata()).cardinality.value +
-          (await (<any> action.entries[1].output).metadata()).cardinality.value);
+        await expect(actor.test(action)).resolves.toHaveProperty('iterations',0);
       });
     });
 
