@@ -1,4 +1,5 @@
 import type { Bindings } from '@incremunica/incremental-types';
+import { termToString } from 'rdf-string';
 
 export class HashBindings {
   private readonly variables = new Map<string, void>();
@@ -13,7 +14,7 @@ export class HashBindings {
     for (const key of this.variables.keys()) {
       const binding = bindings.get(key);
       if (binding) {
-        hash += `${key}:<${binding.value}>\n`;
+        hash += `${key}:<${termToString(bindings.get(key))}>\n`;
       }
     }
 
