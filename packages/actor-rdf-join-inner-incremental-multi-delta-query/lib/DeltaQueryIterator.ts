@@ -129,24 +129,28 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       ).then(unsafeOutput => {
         const output = ActorQueryOperation.getSafeBindings(unsafeOutput);
         // Figure out diff (change diff if needed)
-        const bindingsStream = output.bindingsStream.map((resultBindings: Bindings) => {
-          const tempBindings = <Bindings>resultBindings.merge(constBindings);
-          if (tempBindings === undefined) {
-            return null;
-          }
-          tempBindings.diff = constBindings.diff;
-          return tempBindings;
-        });
+        let bindingsStream: BindingsStream | undefined = <BindingsStream><unknown>output.bindingsStream.map(
+          (resultBindings: Bindings) => {
+            const tempBindings = <Bindings>resultBindings.merge(constBindings);
+            if (tempBindings === undefined) {
+              return null;
+            }
+            tempBindings.diff = constBindings.diff;
+            return tempBindings;
+          },
+        );
 
         this.pending = false;
 
-        bindingsStream.on('end', () => {
+        bindingsStream.once('end', () => {
           // Add or delete binding from store
           if (constBindings.diff || constBindings.diff === undefined) {
             this.store.add(constQuad);
           } else {
             this.store.delete(constQuad);
           }
+          this.currentSource = undefined;
+          bindingsStream = undefined;
           this.readable = true;
         });
 

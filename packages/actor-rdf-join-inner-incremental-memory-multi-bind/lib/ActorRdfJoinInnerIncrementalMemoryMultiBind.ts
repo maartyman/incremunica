@@ -156,7 +156,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
         const hashData = transformMap.get(hash);
         if (hashData !== undefined) {
           if (hashData.count < 2) {
-            hashData.iterator.destroy();
+            hashData.iterator.close();
             hashData.count = 0;
             transformMap.delete(hash);
           } else {
