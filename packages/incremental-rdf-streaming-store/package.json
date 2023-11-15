@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/incremental-rdf-streaming-store",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An RDF Store where the match function gives a stream.",
   "lsd:module": true,
   "main": "lib/index.js",

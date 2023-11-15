@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/incremental-inner-join",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An incremental-inner-join base class",
   "lsd:module": true,
   "main": "lib/index.js",

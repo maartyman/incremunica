@@ -1,6 +1,32 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.0"></a>
+## [v1.1.0](https://github.com/maartyman/incremunica/compare/v1.0.3...v1.1.0) - 2023-11-15
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [add hash-bindings to package.json](https://github.com/maartyman/incremunica/commit/e49300883973053ea532e3d50e85ae698b189b87)
+* [Merge pull request #44 from maartyman/master](https://github.com/maartyman/incremunica/commit/7f5553da1c725a039d1283cfb725c2768d532531)
+* [Merge pull request #43 from maartyman/fix-set-semantics-streaming-store](https://github.com/maartyman/incremunica/commit/7648ac0a9a6495e45477ba441ee138e6eff635de)
+* [fixed set semantics bug in the streaming store](https://github.com/maartyman/incremunica/commit/7ca9cbc563738306d4c090c6acbbb5383c3c8a69)
+* [Merge pull request #42 from maartyman/cleanup](https://github.com/maartyman/incremunica/commit/2db40527802b7ce3553be383b90837de2b67ad92)
+* [fixed workflow](https://github.com/maartyman/incremunica/commit/1f7840bc2acf52d53f01a3d57f250212ae2fb82d)
+* [changed the bindingToHash function to use the termToString function](https://github.com/maartyman/incremunica/commit/0505e5f55f812bd6be08c306eec792a79637f9c5)
+* [fixed memory bind join and changed some tests](https://github.com/maartyman/incremunica/commit/3695c82812a5094858cd4efbb0b3ce5c66d95463)
+* [small change to memory bind and fix for delta query](https://github.com/maartyman/incremunica/commit/236d4646b5f02949c3dbdc901d170c1bb9c26e2d)
+* [removed coefficients for now in joins, and changed tests](https://github.com/maartyman/incremunica/commit/ced83217750e5e01b34735cc567657a28be58d5f)
+* [change some scripts to use '-' instead of ':'](https://github.com/maartyman/incremunica/commit/8893003d2d59671bef5d45157dceaf68baf7d220)
+* [Merge pull request #41 from maartyman/bindings-to-string-reliable](https://github.com/maartyman/incremunica/commit/c96f4dc03be03e2120c9e58e67721b7d1e18eb7a)
+* [made hashbindings tests and fixed hash bindings based on keys with a value bug](https://github.com/maartyman/incremunica/commit/3108a7c86b1ff094e9b4248cdd3faf06e6a45558)
+* [DualKeyHashMap does not check if the objects are the same if 2 identical keys are used](https://github.com/maartyman/incremunica/commit/871d7b8c88560ad10209f0eae2b764e819dc5500)
+* [add hash binding class and add it to join actors](https://github.com/maartyman/incremunica/commit/426855dbac83049e9d8b6aae74ce8b9696f1bc7e)
+* [Merge pull request #37 from maartyman/changed-npm-publish](https://github.com/maartyman/incremunica/commit/ea0b543679eeba7a2c8107e0fee34ac052a8d96d)
+* [Merge branch 'master' into changed-npm-publish](https://github.com/maartyman/incremunica/commit/7af075da635d965514ee0ceaea55a9ced87c4cd7)
+* [Merge pull request #36 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/b61e00c55814be08aedd5621d2a41506ed72cdb1)
+* [made yarn publish safer](https://github.com/maartyman/incremunica/commit/dd40dfd3083ab0a1c449ec51f156ff45ef96c28c)
+* [Merge pull request #35 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/82f3d1def8ec432399b857d91f9f4f7e376a6abd)
+* [Merge pull request #34 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/d96ddd80328b302c6ba8a4ee95793cb7d59e1c48)
+
 <a name="v1.0.3"></a>
 ## [v1.0.3](https://github.com/maartyman/incremunica/compare/v1.0.2...v1.0.3) - 2023-09-05
 
