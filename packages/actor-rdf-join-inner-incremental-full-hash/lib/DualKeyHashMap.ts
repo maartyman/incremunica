@@ -11,11 +11,7 @@ export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
     if (mainMap) {
       const mapObject = mainMap.get(mainKey);
       if (mapObject) {
-        if (value.equals(mapObject.value)) {
-          mapObject.count++;
-        } else {
-          throw new Error(`Current value: ${JSON.stringify(mapObject.value)} and given value: ${JSON.stringify(value)} are different. With hash functions mainKey: ${mainKey}, secondary key: ${secondaryKey}!`);
-        }
+        mapObject.count++;
       } else {
         mainMap.set(mainKey, { value, count: 1 });
       }
