@@ -1049,4 +1049,17 @@ describe('StreamStore', () => {
       quad('s4', 'p4', 'o4'),
     ]);
   });
+
+  it('should be set semantics', async () => {
+    store.addQuad(quad('s1', 'p1', 'o1'));
+    store.addQuad(quad('s1', 'p1', 'o1'));
+
+    store.removeQuad(quad('s2', 'p2', 'o2'));
+
+    store.end();
+
+    expect(await arrayifyStream(store.match())).toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1')
+    ]);
+  });
 });
