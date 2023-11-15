@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-rdf-join-inner-incremental-nestedloop",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A inner-incremental-nestedloop rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -35,7 +35,7 @@
     "@comunica/bus-rdf-join": "^2.6.8",
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
     "@comunica/types": "^2.6.8",
-    "@incremunica/incremental-inner-join": "^1.0.0",
+    "@incremunica/incremental-inner-join": "^1.1.0",
     "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-guard-polling-diff",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A polling-diff guard actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -35,7 +35,7 @@
     "@comunica/bus-dereference-rdf": "^2.6.8",
     "@comunica/bus-http": "^2.6.9",
     "@comunica/core": "^2.6.8",
-    "@incremunica/bus-guard": "^1.0.0",
+    "@incremunica/bus-guard": "^1.1.0",
     "readable-stream": "^4.3.0"
   },
   "scripts": {
