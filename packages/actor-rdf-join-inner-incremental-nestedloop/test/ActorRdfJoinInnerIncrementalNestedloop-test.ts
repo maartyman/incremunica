@@ -111,10 +111,10 @@ describe('ActorRdfJoinNestedLoop', () => {
         });
         return expect(actor.test(action)).resolves
           .toEqual({
-            iterations: 20,
+            iterations: 0,
             persistedItems: 0,
             blockingItems: 0,
-            requestTime: 1.4,
+            requestTime: 0,
           });
       });
 
@@ -128,10 +128,10 @@ describe('ActorRdfJoinNestedLoop', () => {
         });
         return expect(actor.test(action)).resolves
           .toEqual({
-            iterations: 20,
+            iterations: 0,
             persistedItems: 0,
             blockingItems: 0,
-            requestTime: 1.4,
+            requestTime: 0,
           });
       });
 
@@ -152,17 +152,15 @@ describe('ActorRdfJoinNestedLoop', () => {
         });
         return expect(actor.test(action)).resolves
           .toEqual({
-            iterations: 20,
+            iterations: 0,
             persistedItems: 0,
             blockingItems: 0,
-            requestTime: 1.4,
+            requestTime: 0,
           });
       });
 
       it('should generate correct test metadata', async() => {
-        await expect(actor.test(action)).resolves.toHaveProperty('iterations',
-          (await (<any> action.entries[0].output).metadata()).cardinality.value *
-          (await (<any> action.entries[1].output).metadata()).cardinality.value);
+        await expect(actor.test(action)).resolves.toHaveProperty('iterations', 0);
       });
     });
 

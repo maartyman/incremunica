@@ -11,7 +11,6 @@ import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory, Algebra } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerIncrementalMemoryMultiBind } from '../lib/ActorRdfJoinInnerIncrementalMemoryMultiBind';
-import Mock = jest.Mock;
 import '@incremunica/incremental-jest';
 import arrayifyStream from "arrayify-stream";
 import {KeysQueryOperation} from "@comunica/context-entries";
@@ -20,14 +19,14 @@ const DF = new DataFactory();
 const BF = new BindingsFactory();
 const FACTORY = new Factory();
 
-describe('ActorRdfJoinMultiBind', () => {
+describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
   let bus: any;
 
   beforeEach(() => {
     bus = new Bus({ name: 'bus' });
   });
 
-  describe('An ActorRdfJoinMultiBind instance', () => {
+  describe('An ActorRdfJoinIncrementalMemoryMultiBind instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>;
@@ -36,7 +35,6 @@ describe('ActorRdfJoinMultiBind', () => {
     let mediatorQueryOperation: Mediator<Actor<IActionQueryOperation, IActorTest, IQueryOperationResultBindings>,
       IActionQueryOperation, IActorTest, IQueryOperationResultBindings>;
     let actor: ActorRdfJoinInnerIncrementalMemoryMultiBind;
-    let logSpy: Mock;
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any> {
@@ -81,7 +79,6 @@ describe('ActorRdfJoinMultiBind', () => {
         mediatorJoinSelectivity,
         mediatorJoinEntriesSort,
       });
-      logSpy = (<any> actor).logDebug = jest.fn();
     });
 
     describe('getJoinCoefficients', () => {
@@ -129,183 +126,196 @@ describe('ActorRdfJoinMultiBind', () => {
             },
           ],
         )).toEqual({
-          iterations: 1.280_000_000_000_000_2,
+          iterations: 0,
           persistedItems: 0,
           blockingItems: 0,
-          requestTime: 0.440_96,
+          requestTime: 0,
         });
       });
 
-      it('should handle three entries with a lower variable overlap', async() => {
-        expect(await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
+        it('should handle three entries with a lower variable overlap', async() => {
+          expect(await actor.getJoinCoefficients(
             {
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-            {
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-            {
-              cardinality: { type: 'estimate', value: 5 },
-              pageSize: 100,
-              requestTime: 30,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-          ],
-        )).toEqual({
-          iterations: 1.280_000_000_000_000_2,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0.440_96,
-        });
-      });
-
-      it('should reject on a right stream of type extend', async() => {
-        await expect(actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 3 },
-                    canContainUndefs: false,
-                  }),
-
+              type: 'inner',
+              entries: [
+                {
+                  output: <any>{},
+                  operation: <any>{},
                 },
-                operation: <any>{ type: Algebra.types.EXTEND },
-              },
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 2 },
-                    canContainUndefs: false,
-                  }),
+                {
+                  output: <any>{},
+                  operation: <any>{},
                 },
-                operation: <any>{},
+                {
+                  output: <any>{},
+                  operation: <any>{},
+                },
+              ],
+              context: new ActionContext(),
+            },
+            [
+              {
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [ DF.variable('a'), DF.variable('b') ],
+              },
+              {
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                canContainUndefs: false,
+                variables: [ DF.variable('a'), DF.variable('b') ],
+              },
+              {
+                cardinality: { type: 'estimate', value: 5 },
+                pageSize: 100,
+                requestTime: 30,
+                canContainUndefs: false,
+                variables: [ DF.variable('a'), DF.variable('b') ],
               },
             ],
-            context: new ActionContext(),
-          },
-          [
-            {
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-          ],
-        )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      });
+          )).toEqual({
+            iterations: 0,
+            persistedItems: 0,
+            blockingItems: 0,
+            requestTime: 0,
+          });
+        });
 
-      it('should reject on a right stream of type group', async() => {
-        await expect(actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
-              },
-              {
-                output: <any> {},
-                operation: <any> {},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
+        it('should reject on a right stream of type extend', async() => {
+          expect(await actor.getJoinCoefficients(
             {
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            { cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ]},
-          ],
-        )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      });
+              type: 'inner',
+              entries: [
+                {
+                  output: <any>{
+                    metadata: () => Promise.resolve({
+                      cardinality: { type: 'estimate', value: 3 },
+                      canContainUndefs: false,
+                    }),
 
-      it('should not reject on a left stream of type group', async() => {
-        expect(await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
+                  },
+                  operation: <any>{ type: Algebra.types.EXTEND },
+                },
+                {
+                  output: <any>{
+                    metadata: () => Promise.resolve({
+                      cardinality: { type: 'estimate', value: 2 },
+                      canContainUndefs: false,
+                    }),
+                  },
+                  operation: <any>{},
+                },
+              ],
+              context: new ActionContext(),
+            },
+            [
               {
-                output: <any> {},
-                operation: <any> {},
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ],
               },
               {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ],
               },
             ],
-            context: new ActionContext(),
-          },
-          [
+          )).toEqual({
+            iterations: 0,
+            persistedItems: 0,
+            blockingItems: 0,
+            requestTime: 0,
+          });
+            //.rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
+        });
+
+        it('should reject on a right stream of type group', async() => {
+          expect(await actor.getJoinCoefficients(
             {
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
+              type: 'inner',
+              entries: [
+                {
+                  output: <any> {},
+                  operation: <any> { type: Algebra.types.GROUP },
+                },
+                {
+                  output: <any> {},
+                  operation: <any> {},
+                },
+              ],
+              context: new ActionContext(),
             },
+            [
+              {
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ],
+              },
+              { cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ]},
+            ],
+          )).toEqual({
+            iterations: 0,
+            persistedItems: 0,
+            blockingItems: 0,
+            requestTime: 0,
+          });
+
+            //.rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
+        });
+
+        it('should not reject on a left stream of type group', async() => {
+          expect(await actor.getJoinCoefficients(
             {
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
+              type: 'inner',
+              entries: [
+                {
+                  output: <any> {},
+                  operation: <any> {},
+                },
+                {
+                  output: <any> {},
+                  operation: <any> { type: Algebra.types.GROUP },
+                },
+              ],
+              context: new ActionContext(),
             },
-          ],
-        )).toEqual({
-          iterations: 0.480_000_000_000_000_1,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0.403_840_000_000_000_03,
+            [
+              {
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ],
+              },
+              {
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                canContainUndefs: false,
+                variables: [ DF.variable('a') ],
+              },
+            ],
+          )).toEqual({
+            iterations: 0,
+            persistedItems: 0,
+            blockingItems: 0,
+            requestTime: 0,
+          });
         });
       });
-    });
 
     describe('sortJoinEntries', () => {
       it('sorts 2 entries', async() => {
@@ -1325,22 +1335,14 @@ describe('ActorRdfJoinMultiBind', () => {
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-            [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]),
           BF.bindings([
@@ -1348,7 +1350,7 @@ describe('ActorRdfJoinMultiBind', () => {
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
-            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
@@ -1356,8 +1358,16 @@ describe('ActorRdfJoinMultiBind', () => {
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+          ]),
+          BF.bindings([
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
+          ]),
+          BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],

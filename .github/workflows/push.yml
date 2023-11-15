@@ -32,7 +32,7 @@ jobs:
       - name: Run depcheck
         run: yarn run depcheck
       - name: Run tests
-        run: yarn run test:ci
+        run: yarn run test-ci
       - name: Submit coverage results
         uses: coverallsapp/github-action@master
         with:

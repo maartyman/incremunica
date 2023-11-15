@@ -50,14 +50,11 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
     action: IActionRdfJoin,
     metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
-    const requestInitialTimes = ActorRdfJoin.getRequestInitialTimes(metadatas);
-    const requestItemTimes = ActorRdfJoin.getRequestItemTimes(metadatas);
     return {
-      iterations: metadatas[0].cardinality.value + metadatas[1].cardinality.value,
-      persistedItems: metadatas[0].cardinality.value + metadatas[1].cardinality.value,
+      iterations: 0,
+      persistedItems: 0,
       blockingItems: 0,
-      requestTime: requestInitialTimes[0] + metadatas[0].cardinality.value * requestItemTimes[0] +
-        requestInitialTimes[1] + metadatas[1].cardinality.value * requestItemTimes[1],
+      requestTime: 0,
     };
   }
 }

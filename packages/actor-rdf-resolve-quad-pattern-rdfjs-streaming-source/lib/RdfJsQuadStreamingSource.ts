@@ -52,23 +52,23 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
 
     const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
 
-    it.setProperty('metadata', { cardinality: { type: 'exact', value: 1 }, canContainUndefs: false });
-
-    // TODO implement setMetadata
-    // this.setMetadata(it, subject, predicate, object, graph)
-    // .catch(error => it.destroy(error));
+    // In case this setMetadata can cause errors, catch the error and emit it on the iterator (it). For now ignore it!
+    /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
+    this.setMetadata(it, subject, predicate, object, graph);
 
     return it;
   }
 
   // TODO implement setMetadata make a proper estimation for the cardinality
-  // protected async setMetadata(
-  //  it: AsyncIterator<RDF.Quad>,
-  //  subject: RDF.Term,
-  //  predicate: RDF.Term,
-  //  object: RDF.Term,
-  //  graph: RDF.Term,
-  // ): Promise<void> {
-  //
-  // }
+  protected async setMetadata(
+    it: AsyncIterator<RDF.Quad>,
+    subject: RDF.Term,
+    predicate: RDF.Term,
+    object: RDF.Term,
+    graph: RDF.Term,
+  ): Promise<void> {
+    const cardinality = 1;
+
+    it.setProperty('metadata', { cardinality: { type: 'exact', value: cardinality }, canContainUndefs: false });
+  }
 }

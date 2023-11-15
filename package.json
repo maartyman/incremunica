@@ -85,16 +85,16 @@
     "test-changed": "lerna run test --since HEAD",
     "build-changed": "lerna run build --since HEAD",
     "test": "jest",
-    "test:ci": "jest --ci --maxWorkers=4 --coverage",
+    "test-ci": "jest --ci --maxWorkers=4 --coverage",
     "lint": "eslint . --ext .ts --cache",
     "lint-fix": "eslint . --ext .ts --fix",
-    "build": "npm run build:ts && npm run build:components",
-    "build:ts": "tsc",
-    "build:components": "componentsjs-generator engines/* packages/*",
+    "build": "npm run build-ts && npm run build-components",
+    "build-ts": "tsc",
+    "build-components": "componentsjs-generator engines/* packages/*",
     "build-watch": "nodemon -e ts --ignore '*.d.ts' --exec yarn run build",
     "build-watch:ts": "tsc --watch",
     "build-watch:components": "nodemon -e d.ts --exec yarn run build:components",
-    "publish": "yarn run build",
+    "publish": "yarn install && yarn pre-commit && yarn publish-release",
     "publish-release": "lerna publish",
     "publish-bare": "lerna exec -- npm publish --silent",
     "publish-canary": "yarn run build && lerna version prerelease --preid alpha.$(.github/get-next-alpha-version.sh) --exact --ignore-scripts --force-publish --no-push --no-git-tag-version --yes && git update-index --assume-unchanged $(git ls-files | tr '\\n' ' ') && lerna publish from-package --no-git-reset --pre-dist-tag next --force-publish --no-push --no-git-tag-version --yes && git update-index --no-assume-unchanged $(git ls-files | tr '\\n' ' ') && git checkout .",
@@ -102,7 +102,7 @@
     "postinstall": "yarn run build && lerna run prepare",
     "version": "manual-git-changelog onversion",
     "depcheck": "lerna-script depcheckTask",
-    "depcheck:fix": "lerna-script depfixTask"
+    "depcheck-fix": "lerna-script depfixTask"
   },
   "resolutions": {
     "@rdfjs/types": "1.1.0"

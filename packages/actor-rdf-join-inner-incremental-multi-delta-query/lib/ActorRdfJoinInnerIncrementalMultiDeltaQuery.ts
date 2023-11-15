@@ -56,9 +56,6 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
       .get(ActorRdfJoinInnerIncrementalMultiDeltaQuery.keyFromDeltaQuery)) {
       throw new Error('Can\'t do two delta query joins after each other');
     }
-
-    const requestInitialTimes = ActorRdfJoin.getRequestInitialTimes(metadatas);
-    const requestItemTimes = ActorRdfJoin.getRequestItemTimes(metadatas);
     return {
       iterations: 0,
       persistedItems: 0,

@@ -39,6 +39,7 @@
     "@comunica/mediatortype-join-coefficients": "^2.6.8",
     "@comunica/types": "^2.6.8",
     "@incremunica/incremental-bindings-factory": "^1.0.0",
+    "@incremunica/hash-bindings": "^1.0.0",
     "asynciterator": "^3.8.0",
     "sparqlalgebrajs": "^4.0.5"
   },
