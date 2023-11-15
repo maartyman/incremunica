@@ -72,6 +72,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     }>();
 
     const hashBindings = new HashBindings();
+    const hashSubBindings = new HashBindings();
 
     // Create bindings function
     const binder = (bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): void => {
@@ -97,7 +98,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               subDone();
               return;
             }
-            const bindingsHash = hashBindings.hash(newBindings);
+            const bindingsHash = hashSubBindings.hash(newBindings);
             const bindingsData = data.memory.get(bindingsHash);
             if (newBindings.diff) {
               if (bindingsData === undefined) {
@@ -175,8 +176,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               },
             }));
           }
-          done();
         }
+        done();
       }
     };
 
