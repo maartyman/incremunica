@@ -7,7 +7,7 @@ A comunica Polling Diff Guard Actor.
 ## Install
 
 ```bash
-$ yarn add @comunica/actor-guard-polling-diff
+$ yarn add @incremunica/actor-guard-polling-diff
 ```
 
 ## Configure
@@ -17,7 +17,7 @@ After installing, this package can be added to your engine's configuration as fo
 {
   "@context": [
     ...
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-guard-polling-diff/^1.0.0/components/context.jsonld"  
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-guard-polling-diff/^1.0.0/components/context.jsonld"  
   ],
   "actors": [
     ...
