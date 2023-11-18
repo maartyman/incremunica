@@ -17,6 +17,7 @@
     "@types/object-inspect": "^1.8.1",
     "@types/readable-stream": "^2.3.15",
     "@types/setup-polly-jest": "^0.5.2",
+    "@types/ws": "^8.5.9",
     "@typescript-eslint/eslint-plugin": "5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
     "abort-controller": "^3.0.0",
@@ -81,12 +82,13 @@
     "test"
   ],
   "scripts": {
-    "pre-commit": "yarn run build && yarn run lint && yarn run depcheck && yarn run test",
+    "pre-commit": "yarn run build && yarn run lint-no-cache && yarn run depcheck && yarn run test",
     "test-changed": "lerna run test --since HEAD",
     "build-changed": "lerna run build --since HEAD",
     "test": "jest",
     "test-ci": "jest --ci --maxWorkers=4 --coverage",
     "lint": "eslint . --ext .ts --cache",
+    "lint-no-cache": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "build": "npm run build-ts && npm run build-components",
     "build-ts": "tsc",
