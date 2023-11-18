@@ -1,0 +1,56 @@
+import type { EventEmitter } from 'events';
+import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
+import { Actor } from '@comunica/core';
+
+/**
+ * An incremunica actor for resource-watch events.
+ *
+ * Actor types:
+ * * Input:  IActionResourceWatch:      TODO: fill in.
+ * * Test:   <none>
+ * * Output: IActorResourceWatchOutput: TODO: fill in.
+ *
+ * @see IActionResourceWatch
+ * @see IActorResourceWatchOutput
+ */
+export abstract class ActorResourceWatch extends Actor<IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+  /**
+  * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
+  */
+  public constructor(args: IActorResourceWatchArgs) {
+    super(args);
+  }
+}
+
+export declare interface IResourceWatchEventEmitter extends EventEmitter {
+  emit: ((event: 'update') => boolean) & ((event: 'delete') => boolean);
+  on: ((event: 'update', listener: () => void) => this) & ((event: 'delete', listener: () => void) => this);
+}
+
+export interface IActionResourceWatch extends IAction {
+  /**
+   * The URL of the source that was fetched.
+   */
+  url: string;
+  /**
+   * The extracted metadata.
+   */
+  metadata: Record<string, any>;
+}
+
+export interface IActorResourceWatchOutput extends IActorOutput {
+  /**
+   * An event emitter that emits 'update' and 'delete' events.
+   */
+  events: IResourceWatchEventEmitter;
+  /**
+   * A function to stop watching the resource.
+   */
+  stopFunction: () => void;
+}
+
+export type IActorResourceWatchArgs = IActorArgs<
+IActionResourceWatch, IActorTest, IActorResourceWatchOutput>;
+
+export type MediatorResourceWatch = Mediate<
+IActionResourceWatch, IActorResourceWatchOutput>;
