@@ -14,30 +14,11 @@ import type { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-qu
  * @see IActorGuardOutput
  */
 export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorGuardOutput> {
-  private static readonly guards: Map<string, IGuard> = new Map<string, IGuard>();
-
   /**
    * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
    */
   public constructor(args: IActorGuardArgs) {
     super(args);
-  }
-
-  public static addGuard(url: string, guard: IGuard): void {
-    const originalGuard = ActorGuard.guards.get(url);
-    if (originalGuard) {
-      originalGuard.delete(url);
-    }
-    ActorGuard.guards.set(url, guard);
-  }
-
-  public static getGuard(url: string): IGuard | undefined {
-    return ActorGuard.guards.get(url);
-  }
-
-  public static deleteGuard(url: string): void {
-    ActorGuard.guards.get(url)?.delete(url);
-    ActorGuard.guards.delete(url);
   }
 }
 
@@ -58,7 +39,6 @@ export interface IActionGuard extends IAction {
    * The extracted metadata.
    */
   metadata: Record<string, any>;
-
 }
 
 export interface IActorGuardOutput extends IActorOutput {

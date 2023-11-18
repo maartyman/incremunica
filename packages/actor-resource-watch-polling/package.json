@@ -1,5 +1,5 @@
 {
-  "name": "@incremunica/actor-guard-polling-diff",
+  "name": "@incremunica/actor-resource-watch-polling",
   "version": "1.1.0",
   "description": "A polling-diff guard actor",
   "lsd:module": true,
@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/actor-guard-polling-diff"
+    "directory": "packages/actor-resource-watch-polling"
   },
   "publishConfig": {
     "access": "public"
@@ -32,11 +32,9 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@comunica/bus-dereference-rdf": "^2.6.8",
     "@comunica/bus-http": "^2.6.9",
     "@comunica/core": "^2.6.8",
-    "@incremunica/bus-guard": "^1.1.0",
-    "readable-stream": "^4.3.0"
+    "@incremunica/bus-resource-watch": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

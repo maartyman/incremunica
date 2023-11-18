@@ -54,6 +54,8 @@
     "ccqs:config/rdf-update-quads/mediators.json",
 
     "icqsi:config/guard/mediators.json",
-    "icqsi:config/guard/actors.json"
+    "icqsi:config/guard/actors.json",
+    "icqsi:config/resource-watch/mediators.json",
+    "icqsi:config/resource-watch/actors.json"
   ]
 }
