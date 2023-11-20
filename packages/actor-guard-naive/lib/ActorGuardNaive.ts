@@ -4,7 +4,6 @@ import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremun
 import { ActorGuard } from '@incremunica/bus-guard';
 import type { MediatorResourceWatch } from '@incremunica/bus-resource-watch';
 import type { Quad } from '@incremunica/incremental-types';
-import { Store } from 'n3';
 
 /**
  * A comunica Naive Guard Actor.
@@ -39,26 +38,26 @@ export class ActorGuardNaive extends ActorGuard {
 
     resourceWatch.events.on('update', async() => {
       const deletionStore = action.streamingSource.store.copyOfStore();
-      const additionStore = new Store();
+      const additionArray: Quad[] = [];
       const responseGet = await this.mediatorDereferenceRdf.mediate({
         context: action.context,
         url: action.url,
       });
 
-      responseGet.data.on('data', (quad: Quad) => {
+      responseGet.data.on('data', quad => {
         if (deletionStore.has(quad)) {
           deletionStore.delete(quad);
           return;
         }
-        additionStore.add(quad);
+        additionArray.push(quad);
       });
 
       responseGet.data.on('end', () => {
         for (const quad of deletionStore) {
           action.streamingSource.store.removeQuad(<Quad>quad);
         }
-        for (const quad of additionStore) {
-          action.streamingSource.store.addQuad(<Quad>quad);
+        for (const quad of additionArray) {
+          action.streamingSource.store.addQuad(quad);
         }
       });
     });
