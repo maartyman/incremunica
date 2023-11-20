@@ -4,7 +4,7 @@ import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremun
 import { ActorGuard } from '@incremunica/bus-guard';
 import type { MediatorResourceWatch } from '@incremunica/bus-resource-watch';
 import type { Quad } from '@incremunica/incremental-types';
-import { Transform } from 'readable-stream';
+import { Store } from 'n3';
 
 /**
  * A comunica Naive Guard Actor.
@@ -38,39 +38,33 @@ export class ActorGuardNaive extends ActorGuard {
     });
 
     resourceWatch.events.on('update', async() => {
-      const store = action.streamingSource.store.copyOfStore();
-      const matchStream = new Transform({
-        transform(quad: Quad, _encoding, callback: (error?: (Error | null), data?: any) => void) {
-          if (store.has(quad)) {
-            store.delete(quad);
-            callback(null, null);
-            return;
-          }
-          quad.diff = true;
-          callback(null, quad);
-        },
-        objectMode: true,
-      });
-
+      const deletionStore = action.streamingSource.store.copyOfStore();
+      const additionStore = new Store();
       const responseGet = await this.mediatorDereferenceRdf.mediate({
         context: action.context,
         url: action.url,
       });
 
-      responseGet.data.on('end', () => {
-        for (const quad of store) {
-          (<Quad>quad).diff = false;
-          matchStream.push(quad);
+      responseGet.data.on('data', (quad: Quad) => {
+        if (deletionStore.has(quad)) {
+          deletionStore.delete(quad);
+          return;
         }
-        matchStream.end();
+        additionStore.add(quad);
       });
 
-      action.streamingSource.store.import(responseGet.data.pipe(matchStream, { end: false }));
+      responseGet.data.on('end', () => {
+        for (const quad of deletionStore) {
+          action.streamingSource.store.removeQuad(<Quad>quad);
+        }
+        for (const quad of additionStore) {
+          action.streamingSource.store.addQuad(<Quad>quad);
+        }
+      });
     });
 
     resourceWatch.events.on('delete', () => {
       for (const quad of action.streamingSource.store.getStore()) {
-        (<Quad>quad).diff = false;
         action.streamingSource.store.removeQuad(<Quad>quad);
       }
     });

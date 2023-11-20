@@ -12,12 +12,14 @@
       "@id": "urn:comunica:default:resource-watch/actors#polling",
       "@type": "ActorResourceWatchPolling",
       "mediatorHttp": { "@id": "urn:comunica:default:http/mediators#main" },
-      "defaultPollingFrequency": 10
+      "defaultPollingFrequency": 10,
+      "priority": 5
     },
     {
       "@id": "urn:comunica:default:resource-watch/actors#solid-notification-websockets",
       "@type": "ActorResourceWatchSolidNotificationWebsockets",
-      "mediatorHttp": { "@id": "urn:comunica:default:http/mediators#main" }
+      "mediatorHttp": { "@id": "urn:comunica:default:http/mediators#main" },
+      "priority": 10
     }
   ]
 }

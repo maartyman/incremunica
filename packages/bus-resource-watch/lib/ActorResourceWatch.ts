@@ -14,6 +14,7 @@ import { Actor } from '@comunica/core';
  * @see IActorResourceWatchOutput
  */
 export abstract class ActorResourceWatch extends Actor<IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+  public readonly priority: number;
   /**
   * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
   */
@@ -49,8 +50,13 @@ export interface IActorResourceWatchOutput extends IActorOutput {
   stopFunction: () => void;
 }
 
-export type IActorResourceWatchArgs = IActorArgs<
-IActionResourceWatch, IActorTest, IActorResourceWatchOutput>;
+export interface IActorResourceWatchArgs extends IActorArgs<
+IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+  /**
+   * The priority of the actor.
+   */
+  priority: number;
+}
 
 export type MediatorResourceWatch = Mediate<
 IActionResourceWatch, IActorResourceWatchOutput>;

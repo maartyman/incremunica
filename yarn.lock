@@ -11201,7 +11201,7 @@ n3@^1.11.1, n3@^1.16.3, n3@^1.16.4, n3@^1.6.3:
     queue-microtask "^1.1.2"
     readable-stream "^4.0.0"
 
-n3@^1.17.0:
+n3@^1.17.0, n3@^1.17.2:
   version "1.17.2"
   resolved "https://registry.yarnpkg.com/n3/-/n3-1.17.2.tgz#3370b2d07da98a5b2865fa43c2d4e5c563cc65df"
   integrity sha512-BxSM52wYFqXrbQQT5WUEzKUn6qpYV+2L4XZLfn3Gblz2kwZ09S+QxC33WNdVEQy2djenFL8SNkrjejEKlvI6+Q==

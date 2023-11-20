@@ -6,7 +6,7 @@
   "@id": "urn:comunica:default:resource-watch/mediators#main",
   "@type": "MediatorNumber",
   "type": "max",
-  "field": "filterFactor",
+  "field": "priority",
   "ignoreErrors": true,
   "bus": { "@id": "ActorResourceWatch:_default_bus" }
 }

@@ -64,12 +64,14 @@ describe('ActorResourceWatchSolidNotificationWebsockets', () => {
     Actor<IActionHttp, IActorTest, IActorHttpOutput>,
     IActionHttp, IActorTest, IActorHttpOutput>;
   let action: IActionResourceWatch;
+  let priority: number;
   let createResourceRequestFn: (url: string) => any;
   let createDescriptionResourceRequestFn: (url: string) => any;
   let createChannelDescriptionRequestFn: (url: string) => any;
 
   beforeEach(() => {
     bus = new Bus({name: 'bus'});
+    priority = 0;
 
     createResourceRequestFn = (url: string): any => {
       throw Error("createResourceRequestFn not set");
@@ -97,7 +99,9 @@ describe('ActorResourceWatchSolidNotificationWebsockets', () => {
     actor = new ActorResourceWatchSolidNotificationWebsockets({
       beforeActors: [],
       mediatorHttp: mediatorHttp,
-      name: 'actor', bus
+      name: 'actor',
+      bus,
+      priority: priority,
     });
 
     action = {
@@ -119,7 +123,7 @@ describe('ActorResourceWatchSolidNotificationWebsockets', () => {
 
       let result = await actor.test(action);
 
-      expect(result).toBeTruthy();
+      expect(result).toEqual({priority: priority});
     });
 
     it('should not test if first get fails', async () => {

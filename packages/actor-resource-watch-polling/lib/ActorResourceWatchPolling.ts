@@ -24,7 +24,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
   }
 
   public async test(action: IActionResourceWatch): Promise<IActorTest> {
-    return true;
+    return { priority: this.priority };
   }
 
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {

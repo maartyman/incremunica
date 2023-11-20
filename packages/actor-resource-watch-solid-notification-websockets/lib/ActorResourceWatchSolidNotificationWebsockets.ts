@@ -37,7 +37,7 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
       throw new Error('Resource does not support Solid Notifications with Websockets');
     }
 
-    return true;
+    return { priority: this.priority };
   }
 
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
