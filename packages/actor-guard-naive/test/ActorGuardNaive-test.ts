@@ -2,9 +2,8 @@ import {Bus} from '@comunica/core';
 import {IActionDereferenceRdf, MediatorDereferenceRdf} from "@comunica/bus-dereference-rdf";
 import {IActionGuard} from "@incremunica/bus-guard";
 import {Transform} from "readable-stream";
-import arrayifyStream from "arrayify-stream";
 import 'jest-rdf';
-import {Store} from "n3";
+import { Store, DataFactory} from "n3";
 import EventEmitter = require("events");
 import {ActorGuardNaive} from "../lib";
 import {IActionResourceWatch, IActorResourceWatchOutput, MediatorResourceWatch} from "@incremunica/bus-resource-watch";
@@ -29,6 +28,7 @@ describe('ActorGuardNaive', () => {
     let streamingStoreEventEmitter: EventEmitter;
     let changeNotificationEventEmitter: EventEmitter;
     let removeQuadFn = jest.fn();
+    let addQuadFn = jest.fn();
     let stopFn = jest.fn();
     let onFn: () => void;
     let hasEnded: {value: boolean};
@@ -39,6 +39,7 @@ describe('ActorGuardNaive', () => {
       changeNotificationEventEmitter = new EventEmitter();
       quadArrayStore = [];
       removeQuadFn = jest.fn();
+      addQuadFn = jest.fn();
       stopFn = jest.fn();
       hasEnded = {value: false};
 
@@ -89,6 +90,7 @@ describe('ActorGuardNaive', () => {
               return new Store(quadArrayStore);
             },
             removeQuad: (quad: any) => removeQuadFn(quad),
+            addQuad: (quad: any) => addQuadFn(quad),
           }
         }
       }
@@ -123,17 +125,6 @@ describe('ActorGuardNaive', () => {
 
       await actor.run(action);
 
-      let promise = new Promise<void>((resolve) => {
-        streamingStoreEventEmitter.once("data", async (stream) => {
-          let tempArray = await arrayifyStream(stream);
-          expect(tempArray).toBeRdfIsomorphic([
-            quad('s3', 'p3', 'o3')
-          ]);
-          expect(tempArray[0].diff).toBeTruthy();
-          resolve();
-        });
-      });
-
       quadArray = [
         quad('s1', 'p1', 'o1'),
         quad('s2', 'p2', 'o2'),
@@ -142,7 +133,16 @@ describe('ActorGuardNaive', () => {
 
       changeNotificationEventEmitter.emit("update");
 
-      await promise;
+      await new Promise<void>((resolve) => setImmediate(resolve));
+
+      expect(addQuadFn).toHaveBeenCalledTimes(1);
+      expect(addQuadFn).toHaveBeenCalledWith(
+        DataFactory.quad(
+          DataFactory.namedNode('s3'),
+          DataFactory.namedNode('p3'),
+          DataFactory.namedNode('o3')
+        )
+      );
     });
 
     it('should attach a negative changes stream', async () => {
@@ -154,17 +154,6 @@ describe('ActorGuardNaive', () => {
 
       await actor.run(action);
 
-      let promise = new Promise<void>((resolve) => {
-        streamingStoreEventEmitter.once("data", async (stream) => {
-          let tempArray = await arrayifyStream(stream);
-          expect(tempArray).toBeRdfIsomorphic([
-            quad('s3', 'p3', 'o3')
-          ]);
-          expect(tempArray[0].diff).toBeFalsy();
-          resolve();
-        });
-      });
-
       quadArray = [
         quad('s1', 'p1', 'o1'),
         quad('s2', 'p2', 'o2')
@@ -172,7 +161,16 @@ describe('ActorGuardNaive', () => {
 
       changeNotificationEventEmitter.emit("update");
 
-      await promise;
+      await new Promise<void>((resolve) => setImmediate(resolve));
+
+      expect(removeQuadFn).toHaveBeenCalledTimes(1);
+      expect(removeQuadFn).toHaveBeenCalledWith(
+        DataFactory.quad(
+          DataFactory.namedNode('s3'),
+          DataFactory.namedNode('p3'),
+          DataFactory.namedNode('o3')
+        )
+      );
     });
 
     it('should handle delete events', async () => {
@@ -189,6 +187,27 @@ describe('ActorGuardNaive', () => {
       await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(removeQuadFn).toHaveBeenCalledTimes(3);
+      expect(removeQuadFn).toHaveBeenNthCalledWith(1,
+        DataFactory.quad(
+          DataFactory.namedNode('s1'),
+          DataFactory.namedNode('p1'),
+          DataFactory.namedNode('o1')
+        )
+      );
+      expect(removeQuadFn).toHaveBeenNthCalledWith(2,
+        DataFactory.quad(
+          DataFactory.namedNode('s2'),
+          DataFactory.namedNode('p2'),
+          DataFactory.namedNode('o2')
+        )
+      );
+      expect(removeQuadFn).toHaveBeenNthCalledWith(3,
+        DataFactory.quad(
+          DataFactory.namedNode('s3'),
+          DataFactory.namedNode('p3'),
+          DataFactory.namedNode('o3')
+        )
+      );
     });
   });
 });
