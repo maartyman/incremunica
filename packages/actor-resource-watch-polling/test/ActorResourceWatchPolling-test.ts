@@ -16,6 +16,7 @@ describe('ActorGuardPolling', () => {
     let mediatorHttp: Mediator<
       Actor<IActionHttp, IActorTest, IActorHttpOutput>,
       IActionHttp, IActorTest, IActorHttpOutput>;
+    let priority: number;
 
     let action: IActionResourceWatch;
     let headersObject: {
@@ -25,6 +26,7 @@ describe('ActorGuardPolling', () => {
     };
 
     beforeEach(() => {
+      priority = 0;
       headersObject = {
         age: undefined,
         'cache-control': undefined,
@@ -53,7 +55,9 @@ describe('ActorGuardPolling', () => {
         beforeActors: [],
         mediatorHttp: mediatorHttp,
         defaultPollingFrequency: 1,
-        name: 'actor', bus
+        priority: priority,
+        name: 'actor',
+        bus
       });
 
       action = {
@@ -68,7 +72,7 @@ describe('ActorGuardPolling', () => {
     });
 
     it('should test', () => {
-      return expect(actor.test(<any>{})).resolves.toBeTruthy();
+      return expect(actor.test(action)).resolves.toEqual({ priority: priority });
     });
 
     it('should get an update if the etag changes', async () => {
