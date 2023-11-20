@@ -136,13 +136,7 @@ describe('ActorGuardNaive', () => {
       await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(addQuadFn).toHaveBeenCalledTimes(1);
-      expect(addQuadFn).toHaveBeenCalledWith(
-        DataFactory.quad(
-          DataFactory.namedNode('s3'),
-          DataFactory.namedNode('p3'),
-          DataFactory.namedNode('o3')
-        )
-      );
+      expect(addQuadFn).toHaveBeenCalledWith(quad('s3', 'p3', 'o3'));
     });
 
     it('should attach a negative changes stream', async () => {
