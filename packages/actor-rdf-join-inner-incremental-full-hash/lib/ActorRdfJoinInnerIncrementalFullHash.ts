@@ -39,7 +39,7 @@ export class ActorRdfJoinInnerIncrementalFullHash extends ActorRdfJoin {
         bindingsStream: join,
         metadata: async() => await this.constructResultMetadata(
           action.entries,
-          await ActorRdfJoin.getMetadatas(action.entries),
+          metadatas,
           action.context,
         ),
       },

@@ -47,6 +47,7 @@
     "arrayify-stream": "^2.0.1"
   },
   "dependencies": {
+    "@comunica/metadata": "^2.10.0",
     "@comunica/actor-abstract-mediatyped": "2.10.0",
     "@comunica/actor-abstract-parse": "2.10.0",
     "@comunica/actor-abstract-path": "2.10.0",

@@ -20,6 +20,7 @@ import {PassThrough, Stream} from "readable-stream";
 import {BindingsStream} from "@incremunica/incremental-types";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
+import { MetadataValidationState } from '@comunica/metadata';
 
 
 const streamifyArray = require('streamify-array');
@@ -83,6 +84,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               ]),
             ], { autoStart: false }),
             metadata: () => Promise.resolve({
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('bound') ],
@@ -124,6 +126,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           },
           [
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               pageSize: 100,
               requestTime: 10,
@@ -131,6 +134,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               pageSize: 100,
               requestTime: 20,
@@ -138,6 +142,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 5 },
               pageSize: 100,
               requestTime: 30,
@@ -176,6 +181,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           },
           [
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               pageSize: 100,
               requestTime: 10,
@@ -183,6 +189,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a'), DF.variable('b') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               pageSize: 100,
               requestTime: 20,
@@ -190,6 +197,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a'), DF.variable('b') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 5 },
               pageSize: 100,
               requestTime: 30,
@@ -213,6 +221,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               {
                 output: <any>{
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: { type: 'estimate', value: 3 },
                     canContainUndefs: false,
                   }),
@@ -223,6 +232,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               {
                 output: <any>{
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: { type: 'estimate', value: 2 },
                     canContainUndefs: false,
                   }),
@@ -234,6 +244,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           },
           [
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               pageSize: 100,
               requestTime: 10,
@@ -241,6 +252,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               pageSize: 100,
               requestTime: 20,
@@ -269,13 +281,16 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           },
           [
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               pageSize: 100,
               requestTime: 10,
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
             },
-            { cardinality: { type: 'estimate', value: 2 },
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 2 },
               pageSize: 100,
               requestTime: 20,
               canContainUndefs: false,
@@ -302,6 +317,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           },
           [
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               pageSize: 100,
               requestTime: 10,
@@ -309,6 +325,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a') ],
             },
             {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               pageSize: 100,
               requestTime: 20,
@@ -334,6 +351,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -343,6 +361,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -355,6 +374,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -364,6 +384,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -378,6 +399,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -387,6 +409,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -396,6 +419,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 5 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -407,6 +431,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -416,6 +441,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -425,6 +451,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 5 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -440,6 +467,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -449,6 +477,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -458,6 +487,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -470,6 +500,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -479,6 +510,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -488,6 +520,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -503,6 +536,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -512,6 +546,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -521,6 +556,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 5 },
                 canContainUndefs: true,
                 variables: [ DF.variable('a') ],
@@ -533,6 +569,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -542,6 +579,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -551,6 +589,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 5 },
               canContainUndefs: true,
               variables: [ DF.variable('a') ],
@@ -566,6 +605,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a1'), DF.variable('b1') ],
@@ -575,6 +615,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a2'), DF.variable('b2') ],
@@ -592,6 +633,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 1 },
                 canContainUndefs: false,
                 variables: [ DF.variable('b') ],
@@ -601,6 +643,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -610,6 +653,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -622,6 +666,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -631,6 +676,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -640,6 +686,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 1 },
               canContainUndefs: false,
               variables: [ DF.variable('b') ],
@@ -655,6 +702,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -664,6 +712,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 1 },
                 canContainUndefs: false,
                 variables: [ DF.variable('b') ],
@@ -673,6 +722,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 20 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -682,6 +732,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 20 },
                 canContainUndefs: false,
                 variables: [ DF.variable('c') ],
@@ -691,6 +742,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -700,6 +752,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 10 },
                 canContainUndefs: false,
                 variables: [ DF.variable('d') ],
@@ -709,6 +762,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any> {},
               operation: <any> {},
               metadata: {
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 10 },
                 canContainUndefs: false,
                 variables: [ DF.variable('a') ],
@@ -721,6 +775,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 2 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -730,6 +785,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -739,6 +795,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 10 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -748,6 +805,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 20 },
               canContainUndefs: false,
               variables: [ DF.variable('a') ],
@@ -757,6 +815,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 1 },
               canContainUndefs: false,
               variables: [ DF.variable('b') ],
@@ -766,6 +825,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 10 },
               canContainUndefs: false,
               variables: [ DF.variable('d') ],
@@ -775,6 +835,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             output: <any> {},
             operation: <any> {},
             metadata: {
+              state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 20 },
               canContainUndefs: false,
               variables: [ DF.variable('c') ],
@@ -803,6 +864,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
@@ -822,6 +884,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
@@ -864,6 +927,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           ]),
         ]);
         expect(await result.metadata()).toEqual({
+          state: new MetadataValidationState(),
           cardinality: {type: 'estimate', value: 2.400_000_000_000_000_4},
           canContainUndefs: false,
           variables: [DF.variable('a'), DF.variable('b')],
@@ -889,6 +953,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 3},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
@@ -911,6 +976,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('c')],
@@ -930,6 +996,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
@@ -971,6 +1038,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           ]),
         ]);
         expect(await result.metadata()).toEqual({
+          state: new MetadataValidationState(),
           cardinality: {type: 'estimate', value: 9.600_000_000_000_001},
           canContainUndefs: false,
           variables: [DF.variable('a'), DF.variable('b'), DF.variable('c')],
@@ -987,17 +1055,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             a: 'b',
             "matchOptions": [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
+              state: expect.any(MetadataValidationState),
               cardinality: {type: 'estimate', value: 1},
               canContainUndefs: false,
               variables: [DF.variable('a')],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
+                state: expect.any(MetadataValidationState),
                 cardinality: {type: 'estimate', value: 3},
                 canContainUndefs: false,
                 variables: [DF.variable('a'), DF.variable('b')],
               },
               {
+                state: expect.any(MetadataValidationState),
                 cardinality: {type: 'estimate', value: 4},
                 canContainUndefs: false,
                 variables: [DF.variable('a'), DF.variable('c')],
@@ -1017,17 +1088,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             a: 'b',
             "matchOptions": [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
+              state: expect.any(MetadataValidationState),
               cardinality: {type: 'estimate', value: 1},
               canContainUndefs: false,
               variables: [DF.variable('a')],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
+                state: expect.any(MetadataValidationState),
                 cardinality: {type: 'estimate', value: 3},
                 canContainUndefs: false,
                 variables: [DF.variable('a'), DF.variable('b')],
               },
               {
+                state: expect.any(MetadataValidationState),
                 cardinality: {type: 'estimate', value: 4},
                 canContainUndefs: false,
                 variables: [DF.variable('a'), DF.variable('c')],
@@ -1058,6 +1132,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ])
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
                   canContainUndefs: false,
                   variables: [ DF.variable('a'), DF.variable('b') ],
@@ -1075,6 +1150,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
                   canContainUndefs: false,
                   variables: [ DF.variable('a'), DF.variable('bound') ],
@@ -1177,6 +1253,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             return {
               bindingsStream: iterator,
               metadata: () => Promise.resolve({
+                state: new MetadataValidationState(),
                 cardinality: {type: 'estimate', value: 3},
                 canContainUndefs: false,
                 variables: [DF.variable('bound')],
@@ -1222,6 +1299,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ])
                 ], {autoStart: false}),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 4},
                   canContainUndefs: false,
                   variables: [DF.variable('a'), DF.variable('b')],
@@ -1234,6 +1312,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: wrapIterator,
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: {type: 'estimate', value: 1},
                   canContainUndefs: false,
                   variables: [DF.variable('a')],
@@ -1367,6 +1446,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               return {
                 bindingsStream: iterator,
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 3 },
                   canContainUndefs: false,
                   variables: [ DF.variable('bound') ],
@@ -1404,6 +1484,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                     ])
                   ], {autoStart: false}),
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 4},
                     canContainUndefs: false,
                     variables: [DF.variable('a'), DF.variable('b')],
@@ -1420,6 +1501,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                     ]),
                   ]),
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 1},
                     canContainUndefs: false,
                     variables: [DF.variable('a')],
@@ -1512,6 +1594,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                     ])
                   ], {autoStart: false}),
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 4},
                     canContainUndefs: false,
                     variables: [DF.variable('a'), DF.variable('b')],
@@ -1524,6 +1607,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: iterator,
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 1},
                     canContainUndefs: false,
                     variables: [DF.variable('a')],
@@ -1658,6 +1742,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                     ])
                   ], {autoStart: false}),
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 4},
                     canContainUndefs: false,
                     variables: [DF.variable('a'), DF.variable('b')],
@@ -1670,6 +1755,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: iterator,
                   metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
                     cardinality: {type: 'estimate', value: 1},
                     canContainUndefs: false,
                     variables: [DF.variable('a')],

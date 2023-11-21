@@ -10,6 +10,7 @@ import { DataFactory } from 'rdf-data-factory';
 import 'jest-rdf';
 import Factory from 'sparqlalgebrajs/lib/factory';
 import {IncrementalFederatedQuadSource} from "../lib/IncrementalFederatedQuadSource";
+import { MetadataValidationState } from '@comunica/metadata';
 
 const squad = require('rdf-quad');
 
@@ -30,7 +31,11 @@ describe('IncrementalFederatedQuadSource', () => {
         const type = action.context.get(KeysRdfResolveQuadPattern.source).type;
         if (type === 'emptySource') {
           const data = new ArrayIterator([], { autoStart: false });
-          data.setProperty('metadata', { cardinality: { type: 'estimate', value: 0 }, canContainUndefs: false });
+          data.setProperty('metadata', {
+            state: new MetadataValidationState(),
+            cardinality: { type: 'estimate', value: 0 },
+            canContainUndefs: false
+          });
           return Promise.resolve({ data });
         }
         if (type === 'nonEmptySourceNoMeta') {
@@ -47,6 +52,7 @@ describe('IncrementalFederatedQuadSource', () => {
             squad('s1', 'p1', 'o2'),
           ], { autoStart: false });
           data.setProperty('metadata', {
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
             canContainUndefs: false,
           });
@@ -58,6 +64,7 @@ describe('IncrementalFederatedQuadSource', () => {
             squad('_:s2', '_:p2', '_:o2'),
           ], { autoStart: false });
           data.setProperty('metadata', {
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
             canContainUndefs: false,
           });
@@ -75,6 +82,7 @@ describe('IncrementalFederatedQuadSource', () => {
             return squad('_:s1', '_:p1', '_:o1');
           };
           data.setProperty('metadata', {
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
             canContainUndefs: false,
           });
@@ -90,6 +98,7 @@ describe('IncrementalFederatedQuadSource', () => {
             squad('s3', 'p1', 'o2', 'g2'),
           ], { autoStart: false });
           data.setProperty('metadata', {
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 6 },
             canContainUndefs: false,
           });
@@ -101,6 +110,7 @@ describe('IncrementalFederatedQuadSource', () => {
             squad('s1', 'p1', 'o2'),
           ], { autoStart: false });
           data.setProperty('metadata', {
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 2 },
             canContainUndefs: true,
           });
@@ -111,6 +121,7 @@ describe('IncrementalFederatedQuadSource', () => {
           squad('s1', 'p1', 'o2'),
         ], { autoStart: false });
         data.setProperty('metadata', {
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 2 },
           requestTime: 10,
           pageSize: 100,
@@ -548,7 +559,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 0 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'exact', value: 0 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'exact', value: 0 },
+          canContainUndefs: false
+        });
 
       expect(await arrayifyStream(stream)).toEqual([]);
     });
@@ -574,7 +589,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 0 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 0 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 0 },
+          canContainUndefs: false
+        });
 
       expect(await arrayifyStream(stream)).toEqual([]);
     });
@@ -627,6 +646,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 2 },
           requestTime: 10,
           pageSize: 100,
@@ -711,7 +731,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 6 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 6 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 6 },
+          canContainUndefs: false
+        });
 
       expect(await arrayifyStream(stream)).toEqual([
         squad('s1', 'p1', 'o1'),
@@ -765,6 +789,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 2 },
           requestTime: 10,
           pageSize: 100,
@@ -828,7 +853,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 0 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 0 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 0 },
+          canContainUndefs: false
+        });
 
       expect(await stream.toArray()).toEqual([]);
     });
@@ -886,7 +915,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 0 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 0 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 0 },
+          canContainUndefs: false
+        });
       expect(await stream.toArray()).toEqual([]);
     });
 
@@ -937,7 +970,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with 0 cardinality', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 0 }, canContainUndefs: false });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 0 },
+          canContainUndefs: false
+        });
 
       expect(await stream.toArray()).toEqual([]);
     });
@@ -999,6 +1036,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           requestTime: 20,
           pageSize: 200,
@@ -1069,6 +1107,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
           requestTime: 10,
           pageSize: 100,
@@ -1125,6 +1164,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
           canContainUndefs: false,
         });
@@ -1179,6 +1219,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
           requestTime: 10,
           pageSize: 100,
@@ -1235,6 +1276,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: Number.POSITIVE_INFINITY },
           canContainUndefs: false,
         });
@@ -1519,6 +1561,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           pageSize: 100,
           requestTime: 10,
@@ -1559,6 +1602,7 @@ describe('IncrementalFederatedQuadSource', () => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
         .resolves.toEqual({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           pageSize: 100,
           requestTime: 10,
@@ -1598,7 +1642,11 @@ describe('IncrementalFederatedQuadSource', () => {
     it('should emit metadata with canContainUndefs true', async() => {
       const stream = source.match(v, v, v, v);
       await expect(new Promise(resolve => stream.getProperty('metadata', resolve)))
-        .resolves.toEqual({ cardinality: { type: 'estimate', value: 4 }, canContainUndefs: true });
+        .resolves.toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'estimate', value: 4 },
+          canContainUndefs: true
+        });
 
       expect(await stream.toArray()).toEqual([
         squad('s1', 'p1', 'o1'),
