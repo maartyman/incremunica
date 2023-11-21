@@ -4304,6 +4304,14 @@
     "@types/node" "*"
     safe-buffer "~5.1.1"
 
+"@types/readable-stream@^4.0.0":
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.8.tgz#93aa90f3c23c49dd3386c7ce22aee14c688ee943"
+  integrity sha512-eNuXRT9IAu3eV5MYF5/v5+T7iHhHmDdMw8sTR4aVX0mMFK3V4MDJn9mKjxZXYSIZLtpw/83he3p+KweyIB8nIw==
+  dependencies:
+    "@types/node" "*"
+    safe-buffer "~5.1.1"
+
 "@types/sax@^1.0.1":
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@types/sax/-/sax-1.2.4.tgz#8221affa7f4f3cb21abd22f244cfabfa63e6a69e"
