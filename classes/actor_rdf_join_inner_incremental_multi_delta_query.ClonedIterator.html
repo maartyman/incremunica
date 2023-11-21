@@ -142,6 +142,7 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_captureRejectionSymbol_" class="tsd-kind-icon">[capture<wbr>Rejection<wbr>Symbol]</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_begin" class="tsd-kind-icon">_begin</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_changeState" class="tsd-kind-icon">_change<wbr>State</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_closeWhenDone" class="tsd-kind-icon">_close<wbr>When<wbr>Done</a></li>
@@ -199,7 +200,9 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#toString" class="tsd-kind-icon">to<wbr>String</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#transform" class="tsd-kind-icon">transform</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#uniq" class="tsd-kind-icon">uniq</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#addAbortListener" class="tsd-kind-icon">add<wbr>Abort<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#getEventListeners" class="tsd-kind-icon">get<wbr>Event<wbr>Listeners</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#getMaxListeners-1" class="tsd-kind-icon">get<wbr>Max<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#listenerCount-1" class="tsd-kind-icon">listener<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#on-1" class="tsd-kind-icon">on</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#once-1" class="tsd-kind-icon">once</a></li>
@@ -424,9 +427,20 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#captureRejectionSymbol">captureRejectionSymbol</a></p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:328</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:402</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Value: <code>Symbol.for(&#39;nodejs.rejection&#39;)</code></p>
+						</div>
+						<p>See how to write a custom <code>rejection handler</code>.</p>
+						<dl class="tsd-comment-tags">
+							<dt>since</dt>
+							<dd><p>v13.4.0, v12.16.0</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 					<a name="captureRejections" class="tsd-anchor"></a>
@@ -435,13 +449,19 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#captureRejections">captureRejections</a></p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:333</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:409</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Sets or gets the default captureRejection value for all emitters.</p>
+							<p>Value: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type">boolean</a></p>
 						</div>
+						<p>Change the default <code>captureRejections</code> option on all new <code>EventEmitter</code> objects.</p>
+						<dl class="tsd-comment-tags">
+							<dt>since</dt>
+							<dd><p>v13.4.0, v12.16.0</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
@@ -451,9 +471,45 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#defaultMaxListeners">defaultMaxListeners</a></p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:334</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:446</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>By default, a maximum of <code>10</code> listeners can be registered for any single
+								event. This limit can be changed for individual <code>EventEmitter</code> instances
+								using the <code>emitter.setMaxListeners(n)</code> method. To change the default
+							for <em>all</em><code>EventEmitter</code> instances, the <code>events.defaultMaxListeners</code>property can be used. If this value is not a positive number, a <code>RangeError</code>is thrown.</p>
+						</div>
+						<p>Take caution when setting the <code>events.defaultMaxListeners</code> because the
+							change affects <em>all</em><code>EventEmitter</code> instances, including those created before
+							the change is made. However, calling <code>emitter.setMaxListeners(n)</code> still has
+						precedence over <code>events.defaultMaxListeners</code>.</p>
+						<p>This is not a hard limit. The <code>EventEmitter</code> instance will allow
+							more listeners to be added but will output a trace warning to stderr indicating
+							that a &quot;possible EventEmitter memory leak&quot; has been detected. For any single<code>EventEmitter</code>, the <code>emitter.getMaxListeners()</code> and <code>emitter.setMaxListeners()</code>methods can be used to
+						temporarily avoid this warning:</p>
+						<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">setMaxListeners</span><span style="color: #000000">(</span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">() + </span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #008000">// do stuff</span>
+<span style="color: #000000">  </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">setMaxListeners</span><span style="color: #000000">(</span><span style="color: #267F99">Math</span><span style="color: #000000">.</span><span style="color: #795E26">max</span><span style="color: #000000">(</span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">() - </span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">0</span><span style="color: #000000">));</span>
+<span style="color: #000000">});</span>
+</code></pre>
+						<p>The <code>--trace-warnings</code> command-line flag can be used to display the
+						stack trace for such warnings.</p>
+						<p>The emitted warning can be inspected with <code>process.on(&#39;warning&#39;)</code> and will
+							have the additional <code>emitter</code>, <code>type</code>, and <code>count</code> properties, referring to
+							the event emitter instance, the event&#39;s name and the number of attached
+							listeners, respectively.
+						Its <code>name</code> property is set to <code>&#39;MaxListenersExceededWarning&#39;</code>.</p>
+						<dl class="tsd-comment-tags">
+							<dt>since</dt>
+							<dd><p>v0.11.2</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 					<a name="errorMonitor" class="tsd-anchor"></a>
@@ -462,18 +518,20 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#errorMonitor">errorMonitor</a></p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:327</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:395</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>This symbol shall be used to install a listener for only monitoring <code>&#39;error&#39;</code>
-								events. Listeners installed using this symbol are called before the regular
-							<code>&#39;error&#39;</code> listeners are called.</p>
+							<p>This symbol shall be used to install a listener for only monitoring <code>&#39;error&#39;</code>events. Listeners installed using this symbol are called before the regular<code>&#39;error&#39;</code> listeners are called.</p>
 						</div>
-						<p>Installing a listener using this symbol does not change the behavior once an
-							<code>&#39;error&#39;</code> event is emitted, therefore the process will still crash if no
+						<p>Installing a listener using this symbol does not change the behavior once an<code>&#39;error&#39;</code> event is emitted. Therefore, the process will still crash if no
 						regular <code>&#39;error&#39;</code> listener is installed.</p>
+						<dl class="tsd-comment-tags">
+							<dt>since</dt>
+							<dd><p>v13.6.0, v12.17.0</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 			</section>
@@ -716,6 +774,36 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="_captureRejectionSymbol_" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> [capture<wbr>Rejection<wbr>Symbol]</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">[capture<wbr>Rejection<wbr>Symbol]<span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#_captureRejectionSymbol_">[captureRejectionSymbol]</a></p>
+								<ul>
+									<li>Defined in node_modules/@types/node/events.d.ts:112</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>error: <span class="tsd-signature-type">Error</span></h5>
+								</li>
+								<li>
+									<h5>event: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-external">
 					<a name="_begin" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _begin</h3>
@@ -1486,7 +1574,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#addListener">addListener</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:354</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:510</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1708,7 +1796,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:610</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:772</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1717,7 +1805,7 @@
 									to each.</p>
 								</div>
 								<p>Returns <code>true</code> if the event had listeners, <code>false</code> otherwise.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEmitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 
 <span style="color: #008000">// First listener</span>
@@ -1778,7 +1866,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#eventNames">eventNames</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:669</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:835</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1786,7 +1874,8 @@
 									<p>Returns an array listing the events for which the emitter has registered
 									listeners. The values in the array are strings or <code>Symbol</code>s.</p>
 								</div>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {});</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;bar&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {});</span>
@@ -1976,7 +2065,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#getMaxListeners">getMaxListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:526</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:687</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2088,19 +2177,21 @@
 					<a name="listenerCount" class="tsd-anchor"></a>
 					<h3>listener<wbr>Count</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#listenerCount">listenerCount</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:616</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:781</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns the number of listeners listening to the event named <code>eventName</code>.</p>
+									<p>Returns the number of listeners listening for the event named <code>eventName</code>.
+										If <code>listener</code> is provided, it will return how many times the listener is found
+									in the list of the listeners of the event.</p>
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt>since</dt>
@@ -2114,6 +2205,12 @@
 									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>The name of the event being listened for</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> listener: <span class="tsd-signature-type">Function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event handler function</p>
 									</div>
 								</li>
 							</ul>
@@ -2132,7 +2229,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#listeners">listeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:539</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:700</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2218,7 +2315,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#off">off</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:499</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:660</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2273,7 +2370,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#on">on</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:385</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:542</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2290,7 +2387,8 @@
 								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
 								<p>By default, event listeners are invoked in the order they are added. The<code>emitter.prependListener()</code> method can be used as an alternative to add the
 								event listener to the beginning of the listeners array.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;a&#039;</span><span style="color: #000000">));</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">prependListener</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">));</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">);</span>
@@ -2352,7 +2450,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#once">once</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:414</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:572</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2367,7 +2465,8 @@
 								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
 								<p>By default, event listeners are invoked in the order they are added. The<code>emitter.prependOnceListener()</code> method can be used as an alternative to add the
 								event listener to the beginning of the listeners array.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;a&#039;</span><span style="color: #000000">));</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">prependOnceListener</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">));</span>
 <span style="color: #001080">myEE</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">);</span>
@@ -2463,7 +2562,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#prependListener">prependListener</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:634</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:799</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2532,7 +2631,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#prependOnceListener">prependOnceListener</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:650</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:815</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2639,7 +2738,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#rawListeners">rawListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:569</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:731</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2647,7 +2746,8 @@
 									<p>Returns a copy of the array of listeners for the event named <code>eventName</code>,
 									including any wrappers (such as those created by <code>.once()</code>).</p>
 								</div>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;log&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;log once&#039;</span><span style="color: #000000">));</span>
 
 <span style="color: #008000">// Returns a new Array with a function `onceWrapper` which has a property</span>
@@ -2722,7 +2822,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#removeAllListeners">removeAllListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:510</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:671</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2760,7 +2860,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#removeListener">removeListener</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:494</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:655</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2781,7 +2881,9 @@
 								<p>Once an event is emitted, all listeners attached to it at the
 									time of emitting are called in order. This implies that any<code>removeListener()</code> or <code>removeAllListeners()</code> calls <em>after</em> emitting and <em>before</em> the last listener finishes execution
 								will not remove them from<code>emit()</code> in progress. Subsequent events behave as expected.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEmitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MyEmitter</span><span style="color: #000000">();</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">MyEmitter</span><span style="color: #000000"> </span><span style="color: #0000FF">extends</span><span style="color: #000000"> </span><span style="color: #267F99">EventEmitter</span><span style="color: #000000"> {}</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEmitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MyEmitter</span><span style="color: #000000">();</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">callbackA</span><span style="color: #000000"> = () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
 <span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;A&#039;</span><span style="color: #000000">);</span>
@@ -2817,7 +2919,8 @@
 								<p>When a single function has been added as a handler multiple times for a single
 									event (as in the example below), <code>removeListener()</code> will remove the most
 								recently added instance. In the example the <code>once(&#39;ping&#39;)</code>listener is removed:</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 
 <span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">pong</span><span style="color: #000000">() {</span>
 <span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;pong&#039;</span><span style="color: #000000">);</span>
@@ -2879,7 +2982,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#setMaxListeners">setMaxListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:520</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:681</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3237,6 +3340,87 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="addAbortListener" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> add<wbr>Abort<wbr>Listener</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Abort<wbr>Listener<span class="tsd-signature-symbol">(</span>signal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AbortSignal</span>, resource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Event</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Disposable</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#addAbortListener">addAbortListener</a></p>
+								<ul>
+									<li>Defined in node_modules/@types/node/events.d.ts:387</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Listens once to the <code>abort</code> event on the provided <code>signal</code>.</p>
+								</div>
+								<p>Listening to the <code>abort</code> event on abort signals is unsafe and may
+									lead to resource leaks since another third party with the signal can
+									call <code>e.stopImmediatePropagation()</code>. Unfortunately Node.js cannot change
+									this since it would violate the web standard. Additionally, the original
+								API makes it easy to forget to remove listeners.</p>
+								<p>This API allows safely using <code>AbortSignal</code>s in Node.js APIs by solving these
+									two issues by listening to the event such that <code>stopImmediatePropagation</code> does
+								not prevent the listener from running.</p>
+								<p>Returns a disposable so that it may be unsubscribed from more easily.</p>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">addAbortListener</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">example</span><span style="color: #000000">(</span><span style="color: #001080">signal</span><span style="color: #000000">) {</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">disposable</span><span style="color: #000000">;</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">signal</span><span style="color: #000000">.</span><span style="color: #795E26">addEventListener</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;abort&#039;</span><span style="color: #000000">, (</span><span style="color: #001080">e</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">e</span><span style="color: #000000">.</span><span style="color: #795E26">stopImmediatePropagation</span><span style="color: #000000">());</span>
+<span style="color: #000000">    </span><span style="color: #001080">disposable</span><span style="color: #000000"> = </span><span style="color: #795E26">addAbortListener</span><span style="color: #000000">(</span><span style="color: #001080">signal</span><span style="color: #000000">, (</span><span style="color: #001080">e</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">      </span><span style="color: #008000">// Do something when signal is aborted.</span>
+<span style="color: #000000">    });</span>
+<span style="color: #000000">  } </span><span style="color: #AF00DB">finally</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">disposable</span><span style="color: #000000">?.[</span><span style="color: #267F99">Symbol</span><span style="color: #000000">.</span><span style="color: #001080">dispose</span><span style="color: #000000">]();</span>
+<span style="color: #000000">  }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v20.5.0</p>
+									</dd>
+									<dt>experimental</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>signal: <span class="tsd-signature-type">AbortSignal</span></h5>
+								</li>
+								<li>
+									<h5>resource: <span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Event</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Event</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>event: <span class="tsd-signature-type">Event</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Disposable</span></h4>
+							<p>Disposable that removes the <code>abort</code> listener.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 					<a name="getEventListeners" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Event<wbr>Listeners</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
@@ -3247,7 +3431,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#getEventListeners">getEventListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:299</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:308</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3258,19 +3442,19 @@
 								the emitter.</p>
 								<p>For <code>EventTarget</code>s this is the only way to get the event listeners for the
 								event target. This is useful for debugging and diagnostic purposes.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">getEventListeners</span><span style="color: #000000">, </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">getEventListeners</span><span style="color: #000000">, </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #000000">{</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">listener</span><span style="color: #000000"> = () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Events are fun&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  </span><span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, </span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #795E26">getEventListeners</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// [listener]</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getEventListeners</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">)); </span><span style="color: #008000">// [ [Function: listener] ]</span>
 <span style="color: #000000">}</span>
 <span style="color: #000000">{</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">et</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventTarget</span><span style="color: #000000">();</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">listener</span><span style="color: #000000"> = () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Events are fun&#039;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  </span><span style="color: #001080">et</span><span style="color: #000000">.</span><span style="color: #795E26">addEventListener</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">, </span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #795E26">getEventListeners</span><span style="color: #000000">(</span><span style="color: #001080">et</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// [listener]</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getEventListeners</span><span style="color: #000000">(</span><span style="color: #001080">et</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;foo&#039;</span><span style="color: #000000">)); </span><span style="color: #008000">// [ [Function: listener] ]</span>
 <span style="color: #000000">}</span>
 </code></pre>
 								<dl class="tsd-comment-tags">
@@ -3293,6 +3477,60 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="getMaxListeners-1" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Max<wbr>Listeners</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Max<wbr>Listeners<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">_DOMEventTarget</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#getMaxListeners-1">getMaxListeners</a></p>
+								<ul>
+									<li>Defined in node_modules/@types/node/events.d.ts:337</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the currently set max amount of listeners.</p>
+								</div>
+								<p>For <code>EventEmitter</code>s this behaves exactly the same as calling <code>.getMaxListeners</code> on
+								the emitter.</p>
+								<p>For <code>EventTarget</code>s this is the only way to get the max event listeners for the
+									event target. If the number of event handlers on a single EventTarget exceeds
+								the max set, the EventTarget will print a warning.</p>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">getMaxListeners</span><span style="color: #000000">, </span><span style="color: #001080">setMaxListeners</span><span style="color: #000000">, </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">)); </span><span style="color: #008000">// 10</span>
+<span style="color: #000000">  </span><span style="color: #795E26">setMaxListeners</span><span style="color: #000000">(</span><span style="color: #098658">11</span><span style="color: #000000">, </span><span style="color: #001080">ee</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">)); </span><span style="color: #008000">// 11</span>
+<span style="color: #000000">}</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">et</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventTarget</span><span style="color: #000000">();</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">(</span><span style="color: #001080">et</span><span style="color: #000000">)); </span><span style="color: #008000">// 10</span>
+<span style="color: #000000">  </span><span style="color: #795E26">setMaxListeners</span><span style="color: #000000">(</span><span style="color: #098658">11</span><span style="color: #000000">, </span><span style="color: #001080">et</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #795E26">getMaxListeners</span><span style="color: #000000">(</span><span style="color: #001080">et</span><span style="color: #000000">)); </span><span style="color: #008000">// 11</span>
+<span style="color: #000000">}</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v19.9.0</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>emitter: <span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">_DOMEventTarget</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 					<a name="listenerCount-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> listener<wbr>Count</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
@@ -3303,14 +3541,15 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#listenerCount-1">listenerCount</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:271</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:280</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>A class method that returns the number of listeners for the given <code>eventName</code>registered on the given <code>emitter</code>.</p>
 								</div>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000">, </span><span style="color: #0070C1">listenerCount</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000">, </span><span style="color: #001080">listenerCount</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myEmitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #001080">myEmitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {});</span>
 <span style="color: #001080">myEmitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {});</span>
@@ -3356,29 +3595,28 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#on-1">on</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:254</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:258</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">on</span><span style="color: #000000">, </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+									<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">on</span><span style="color: #000000">, </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">process</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:process&#039;</span><span style="color: #000000">;</span>
 </code></pre>
 								</div>
-								<p>(async () =&gt; {
-								const ee = new EventEmitter();</p>
-								<p>  // Emit later on
+								<p>const ee = new EventEmitter();</p>
+								<p>// Emit later on
 									process.nextTick(() =&gt; {
 									ee.emit(&#39;foo&#39;, &#39;bar&#39;);
 									ee.emit(&#39;foo&#39;, 42);
 								});</p>
-								<p>  for await (const event of on(ee, &#39;foo&#39;)) {
+								<p>for await (const event of on(ee, &#39;foo&#39;)) {
 									// The execution of this inner block is synchronous and it
 									// processes one event at a time (even with await). Do not use
 									// if concurrent execution is required.
 									console.log(event); // prints [&#39;bar&#39;] [42]
 									}
-									// Unreachable here
-								})();</p>
+								// Unreachable here</p>
 								<pre><code>
 <span style="color: #001080">Returns</span><span style="color: #000000"> </span><span style="color: #001080">an</span><span style="color: #000000"> </span><span style="color: #A31515">`AsyncIterator`</span><span style="color: #000000"> </span><span style="color: #001080">that</span><span style="color: #000000"> </span><span style="color: #001080">iterates</span><span style="color: #000000"> </span><span style="color: #A31515">`eventName`</span><span style="color: #000000"> </span><span style="color: #001080">events</span><span style="color: #000000">. </span><span style="color: #001080">It</span><span style="color: #000000"> </span><span style="color: #001080">will</span><span style="color: #000000"> </span><span style="color: #AF00DB">throw</span>
 <span style="color: #AF00DB">if</span><span style="color: #000000"> </span><span style="color: #001080">the</span><span style="color: #000000"> </span><span style="color: #A31515">`EventEmitter`</span><span style="color: #000000"> </span><span style="color: #001080">emits</span><span style="color: #000000"> </span><span style="color: #A31515">`&#039;error&#039;`</span><span style="color: #000000">. </span><span style="color: #001080">It</span><span style="color: #000000"> </span><span style="color: #001080">removes</span><span style="color: #000000"> </span><span style="color: #001080">all</span><span style="color: #000000"> </span><span style="color: #001080">listeners</span><span style="color: #000000"> </span><span style="color: #001080">when</span>
@@ -3388,7 +3626,9 @@
 <span style="color: #001080">An</span><span style="color: #000000"> </span><span style="color: #A31515">`AbortSignal`</span><span style="color: #000000"> </span><span style="color: #001080">can</span><span style="color: #000000"> </span><span style="color: #001080">be</span><span style="color: #000000"> </span><span style="color: #001080">used</span><span style="color: #000000"> </span><span style="color: #001080">to</span><span style="color: #000000"> </span><span style="color: #001080">cancel</span><span style="color: #000000"> </span><span style="color: #001080">waiting</span><span style="color: #000000"> </span><span style="color: #001080">on</span><span style="color: #000000"> events:</span>
 
 <span style="color: #A31515">```js</span>
-<span style="color: #A31515">const { on, EventEmitter } = require(&#039;events&#039;);</span>
+<span style="color: #A31515">import { on, EventEmitter } from &#039;node:events&#039;;</span>
+<span style="color: #A31515">import process from &#039;node:process&#039;;</span>
+
 <span style="color: #A31515">const ac = new AbortController();</span>
 
 <span style="color: #A31515">(async () =&gt; {</span>
@@ -3449,7 +3689,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#once-1">once</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:194</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:193</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3461,49 +3701,46 @@
 								</div>
 								<p>This method is intentionally generic and works with the web platform <a href="https://dom.spec.whatwg.org/#interface-eventtarget">EventTarget</a> interface, which has no special<code>&#39;error&#39;</code> event
 								semantics and does not listen to the <code>&#39;error&#39;</code> event.</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">once</span><span style="color: #000000">, </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">once</span><span style="color: #000000">, </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">process</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:process&#039;</span><span style="color: #000000">;</span>
 
-<span style="color: #0000FF">async</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">run</span><span style="color: #000000">() {</span>
-<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 
-<span style="color: #000000">  </span><span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">nextTick</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">, </span><span style="color: #098658">42</span><span style="color: #000000">);</span>
-<span style="color: #000000">  });</span>
+<span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">nextTick</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">, </span><span style="color: #098658">42</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
 
-<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> [</span><span style="color: #0070C1">value</span><span style="color: #000000">] = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> [</span><span style="color: #0070C1">value</span><span style="color: #000000">] = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">);</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">value</span><span style="color: #000000">);</span>
 
-<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">err</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;kaboom&#039;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">nextTick</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">);</span>
-<span style="color: #000000">  });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">err</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;kaboom&#039;</span><span style="color: #000000">);</span>
+<span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">nextTick</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
 
-<span style="color: #000000">  </span><span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  } </span><span style="color: #AF00DB">catch</span><span style="color: #000000"> (</span><span style="color: #001080">err</span><span style="color: #000000">) {</span>
-<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error happened&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">);</span>
-<span style="color: #000000">  }</span>
+<span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;myevent&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">} </span><span style="color: #AF00DB">catch</span><span style="color: #000000"> (</span><span style="color: #001080">err</span><span style="color: #000000">) {</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error happened&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">);</span>
 <span style="color: #000000">}</span>
-
-<span style="color: #795E26">run</span><span style="color: #000000">();</span>
 </code></pre>
 								<p>The special handling of the <code>&#39;error&#39;</code> event is only used when <code>events.once()</code>is used to wait for another event. If <code>events.once()</code> is used to wait for the
 									&#39;<code>error&#39;</code> event itself, then it is treated as any other kind of event without
 								special handling:</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000">, </span><span style="color: #0070C1">once</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000">, </span><span style="color: #001080">once</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 
 <span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #001080">ee</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">)</span>
 <span style="color: #000000">  .</span><span style="color: #795E26">then</span><span style="color: #000000">(([</span><span style="color: #001080">err</span><span style="color: #000000">]) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ok&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">.</span><span style="color: #001080">message</span><span style="color: #000000">))</span>
-<span style="color: #000000">  .</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">err</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">.</span><span style="color: #001080">message</span><span style="color: #000000">));</span>
+<span style="color: #000000">  .</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">err</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, </span><span style="color: #001080">err</span><span style="color: #000000">.</span><span style="color: #001080">message</span><span style="color: #000000">));</span>
 
 <span style="color: #001080">ee</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;error&#039;</span><span style="color: #000000">, </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;boom&#039;</span><span style="color: #000000">));</span>
 
 <span style="color: #008000">// Prints: ok boom</span>
 </code></pre>
 								<p>An <code>AbortSignal</code> can be used to cancel waiting for the event:</p>
-								<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">EventEmitter</span><span style="color: #000000">, </span><span style="color: #0070C1">once</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+								<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EventEmitter</span><span style="color: #000000">, </span><span style="color: #001080">once</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ee</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">EventEmitter</span><span style="color: #000000">();</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ac</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">AbortController</span><span style="color: #000000">();</span>
@@ -3549,7 +3786,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#once-1">once</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:195</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:198</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -3579,15 +3816,12 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html">TransformIterator</a>.<a href="actor_rdf_join_inner_incremental_multi_delta_query.TransformIterator.html#setMaxListeners-1">setMaxListeners</a></p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:317</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:352</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> {</span>
-<span style="color: #000000">  </span><span style="color: #0070C1">setMaxListeners</span><span style="color: #000000">,</span>
-<span style="color: #000000">  </span><span style="color: #0070C1">EventEmitter</span>
-<span style="color: #000000">} = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;events&#039;</span><span style="color: #000000">);</span>
+									<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">setMaxListeners</span><span style="color: #000000">, </span><span style="color: #001080">EventEmitter</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;node:events&#039;</span><span style="color: #000000">;</span>
 </code></pre>
 								</div>
 								<p>const target = new EventTarget();
@@ -3725,6 +3959,9 @@
 									</li>
 									<li class=" tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#source" class="tsd-kind-icon">source</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_captureRejectionSymbol_" class="tsd-kind-icon">[capture<wbr>Rejection<wbr>Symbol]</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected tsd-is-external">
 										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#_begin" class="tsd-kind-icon">_begin</a>
@@ -3898,7 +4135,13 @@
 										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#uniq" class="tsd-kind-icon">uniq</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#addAbortListener" class="tsd-kind-icon">add<wbr>Abort<wbr>Listener</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#getEventListeners" class="tsd-kind-icon">get<wbr>Event<wbr>Listeners</a>
+									</li>
+									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#getMaxListeners-1" class="tsd-kind-icon">get<wbr>Max<wbr>Listeners</a>
 									</li>
 									<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 										<a href="actor_rdf_join_inner_incremental_multi_delta_query.ClonedIterator.html#listenerCount-1" class="tsd-kind-icon">listener<wbr>Count</a>
