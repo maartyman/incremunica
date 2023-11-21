@@ -1,9 +1,11 @@
 import { EventEmitter } from 'events';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest } from '@comunica/core';
-import type { IActionResourceWatch, IActorResourceWatchArgs,
+import type {
+  IActionResourceWatch, IActorResourceWatchArgs,
   IActorResourceWatchOutput,
-  IResourceWatchEventEmitter } from '@incremunica/bus-resource-watch';
+  IResourceWatchEventEmitter,
+} from '@incremunica/bus-resource-watch';
 import {
   ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
@@ -24,13 +26,14 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
   }
 
   public async test(action: IActionResourceWatch): Promise<IActorTest> {
-    const fetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> => this.mediatorHttp.mediate({
-      context: action.context,
-      input,
-      init,
-    });
+    const customFetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> =>
+      this.mediatorHttp.mediate({
+        context: action.context,
+        input,
+        init,
+      });
 
-    const client = new SubscriptionClient(fetch);
+    const client = new SubscriptionClient(<typeof fetch>customFetch);
     const notificationChannel = await client.subscribe(action.url, this.channelType);
 
     if (notificationChannel.receiveFrom === undefined) {
@@ -41,13 +44,14 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
   }
 
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
-    const fetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> => this.mediatorHttp.mediate({
-      context: action.context,
-      input,
-      init,
-    });
+    const customFetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> =>
+      this.mediatorHttp.mediate({
+        context: action.context,
+        input,
+        init,
+      });
 
-    const client = new SubscriptionClient(fetch);
+    const client = new SubscriptionClient(<typeof fetch>customFetch);
     const notificationChannel = await client.subscribe(action.url, this.channelType);
 
     if (notificationChannel.receiveFrom === undefined) {
