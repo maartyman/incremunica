@@ -11,6 +11,7 @@ import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerIncrementalFullHash } from '../lib';
 import '@incremunica/incremental-jest';
+import { MetadataValidationState } from '@comunica/metadata';
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -62,6 +63,7 @@ describe('ActorRdfJoinFullHash', () => {
             output: {
               bindingsStream: new ArrayIterator([], { autoStart: false }),
               metadata: async() => ({
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 4 },
                 pageSize: 100,
                 requestTime: 10,
@@ -76,6 +78,7 @@ describe('ActorRdfJoinFullHash', () => {
             output: {
               bindingsStream: new ArrayIterator([], { autoStart: false }),
               metadata: async() => ({
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 5 },
                 pageSize: 100,
                 requestTime: 20,
@@ -103,6 +106,7 @@ describe('ActorRdfJoinFullHash', () => {
 
       it('should fail on undefs in left stream', () => {
         action.entries[0].output.metadata = () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
@@ -113,6 +117,7 @@ describe('ActorRdfJoinFullHash', () => {
 
       it('should fail on undefs in right stream', () => {
         action.entries[1].output.metadata = () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
@@ -123,11 +128,13 @@ describe('ActorRdfJoinFullHash', () => {
 
       it('should fail on undefs in left and right stream', () => {
         action.entries[0].output.metadata = () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],
         });
         action.entries[1].output.metadata = () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           canContainUndefs: true,
           variables: [],

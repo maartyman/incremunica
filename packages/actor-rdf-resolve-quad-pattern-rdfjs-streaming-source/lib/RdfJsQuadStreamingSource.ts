@@ -1,5 +1,6 @@
 import type { IQuadSource } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { ActionContextKey } from '@comunica/core/lib/ActionContext';
+import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext } from '@comunica/types';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
@@ -69,6 +70,10 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
   ): Promise<void> {
     const cardinality = 1;
 
-    it.setProperty('metadata', { cardinality: { type: 'exact', value: cardinality }, canContainUndefs: false });
+    it.setProperty('metadata', {
+      state: new MetadataValidationState(),
+      cardinality: { type: 'exact', value: cardinality },
+      canContainUndefs: false,
+    });
   }
 }

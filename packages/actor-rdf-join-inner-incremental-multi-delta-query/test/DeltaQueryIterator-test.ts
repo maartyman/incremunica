@@ -15,6 +15,7 @@ import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import * as RDF from "@rdfjs/types";
 import {Transform} from "readable-stream";
 import EventEmitter = require("events");
+import {MetadataValidationState} from "@comunica/metadata";
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
@@ -37,13 +38,11 @@ function nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
 }
 
 describe("DeltaQueryIterator", () => {
-  let bus: any;
   let context: IActionContext;
   let mediatorQueryOperation: MediatorQueryOperation;
   let mediateFunc: jest.Mock;
 
   beforeEach(() => {
-    bus = new Bus({ name: 'bus' });
     context = new ActionContext();
 
     mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
@@ -54,6 +53,7 @@ describe("DeltaQueryIterator", () => {
         return {
           bindingsStream: new EmptyIterator(),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 0 },
             canContainUndefs: false,
             variables: [ DF.variable('a'), DF.variable('a')],
@@ -82,6 +82,7 @@ describe("DeltaQueryIterator", () => {
       return {
         bindingsStream: bindingstream,
         metadata: () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],
@@ -571,6 +572,7 @@ describe("DeltaQueryIterator", () => {
           ]),
         ]),
         metadata: () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],
@@ -636,6 +638,7 @@ describe("DeltaQueryIterator", () => {
       return {
         bindingsStream: new EmptyIterator(),
         metadata: () => Promise.resolve({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
           variables: [ DF.variable('bound') ],

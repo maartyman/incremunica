@@ -7,6 +7,7 @@ import type {
 import { getDataSourceContext } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { BlankNodeScoped } from '@comunica/data-factory';
+import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext, DataSources, IDataSource, MetadataQuads } from '@comunica/types';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
@@ -189,7 +190,11 @@ export class IncrementalFederatedQuadSource implements IQuadSource {
 
   public match(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term, graph: RDF.Term): AsyncIterator<RDF.Quad> {
     // Counters for our metadata
-    const metadata: MetadataQuads = { cardinality: { type: 'exact', value: 0 }, canContainUndefs: false };
+    const metadata: MetadataQuads = {
+      state: new MetadataValidationState(),
+      cardinality: { type: 'exact', value: 0 },
+      canContainUndefs: false,
+    };
     let remainingSources = this.sources.length;
 
     // Anonymous function to handle cardinality from metadata

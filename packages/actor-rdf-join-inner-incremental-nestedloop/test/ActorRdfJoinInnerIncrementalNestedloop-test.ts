@@ -11,6 +11,7 @@ import {ArrayIterator} from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerIncrementalNestedloop } from '../lib/ActorRdfJoinInnerIncrementalNestedloop';
 import '@incremunica/incremental-jest';
+import { MetadataValidationState } from '@comunica/metadata';
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -62,6 +63,7 @@ describe('ActorRdfJoinNestedLoop', () => {
             output: {
               bindingsStream: new ArrayIterator([], { autoStart: false }),
               metadata: async() => ({
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 4 },
                 pageSize: 100,
                 requestTime: 10,
@@ -76,6 +78,7 @@ describe('ActorRdfJoinNestedLoop', () => {
             output: {
               bindingsStream: new ArrayIterator([], { autoStart: false }),
               metadata: async() => ({
+                state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 5 },
                 pageSize: 100,
                 requestTime: 20,
@@ -103,6 +106,7 @@ describe('ActorRdfJoinNestedLoop', () => {
 
       it('should handle undefs in left stream', () => {
         action.entries[0].output.metadata = async() => ({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           pageSize: 100,
           requestTime: 10,
@@ -120,6 +124,7 @@ describe('ActorRdfJoinNestedLoop', () => {
 
       it('should handle undefs in right stream', () => {
         action.entries[1].output.metadata = async() => ({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 5 },
           pageSize: 100,
           requestTime: 20,
@@ -137,6 +142,7 @@ describe('ActorRdfJoinNestedLoop', () => {
 
       it('should handle undefs in left and right stream', () => {
         action.entries[0].output.metadata = async() => ({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
           pageSize: 100,
           requestTime: 10,
@@ -144,6 +150,7 @@ describe('ActorRdfJoinNestedLoop', () => {
           variables: [],
         });
         action.entries[1].output.metadata = async() => ({
+          state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 5 },
           pageSize: 100,
           requestTime: 20,
@@ -414,6 +421,7 @@ describe('ActorRdfJoinNestedLoop', () => {
         ]),
       ]);
       action.entries[1].output.metadata = async() => ({
+        state: new MetadataValidationState(),
         cardinality: { type: 'estimate', value: 5 },
         pageSize: 100,
         requestTime: 20,

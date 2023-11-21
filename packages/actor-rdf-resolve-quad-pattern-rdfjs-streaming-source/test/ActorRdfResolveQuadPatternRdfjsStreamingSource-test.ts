@@ -12,6 +12,7 @@ import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import {ActionContextKey} from "@comunica/core/lib/ActionContext";
+import {MetadataValidationState} from "@comunica/metadata";
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -191,7 +192,11 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
         DF.quad(DF.namedNode('s2'), DF.namedNode('p'), DF.namedNode('o2')),
       ]);
       expect(await new Promise(resolve => data.getProperty('metadata', resolve)))
-        .toEqual({ cardinality: { type: 'exact', value: 1 }, canContainUndefs: false });
+        .toEqual({
+          state: new MetadataValidationState(),
+          cardinality: { type: 'exact', value: 1 },
+          canContainUndefs: false
+        });
 
       let stopMatches = context.get<any[]>(new ActionContextKey("matchOptions"))
       if (stopMatches === undefined) {
