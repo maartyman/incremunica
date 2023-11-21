@@ -18,7 +18,7 @@
     "@types/readable-stream": "^4.0.0",
     "@types/setup-polly-jest": "^0.5.2",
     "@types/ws": "^8.5.9",
-    "@typescript-eslint/eslint-plugin": "5.43.0",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "^5.43.0",
     "abort-controller": "^3.0.0",
     "arrayify-stream": "^2.0.1",
