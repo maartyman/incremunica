@@ -67,40 +67,60 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
-					<a href="#incremunica-rdfjs-streaming-source-rdf-resolve-quad-pattern-actor" id="incremunica-rdfjs-streaming-source-rdf-resolve-quad-pattern-actor" style="color: inherit; text-decoration: none;">
-						<h1>Incremunica RDFjs Streaming Source RDF Resolve Quad Pattern Actor</h1>
+					<a href="#comunica-bus-rdf-resolve-quad-pattern" id="comunica-bus-rdf-resolve-quad-pattern" style="color: inherit; text-decoration: none;">
+						<h1>Comunica Bus RDF Resolve Quad Pattern</h1>
 					</a>
-					<p><a href="https://badge.fury.io/js/@incremunica%2Factor-rdf-resolve-quad-pattern-rdfjs-streaming-source"><img src="https://badge.fury.io/js/@incremunica%2Factor-rdf-resolve-quad-pattern-rdfjs-streaming-source.svg" alt="npm version"></a></p>
-					<p>A comunica RDFjs Streaming Source RDF Resolve Quad Pattern Actor.</p>
+					<p><a href="https://www.npmjs.com/package/@comunica/bus-rdf-resolve-quad-pattern"><img src="https://badge.fury.io/js/%40comunica%2Fbus-rdf-resolve-quad-pattern.svg" alt="npm version"></a></p>
+					<p>A bus for translating a quad pattern into a stream of quad.</p>
+					<p>This module is part of the <a href="https://github.com/comunica/comunica">Comunica framework</a>,
+					and should only be used by <a href="https://comunica.dev/docs/modify/">developers that want to build their own query engine</a>.</p>
+					<p><a href="https://comunica.dev/docs/query/">Click here if you just want to query with Comunica</a>.</p>
 					<a href="#install" id="install" style="color: inherit; text-decoration: none;">
 						<h2>Install</h2>
 					</a>
-					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source</span>
+					<pre><code class="language-bash"><span style="color: #000000">$ yarn add @comunica/bus-rdf-resolve-quad-pattern</span>
 </code></pre>
-					<a href="#configure" id="configure" style="color: inherit; text-decoration: none;">
-						<h2>Configure</h2>
+					<a href="#bus-usage" id="bus-usage" style="color: inherit; text-decoration: none;">
+						<h2>Bus usage</h2>
 					</a>
-					<p>After installing, this package can be added to your engine&#39;s configuration as follows:</p>
-					<pre><code class="language-text">{
-  &quot;@context&quot;: [
-    ...
-    &quot;https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source/^1.0.0/components/context.jsonld&quot;  
-  ],
-  &quot;actors&quot;: [
-    ...
-    {
-      &quot;@id&quot;: &quot;urn:comunica:default:rdf-resolve-quad-pattern/actors#rdfjs-streaming-source&quot;,
-      &quot;@type&quot;: &quot;ActorRdfResolveQuadPatternRdfjsStreamingSource&quot;
-    }
-  ]
-}
-</code></pre>
+					<ul>
+						<li><strong>Context</strong>: <code>&quot;https://linkedsoftwaredependencies.org/bundles/npm/@comunica/bus-rdf-resolve-quad-pattern/^2.0.0/components/context.jsonld&quot;</code></li>
+						<li><strong>Bus name</strong>: <code>ActorRdfResolveQuadPattern:_default_bus</code></li>
+					</ul>
+					<a href="#creating-actors-on-this-bus" id="creating-actors-on-this-bus" style="color: inherit; text-decoration: none;">
+						<h2>Creating actors on this bus</h2>
+					</a>
+					<p>Actors extending <a href="https://comunica.github.io/comunica/classes/bus_rdf_resolve_quad_pattern.ActorRdfResolveQuadPattern.html"><code>ActorRdfResolveQuadPattern</code></a> are automatically subscribed to this bus.</p>
+					<p><a href="https://comunica.github.io/comunica/classes/bus_rdf_resolve_quad_pattern.ActorRdfResolveQuadPatternSource.html"><code>ActorRdfResolveQuadPatternSource</code></a> is an extension of <code>ActorRdfResolveQuadPattern</code>
+					that delegates quad pattern stream creation to an <a href="https://comunica.github.io/comunica/interfaces/bus_rdf_resolve_quad_pattern.IQuadSource.html"><code>IQuadSource</code></a>.</p>
 				</div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-external">
+							<h3>References</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#ActorRdfResolveQuadPattern" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#ActorRdfResolveQuadPatternSource" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Source</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActionRdfResolveQuadPattern" class="tsd-kind-icon">IAction<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActorRdfResolveQuadPatternArgs" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Args</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActorRdfResolveQuadPatternOutput" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Output</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IQuadSource" class="tsd-kind-icon">IQuad<wbr>Source</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#MediatorRdfResolveQuadPattern" class="tsd-kind-icon">Mediator<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSource" class="tsd-kind-icon">get<wbr>Context<wbr>Source</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSourceFirst" class="tsd-kind-icon">get<wbr>Context<wbr>Source<wbr>First</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSourceUrl" class="tsd-kind-icon">get<wbr>Context<wbr>Source<wbr>Url</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSources" class="tsd-kind-icon">get<wbr>Context<wbr>Sources</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceContext" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Context</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceType" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Type</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceValue" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Value</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#hasContextSingleSource" class="tsd-kind-icon">has<wbr>Context<wbr>Single<wbr>Source</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#hasContextSingleSourceOfType" class="tsd-kind-icon">has<wbr>Context<wbr>Single<wbr>Source<wbr>OfType</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module tsd-is-external"><a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#isDataSourceRawType" class="tsd-kind-icon">is<wbr>Data<wbr>Source<wbr>Raw<wbr>Type</a></li>
+							</ul>
+						</section>
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
@@ -111,6 +131,94 @@
 					</div>
 				</section>
 			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>References</h2>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="ActorRdfResolveQuadPattern" class="tsd-anchor"></a>
+					<h3>Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</h3>
+					Re-exports <a href="">ActorRdfResolveQuadPattern</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="ActorRdfResolveQuadPatternSource" class="tsd-anchor"></a>
+					<h3>Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Source</h3>
+					Re-exports <a href="">ActorRdfResolveQuadPatternSource</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="IActionRdfResolveQuadPattern" class="tsd-anchor"></a>
+					<h3>IAction<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</h3>
+					Re-exports <a href="">IActionRdfResolveQuadPattern</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="IActorRdfResolveQuadPatternArgs" class="tsd-anchor"></a>
+					<h3>IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Args</h3>
+					Re-exports <a href="">IActorRdfResolveQuadPatternArgs</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="IActorRdfResolveQuadPatternOutput" class="tsd-anchor"></a>
+					<h3>IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Output</h3>
+					Re-exports <a href="">IActorRdfResolveQuadPatternOutput</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="IQuadSource" class="tsd-anchor"></a>
+					<h3>IQuad<wbr>Source</h3>
+					Re-exports <a href="">IQuadSource</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="MediatorRdfResolveQuadPattern" class="tsd-anchor"></a>
+					<h3>Mediator<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</h3>
+					Re-exports <a href="">MediatorRdfResolveQuadPattern</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getContextSource" class="tsd-anchor"></a>
+					<h3>get<wbr>Context<wbr>Source</h3>
+					Re-exports <a href="">getContextSource</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getContextSourceFirst" class="tsd-anchor"></a>
+					<h3>get<wbr>Context<wbr>Source<wbr>First</h3>
+					Re-exports <a href="">getContextSourceFirst</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getContextSourceUrl" class="tsd-anchor"></a>
+					<h3>get<wbr>Context<wbr>Source<wbr>Url</h3>
+					Re-exports <a href="">getContextSourceUrl</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getContextSources" class="tsd-anchor"></a>
+					<h3>get<wbr>Context<wbr>Sources</h3>
+					Re-exports <a href="">getContextSources</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getDataSourceContext" class="tsd-anchor"></a>
+					<h3>get<wbr>Data<wbr>Source<wbr>Context</h3>
+					Re-exports <a href="">getDataSourceContext</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getDataSourceType" class="tsd-anchor"></a>
+					<h3>get<wbr>Data<wbr>Source<wbr>Type</h3>
+					Re-exports <a href="">getDataSourceType</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="getDataSourceValue" class="tsd-anchor"></a>
+					<h3>get<wbr>Data<wbr>Source<wbr>Value</h3>
+					Re-exports <a href="">getDataSourceValue</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="hasContextSingleSource" class="tsd-anchor"></a>
+					<h3>has<wbr>Context<wbr>Single<wbr>Source</h3>
+					Re-exports <a href="">hasContextSingleSource</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="hasContextSingleSourceOfType" class="tsd-anchor"></a>
+					<h3>has<wbr>Context<wbr>Single<wbr>Source<wbr>OfType</h3>
+					Re-exports <a href="">hasContextSingleSourceOfType</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+					<a name="isDataSourceRawType" class="tsd-anchor"></a>
+					<h3>is<wbr>Data<wbr>Source<wbr>Raw<wbr>Type</h3>
+					Re-exports <a href="">isDataSourceRawType</a>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
@@ -118,13 +226,16 @@
 					<li class=" ">
 						<a href="../modules.html">Modules</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class="current tsd-kind-module tsd-is-external">
 						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-module tsd-is-external">
+						<a href="_comunica.html" class="tsd-kind-icon">@comunica</a>
+					</li>
 					<li class=" tsd-kind-module">
 						<a href="actor_guard_naive.html" class="tsd-kind-icon">actor-<wbr>guard-<wbr>naive</a>
 					</li>
@@ -160,9 +271,60 @@
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-module">
+					<li class="current tsd-kind-module tsd-is-external">
 						<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html" class="tsd-kind-icon">actor-<wbr>rdf-<wbr>resolve-<wbr>quad-<wbr>pattern-<wbr>rdfjs-<wbr>streaming-<wbr>source</a>
 						<ul>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#ActorRdfResolveQuadPattern" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#ActorRdfResolveQuadPatternSource" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Source</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActionRdfResolveQuadPattern" class="tsd-kind-icon">IAction<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActorRdfResolveQuadPatternArgs" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Args</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IActorRdfResolveQuadPatternOutput" class="tsd-kind-icon">IActor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Output</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#IQuadSource" class="tsd-kind-icon">IQuad<wbr>Source</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#MediatorRdfResolveQuadPattern" class="tsd-kind-icon">Mediator<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSource" class="tsd-kind-icon">get<wbr>Context<wbr>Source</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSourceFirst" class="tsd-kind-icon">get<wbr>Context<wbr>Source<wbr>First</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSourceUrl" class="tsd-kind-icon">get<wbr>Context<wbr>Source<wbr>Url</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getContextSources" class="tsd-kind-icon">get<wbr>Context<wbr>Sources</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceContext" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Context</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceType" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#getDataSourceValue" class="tsd-kind-icon">get<wbr>Data<wbr>Source<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#hasContextSingleSource" class="tsd-kind-icon">has<wbr>Context<wbr>Single<wbr>Source</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#hasContextSingleSourceOfType" class="tsd-kind-icon">has<wbr>Context<wbr>Single<wbr>Source<wbr>OfType</a>
+							</li>
+							<li class=" tsd-kind-reference tsd-parent-kind-module tsd-is-external">
+								<a href="actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.html#isDataSourceRawType" class="tsd-kind-icon">is<wbr>Data<wbr>Source<wbr>Raw<wbr>Type</a>
+							</li>
 							<li class=" tsd-kind-class tsd-parent-kind-module">
 								<a href="../classes/actor_rdf_resolve_quad_pattern_rdfjs_streaming_source.ActorRdfResolveQuadPatternRdfjsStreamingSource.html" class="tsd-kind-icon">Actor<wbr>Rdf<wbr>Resolve<wbr>Quad<wbr>Pattern<wbr>Rdfjs<wbr>Streaming<wbr>Source</a>
 							</li>
@@ -208,6 +370,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="query_sparql_incremental.html" class="tsd-kind-icon">query-<wbr>sparql-<wbr>incremental</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-external">
+						<a href="rdf_parse.html" class="tsd-kind-icon">rdf-<wbr>parse</a>
 					</li>
 					<li class=" tsd-kind-module tsd-is-external">
 						<a href="sparqlalgebrajs.html" class="tsd-kind-icon">sparqlalgebrajs</a>
