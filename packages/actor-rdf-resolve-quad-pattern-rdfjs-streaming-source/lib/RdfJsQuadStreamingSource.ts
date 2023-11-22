@@ -1,7 +1,7 @@
 import type { IQuadSource } from '@comunica/bus-rdf-resolve-quad-pattern';
-import { ActionContextKey } from '@comunica/core/lib/ActionContext';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext } from '@comunica/types';
+import { KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
@@ -44,7 +44,7 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
 
     if (this.context) {
       const matchOptionsArray: ({ stopMatch: () => void })[] | undefined = this.context.get(
-        new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'),
+        KeysStreamingSource.matchOptions,
       );
       if (matchOptionsArray !== undefined) {
         matchOptionsArray.push(matchOptions);

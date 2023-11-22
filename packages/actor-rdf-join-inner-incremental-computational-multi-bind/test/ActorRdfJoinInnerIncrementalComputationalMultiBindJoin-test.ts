@@ -18,9 +18,9 @@ import {KeysQueryOperation, KeysRdfResolveQuadPattern} from "@comunica/context-e
 import {EventEmitter} from "events";
 import {PassThrough, Stream} from "readable-stream";
 import {BindingsStream} from "@incremunica/incremental-types";
-import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import { MetadataValidationState } from '@comunica/metadata';
+import {KeysStreamingSource} from "@incremunica/context-entries";
 
 
 const streamifyArray = require('streamify-array');
@@ -1243,7 +1243,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               }
               stopMatchJest();
             }
-            let matchOptions = arg.context.get(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'));
+            let matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
             -expect(matchOptions).not.toBeUndefined()
             if (matchOptions !== undefined) {
               (<({ stopMatch: () => void })[]>matchOptions).push({
@@ -1436,7 +1436,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 stream.end();
                 stopMatchJest();
               }
-              let matchOptions = arg.context.get(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'));
+              let matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
 -              expect(matchOptions).not.toBeUndefined()
               if (matchOptions !== undefined) {
                 (<({ stopMatch: () => void })[]> matchOptions).push({

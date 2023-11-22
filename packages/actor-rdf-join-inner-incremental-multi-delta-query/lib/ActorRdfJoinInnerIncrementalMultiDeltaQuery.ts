@@ -7,9 +7,9 @@ import type {
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
-import { ActionContextKey } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { MetadataBindings } from '@comunica/types';
+import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DeltaQueryIterator } from './DeltaQueryIterator';
 
 /**
@@ -18,7 +18,6 @@ import { DeltaQueryIterator } from './DeltaQueryIterator';
 export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   public readonly selectivityModifier: number;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
-  public static readonly keyFromDeltaQuery = new ActionContextKey('keyFromDeltaQuery');
   public constructor(args: IActorRdfJoinMultiDeltaQueryArgs) {
     super(args, {
       logicalType: 'inner',
@@ -53,7 +52,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   ): Promise<IMediatorTypeJoinCoefficients> {
     // Throw when the previous join was a delta query join or when it is a static query
     if (action.context
-      .get(ActorRdfJoinInnerIncrementalMultiDeltaQuery.keyFromDeltaQuery)) {
+      .get(KeysDeltaQueryJoin.fromDeltaQuery)) {
       throw new Error('Can\'t do two delta query joins after each other');
     }
     return {

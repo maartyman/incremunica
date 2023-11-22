@@ -4,11 +4,11 @@ import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
+import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import type { BindingsStream, Quad, Bindings } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';
-import { ActorRdfJoinInnerIncrementalMultiDeltaQuery } from './ActorRdfJoinInnerIncrementalMultiDeltaQuery';
 
 export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private count = 0;
@@ -30,7 +30,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     this.entries = entries;
     this.subContext = new ActionContext()
       .set(KeysRdfResolveQuadPattern.sources, [ this.store ])
-      .set(ActorRdfJoinInnerIncrementalMultiDeltaQuery.keyFromDeltaQuery, true);
+      .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
     this.readable = false;

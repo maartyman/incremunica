@@ -11,8 +11,8 @@ import 'jest-rdf';
 import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
-import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 import {MetadataValidationState} from "@comunica/metadata";
+import {KeysStreamingSource} from "@incremunica/context-entries";
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -140,16 +140,16 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
 
     it("stopMatches in context should be kept undefined", async () => {
       let context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: source});
-      expect(context.get<any[]>(new ActionContextKey("matchOptions"))).toBeUndefined();
+      expect(context.get<any[]>(KeysStreamingSource.matchOptions)).toBeUndefined();
       (await (<any>actor).getSource(context)).match()
-      expect(context.get<any[]>(new ActionContextKey("matchOptions"))).toBeUndefined();
+      expect(context.get<any[]>(KeysStreamingSource.matchOptions)).toBeUndefined();
     });
 
     it("should error on stopMatch if StreamingStore isn't doing it's job", async () => {
       let context: IActionContext = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: source});
-      context = context.set(new ActionContextKey("matchOptions"), []);
+      context = context.set(KeysStreamingSource.matchOptions, []);
       (await (<any>actor).getSource(context)).match()
-      let stopMatches = context.get<any[]>(new ActionContextKey("matchOptions"))
+      let stopMatches = context.get<any[]>(KeysStreamingSource.matchOptions)
       if (stopMatches === undefined) {
         throw new Error("stopMatches in context is undefined")
       }
@@ -167,7 +167,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       ])));
 
       context = new ActionContext({ [KeysRdfResolveQuadPattern.source.name]: store });
-      context = context.set(new ActionContextKey("matchOptions"), []);
+      context = context.set(KeysStreamingSource.matchOptions, []);
       const pattern: any = {
         subject: DF.variable('s'),
         predicate: DF.namedNode('p'),
@@ -198,7 +198,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
           canContainUndefs: false
         });
 
-      let stopMatches = context.get<any[]>(new ActionContextKey("matchOptions"))
+      let stopMatches = context.get<any[]>(KeysStreamingSource.matchOptions)
       if (stopMatches === undefined) {
         throw new Error("stopMatches in context is undefined")
       }
