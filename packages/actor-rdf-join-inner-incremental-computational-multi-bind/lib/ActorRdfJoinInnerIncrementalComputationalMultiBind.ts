@@ -5,7 +5,6 @@ import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
-import { ActionContextKey } from '@comunica/core/lib/ActionContext';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
@@ -15,6 +14,7 @@ import type {
   IQueryOperationResultBindings,
   MetadataBindings,
 } from '@comunica/types';
+import { KeysStreamingSource } from '@incremunica/context-entries';
 import { HashBindings } from '@incremunica/hash-bindings';
 import type { Bindings } from '@incremunica/incremental-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
@@ -269,7 +269,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         const matchOptions: ({ stopMatch: () => void })[] = [];
         const currentSubContext = subContext
           .set(KeysQueryOperation.joinBindings, operationBindings)
-          .set(new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'), matchOptions);
+          .set(KeysStreamingSource.matchOptions, matchOptions);
         const operation = operations.length === 1 ?
           operations[0] :
           ActorRdfJoinInnerIncrementalComputationalMultiBind.FACTORY.createJoin(operations);

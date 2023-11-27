@@ -11,8 +11,9 @@ import 'jest-rdf';
 import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
-import {ActionContextKey} from "@comunica/core/lib/ActionContext";
 import {MetadataValidationState} from "@comunica/metadata";
+import {KeysGuard, KeysStreamingSource} from "@incremunica/context-entries";
+import EventEmitter = require("events");
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -140,16 +141,16 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
 
     it("stopMatches in context should be kept undefined", async () => {
       let context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: source});
-      expect(context.get<any[]>(new ActionContextKey("matchOptions"))).toBeUndefined();
+      expect(context.get<any[]>(KeysStreamingSource.matchOptions)).toBeUndefined();
       (await (<any>actor).getSource(context)).match()
-      expect(context.get<any[]>(new ActionContextKey("matchOptions"))).toBeUndefined();
+      expect(context.get<any[]>(KeysStreamingSource.matchOptions)).toBeUndefined();
     });
 
     it("should error on stopMatch if StreamingStore isn't doing it's job", async () => {
       let context: IActionContext = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: source});
-      context = context.set(new ActionContextKey("matchOptions"), []);
+      context = context.set(KeysStreamingSource.matchOptions, []);
       (await (<any>actor).getSource(context)).match()
-      let stopMatches = context.get<any[]>(new ActionContextKey("matchOptions"))
+      let stopMatches = context.get<any[]>(KeysStreamingSource.matchOptions)
       if (stopMatches === undefined) {
         throw new Error("stopMatches in context is undefined")
       }
@@ -167,7 +168,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       ])));
 
       context = new ActionContext({ [KeysRdfResolveQuadPattern.source.name]: store });
-      context = context.set(new ActionContextKey("matchOptions"), []);
+      context = context.set(KeysStreamingSource.matchOptions, []);
       const pattern: any = {
         subject: DF.variable('s'),
         predicate: DF.namedNode('p'),
@@ -198,7 +199,7 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
           canContainUndefs: false
         });
 
-      let stopMatches = context.get<any[]>(new ActionContextKey("matchOptions"))
+      let stopMatches = context.get<any[]>(KeysStreamingSource.matchOptions)
       if (stopMatches === undefined) {
         throw new Error("stopMatches in context is undefined")
       }
@@ -211,6 +212,60 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       const source = new RdfJsQuadStreamingSource();
       source.store.end()
       expect(await arrayifyStream(source.store.match())).toEqualRdfQuadArray([]);
+    });
+
+    it('should set the `up-to-date` property to true by default', async () => {
+      const store = new StreamingStore();
+
+      context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: store});
+      const pattern: any = {
+        subject: DF.variable('s'),
+        predicate: DF.namedNode('p'),
+        object: DF.variable('o'),
+        graph: DF.variable('g'),
+      };
+
+      const {data} = await actor.run({pattern, context});
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      store.end();
+    });
+
+    it('should set the `up-to-date` based on the guard events', async () => {
+      const store = new StreamingStore();
+      const guardEvents = new EventEmitter();
+
+      context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: store});
+      context = context.set(KeysGuard.events, guardEvents);
+
+      const pattern: any = {
+        subject: DF.variable('s'),
+        predicate: DF.namedNode('p'),
+        object: DF.variable('o'),
+        graph: DF.variable('g'),
+      };
+
+      const {data} = await actor.run({pattern, context});
+
+      expect(EventEmitter.getEventListeners(guardEvents, 'modified').length).toEqual(1);
+      expect(EventEmitter.getEventListeners(guardEvents, 'up-to-date').length).toEqual(1);
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      guardEvents.emit('modified');
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(false);
+
+      guardEvents.emit('up-to-date');
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      store.end();
     });
 
     /*

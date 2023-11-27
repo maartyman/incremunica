@@ -1,23 +1,23 @@
 {
-  "name": "@incremunica/bus-guard",
-  "version": "1.1.0",
-  "description": "A comunica bus for guard events.",
-  "lsd:module": true,
+  "name": "@incremunica/context-entries",
+  "version": "1.0.0",
+  "description": "A collection of reusable Incremunica context key definitions.",
   "main": "lib/index.js",
   "typings": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/bus-guard"
+    "directory": "packages/context-entries"
   },
   "publishConfig": {
     "access": "public"
   },
   "sideEffects": false,
   "keywords": [
-    "comunica",
-    "bus",
-    "guard"
+    "incremunica",
+    "context",
+    "entries",
+    "keys"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,12 +32,9 @@
   ],
   "dependencies": {
     "@comunica/core": "^2.10.0",
-    "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.1.0",
     "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {
-    "build": "npm run build:ts && npm run build:components",
-    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
-    "build:components": "componentsjs-generator"
+    "build": "node \"../../node_modules/typescript/bin/tsc\""
   }
 }

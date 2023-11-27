@@ -13,6 +13,7 @@ import {IActionRdfJoin} from "@comunica/bus-rdf-join";
 import arrayifyStream from "arrayify-stream";
 import {ActorRdfJoinInnerIncrementalMultiDeltaQuery} from "../lib";
 import { MetadataValidationState } from '@comunica/metadata';
+import {KeysDeltaQueryJoin} from "@incremunica/context-entries";
 
 const DF = new DataFactory();
 const BF = new BindingsFactory();
@@ -136,7 +137,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
               },
             ],
             context: new ActionContext()
-              .set(ActorRdfJoinInnerIncrementalMultiDeltaQuery.keyFromDeltaQuery, true),
+              .set(KeysDeltaQueryJoin.fromDeltaQuery, true),
           },
           [
             {

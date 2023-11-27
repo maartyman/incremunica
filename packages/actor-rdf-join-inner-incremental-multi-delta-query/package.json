@@ -40,6 +40,7 @@
     "@comunica/mediatortype-join-coefficients": "^2.10.0",
     "@comunica/types": "^2.10.0",
     "@incremunica/incremental-types": "^1.0.0",
+    "@incremunica/context-entries": "^1.0.0",
     "asynciterator": "^3.8.1",
     "n3": "^1.16.4",
     "sparqlalgebrajs": "^4.1.0"

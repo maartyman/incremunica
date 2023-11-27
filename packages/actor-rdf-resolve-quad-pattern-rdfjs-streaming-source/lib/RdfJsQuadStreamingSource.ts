@@ -1,9 +1,9 @@
 import type { IQuadSource } from '@comunica/bus-rdf-resolve-quad-pattern';
-import { ActionContextKey } from '@comunica/core/lib/ActionContext';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext } from '@comunica/types';
+import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
-import type { Quad } from '@incremunica/incremental-types';
+import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
@@ -44,7 +44,7 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
 
     if (this.context) {
       const matchOptionsArray: ({ stopMatch: () => void })[] | undefined = this.context.get(
-        new ActionContextKey<({ stopMatch: () => void })[]>('matchOptions'),
+        KeysStreamingSource.matchOptions,
       );
       if (matchOptionsArray !== undefined) {
         matchOptionsArray.push(matchOptions);
@@ -52,6 +52,20 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
     }
 
     const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
+
+    // Set up-to-date property
+    it.setProperty('up-to-date', true);
+    if (this.context) {
+      const guardEvents = this.context.get<IGuardEvents>(KeysGuard.events);
+      if (guardEvents) {
+        guardEvents.on('modified', () => {
+          it.setProperty('up-to-date', false);
+        });
+        guardEvents.on('up-to-date', () => {
+          it.setProperty('up-to-date', true);
+        });
+      }
+    }
 
     // In case this setMetadata can cause errors, catch the error and emit it on the iterator (it). For now ignore it!
     /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
