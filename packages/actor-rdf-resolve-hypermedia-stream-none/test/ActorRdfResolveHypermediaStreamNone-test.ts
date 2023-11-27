@@ -1,13 +1,25 @@
 import { Bus } from '@comunica/core';
 import { ActorRdfResolveHypermediaStreamNone } from '../lib/ActorRdfResolveHypermediaStreamNone';
-import {MediatorGuard} from "@incremunica/bus-guard";
+import {IActionGuard, MediatorGuard} from "@incremunica/bus-guard";
 import {DataFactory} from "rdf-data-factory";
 import arrayifyStream from "arrayify-stream";
 import 'jest-rdf'
+import {EventEmitter} from "events";
+import {KeysGuard} from "@incremunica/context-entries";
+import {IGuardEvents} from "@incremunica/incremental-types";
 
 const DF = new DataFactory();
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
+
+function captureEvents(item: EventEmitter, ...events: string[]) {
+  const counts = (<any>item)._eventCounts = Object.create(null);
+  for (const event of events) {
+    counts[event] = 0;
+    item.on(event, () => { counts[event]++; });
+  }
+  return item;
+}
 
 describe('ActorRdfResolveHypermediaStreamNone', () => {
   let bus: any;
@@ -19,12 +31,17 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
   describe('An ActorRdfResolveHypermediaStreamNone instance', () => {
     let actor: ActorRdfResolveHypermediaStreamNone;
     let mediatorGuard: MediatorGuard;
+    let guardEvents: EventEmitter;
+    let mediatorFn: jest.Func;
 
     beforeEach(() => {
+      guardEvents = new EventEmitter();
+      captureEvents(guardEvents, 'modified', 'up-to-date');
+      mediatorFn = jest.fn();
       mediatorGuard = <any> {
-        mediated: false,
-        mediate: () => {
-          (<any>mediatorGuard).mediated = true;
+        mediate: (action: IActionGuard) => {
+          mediatorFn(action);
+          return { guardEvents }
         }
       };
       actor = new ActorRdfResolveHypermediaStreamNone({ name: 'actor', bus, mediatorGuard});
@@ -77,8 +94,43 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
         url: "http://test.com",
         quads: streamifyArray([])
       };
-      await actor.run(action)
-      expect((<any>mediatorGuard).mediated).toBeTruthy()
+      await actor.run(action);
+      expect(mediatorFn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should add the guard events to the source', async () => {
+      let action = <any> {
+        context: {
+          get: () => {
+            return ""
+          }
+        },
+        url: "http://test.com",
+        quads: streamifyArray([])
+      };
+      let result = await actor.run(action);
+      let events = <IGuardEvents>(<any> result.source).context.get(KeysGuard.events);
+      expect(events).toEqual(guardEvents);
+      guardEvents.emit("modified");
+      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
+    });
+
+    it('should add the guard events to the source even if the source has no context', async () => {
+      mediatorFn = jest.fn((action: IActionGuard) => {
+        action.streamingSource.context = undefined;
+      });
+      let action = <any> {
+        context: {
+          get: () => {
+            return ""
+          }
+        },
+        url: "http://test.com",
+        quads: streamifyArray([])
+      };
+      let result = await actor.run(action);
+      expect(mediatorFn).toHaveBeenCalledTimes(1);
+      expect((<any> result.source).context.get(KeysGuard.events)).toEqual(guardEvents);
     });
   });
 });

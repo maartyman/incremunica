@@ -1053,7 +1053,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           ]),
           context: new ActionContext({
             a: 'b',
-            "matchOptions": [],
+            [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
               cardinality: {type: 'estimate', value: 1},
@@ -1086,7 +1086,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           ]),
           context: new ActionContext({
             a: 'b',
-            "matchOptions": [],
+            [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
               cardinality: {type: 'estimate', value: 1},

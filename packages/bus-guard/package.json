@@ -32,7 +32,8 @@
   ],
   "dependencies": {
     "@comunica/core": "^2.10.0",
-    "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.1.0"
+    "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.1.0",
+    "@incremunica/incremental-types": "^1.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

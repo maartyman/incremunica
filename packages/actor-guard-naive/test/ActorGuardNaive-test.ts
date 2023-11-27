@@ -11,6 +11,16 @@ import {IActionResourceWatch, IActorResourceWatchOutput, MediatorResourceWatch} 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
 
+// Captures the number of times an event has been emitted
+function captureEvents(item: EventEmitter, ...events: string[]) {
+  const counts = (<any>item)._eventCounts = Object.create(null);
+  for (const event of events) {
+    counts[event] = 0;
+    item.on(event, () => { counts[event]++; });
+  }
+  return item;
+}
+
 describe('ActorGuardNaive', () => {
   let bus: any;
 
@@ -123,7 +133,11 @@ describe('ActorGuardNaive', () => {
         quad('s2', 'p2', 'o2')
       ];
 
-      await actor.run(action);
+      let {guardEvents} = await actor.run(action);
+      captureEvents(guardEvents, 'modified', 'up-to-date');
+
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
 
       quadArray = [
         quad('s1', 'p1', 'o1'),
@@ -133,8 +147,10 @@ describe('ActorGuardNaive', () => {
 
       changeNotificationEventEmitter.emit("update");
 
-      await new Promise<void>((resolve) => setImmediate(resolve));
+      await new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
+      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
       expect(addQuadFn).toHaveBeenCalledTimes(1);
       expect(addQuadFn).toHaveBeenCalledWith(quad('s3', 'p3', 'o3'));
     });
@@ -146,7 +162,11 @@ describe('ActorGuardNaive', () => {
         quad('s3', 'p3', 'o3')
       ];
 
-      await actor.run(action);
+      let {guardEvents} = await actor.run(action);
+      captureEvents(guardEvents, 'modified', 'up-to-date');
+
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
 
       quadArray = [
         quad('s1', 'p1', 'o1'),
@@ -155,8 +175,10 @@ describe('ActorGuardNaive', () => {
 
       changeNotificationEventEmitter.emit("update");
 
-      await new Promise<void>((resolve) => setImmediate(resolve));
+      await new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
+      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
       expect(removeQuadFn).toHaveBeenCalledTimes(1);
       expect(removeQuadFn).toHaveBeenCalledWith(
         DataFactory.quad(
@@ -174,12 +196,20 @@ describe('ActorGuardNaive', () => {
         quad('s3', 'p3', 'o3')
       ];
 
-      await actor.run(action);
+      let {guardEvents} = await actor.run(action);
+      captureEvents(guardEvents, 'modified', 'up-to-date');
+
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
+
+      let updatePromise = new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
       changeNotificationEventEmitter.emit("delete");
 
-      await new Promise<void>((resolve) => setImmediate(resolve));
+      await updatePromise;
 
+      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
       expect(removeQuadFn).toHaveBeenCalledTimes(3);
       expect(removeQuadFn).toHaveBeenNthCalledWith(1,
         DataFactory.quad(

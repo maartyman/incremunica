@@ -1,9 +1,10 @@
+import { EventEmitter } from 'events';
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
 import type { IActorTest } from '@comunica/core';
 import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremunica/bus-guard';
 import { ActorGuard } from '@incremunica/bus-guard';
 import type { MediatorResourceWatch } from '@incremunica/bus-resource-watch';
-import type { Quad } from '@incremunica/incremental-types';
+import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 
 /**
  * A comunica Naive Guard Actor.
@@ -27,16 +28,20 @@ export class ActorGuardNaive extends ActorGuard {
       metadata: action.metadata,
     });
 
+    const guardEvents: IGuardEvents = new EventEmitter();
+    guardEvents.emit('up-to-date');
+
     // If the streamingStore has ended while making a watcher, stop watching
     if (action.streamingSource.store.hasEnded()) {
       resourceWatch.stopFunction();
-      return {};
+      return { guardEvents };
     }
     action.streamingSource.store.on('end', () => {
       resourceWatch.stopFunction();
     });
 
     resourceWatch.events.on('update', async() => {
+      guardEvents.emit('modified');
       const deletionStore = action.streamingSource.store.copyOfStore();
       const additionArray: Quad[] = [];
       const responseGet = await this.mediatorDereferenceRdf.mediate({
@@ -59,16 +64,19 @@ export class ActorGuardNaive extends ActorGuard {
         for (const quad of additionArray) {
           action.streamingSource.store.addQuad(quad);
         }
+        guardEvents.emit('up-to-date');
       });
     });
 
     resourceWatch.events.on('delete', () => {
+      guardEvents.emit('modified');
       for (const quad of action.streamingSource.store.getStore()) {
         action.streamingSource.store.removeQuad(<Quad>quad);
       }
+      guardEvents.emit('up-to-date');
     });
 
-    return {};
+    return { guardEvents };
   }
 }
 

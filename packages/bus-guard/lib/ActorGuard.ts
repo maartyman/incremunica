@@ -1,6 +1,7 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
 import type { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
+import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvents';
 
 /**
  * A comunica actor for guard events.
@@ -22,10 +23,6 @@ export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorG
   }
 }
 
-export interface IGuard {
-  delete: (url: string) => void;
-}
-
 export interface IActionGuard extends IAction {
   /**
    * The source element of the data.
@@ -42,7 +39,10 @@ export interface IActionGuard extends IAction {
 }
 
 export interface IActorGuardOutput extends IActorOutput {
-
+  /**
+   * Events send by the guard
+   */
+  guardEvents: IGuardEvents;
 }
 
 export type IActorGuardArgs = IActorArgs<

@@ -12,7 +12,8 @@ import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 
 import {promisifyEventEmitter} from "event-emitter-promisify/dist";
 import {MetadataValidationState} from "@comunica/metadata";
-import {KeysStreamingSource} from "@incremunica/context-entries";
+import {KeysGuard, KeysStreamingSource} from "@incremunica/context-entries";
+import EventEmitter = require("events");
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -211,6 +212,60 @@ describe('ActorRdfResolveQuadPatternRdfjsStreamingSource', () => {
       const source = new RdfJsQuadStreamingSource();
       source.store.end()
       expect(await arrayifyStream(source.store.match())).toEqualRdfQuadArray([]);
+    });
+
+    it('should set the `up-to-date` property to true by default', async () => {
+      const store = new StreamingStore();
+
+      context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: store});
+      const pattern: any = {
+        subject: DF.variable('s'),
+        predicate: DF.namedNode('p'),
+        object: DF.variable('o'),
+        graph: DF.variable('g'),
+      };
+
+      const {data} = await actor.run({pattern, context});
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      store.end();
+    });
+
+    it('should set the `up-to-date` based on the guard events', async () => {
+      const store = new StreamingStore();
+      const guardEvents = new EventEmitter();
+
+      context = new ActionContext({[KeysRdfResolveQuadPattern.source.name]: store});
+      context = context.set(KeysGuard.events, guardEvents);
+
+      const pattern: any = {
+        subject: DF.variable('s'),
+        predicate: DF.namedNode('p'),
+        object: DF.variable('o'),
+        graph: DF.variable('g'),
+      };
+
+      const {data} = await actor.run({pattern, context});
+
+      expect(EventEmitter.getEventListeners(guardEvents, 'modified').length).toEqual(1);
+      expect(EventEmitter.getEventListeners(guardEvents, 'up-to-date').length).toEqual(1);
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      guardEvents.emit('modified');
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(false);
+
+      guardEvents.emit('up-to-date');
+
+      expect(await new Promise(resolve => data.getProperty('up-to-date', resolve)))
+        .toEqual(true);
+
+      store.end();
     });
 
     /*
