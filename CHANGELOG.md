@@ -1,6 +1,52 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.0"></a>
+## [v1.2.0](https://github.com/maartyman/incremunica/compare/v1.1.0...v1.2.0) - 2023-11-29
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [updated packages and lock file](https://github.com/maartyman/incremunica/commit/47fca971a07daeb3c729a1743e8d0be7602b5d42)
+* [Merge pull request #65 from maartyman/bindingstream-up-to-date-feature](https://github.com/maartyman/incremunica/commit/cbd84ede2a29928138f5294e5ab2f67149a8f68e)
+* [add up-to-date field to lowest iterators](https://github.com/maartyman/incremunica/commit/98f4b1b76f325d54610dcac91a2cd7a0dcadaa74)
+* [implemented context entries](https://github.com/maartyman/incremunica/commit/b3a13db69cde359575ef32868ca1863da995f9b9)
+* [Merge pull request #64 from maartyman/fix-docs](https://github.com/maartyman/incremunica/commit/6449d22b3e0f81645fa688122ef80722b2c93b60)
+* [Merge branch 'master' into fix-docs](https://github.com/maartyman/incremunica/commit/40b79f5159c05c5d84aca29efa4de76eb780992e)
+* [change typedoc configs](https://github.com/maartyman/incremunica/commit/9b7694db0e97bde2de12e346e09094b6e0c8155d)
+* [Update jest monorepo to v29](https://github.com/maartyman/incremunica/commit/0fee730729f59cdd70b5482c49178dad255f25fe)
+* [Update dependency typescript to v5](https://github.com/maartyman/incremunica/commit/10dc04b2fe57ce06a37f7d4fe02a37558897f803)
+* [Merge pull request #61 from maartyman/update-comunica-packages](https://github.com/maartyman/incremunica/commit/8be6799ed60b48ff04eb2bccd660d7a56fcc5488)
+* [fixed delta-query tests](https://github.com/maartyman/incremunica/commit/a6c3fe963e4051b0c0ce66c742c81a68b3c6f556)
+* [Merge branch 'master' into update-comunica-packages](https://github.com/maartyman/incremunica/commit/72930e86041545e6b73feae7abe25682872bf09f)
+* [Update dependency nodemon to v3](https://github.com/maartyman/incremunica/commit/ec68ae19c342a7251c516bc63d1cbb0800373cef)
+* [updated comunica packages to 2.10 and fixed tests](https://github.com/maartyman/incremunica/commit/a9496232e7ffcc73b591e8de96a232f795f1fd5e)
+* [Update dependency typedoc to ^0.25.0](https://github.com/maartyman/incremunica/commit/be07952e352bb98b5f2b41d1b9c2331b57eeaff9)
+* [Update dependency @typescript-eslint/eslint-plugin to v5.62.0](https://github.com/maartyman/incremunica/commit/32e5cea39e7c0ef32ec42e056d32f1c89a8def4b)
+* [Update Comunica monorepo packages](https://github.com/maartyman/incremunica/commit/1a29b89c1c6b61d87b10ce5a3b831f014d8aea39)
+* [fix fetch function](https://github.com/maartyman/incremunica/commit/63415fa7fd49d1b06534de42f014dd905b3f3694)
+* [Update dependency @types/node to v20](https://github.com/maartyman/incremunica/commit/3ea28d247fb435ba53f1a1a7c609c93cfd7b7a87)
+* [Merge pull request #53 from maartyman/renovate/readable-stream-4.x](https://github.com/maartyman/incremunica/commit/2ec72d78635364b55dcde3e6905d84eb3472acbb)
+* [Update dependency @types/readable-stream to v4](https://github.com/maartyman/incremunica/commit/6d96ab6c19421630a508adbd60b48a37e95cb312)
+* [Merge pull request #51 from maartyman/guard-watch-changes](https://github.com/maartyman/incremunica/commit/cf87d022bba2958d1371ec9e740c9fe5561adbbc)
+* [change addition store to array](https://github.com/maartyman/incremunica/commit/717713ffa0bfb8db040bf1d7f028d7720a6e7007)
+* [Merge pull request #50 from maartyman/guard-watch-changes](https://github.com/maartyman/incremunica/commit/00fae26c204925ef6595bac7fc0b34c90f25302d)
+* [made sure deletions are propagated before additions](https://github.com/maartyman/incremunica/commit/4c9572dfdec5395a9a29096475a139eba1a77a0f)
+* [added priority for the resource watchers](https://github.com/maartyman/incremunica/commit/a35a9ce44bec6face65ec338f5aaa1c622e7d887)
+* [Merge pull request #49 from maartyman/node-version-update](https://github.com/maartyman/incremunica/commit/84b9bed8e130f7bd7adda0d1d7fdacea59c4aeee)
+* [test for new versions](https://github.com/maartyman/incremunica/commit/f5ef802ec8ecab9da8221259d696289b3893077a)
+* [Merge pull request #47 from maartyman/solid-notification-client](https://github.com/maartyman/incremunica/commit/d938b8f16a60c4a14bd6bbd58bc7313206b4809b)
+* [Merge branch 'master' into solid-notification-client](https://github.com/maartyman/incremunica/commit/2ee692fec4c956d941673658b23d032eb1ed34c9)
+* [updated the configs + updated the engine's package.json + updated yarn.lock + updated main package.json](https://github.com/maartyman/incremunica/commit/549705ffe8eda2534366eb0ee9a2135e65436993)
+* [updated offline asset recordings](https://github.com/maartyman/incremunica/commit/94d3bfa60ad6d56a4a896cb3ef806ad5a396eeb3)
+* [changed bus guard and added naive guard actor](https://github.com/maartyman/incremunica/commit/56fa228dfb00297504203e17581dc97853a409c6)
+* [removed the polling diff guard actor](https://github.com/maartyman/incremunica/commit/e4d0ddafe76544d1bab884d1a6b2526f0d72bc9e)
+* [added the solid notification websockets resource watcher](https://github.com/maartyman/incremunica/commit/049e38f65b2cf113d4ca582a8d38b1a54245b9dc)
+* [added the polling resource watcher](https://github.com/maartyman/incremunica/commit/88eb0736f452e52b20a528b1d1670f7add131eb8)
+* [added the bus for resource watchers](https://github.com/maartyman/incremunica/commit/42edc6b7666521d4333f5d999a008fedab8ed575)
+* [fix polling readme](https://github.com/maartyman/incremunica/commit/49da6f97d4051b787625ddaf54f996596a2cc9b9)
+* [Merge pull request #46 from maartyman/webpack](https://github.com/maartyman/incremunica/commit/8dded48091d73e119baeaa518cc2c547059f952c)
+* [added webpack testing (local and in CI)](https://github.com/maartyman/incremunica/commit/53451ee737c0a8952519f20c02ca1e8cf5ceb21f)
+* [Merge pull request #45 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/f434fe7f6e69fd939294db6c1a2139e82dc62064)
+
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/maartyman/incremunica/compare/v1.0.3...v1.1.0) - 2023-11-15
 

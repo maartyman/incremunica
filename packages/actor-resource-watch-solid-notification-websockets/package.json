@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-resource-watch-solid-notification-websockets",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "An incremunica solid notification resource watch actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -34,7 +34,7 @@
   "dependencies": {
     "@comunica/bus-http": "^2.10.0",
     "@comunica/core": "^2.10.0",
-    "@incremunica/bus-resource-watch": "^1.0.0",
+    "@incremunica/bus-resource-watch": "^1.2.0",
     "@solid-notifications/subscription": "^0.1.0",
     "@solid-notifications/types": "^0.1.0",
     "ws": "^8.14.2"

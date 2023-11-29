@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-rdf-metadata-extract-guard-data",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A guard-data rdf-metadata-extract actor",
   "lsd:module": true,
   "main": "lib/index.js",
