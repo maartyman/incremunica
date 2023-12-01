@@ -2,5 +2,6 @@
   "extends": [
     "github>rubensworks/renovate-presets:js",
     "docker:disable"
-  ]
+  ],
+  "automerge": false
 }
