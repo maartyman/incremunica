@@ -1215,20 +1215,6 @@
     rdf-terms "^1.11.0"
     sparqlalgebrajs "^4.2.0"
 
-"@comunica/actor-query-operation-construct@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-construct/-/actor-query-operation-construct-2.10.0.tgz#977167aab388cf7f68bc4c4b93bcd8025c943381"
-  integrity sha512-7boEkt3MHlfHe5hxDJzolrSps+uCFvIZPWRiSQ1EJhT4el8WES9kWhveo8guJuMMHanVLC42FfHwUA+xF879RA==
-  dependencies:
-    "@comunica/bus-query-operation" "^2.10.0"
-    "@comunica/core" "^2.10.0"
-    "@comunica/types" "^2.10.0"
-    "@rdfjs/types" "*"
-    asynciterator "^3.8.1"
-    rdf-data-factory "^1.1.1"
-    rdf-terms "^1.11.0"
-    sparqlalgebrajs "^4.2.0"
-
 "@comunica/actor-query-operation-describe-subject@2.10.1":
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-describe-subject/-/actor-query-operation-describe-subject-2.10.1.tgz#bd21880eb72f89d5e43236d965689d4a4b008e08"
@@ -2422,22 +2408,6 @@
     rdf-terms "^1.11.0"
     sparqlalgebrajs "^4.2.0"
 
-"@comunica/bus-query-operation@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@comunica/bus-query-operation/-/bus-query-operation-2.10.0.tgz#d5dfd032a830f38c64c9c25ba90b77ed30a0cadf"
-  integrity sha512-OSPjD5BO9dfnbkY6oNBZ4/ofqNvczwTs6fgJG2GdcCP4WKJQmhv5wTuDYa9ksQkaYcqs0WiIYMiMABbILLrjjQ==
-  dependencies:
-    "@comunica/bindings-factory" "^2.10.0"
-    "@comunica/context-entries" "^2.10.0"
-    "@comunica/core" "^2.10.0"
-    "@comunica/data-factory" "^2.7.0"
-    "@comunica/types" "^2.10.0"
-    "@rdfjs/types" "*"
-    asynciterator "^3.8.1"
-    rdf-string "^1.6.1"
-    rdf-terms "^1.11.0"
-    sparqlalgebrajs "^4.2.0"
-
 "@comunica/bus-query-parse@2.10.0", "@comunica/bus-query-parse@^2.10.0":
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/@comunica/bus-query-parse/-/bus-query-parse-2.10.0.tgz#04be580243076d72870f3caa8d82161b758caf90"
@@ -2479,22 +2449,6 @@
   integrity sha512-pPFoJVHY5p931jIKt+9sqRCGiuuf8yFqrlOOAd3un72cwuyhwNHvn52xwvcPlNUAySz/kDmW+U0syflqI6VdAw==
   dependencies:
     "@comunica/bus-query-operation" "^2.10.1"
-    "@comunica/bus-rdf-join-selectivity" "^2.10.0"
-    "@comunica/context-entries" "^2.10.0"
-    "@comunica/core" "^2.10.0"
-    "@comunica/mediatortype-join-coefficients" "^2.10.0"
-    "@comunica/metadata" "^2.10.0"
-    "@comunica/types" "^2.10.0"
-    "@rdfjs/types" "*"
-    rdf-data-factory "^1.1.1"
-    rdf-string "^1.6.1"
-
-"@comunica/bus-rdf-join@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@comunica/bus-rdf-join/-/bus-rdf-join-2.10.0.tgz#253eb0c66c23e51ec221170f7e30523dd43c7090"
-  integrity sha512-PkfemBRaODavpp7qlUho7cvu+LyTSZqpvxby9pPx1+h4AJe3BvH1/i0hjLvsM5IBR16rWeWPYOBBx5YtUkEZfw==
-  dependencies:
-    "@comunica/bus-query-operation" "^2.10.0"
     "@comunica/bus-rdf-join-selectivity" "^2.10.0"
     "@comunica/context-entries" "^2.10.0"
     "@comunica/core" "^2.10.0"
