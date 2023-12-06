@@ -11,7 +11,7 @@ import {
   createFailedRequest,
   createResourceRequest
 } from "./mocks/HTTPMock";
-import {Server, WebSocket} from 'ws';
+import {Server, WebSocket} from 'isomorphic-ws';
 
 let message: any = {
   "@context": [

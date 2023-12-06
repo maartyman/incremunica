@@ -11,8 +11,8 @@ import {
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import { ChannelType } from '@solid-notifications/types';
-import type { MessageEvent } from 'ws';
-import { WebSocket } from 'ws';
+import type { MessageEvent } from 'isomorphic-ws';
+import { WebSocket } from 'isomorphic-ws';
 
 /**
  * An incremunica Resource Watch Solid Notification Websockets Actor.
