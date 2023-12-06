@@ -37,7 +37,7 @@
     "@incremunica/bus-resource-watch": "^1.2.0",
     "@solid-notifications/subscription": "^0.1.0",
     "@solid-notifications/types": "^0.1.0",
-    "ws": "^8.14.2"
+    "isomorphic-ws": "^5.0.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
