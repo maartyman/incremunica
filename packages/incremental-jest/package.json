@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/incremental-jest",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Jest utilities for incremunica",
   "main": "lib/index.js",
   "typings": "lib/index",
@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "@comunica/types": "^2.10.0",
-    "@incremunica/incremental-bindings-factory": "^1.2.1",
+    "@incremunica/incremental-bindings-factory": "^1.2.2",
     "@rdfjs/types": "*",
     "arrayify-stream": "^2.0.1"
   },
