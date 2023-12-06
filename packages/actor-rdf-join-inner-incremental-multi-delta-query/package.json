@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-rdf-join-inner-incremental-multi-delta-query",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A inner-incremental-multi-delta-query rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -39,8 +39,8 @@
     "@comunica/core": "^2.10.0",
     "@comunica/mediatortype-join-coefficients": "^2.10.0",
     "@comunica/types": "^2.10.0",
-    "@incremunica/context-entries": "^1.2.1",
-    "@incremunica/incremental-types": "^1.2.1",
+    "@incremunica/context-entries": "^1.2.2",
+    "@incremunica/incremental-types": "^1.2.2",
     "asynciterator": "^3.8.1",
     "n3": "^1.16.4",
     "sparqlalgebrajs": "^4.1.0"

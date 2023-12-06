@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/hash-bindings",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A hash bindings class",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -30,7 +30,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@incremunica/incremental-types": "^1.2.1",
+    "@incremunica/incremental-types": "^1.2.2",
     "rdf-string": "^1.6.3"
   },
   "scripts": {

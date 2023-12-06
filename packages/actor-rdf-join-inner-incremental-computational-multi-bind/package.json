@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-rdf-join-inner-incremental-computational-multi-bind",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A inner-incremental-computational-multi-bind rdf-join actor",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -39,9 +39,9 @@
     "@comunica/context-entries": "^2.10.0",
     "@comunica/mediatortype-join-coefficients": "^2.10.0",
     "@comunica/types": "^2.10.0",
-    "@incremunica/context-entries": "^1.2.1",
-    "@incremunica/hash-bindings": "^1.2.1",
-    "@incremunica/incremental-bindings-factory": "^1.2.1",
+    "@incremunica/context-entries": "^1.2.2",
+    "@incremunica/hash-bindings": "^1.2.2",
+    "@incremunica/incremental-bindings-factory": "^1.2.2",
     "asynciterator": "^3.8.1",
     "sparqlalgebrajs": "^4.0.5"
   },
