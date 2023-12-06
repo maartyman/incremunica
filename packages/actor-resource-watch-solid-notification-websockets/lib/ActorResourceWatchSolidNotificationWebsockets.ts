@@ -11,8 +11,8 @@ import {
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import { ChannelType } from '@solid-notifications/types';
-import type { MessageEvent } from 'isomorphic-ws';
-import { WebSocket } from 'isomorphic-ws';
+// eslint-disable-next-line import/no-unassigned-import
+import 'websocket-polyfill';
 
 /**
  * An incremunica Resource Watch Solid Notification Websockets Actor.
@@ -62,7 +62,7 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
 
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
-    socket.onmessage = (message: MessageEvent) => {
+    socket.onmessage = message => {
       // TODO: For now ignoring the Buffer options => tests?
       // let data: string | Buffer | ArrayBuffer | Buffer[] = message.data;
       // if (Array.isArray(data)) {
