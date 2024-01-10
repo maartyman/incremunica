@@ -718,8 +718,9 @@ describe("DeltaQueryIterator", () => {
   });
 
   it('should handle a failed sub query', async() => {
+    const error = new Error('myError');
     mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-      throw new Error("test")
+      throw error;
     });
 
     mediatorQueryOperation = <any> {
@@ -762,17 +763,21 @@ describe("DeltaQueryIterator", () => {
       }
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
       mediatorQueryOperation
     );
 
-    delta.on("data", () => {})
+    delta.on("data", () => {});
 
-    await promisifyEventEmitter(delta);
+    const callback = jest.fn();
+    delta.on('error', callback);
 
-    expect(mediateFunc).toBeCalledTimes(2);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(callback).toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledWith(error);
+    delta.destroy();
   });
 })

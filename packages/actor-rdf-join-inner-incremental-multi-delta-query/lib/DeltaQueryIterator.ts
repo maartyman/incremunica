@@ -1,11 +1,11 @@
 import { BindingsToQuadsIterator } from '@comunica/actor-query-operation-construct';
-import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
+import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
-import type { BindingsStream, Quad, Bindings } from '@incremunica/incremental-types';
+import type { Bindings, BindingsStream, Quad } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';
@@ -29,25 +29,29 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     super();
     this.entries = entries;
     this.subContext = new ActionContext()
-      .set(KeysRdfResolveQuadPattern.source, this.store )
+      .set(KeysRdfResolveQuadPattern.source, this.store)
       .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
     this.readable = false;
+    this.setProperty('up-to-date', true);
 
     for (const entry of this.entries) {
       if (entry.output.bindingsStream.readable) {
         this.readable = true;
+        this.setProperty('up-to-date', false);
       }
 
       entry.output.bindingsStream.on('end', () => {
         this.readable = true;
+        this.setProperty('up-to-date', false);
       });
 
       entry.output.bindingsStream.on('error', error => this.destroy(error));
 
       entry.output.bindingsStream.on('readable', () => {
         this.readable = true;
+        this.setProperty('up-to-date', false);
       });
     }
   }
@@ -66,9 +70,18 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     for (const entry of this.entries) {
       if (!entry.output.bindingsStream.done) {
         this.getNewBindingsStream();
+        if (
+          !this.pending &&
+          (this.currentSource === undefined || this.currentSource.done)
+        ) {
+          this.setProperty('up-to-date', true);
+          this.emit('up-to-date');
+        }
         return null;
       }
     }
+    this.setProperty('up-to-date', true);
+    this.emit('up-to-date');
     this.close();
     return null;
   }
@@ -93,9 +106,13 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       }
 
       let bindings = source.output.bindingsStream.read();
+      while (bindings === null && source.output.bindingsStream.readable) {
+        bindings = source.output.bindingsStream.read();
+      }
       if (bindings === null) {
         continue;
       }
+
       let quad = BindingsToQuadsIterator.bindQuad(bindings, <Quad><any>source.operation);
 
       while (quad === undefined) {
@@ -156,13 +173,12 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
         bindingsStream.on('readable', () => {
           this.readable = true;
+          this.setProperty('up-to-date', false);
         });
 
         this.currentSource = <BindingsStream><unknown>bindingsStream;
-      }).catch(() => {
-        this.pending = false;
-        this.currentSource = undefined;
-        this.readable = true;
+      }).catch(error => {
+        this.emit('error', error);
       });
       return;
     }
