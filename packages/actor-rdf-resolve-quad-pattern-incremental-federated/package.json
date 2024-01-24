@@ -40,10 +40,16 @@
     "@comunica/types": "^2.10.0",
     "@comunica/metadata": "^2.10.0",
     "@rdfjs/types": "*",
-    "asynciterator": "^3.8.1",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event",
     "rdf-data-factory": "^1.1.1",
     "rdf-terms": "^1.9.1",
     "sparqlalgebrajs": "^4.0.5"
+  },
+  "overrides": {
+    "asynciterator": "$asynciterator-local"
+  },
+  "resolutions": {
+    "asynciterator": "$asynciterator-local"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

@@ -53,19 +53,32 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
 
     const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
 
-    // Set up-to-date property
-    it.setProperty('up-to-date', true);
-    if (this.context) {
-      const guardEvents = this.context.get<IGuardEvents>(KeysGuard.events);
-      if (guardEvents) {
-        guardEvents.on('modified', () => {
-          it.setProperty('up-to-date', false);
-        });
-        guardEvents.on('up-to-date', () => {
-          it.setProperty('up-to-date', true);
-        });
-      }
+    let upToDate = this.store.isHalted();
+    // Set up-to-date event listener
+    const guardEvents = this.context?.get<IGuardEvents>(KeysGuard.events);
+    if (guardEvents) {
+      guardEvents.on('up-to-date', () => {
+        upToDate = true;
+      });
+      guardEvents.on('modified', () => {
+        upToDate = false;
+      });
     }
+    else {
+      this.store.on('resume', () => {
+        upToDate = false;
+      })
+      this.store.on('halt', () => {
+        upToDate = true;
+      });
+      this.store.on('flush', () => {
+        upToDate = true;
+      });
+    }
+    it.on("unreadable", () => {
+      if (upToDate)
+        (it as any).upToDate = true;
+    });
 
     // In case this setMetadata can cause errors, catch the error and emit it on the iterator (it). For now ignore it!
     /* eslint-disable-next-line @typescript-eslint/no-floating-promises */

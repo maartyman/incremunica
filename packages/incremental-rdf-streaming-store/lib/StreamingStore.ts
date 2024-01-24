@@ -5,6 +5,7 @@ import type { Term } from 'n3';
 import { Store } from 'n3';
 import { Readable, PassThrough } from 'readable-stream';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
+import { LinkedList } from "./LinkedList";
 
 /**
  * A StreamingStore allows data lookup and insertion to happen in parallel.
@@ -22,11 +23,12 @@ export class StreamingStore<Q extends Quad>
   protected ended = false;
   protected numberOfListeners = 0;
   protected halted = false;
-  protected haltBuffer = new Array<Q>();
+  protected haltBuffer = new LinkedList<Q>();
 
   public constructor(store = new Store<Q>()) {
     super();
     this.store = store;
+    this.setMaxListeners(Infinity);
   }
 
   /**
@@ -70,13 +72,26 @@ export class StreamingStore<Q extends Quad>
 
   public halt(): void {
     this.halted = true;
+    this.emit('halt');
+  }
+
+  public flush(): void {
+    let quad = this.haltBuffer.shift();
+    while (quad) {
+      this.handleQuad(quad);
+      quad = this.haltBuffer.shift();
+    }
+    this.emit('flush');
   }
 
   public resume(): void {
-    for (const quad of this.haltBuffer) {
+    let quad = this.haltBuffer.shift();
+    while (quad) {
       this.handleQuad(quad);
+      quad = this.haltBuffer.shift();
     }
     this.halted = false;
+    this.emit('resume');
   }
 
   public isHalted(): boolean {

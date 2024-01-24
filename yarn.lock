@@ -5439,10 +5439,9 @@ asynciterator@^3.8.0:
   resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.0.tgz#d9246a3d39ce2a9e4b020834d7f352adf35b49d8"
   integrity sha512-bD34LqKHJnkB77MHjL3hOAUOcy9dbB+3lHvL+EiJpD3k2Nyq3i1dCk5adMisB2rwlrHVu/+XRhOdPZL9hzpsfw==
 
-asynciterator@^3.8.1:
+asynciterator@^3.8.1, "asynciterator@git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event":
   version "3.8.1"
-  resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.1.tgz#80be735b252332494e186ee733544e5b21dd2123"
-  integrity sha512-SmdG0FUY3pYGOZZGdYq8Qb/DCRDXBFZUk08V1/4lbBXdAQvcC3Kxzz9FUDPBTik7VAVltt4cZirAPtJv3gOpEw==
+  resolved "git+https://github.com/maartyman/AsyncIterator.git#5ab4590f6ef30e58d4953534e45d3dc5b4e88539"
 
 asynckit@^0.4.0:
   version "0.4.0"
