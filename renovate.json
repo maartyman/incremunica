@@ -3,5 +3,9 @@
     "github>rubensworks/renovate-presets:js",
     "docker:disable"
   ],
-  "automerge": false
+  "packageRules": [
+    {
+      "automerge": false
+    }
+  ]
 }
