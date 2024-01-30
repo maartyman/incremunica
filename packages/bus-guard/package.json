@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/bus-guard",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "A comunica bus for guard events.",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -32,8 +32,8 @@
   ],
   "dependencies": {
     "@comunica/core": "^2.10.0",
-    "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.2.0",
-    "@incremunica/incremental-types": "^1.2.0"
+    "@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source": "^1.2.2",
+    "@incremunica/incremental-types": "^1.2.2"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

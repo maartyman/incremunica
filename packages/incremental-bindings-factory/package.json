@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/incremental-bindings-factory",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Incremental bindings factory module for Comunica",
   "main": "lib/index.js",
   "typings": "lib/index",
@@ -29,7 +29,7 @@
     "lib/**/*.js.map"
   ],
   "dependencies": {
-    "@incremunica/incremental-types": "^1.2.0",
+    "@incremunica/incremental-types": "^1.2.2",
     "@rdfjs/types": "*",
     "immutable": "^4.1.0",
     "rdf-data-factory": "^1.1.1",

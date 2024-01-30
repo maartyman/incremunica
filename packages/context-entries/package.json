@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/context-entries",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "A collection of reusable Incremunica context key definitions.",
   "main": "lib/index.js",
   "typings": "lib/index",
@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "@comunica/core": "^2.10.0",
-    "@incremunica/incremental-types": "^1.2.0"
+    "@incremunica/incremental-types": "^1.2.2"
   },
   "scripts": {
     "build": "node \"../../node_modules/typescript/bin/tsc\""

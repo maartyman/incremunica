@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/dev-tools",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Development tools for comunica/incremunica.",
   "lsd:module": true,
   "main": "lib/index.js",
@@ -35,6 +35,6 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@incremunica/incremental-types": "^1.2.0"
+    "@incremunica/incremental-types": "^1.2.2"
   }
 }

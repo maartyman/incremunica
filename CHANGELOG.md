@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.2"></a>
+## [v1.2.2](https://github.com/maartyman/incremunica/compare/v1.2.1...v1.2.2) - 2023-12-06
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [Merge pull request #81 from maartyman/fix-browser-websockets](https://github.com/maartyman/incremunica/commit/ed18be6268ae001875e4d70c8ab2f8fb0129dbd8)
+* [use the 'websocket-polyfill' package to support browser and nodejs](https://github.com/maartyman/incremunica/commit/081e288f38b27bbeab4596900b1f0ca4a06aaaf6)
+* [added nessecary 'ws' package](https://github.com/maartyman/incremunica/commit/3c1ef25ca41adb340d5cbfe63fb4e3ad798b2ebb)
+* [Merge pull request #80 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/59281a9ddf289a6579edbce60f4899342b638c4f)
+
+<a name="v1.2.1"></a>
+## [v1.2.1](https://github.com/maartyman/incremunica/compare/v1.2.0...v1.2.1) - 2023-12-06
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [Merge pull request #79 from maartyman/fix-browser-websockets](https://github.com/maartyman/incremunica/commit/0812a6de5e42aae7e18905d53f0a42b9ace8abac)
+* [Fixed package 'ws' not working in the browser](https://github.com/maartyman/incremunica/commit/cc9cf5a9d12645b44bcc39d04bbf69941574fc2c)
+* [Merge pull request #78 from maartyman/fix-automerge-renovate](https://github.com/maartyman/incremunica/commit/cbb6b6a4ec95743602dbfc523f387495a76463e5)
+* [properly updated to comunica 2.10.1](https://github.com/maartyman/incremunica/commit/c3be728b46383cdd0c1596ed1e2e0d169028c7d8)
+* [disabled automerge](https://github.com/maartyman/incremunica/commit/5487f75d68b2498773afa8236744141de3722a2e)
+* [Update Comunica monorepo packages to v2.10.1](https://github.com/maartyman/incremunica/commit/a75d23b6465fd0ee0c5a86b9880292aabb0ce735)
+* [Merge pull request #75 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/67a4a47286c2013575fbf84770a30400f687e255)
+
 <a name="v1.2.0"></a>
 ## [v1.2.0](https://github.com/maartyman/incremunica/compare/v1.1.0...v1.2.0) - 2023-11-29
 
