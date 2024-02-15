@@ -40,19 +40,26 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     });
   }
 
-  public static haltSources(sources: DataSources): void {
+  public static haltSources(sources: DataSources): { resume: () => void }[] {
+    const sourcesToResume: { resume: () => void }[] = [];
     for (const source of sources) {
-      if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
+      if (
+        typeof source !== 'string' &&
+        'resume' in source &&
+        'halt' in source &&
+        'isHalted' in source &&
+        !(<any>source).isHalted()
+      ) {
         (<any>source).halt();
+        sourcesToResume.push(<{ resume: () => void }>source);
       }
     }
+    return sourcesToResume;
   }
 
-  public static resumeSources(sources: DataSources): void {
+  public static resumeSources(sources: { resume: () => void }[]): void {
     for (const source of sources) {
-      if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
-        (<any>source).resume();
-      }
+      (<any>source).resume();
     }
   }
 
@@ -123,7 +130,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         const activeElement = hashData.elements[hashData.elements.length - 1];
         hashData.elements.pop();
 
-        ActorRdfJoinInnerIncrementalComputationalMultiBind.haltSources(sources);
+        const sourcesToResume = ActorRdfJoinInnerIncrementalComputationalMultiBind.haltSources(sources);
 
         let activeIteratorStopped = false;
         let newIteratorStopped = false;
@@ -131,7 +138,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         activeElement.iterator.on('end', () => {
           activeIteratorStopped = true;
           if (newIteratorStopped) {
-            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sourcesToResume);
           }
           activeElement.iterator.removeAllListeners();
         });
@@ -144,7 +151,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         newIterator.on('end', () => {
           newIteratorStopped = true;
           if (activeIteratorStopped) {
-            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sourcesToResume);
           }
           newIterator.removeAllListeners();
         });

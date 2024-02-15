@@ -1180,6 +1180,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
         resumeMock = jest.fn();
 
         let mockStreamingStore = {
+          isHalted: () => false,
           halt: haltMock,
           resume: resumeMock
         }
@@ -1384,6 +1385,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           resumeMock = jest.fn();
 
           let mockStreamingStore = {
+            isHalted: () => false,
             halt: haltMock,
             resume: resumeMock
           }
