@@ -1,5 +1,5 @@
 import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
-import {AsyncIterator} from 'asynciterator';
+import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
   protected leftIterator: BindingsStream;
@@ -33,12 +33,14 @@ export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
     });
 
     this.leftIterator.on('up-to-date', () => {
-      if (this.rightIterator.upToDate)
+      if (this.rightIterator.upToDate) {
         this.readable = true;
+      }
     });
     this.rightIterator.on('up-to-date', () => {
-      if (this.leftIterator.upToDate)
+      if (this.leftIterator.upToDate) {
         this.readable = true;
+      }
     });
 
     this.leftIterator.on('end', () => {

@@ -69,8 +69,9 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       if (!entry.output.bindingsStream.done) {
         this.getNewBindingsStream();
         for (const entry of this.entries) {
-          if (!entry.output.bindingsStream.upToDate)
+          if (!entry.output.bindingsStream.upToDate) {
             return null;
+          }
         }
         if (
           !this.pending &&

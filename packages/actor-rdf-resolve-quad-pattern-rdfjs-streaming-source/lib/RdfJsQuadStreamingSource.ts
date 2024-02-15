@@ -5,7 +5,7 @@ import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
-import { wrap as wrapAsyncIterator } from 'asynciterator';
+import { WrappingIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 
 export class RdfJsQuadStreamingSource implements IQuadSource {
@@ -51,34 +51,24 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
       }
     }
 
-    const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
+    const it = new WrappingIterator<Quad>(rawStream);
 
-    let upToDate = this.store.isHalted();
-    // Set up-to-date event listener
-    const guardEvents = this.context?.get<IGuardEvents>(KeysGuard.events);
-    if (guardEvents) {
-      guardEvents.on('up-to-date', () => {
-        upToDate = true;
-      });
-      guardEvents.on('modified', () => {
-        upToDate = false;
-      });
+    if (this.store.constructor.name === 'StreamingStore') {
+      let upToDate = this.store.isHalted();
+      // Set up-to-date event listener
+      const guardEvents = this.context?.get<IGuardEvents>(KeysGuard.events);
+      if (guardEvents) {
+        // TODO doesn't work with guard events
+        guardEvents.on('up-to-date', () => {
+          upToDate = true;
+          it.readable = true;
+        });
+        guardEvents.on('modified', () => {
+          upToDate = false;
+          it.readable = true;
+        });
+      }
     }
-    else {
-      this.store.on('resume', () => {
-        upToDate = false;
-      })
-      this.store.on('halt', () => {
-        upToDate = true;
-      });
-      this.store.on('flush', () => {
-        upToDate = true;
-      });
-    }
-    it.on("unreadable", () => {
-      if (upToDate)
-        (it as any).upToDate = true;
-    });
 
     // In case this setMetadata can cause errors, catch the error and emit it on the iterator (it). For now ignore it!
     /* eslint-disable-next-line @typescript-eslint/no-floating-promises */

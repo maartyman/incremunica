@@ -78,9 +78,6 @@
   "overrides": {
     "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
-  "resolutions": {
-    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
-  },
   "pre-commit": [
     "build",
     "lint",
@@ -115,7 +112,8 @@
     "depcheck-fix": "lerna-script depfixTask"
   },
   "resolutions": {
-    "@rdfjs/types": "1.1.0"
+    "@rdfjs/types": "1.1.0",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
   "dependencies": {}
 }

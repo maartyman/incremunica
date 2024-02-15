@@ -4,8 +4,8 @@ import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
 import { Store } from 'n3';
 import { Readable, PassThrough } from 'readable-stream';
+import { LinkedList } from './LinkedList';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
-import { LinkedList } from "./LinkedList";
 
 /**
  * A StreamingStore allows data lookup and insertion to happen in parallel.
@@ -28,7 +28,7 @@ export class StreamingStore<Q extends Quad>
   public constructor(store = new Store<Q>()) {
     super();
     this.store = store;
-    this.setMaxListeners(Infinity);
+    this.setMaxListeners(Number.POSITIVE_INFINITY);
   }
 
   /**
@@ -71,8 +71,10 @@ export class StreamingStore<Q extends Quad>
   }
 
   public halt(): void {
+    if (!this.halted) {
+      this.emit('halt');
+    }
     this.halted = true;
-    this.emit('halt');
   }
 
   public flush(): void {
@@ -81,17 +83,33 @@ export class StreamingStore<Q extends Quad>
       this.handleQuad(quad);
       quad = this.haltBuffer.shift();
     }
+    for (const pendingStreams of this.pendingStreams.indexedStreams.values()) {
+      for (const pendingStream of pendingStreams) {
+        if (!this.ended) {
+          pendingStream.push('pause');
+        }
+      }
+    }
     this.emit('flush');
   }
 
   public resume(): void {
-    let quad = this.haltBuffer.shift();
-    while (quad) {
-      this.handleQuad(quad);
-      quad = this.haltBuffer.shift();
+    if (this.halted) {
+      let quad = this.haltBuffer.shift();
+      while (quad) {
+        this.handleQuad(quad);
+        quad = this.haltBuffer.shift();
+      }
+      for (const pendingStreams of this.pendingStreams.indexedStreams.values()) {
+        for (const pendingStream of pendingStreams) {
+          if (!this.ended) {
+            pendingStream.push('pause');
+          }
+        }
+      }
+      this.halted = false;
+      this.emit('resume');
     }
-    this.halted = false;
-    this.emit('resume');
   }
 
   public isHalted(): boolean {
@@ -208,12 +226,13 @@ export class StreamingStore<Q extends Quad>
       const pendingStream = new PassThrough({ objectMode: true });
       if (options) {
         options.stopMatch = () => {
-          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
           pendingStream.end();
+          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
         };
       }
       this.pendingStreams.addPatternListener(pendingStream, subject, predicate, object, graph);
       pendingStream.pipe(unionStream, { end: false });
+      pendingStream.pause();
 
       let pendingStreamEnded = false;
       let storeResultEnded = false;
@@ -229,6 +248,11 @@ export class StreamingStore<Q extends Quad>
         storeResultEnded = true;
         if (pendingStreamEnded) {
           unionStream.end();
+        } else {
+          pendingStream.resume();
+          if (this.halted) {
+            pendingStream.push('pause');
+          }
         }
       });
     } else {
