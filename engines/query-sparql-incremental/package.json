@@ -116,8 +116,11 @@
     "@comunica/actor-rdf-join-entries-sort-cardinality": "2.10.0",
     "@comunica/actor-rdf-join-inner-multi-empty": "2.10.0",
     "@comunica/actor-rdf-join-inner-multi-smallest": "2.10.0",
+    "@comunica/actor-rdf-join-inner-multi-sequential": "2.10.0",
     "@comunica/actor-rdf-join-inner-none": "2.10.0",
     "@comunica/actor-rdf-join-inner-single": "2.10.0",
+    "@comunica/actor-rdf-join-inner-hash": "2.10.0",
+    "@comunica/actor-rdf-join-inner-multi-bind": "2.10.0",
     "@comunica/actor-rdf-join-selectivity-variable-counting": "2.10.0",
     "@comunica/actor-rdf-metadata-all": "2.10.0",
     "@comunica/actor-rdf-metadata-extract-allow-http-methods": "2.10.0",
@@ -214,6 +217,12 @@
     "@incremunica/incremental-inner-join": "^1.1.0",
     "@incremunica/incremental-rdf-streaming-store": "^1.1.0",
     "@incremunica/incremental-types": "^1.0.0"
+  },
+  "overrides": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
+  },
+  "resolutions": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
   "scripts": {
     "build": "npm run build:ts",

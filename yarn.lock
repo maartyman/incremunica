@@ -1967,6 +1967,30 @@
     "@comunica/bus-rdf-join-entries-sort" "^2.10.0"
     "@comunica/core" "^2.10.0"
 
+"@comunica/actor-rdf-join-inner-hash@2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-inner-hash/-/actor-rdf-join-inner-hash-2.10.0.tgz#932dd3877331650213721ffc739ae35638c066f5"
+  integrity sha512-kgbCQsuvXke+dSY+J2YMdMnFLGx5XPaeV++l+Wy6lCVrSltCi06O874b68i4sHxPC4B49KczTBAvnzfC31lWHw==
+  dependencies:
+    "@comunica/bus-rdf-join" "^2.10.0"
+    "@comunica/mediatortype-join-coefficients" "^2.10.0"
+    "@comunica/types" "^2.10.0"
+    asyncjoin "^1.1.1"
+
+"@comunica/actor-rdf-join-inner-multi-bind@2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-inner-multi-bind/-/actor-rdf-join-inner-multi-bind-2.10.0.tgz#e0bb18ae0fcfe6ed6ddffe155b07958b8a9f1674"
+  integrity sha512-T5fLuQ4SStX6xAwwBHJG+1Fv//0Z2zzXrqPeg3zkJxfQzFkB5KZ15hLUUPZ//w9QFnsheQdUbTe8XKhF4QKOWA==
+  dependencies:
+    "@comunica/bus-query-operation" "^2.10.0"
+    "@comunica/bus-rdf-join" "^2.10.0"
+    "@comunica/bus-rdf-join-entries-sort" "^2.10.0"
+    "@comunica/context-entries" "^2.10.0"
+    "@comunica/mediatortype-join-coefficients" "^2.10.0"
+    "@comunica/types" "^2.10.0"
+    asynciterator "^3.8.1"
+    sparqlalgebrajs "^4.2.0"
+
 "@comunica/actor-rdf-join-inner-multi-empty@2.10.0":
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-inner-multi-empty/-/actor-rdf-join-inner-multi-empty-2.10.0.tgz#5a95fb832603a7aee3aad782efe72a1ffbfb5989"
@@ -1977,6 +2001,17 @@
     "@comunica/metadata" "^2.10.0"
     "@comunica/types" "^2.10.0"
     asynciterator "^3.8.1"
+
+"@comunica/actor-rdf-join-inner-multi-sequential@2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-inner-multi-sequential/-/actor-rdf-join-inner-multi-sequential-2.10.0.tgz#025404f1d6abc7fb08a695d73a5c6da91e280d21"
+  integrity sha512-pD6Y66B0pDdges08M7HNomZe7MQlO8Lm5/3Aiv5jJ+3WxS9mgfF33ixmypHC+j5uKp16D/Z2iiyBafgz7vtLhw==
+  dependencies:
+    "@comunica/bus-query-operation" "^2.10.0"
+    "@comunica/bus-rdf-join" "^2.10.0"
+    "@comunica/mediatortype-join-coefficients" "^2.10.0"
+    "@comunica/types" "^2.10.0"
+    sparqlalgebrajs "^4.2.0"
 
 "@comunica/actor-rdf-join-inner-multi-smallest@2.10.0":
   version "2.10.0"
@@ -5434,15 +5469,21 @@ async@^3.2.3:
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
 
+asynciterator@^3.6.0, asynciterator@^3.8.1, "asynciterator@git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event":
+  version "3.8.1"
+  resolved "git+https://github.com/maartyman/AsyncIterator.git#5ab4590f6ef30e58d4953534e45d3dc5b4e88539"
+
 asynciterator@^3.8.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.0.tgz#d9246a3d39ce2a9e4b020834d7f352adf35b49d8"
   integrity sha512-bD34LqKHJnkB77MHjL3hOAUOcy9dbB+3lHvL+EiJpD3k2Nyq3i1dCk5adMisB2rwlrHVu/+XRhOdPZL9hzpsfw==
 
-asynciterator@^3.8.1:
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.1.tgz#80be735b252332494e186ee733544e5b21dd2123"
-  integrity sha512-SmdG0FUY3pYGOZZGdYq8Qb/DCRDXBFZUk08V1/4lbBXdAQvcC3Kxzz9FUDPBTik7VAVltt4cZirAPtJv3gOpEw==
+asyncjoin@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/asyncjoin/-/asyncjoin-1.1.2.tgz#f630217394865b8d52d06e88ca91bec1f912a466"
+  integrity sha512-zi6B+C3GgEu8qrmFn3gDd58cbGNaNFW3s8DJmCxUOjQwqWZcQO6dEoZBWl56+QGQyX0da0FRX1fsAyYB9LmwJA==
+  dependencies:
+    asynciterator "^3.6.0"
 
 asynckit@^0.4.0:
   version "0.4.0"

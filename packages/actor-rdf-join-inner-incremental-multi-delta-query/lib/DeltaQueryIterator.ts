@@ -33,25 +33,23 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
-    this.readable = false;
-    this.setProperty('up-to-date', true);
-
     for (const entry of this.entries) {
       if (entry.output.bindingsStream.readable) {
         this.readable = true;
-        this.setProperty('up-to-date', false);
       }
 
       entry.output.bindingsStream.on('end', () => {
         this.readable = true;
-        this.setProperty('up-to-date', false);
+      });
+
+      entry.output.bindingsStream.on('up-to-date', () => {
+        this.readable = true;
       });
 
       entry.output.bindingsStream.on('error', error => this.destroy(error));
 
       entry.output.bindingsStream.on('readable', () => {
         this.readable = true;
-        this.setProperty('up-to-date', false);
       });
     }
   }
@@ -70,18 +68,20 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     for (const entry of this.entries) {
       if (!entry.output.bindingsStream.done) {
         this.getNewBindingsStream();
+        for (const entry of this.entries) {
+          if (!entry.output.bindingsStream.upToDate) {
+            return null;
+          }
+        }
         if (
           !this.pending &&
           (this.currentSource === undefined || this.currentSource.done)
         ) {
-          this.setProperty('up-to-date', true);
-          this.emit('up-to-date');
+          this.upToDate = true;
         }
         return null;
       }
     }
-    this.setProperty('up-to-date', true);
-    this.emit('up-to-date');
     this.close();
     return null;
   }
@@ -173,7 +173,6 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
         bindingsStream.on('readable', () => {
           this.readable = true;
-          this.setProperty('up-to-date', false);
         });
 
         this.currentSource = <BindingsStream><unknown>bindingsStream;

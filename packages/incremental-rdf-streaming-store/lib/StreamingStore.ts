@@ -4,6 +4,7 @@ import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
 import { Store } from 'n3';
 import { Readable, PassThrough } from 'readable-stream';
+import { LinkedList } from './LinkedList';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
 
 /**
@@ -22,11 +23,12 @@ export class StreamingStore<Q extends Quad>
   protected ended = false;
   protected numberOfListeners = 0;
   protected halted = false;
-  protected haltBuffer = new Array<Q>();
+  protected haltBuffer = new LinkedList<Q>();
 
   public constructor(store = new Store<Q>()) {
     super();
     this.store = store;
+    this.setMaxListeners(Number.POSITIVE_INFINITY);
   }
 
   /**
@@ -69,14 +71,45 @@ export class StreamingStore<Q extends Quad>
   }
 
   public halt(): void {
+    if (!this.halted) {
+      this.emit('halt');
+    }
     this.halted = true;
   }
 
-  public resume(): void {
-    for (const quad of this.haltBuffer) {
+  public flush(): void {
+    let quad = this.haltBuffer.shift();
+    while (quad) {
       this.handleQuad(quad);
+      quad = this.haltBuffer.shift();
     }
-    this.halted = false;
+    for (const pendingStreams of this.pendingStreams.indexedStreams.values()) {
+      for (const pendingStream of pendingStreams) {
+        if (!this.ended) {
+          pendingStream.push('pause');
+        }
+      }
+    }
+    this.emit('flush');
+  }
+
+  public resume(): void {
+    if (this.halted) {
+      let quad = this.haltBuffer.shift();
+      while (quad) {
+        this.handleQuad(quad);
+        quad = this.haltBuffer.shift();
+      }
+      for (const pendingStreams of this.pendingStreams.indexedStreams.values()) {
+        for (const pendingStream of pendingStreams) {
+          if (!this.ended) {
+            pendingStream.push('pause');
+          }
+        }
+      }
+      this.halted = false;
+      this.emit('resume');
+    }
   }
 
   public isHalted(): boolean {
@@ -193,12 +226,13 @@ export class StreamingStore<Q extends Quad>
       const pendingStream = new PassThrough({ objectMode: true });
       if (options) {
         options.stopMatch = () => {
-          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
           pendingStream.end();
+          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
         };
       }
       this.pendingStreams.addPatternListener(pendingStream, subject, predicate, object, graph);
       pendingStream.pipe(unionStream, { end: false });
+      pendingStream.pause();
 
       let pendingStreamEnded = false;
       let storeResultEnded = false;
@@ -214,6 +248,11 @@ export class StreamingStore<Q extends Quad>
         storeResultEnded = true;
         if (pendingStreamEnded) {
           unionStream.end();
+        } else {
+          pendingStream.resume();
+          if (this.halted) {
+            pendingStream.push('pause');
+          }
         }
       });
     } else {

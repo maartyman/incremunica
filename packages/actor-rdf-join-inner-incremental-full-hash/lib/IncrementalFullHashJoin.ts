@@ -108,6 +108,9 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
       }
 
       this.readable = false;
+      if (this.leftIterator.upToDate && this.rightIterator.upToDate) {
+        this.upToDate = true;
+      }
       return null;
     }
   }

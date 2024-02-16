@@ -38,8 +38,14 @@
     "@comunica/types": "^2.10.0",
     "@incremunica/hash-bindings": "^1.1.0",
     "@incremunica/incremental-bindings-factory": "^1.0.0",
-    "asynciterator": "^3.8.1",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event",
     "sparqlalgebrajs": "^4.2.0"
+  },
+  "overrides": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
+  },
+  "resolutions": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

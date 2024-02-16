@@ -42,8 +42,14 @@
     "@incremunica/hash-bindings": "^1.1.0",
     "@incremunica/incremental-bindings-factory": "^1.0.0",
     "@incremunica/context-entries": "^1.0.0",
-    "asynciterator": "^3.8.1",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event",
     "sparqlalgebrajs": "^4.0.5"
+  },
+  "overrides": {
+    "asynciterator": "$asynciterator-local"
+  },
+  "resolutions": {
+    "**/asynciterator": "$asynciterator-local"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

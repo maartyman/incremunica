@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "^5.43.0",
     "abort-controller": "^3.0.0",
     "arrayify-stream": "^2.0.1",
-    "asynciterator": "^3.8.1",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event",
     "babel-loader": "^9.1.0",
     "componentsjs-generator": "^3.1.0",
     "depcheck": "^1.4.3",
@@ -75,6 +75,9 @@
     "webpack-cli": "^5.0.0",
     "@comunica/jest": "^2.10.0"
   },
+  "overrides": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
+  },
   "pre-commit": [
     "build",
     "lint",
@@ -109,7 +112,8 @@
     "depcheck-fix": "lerna-script depfixTask"
   },
   "resolutions": {
-    "@rdfjs/types": "1.1.0"
+    "@rdfjs/types": "1.1.0",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
   "dependencies": {}
 }

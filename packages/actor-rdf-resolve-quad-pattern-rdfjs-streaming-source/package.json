@@ -40,7 +40,13 @@
     "@incremunica/incremental-types": "^1.0.0",
     "@incremunica/context-entries": "^1.0.0",
     "@rdfjs/types": "*",
-    "asynciterator": "^3.8.1"
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
+  },
+  "overrides": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
+  },
+  "resolutions": {
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

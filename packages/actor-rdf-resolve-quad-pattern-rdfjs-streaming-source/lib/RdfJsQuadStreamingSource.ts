@@ -5,7 +5,7 @@ import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
-import { wrap as wrapAsyncIterator } from 'asynciterator';
+import { WrappingIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 
 export class RdfJsQuadStreamingSource implements IQuadSource {
@@ -51,18 +51,21 @@ export class RdfJsQuadStreamingSource implements IQuadSource {
       }
     }
 
-    const it = wrapAsyncIterator<Quad>(rawStream, { autoStart: false });
+    const it = new WrappingIterator<Quad>(rawStream);
 
-    // Set up-to-date property
-    it.setProperty('up-to-date', true);
-    if (this.context) {
-      const guardEvents = this.context.get<IGuardEvents>(KeysGuard.events);
+    if (this.store.constructor.name === 'StreamingStore') {
+      let upToDate = this.store.isHalted();
+      // Set up-to-date event listener
+      const guardEvents = this.context?.get<IGuardEvents>(KeysGuard.events);
       if (guardEvents) {
-        guardEvents.on('modified', () => {
-          it.setProperty('up-to-date', false);
-        });
+        // TODO doesn't work with guard events
         guardEvents.on('up-to-date', () => {
-          it.setProperty('up-to-date', true);
+          upToDate = true;
+          it.readable = true;
+        });
+        guardEvents.on('modified', () => {
+          upToDate = false;
+          it.readable = true;
         });
       }
     }

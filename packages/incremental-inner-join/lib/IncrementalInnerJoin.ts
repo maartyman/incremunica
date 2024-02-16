@@ -32,6 +32,17 @@ export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
       this.readable = true;
     });
 
+    this.leftIterator.on('up-to-date', () => {
+      if (this.rightIterator.upToDate) {
+        this.readable = true;
+      }
+    });
+    this.rightIterator.on('up-to-date', () => {
+      if (this.leftIterator.upToDate) {
+        this.readable = true;
+      }
+    });
+
     this.leftIterator.on('end', () => {
       if (!this.hasResults()) {
         this._end();

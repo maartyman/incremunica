@@ -34,8 +34,14 @@
   ],
   "dependencies": {
     "@rdfjs/types": "*",
-    "asynciterator": "^3.8.1",
+    "asynciterator": "git+https://github.com/maartyman/AsyncIterator.git#up-to-date-event",
     "n3": "^1.16.3"
+  },
+  "overrides": {
+    "asynciterator": "$asynciterator-local"
+  },
+  "resolutions": {
+    "asynciterator": "$asynciterator-local"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
