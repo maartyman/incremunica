@@ -14,7 +14,10 @@
 
 This is a monorepo that builds upon the core comunica packages to allow for incremental query evaluation. 
 
-**Important note: Not all SPARQL operators are currently supported. (only joins and projections (triple pattern queries))**
+## Querying with Incremunica
+
+To query with Incremunica, you can follow the guide in the [`@comunica/actor-init-sparql`](https://www.npmjs.com/package/@incremunica/query-sparql-incremental?activeTab=readme) package on npm.
+The rest of this readme is intended for developers who want to contribute to Incremunica.
 
 ## Development Setup
 
@@ -46,6 +49,8 @@ This will install the dependencies of all modules, and bootstrap the Lerna monor
 Furthermore, this will add [pre-commit hooks](https://www.npmjs.com/package/pre-commit)
 to build, lint and test.
 These hooks can temporarily be disabled at your own risk by adding the `-n` flag to the commit command.
+
+**Important note: Not all SPARQL operators are currently supported. (only joins and projections (triple pattern queries))**
 
 ## License
 This code is copyrighted by [Ghent University – imec](http://idlab.ugent.be/)

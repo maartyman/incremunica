@@ -16,30 +16,9 @@ or
 $ yarn add @incremunica/query-sparql-incremental
 ```
 
-## Install a prerelease
-
-Since this package is still in testing phase, you may want to install a prerelease of this package, which you can do by appending `@next` to the package name during installation.
-
-
-```bash
-$ npm install -g @incremunica/query-sparql-incremental@next
-```
-
-or
-
-```bash
-$ yarn add @incremunica/query-sparql-incremental@next
-```
-
 ## Usage
 
-Show the help with all options:
-
-```bash
-$ comunica-sparql-incremental --help
-```
-
-_[**Read more** about querying from the command line](https://comunica.dev/docs/query/getting_started/query_cli/)._
+Incremunica can be used in JavaScript/TypeScript applications and from the command line.
 
 ### Usage within application
 
@@ -117,3 +96,12 @@ async function main() {
 main();
 ```
 
+### Usage from the command line
+
+Show the help with all options:
+
+```bash
+$ comunica-sparql-incremental --help
+```
+
+_[**Read more** about querying from the command line](https://comunica.dev/docs/query/getting_started/query_cli/)._
