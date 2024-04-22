@@ -1,6 +1,14 @@
 import type {Bindings, BindingsStream} from '@incremunica/incremental-types';
 
 export const DevTools = {
+  bindingsToString(bindings: Bindings) {
+    let string = `bindings, ${bindings.diff} :`;
+    bindings.forEach((value, key) => {
+      string += `\n\t${key.value}: ${value.value}`;
+    });
+    return string;
+  },
+
   printBindings(bindings: Bindings) {
     let string = `bindings, ${bindings.diff} :`;
     bindings.forEach((value, key) => {

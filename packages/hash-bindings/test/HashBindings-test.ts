@@ -88,6 +88,25 @@ describe('HashBindings', () => {
     expect(hash2).toEqual('a:<ex:a1>\nc:<ex:c1>\nb:<ex:b1>\n');
     expect(hash3).toEqual('a:<ex:a1>\nc:<ex:c1>\n');
   });
+
+  it('should hash with the initialization variables', () => {
+    hashBindings = new HashBindings([ DF.variable('a'), DF.variable('b') ]);
+
+    let bindings1: Bindings = BF.bindings([
+      [ DF.variable('a'), DF.namedNode('ex:a1') ],
+      [ DF.variable('b'), DF.namedNode('ex:b1') ],
+    ]);
+
+    let bindings2: Bindings = BF.bindings([
+      [ DF.variable('a'), DF.namedNode('ex:a1') ],
+    ]);
+
+    let hash1 = hashBindings.hash(bindings1);
+    let hash2 = hashBindings.hash(bindings2);
+
+    expect(hash1).toEqual('a:<ex:a1>\nb:<ex:b1>\n');
+    expect(hash2).toEqual('a:<ex:a1>\n');
+  });
 });
 
 

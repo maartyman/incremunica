@@ -8,6 +8,7 @@
     "ccqs:config/query-operation/actors/query/project.json",
     "icqsi:config/query-operation/actors/query/quadpattern.json",
     "ccqs:config/query-operation/actors/query/union.json",
+    "ccqs:config/query-operation/actors/query/minus.json",
     "ccqs:config/query-operation/actors/query/values.json",
 
     "ccqs:config/query-operation/actors/query/path-alt.json",
