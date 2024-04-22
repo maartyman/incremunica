@@ -1,12 +1,26 @@
 import type { Bindings } from '@incremunica/incremental-types';
+import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 
 export class HashBindings {
-  private readonly variables = new Map<string, void>();
+  private readonly initializedWithVariables: boolean;
+  private readonly variables = new Set<string>();
+
+  public constructor(variables?: RDF.Variable[]) {
+    this.initializedWithVariables = variables !== undefined;
+    if (variables) {
+      for (const variable of variables) {
+        this.variables.add(variable.value);
+      }
+    }
+  }
+
   public hash(bindings: Bindings): string {
-    for (const key of bindings.keys()) {
-      if (!this.variables.has(key.value)) {
-        this.variables.set(key.value);
+    if (!this.initializedWithVariables) {
+      for (const key of bindings.keys()) {
+        if (!this.variables.has(key.value)) {
+          this.variables.add(key.value);
+        }
       }
     }
 
