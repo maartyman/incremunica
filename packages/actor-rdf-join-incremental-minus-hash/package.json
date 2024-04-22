@@ -1,0 +1,49 @@
+{
+  "name": "@incremunica/actor-rdf-join-incremental-minus-hash",
+  "version": "1.2.2",
+  "description": "An incremental-minus-hash rdf-join actor",
+  "lsd:module": true,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/actor-rdf-join-incremental-minus-hash"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "comunica",
+    "actor",
+    "rdf-join",
+    "incremental-minus-hash"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "dependencies": {
+    "@comunica/bindings-factory": "^2.10.1",
+    "@comunica/bus-rdf-join": "^2.10.1",
+    "@comunica/mediatortype-join-coefficients": "^2.10.0",
+    "@comunica/types": "^2.10.0",
+    "@incremunica/hash-bindings": "^1.2.2",
+    "@incremunica/incremental-types": "^1.2.2",
+    "@rdfjs/types": "*",
+    "asynciterator": "^3.8.1"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  }
+}
