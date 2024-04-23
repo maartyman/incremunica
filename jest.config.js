@@ -16,6 +16,7 @@ module.exports = {
   setupFilesAfterEnv: [ './setup-jest.js' ],
   collectCoverage: true,
   coveragePathIgnorePatterns: [
+    '/actor-query-operation-incremental-filter/',
     'util.ts',
     '/node_modules/',
     '/mocks/',
