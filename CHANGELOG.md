@@ -1,6 +1,30 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.3.0"></a>
+## [v1.3.0](https://github.com/maartyman/incremunica/compare/v1.2.2...v1.3.0) - 2024-04-23
+
+### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
+* [add new packages to package.json](https://github.com/maartyman/incremunica/commit/9eb8d4c2523be342d08739f7fff1ecc097a12821)
+* [Merge pull request #100 from maartyman/add-incremental-filter](https://github.com/maartyman/incremunica/commit/4f571d5884508525b9fcd42038347d0e24d8b554)
+* [partial implementation of the FILTER operator](https://github.com/maartyman/incremunica/commit/42be10d516645b9198795377b5991cf3df45b0cf)
+* [Merge pull request #99 from maartyman/add-optional](https://github.com/maartyman/incremunica/commit/aea11b668717ada65e15a98d117274bc6bd0bbc2)
+* [Added incremental optional operator](https://github.com/maartyman/incremunica/commit/8308ddaf74b60ec56902b511b8285291e90b8c2a)
+* [Merge pull request #98 from maartyman/add-minus](https://github.com/maartyman/incremunica/commit/c85d00ccf5e138df4df2101ebf7d2e49515aa1e1)
+* [added incremental minus operator](https://github.com/maartyman/incremunica/commit/8316d2908e4a64d776540ff0525d311c0f19eb7c)
+* [added variable initialization to hash bindings](https://github.com/maartyman/incremunica/commit/0b2fff89645edc90ffb028a04c0c2e90bed3c178)
+* [added bindingsToString method](https://github.com/maartyman/incremunica/commit/c740d7e60fe1c092dc294409e63f46afe893f556)
+* [Merge pull request #97 from maartyman/fix-readme](https://github.com/maartyman/incremunica/commit/a528f09bccb4bf4536d5a2adfadd89f506c92b84)
+* [Improved clarity on how to use Incremuncia](https://github.com/maartyman/incremunica/commit/19576cff9acbf16b7eb8dfe319cc6b0b8f54322d)
+* [Merge pull request #90 from maartyman/fix-automerge-renovate](https://github.com/maartyman/incremunica/commit/f6e59a7383852988a87769f713dfd6ae60420ab8)
+* [copied renovate settings](https://github.com/maartyman/incremunica/commit/052b720533eeb0b11ebf9e734624e057502e02b1)
+* [Merge pull request #86 from maartyman/fix-automerge-renovate](https://github.com/maartyman/incremunica/commit/06b466157aafceb51336df2fbdc96d2dea9f53fd)
+* [Merge branch 'master' into fix-automerge-renovate](https://github.com/maartyman/incremunica/commit/86083c9a84dfb0e028ec5d66a6aa23af4732db45)
+* [fix automerge properly](https://github.com/maartyman/incremunica/commit/1cb3992e7f47194f97e3dc63ce797061cad915cb)
+* [Update Comunica monorepo packages to v2.10.2](https://github.com/maartyman/incremunica/commit/4abf315c8e916860f9e2a262bd12bc6d14a21eaf)
+* [Update dependency node-polyfill-webpack-plugin to v3](https://github.com/maartyman/incremunica/commit/e2906c95b619cb830bde1d698fdac28dc8c03120)
+* [Merge pull request #82 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/2814a2f88a4d780f4403561de7e217c3aa4f3952)
+
 <a name="v1.2.2"></a>
 ## [v1.2.2](https://github.com/maartyman/incremunica/compare/v1.2.1...v1.2.2) - 2023-12-06
 
