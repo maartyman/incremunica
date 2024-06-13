@@ -1,5 +1,5 @@
 {
-  "name": "@incremunica/actor-query-incremental-operation-distinct-hash",
+  "name": "@incremunica/actor-query-operation-incremental-distinct-hash",
   "version": "1.3.0",
   "description": "An incremental distinct-hash query-operation actor",
   "lsd:module": true,
