@@ -37,7 +37,7 @@
     "@comunica/types": "^2.10.0",
     "@incremunica/incremental-bindings-factory": "^1.3.0",
     "@rdfjs/types": "*",
-    "arrayify-stream": "^2.0.1"
+    "arrayify-stream": "^3.0.0"
   },
   "scripts": {
     "build": "npm run build:ts",
