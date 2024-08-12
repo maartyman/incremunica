@@ -44,7 +44,7 @@
     "engine-default.js"
   ],
   "devDependencies": {
-    "arrayify-stream": "^2.0.1"
+    "arrayify-stream": "^3.0.0"
   },
   "dependencies": {
     "@comunica/actor-abstract-mediatyped": "2.10.0",
