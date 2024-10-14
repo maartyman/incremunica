@@ -33,7 +33,7 @@
   ],
   "dependencies": {
     "@incremunica/incremental-types": "^1.3.0",
-    "asynciterator": "^3.8.1"
+    "asynciterator": "^3.9.0"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

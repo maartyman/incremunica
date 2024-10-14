@@ -34,9 +34,9 @@
   "dependencies": {
     "@incremunica/hash-bindings": "^1.3.0",
     "@incremunica/incremental-types": "^1.3.0",
-    "@comunica/bus-query-operation": "^2.10.1",
-    "@comunica/core": "^2.10.0",
-    "@comunica/types": "^2.10.0",
+    "@comunica/bus-query-operation": "^3.2.2",
+    "@comunica/core": "^3.2.1",
+    "@comunica/types": "^3.2.1",
     "sparqlalgebrajs": "^4.2.0"
   },
   "scripts": {
