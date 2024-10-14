@@ -1,5 +1,6 @@
 import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
-import type { Bindings } from '@incremunica/incremental-types';
+import type { Bindings } from '@comunica/bindings-factory';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Bindings[] = [];
@@ -19,7 +20,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   }
 
   private addOrDeleteFromMemory(item: Bindings, memory: Bindings[]): boolean {
-    if (item.diff) {
+    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
       memory.push(item);
       return true;
     }
@@ -53,9 +54,9 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
           continue;
         }
 
-        const resultingBindings = this.activeSide === Side.right ?
+        const resultingBindings = <Bindings>(this.activeSide === Side.right ?
           this.funJoin(otherArray[this.index], this.activeElement) :
-          this.funJoin(this.activeElement, otherArray[this.index]);
+          this.funJoin(this.activeElement, otherArray[this.index]));
 
         this.index++;
 
@@ -69,7 +70,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = this.leftIterator.read();
+      let item = <Bindings>this.leftIterator.read();
       if (item !== null) {
         if (this.addOrDeleteFromMemory(item, this.leftMemory)) {
           this.activeElement = item;
@@ -79,7 +80,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
         continue;
       }
 
-      item = this.rightIterator.read();
+      item = <Bindings>this.rightIterator.read();
       if (item !== null) {
         if (this.addOrDeleteFromMemory(item, this.rightMemory)) {
           this.activeElement = item;

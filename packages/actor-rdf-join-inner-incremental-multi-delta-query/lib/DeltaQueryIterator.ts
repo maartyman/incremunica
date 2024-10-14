@@ -1,14 +1,17 @@
 import { BindingsToQuadsIterator } from '@comunica/actor-query-operation-construct';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
-import { KeysRdfResolveQuadPattern } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
-import type { BindingsStream, Quad, Bindings } from '@incremunica/incremental-types';
+import type { Quad } from '@incremunica/incremental-types';
+import type { BindingsStream } from '@comunica/types';
+import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';
+import {KeysQueryOperation} from "@comunica/context-entries";
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private count = 0;
@@ -20,6 +23,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private readonly subContext: IActionContext;
   private readonly store = new Store();
   private pending = false;
+  private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
     entries: IJoinEntry[],
@@ -29,7 +33,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     super();
     this.entries = entries;
     this.subContext = new ActionContext()
-      .set(KeysRdfResolveQuadPattern.sources, [ this.store ])
+      .set(KeysQueryOperation.querySources, [ this.store ])
       .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
@@ -54,7 +58,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
   public read(): Bindings | null {
     if (this.currentSource !== undefined && !this.currentSource.done && this.currentSource.readable) {
-      const binding = this.currentSource.read();
+      const binding = <Bindings>this.currentSource.read();
       if (binding !== null) {
         return binding;
       }
@@ -118,7 +122,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       // Do query
       this.pending = true;
       const subOperations = subEntries
-        .map(entry => materializeOperation(entry.operation, constBindings, { bindFilter: false }));
+        .map(entry => materializeOperation(entry.operation, constBindings, this.bindingsFactory, { bindFilter: false }));
 
       const operation = subOperations.length === 1 ?
         subOperations[0] :
@@ -131,11 +135,11 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
         // Figure out diff (change diff if needed)
         let bindingsStream: BindingsStream | undefined = <BindingsStream><unknown>output.bindingsStream.map(
           (resultBindings: Bindings) => {
-            const tempBindings = <Bindings>resultBindings.merge(constBindings);
+            let tempBindings = <Bindings>resultBindings.merge(constBindings);
             if (tempBindings === undefined) {
               return null;
             }
-            tempBindings.diff = constBindings.diff;
+            tempBindings = tempBindings.setContextEntry(new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition()));
             return tempBindings;
           },
         );
@@ -144,7 +148,8 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
         bindingsStream.once('end', () => {
           // Add or delete binding from store
-          if (constBindings.diff || constBindings.diff === undefined) {
+          if (constBindings.getContextEntry(new ActionContextKeyIsAddition()) ||
+            constBindings.getContextEntry(new ActionContextKeyIsAddition()) === undefined) {
             this.store.add(constQuad);
           } else {
             this.store.delete(constQuad);
