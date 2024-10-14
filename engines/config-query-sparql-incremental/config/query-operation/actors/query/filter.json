@@ -1,6 +1,6 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^3.0.0/components/context.jsonld",
 
     "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-operation-incremental-filter/^1.0.0/components/context.jsonld"
   ],
@@ -10,7 +10,8 @@
     {
       "@id": "urn:comunica:default:query-operation/actors#filter",
       "@type": "ActorQueryOperationIncrementalFilter",
-      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" },
+      "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" }
     }
   ]
 }
