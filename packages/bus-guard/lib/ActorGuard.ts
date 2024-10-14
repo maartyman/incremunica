@@ -1,7 +1,8 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
-import type { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
 import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvents';
+import {IQuerySource} from "@comunica/types";
+import {StreamingQuerySourceRdfJs} from "@incremunica/actor-query-source-identify-streaming-rdfjs";
 
 /**
  * A comunica actor for guard events.
@@ -27,7 +28,7 @@ export interface IActionGuard extends IAction {
   /**
    * The source element of the data.
    */
-  streamingSource: RdfJsQuadStreamingSource;
+  streamingSource: StreamingQuerySourceRdfJs;
   /**
    * The URL of the source that was fetched.
    */

@@ -1,14 +1,23 @@
-import { Bus } from '@comunica/core';
-import { ActorRdfResolveHypermediaStreamNone } from '../lib/ActorRdfResolveHypermediaStreamNone';
+import {ActionContext, Bus} from '@comunica/core';
+import { ActorQuerySourceIdentifyHypermediaStreamNone } from '../lib';
 import {IActionGuard, MediatorGuard} from "@incremunica/bus-guard";
 import {DataFactory} from "rdf-data-factory";
 import arrayifyStream from "arrayify-stream";
 import 'jest-rdf'
+import '@incremunica/incremental-jest'
 import {EventEmitter} from "events";
 import {KeysGuard} from "@incremunica/context-entries";
+import { Factory } from 'sparqlalgebrajs';
 import {IGuardEvents} from "@incremunica/incremental-types";
+import {
+  ActionContextKeyIsAddition,
+  ActorMergeBindingsContextIsAddition
+} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {BindingsFactory} from "@comunica/bindings-factory";
+import {DevTools} from "@incremunica/dev-tools";
 
 const DF = new DataFactory();
+const AF = new Factory();
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
 
@@ -23,14 +32,17 @@ function captureEvents(item: EventEmitter, ...events: string[]) {
 
 describe('ActorRdfResolveHypermediaStreamNone', () => {
   let bus: any;
+  let BF: BindingsFactory;
 
-  beforeEach(() => {
-    bus = new Bus({ name: 'bus' });
+  beforeEach(async () => {
+    bus = new Bus({name: 'bus'});
+    BF = await DevTools.createBindingsFactory(DF);
   });
 
   describe('An ActorRdfResolveHypermediaStreamNone instance', () => {
-    let actor: ActorRdfResolveHypermediaStreamNone;
+    let actor: ActorQuerySourceIdentifyHypermediaStreamNone;
     let mediatorGuard: MediatorGuard;
+    let mediatorMergeBindingsContext: any;
     let guardEvents: EventEmitter;
     let mediatorFn: jest.Func;
 
@@ -44,7 +56,15 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
           return { guardEvents }
         }
       };
-      actor = new ActorRdfResolveHypermediaStreamNone({ name: 'actor', bus, mediatorGuard});
+      mediatorMergeBindingsContext = <any> {
+        mediate: async (action: any) => {
+          return (await new ActorMergeBindingsContextIsAddition({
+            bus: new Bus({name: 'bus'}),
+            name: 'actor'
+          }).run(<any>{})).mergeHandlers;
+        }
+      }
+      actor = new ActorQuerySourceIdentifyHypermediaStreamNone({ name: 'actor', bus, mediatorGuard, mediatorMergeBindingsContext});
     });
 
     it('should test', async () => {
@@ -53,6 +73,8 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
     });
 
     it('should run and make a streaming store', async () => {
+      let deletedQuad = quad("s1","p1","o1");
+      deletedQuad.diff = false
       let action = <any> {
         context: {
           get: () => {
@@ -62,15 +84,15 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
         url: "http://test.com",
         quads: streamifyArray([
           quad("s1","p1","o1"),
-          quad("s2","p2","o2")
+          quad("s2","p2","o2"),
+          deletedQuad
         ])
       };
-      let stream = (await actor.run(action)).source.match(
-        DF.variable('s'),
-        DF.variable('p'),
-        DF.variable('o'),
-        DF.variable('g'),
-      )
+      let result = (await actor.run(action))
+      let stream = result.source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        new ActionContext()
+      );
       let number = 2
       stream.on("data", () => {
         number--;
@@ -78,9 +100,22 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
           stream.close();
         }
       })
-      expect(await arrayifyStream(stream)).toBeRdfIsomorphic([
-        quad("s1","p1","o1"),
-        quad("s2","p2","o2")
+      expect(await arrayifyStream(stream)).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s1')],
+          [DF.variable('p'), DF.namedNode('p1')],
+          [DF.variable('o'), DF.namedNode('o1')],
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s2')],
+          [DF.variable('p'), DF.namedNode('p2')],
+          [DF.variable('o'), DF.namedNode('o2')],
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([
+          [DF.variable('s'), DF.namedNode('s1')],
+          [DF.variable('p'), DF.namedNode('p1')],
+          [DF.variable('o'), DF.namedNode('o1')],
+        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
     });
 
