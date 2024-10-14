@@ -3,12 +3,11 @@ import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-o
 import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
-import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
-  DataSources,
+  IQuerySource,
   IActionContext,
   IJoinEntryWithMetadata,
   IQueryOperationResultBindings,
@@ -16,11 +15,11 @@ import type {
 } from '@comunica/types';
 import { KeysStreamingSource } from '@incremunica/context-entries';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { Bindings } from '@incremunica/incremental-bindings-factory';
-import type { AsyncIterator } from 'asynciterator';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
+import {BindingsFactory, Bindings} from "@comunica/bindings-factory";
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -40,7 +39,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     });
   }
 
-  public static haltSources(sources: DataSources): void {
+  public static haltSources(sources: IQuerySource[]): void {
     for (const source of sources) {
       if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
         (<any>source).halt();
@@ -48,7 +47,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     }
   }
 
-  public static resumeSources(sources: DataSources): void {
+  public static resumeSources(sources: IQuerySource[]): void {
     for (const source of sources) {
       if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
         (<any>source).resume();
@@ -73,13 +72,14 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     operationBinder: (boundOperations: Algebra.Operation[], operationBindings: Bindings)
     => Promise<[BindingsStream, () => void]>,
     optional: boolean,
-    sources: DataSources,
+    sources: any,
   ): Promise<BindingsStream> {
+    const bindingsFactory = new BindingsFactory();
     const transformMap = new Map<
     string,
     {
       elements: {
-        iterator: AsyncIterator<Bindings>;
+        iterator: BindingsStream;
         stopFunction: (() => void);
       }[];
       subOperations: Algebra.Operation[];
@@ -91,13 +91,14 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
-      if (bindings.diff) {
+      if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
         if (hashData === undefined) {
           hashData = {
             elements: [],
             subOperations: operations.map(operation => materializeOperation(
               operation,
               bindings,
+              bindingsFactory,
               { bindFilter: false },
             )),
           };
@@ -151,8 +152,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           transformMap.delete(hash);
         }
 
-        push(new TransformIterator(
-          () => newIterator.map(bindingsMerger),
+        push(<BindingsStream><any>new TransformIterator(
+          () => <any>newIterator.map(bindingsMerger),
           { maxBufferSize: 128, autoStart: false },
         ));
         done();
@@ -161,7 +162,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       done();
     };
 
-    return new UnionIterator(baseStream.transform({
+    return <any>new UnionIterator(<any>baseStream.transform({
       transform: binder,
       optional,
     }), { autoStart: false });
@@ -255,7 +256,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const remainingEntries = [ ...entries ];
     remainingEntries.splice(0, 1);
 
-    const sources = getContextSources(action.context);
+    const sources = ActorQueryOperation.getOperationSource(remainingEntries[0].operation);
 
     // Bind the remaining patterns for each binding in the stream
     const subContext = action.context

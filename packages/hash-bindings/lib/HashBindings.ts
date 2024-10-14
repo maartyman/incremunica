@@ -1,4 +1,4 @@
-import type { Bindings } from '@incremunica/incremental-types';
+import type { Bindings } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 

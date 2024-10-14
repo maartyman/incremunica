@@ -4,19 +4,24 @@ import { ActorQueryOperation,
   materializeOperation } from '@comunica/bus-query-operation';
 import type { IActorTest } from '@comunica/core';
 import { AsyncEvaluator, isExpressionError } from '@comunica/expression-evaluator';
-import type { IActionContext, IQueryOperationResult } from '@comunica/types';
+import type {IActionContext, IQueryOperationResult} from '@comunica/types';
+import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
+import { bindingsToString } from '@comunica/bindings-factory';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { Bindings } from '@incremunica/incremental-bindings-factory';
-import { BindingsFactory, bindingsToString } from '@incremunica/incremental-bindings-factory';
-import type { BindingsStream } from '@incremunica/incremental-types';
+import type { BindingsStream } from '@comunica/types';
 import { EmptyIterator, SingletonIterator, UnionIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {DevTools} from "@incremunica/dev-tools";
+import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
 
 /**
  * A comunica Filter Sparqlee Query Operation Actor.
  */
 export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTypedMediated<Algebra.Filter> {
-  public constructor(args: IActorQueryOperationTypedMediatedArgs) {
+  public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+
+  public constructor(args: IActorQueryOperationIncrementalFilterArgs) {
     super(args, 'filter');
   }
 
@@ -27,7 +32,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       return true;
     }
     if (operation.expression.expressionType === 'operator') {
-      const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation) };
+      const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation, new BindingsFactory()) };
       const _ = new AsyncEvaluator(operation.expression, config);
       return true;
     }
@@ -55,10 +60,10 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
     const output = ActorQueryOperation.getSafeBindings(outputRaw);
     ActorQueryOperation.validateQueryOutput(output, 'bindings');
 
-    const BF = new BindingsFactory();
+    const BF = await BindingsFactory.create(this.mediatorMergeBindingsContext, context);
 
     if (currentOperation.expressionType !== 'existence') {
-      const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation) };
+      const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation, BF) };
       const evaluator = new AsyncEvaluator(currentOperation, config);
 
       const transform = async(item: Bindings, done: any, push: (bindings: Bindings) => void): Promise<void> => {
@@ -105,7 +110,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
     const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
-      if (bindings.diff) {
+      if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
         if (hashData === undefined) {
           hashData = {
             count: 1,
@@ -114,7 +119,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           };
           transformMap.set(hash, hashData);
 
-          const materializedOperation = materializeOperation(currentOperation.input, bindings);
+          const materializedOperation = materializeOperation(currentOperation.input, bindings, BF);
           const intermediateOutputRaw = await this.mediatorQueryOperation.mediate({
             operation: materializedOperation,
             context,
@@ -132,14 +137,12 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
           let posBindings: Bindings;
 
           if (currentOperation.not) {
-            negBindings = BF.fromBindings(bindings);
+            negBindings = bindings;
             hashData.currentState = true;
-            posBindings = BF.fromBindings(bindings);
-            posBindings.diff = false;
+            posBindings = bindings.setContextEntry(new ActionContextKeyIsAddition(), false);
           } else {
-            negBindings = BF.fromBindings(bindings);
-            negBindings.diff = false;
-            posBindings = BF.fromBindings(bindings);
+            negBindings = bindings.setContextEntry(new ActionContextKeyIsAddition(), false);
+            posBindings = bindings;
           }
           let count = 0;
 
@@ -148,7 +151,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
             doneTransform: () => void,
             pushTransform: (val: Bindings) => void,
           ): void => {
-            if (item.diff) {
+            if (item.getContextEntry(new ActionContextKeyIsAddition())) {
               if (count === 0) {
                 if (hashData === undefined) {
                   throw new Error('hashData undefined, should not happen');
@@ -209,4 +212,11 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
     }), { autoStart: false });
     return { type: 'bindings', bindingsStream, metadata: output.metadata };
   }
+}
+
+export interface IActorQueryOperationIncrementalFilterArgs extends IActorQueryOperationTypedMediatedArgs {
+  /**
+   * A mediator for creating binding context merge handlers
+   */
+  mediatorMergeBindingsContext: MediatorMergeBindingsContext;
 }

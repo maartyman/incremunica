@@ -2,7 +2,6 @@ import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { MetadataBindings } from '@comunica/types';
-import type { BindingsStream } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import { IncrementalMinusHash } from './IncrementalMinusHash';
 
@@ -27,8 +26,8 @@ export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
     const commonVariables: RDF.Variable[] = ActorRdfJoin.overlappingVariables(metadatas);
     if (commonVariables.length > 0) {
       const bindingsStream = new IncrementalMinusHash(
-        <BindingsStream><any>output.bindingsStream,
-        <BindingsStream><any>buffer.bindingsStream,
+        output.bindingsStream,
+        buffer.bindingsStream,
         commonVariables,
       );
       return {

@@ -1,4 +1,5 @@
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { BindingsStream } from '@comunica/types';
+import type {Bindings} from "@comunica/bindings-factory";
 import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
@@ -22,8 +23,8 @@ export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
       this.readable = true;
     }
 
-    this.leftIterator.on('error', error => this.destroy(error));
-    this.rightIterator.on('error', error => this.destroy(error));
+    this.leftIterator.on('error', (error: Error) => this.destroy(error));
+    this.rightIterator.on('error', (error: Error) => this.destroy(error));
 
     this.leftIterator.on('readable', () => {
       this.readable = true;

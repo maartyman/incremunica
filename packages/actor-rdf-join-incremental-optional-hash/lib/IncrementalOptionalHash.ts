@@ -1,7 +1,7 @@
-import type { Bindings as BindingsFactoryBindings } from '@incremunica/incremental-bindings-factory';
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
+import type { BindingsStream } from '@comunica/types';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalOptionalHash extends IncrementalInnerJoin {
   private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
@@ -38,7 +38,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: string, memory: Map<string, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.diff) {
+    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);
@@ -91,19 +91,19 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
           continue;
         }
 
-        let resultingBindings = null;
+        let resultingBindings: null | Bindings = null;
         if (this.prependArray) {
           // We need to delete the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(<BindingsFactoryBindings> this.otherArray[this.index]);
-          resultingBindings.diff = false;
+          resultingBindings = this.bindingsFactory.fromBindings(this.otherArray[this.index]);
+          resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), false);
         } else if (this.activeElement === null) {
           // If this.activeElement is null, then appendArray is true
           // we need to add the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(<BindingsFactoryBindings> this.otherArray[this.index]);
-          resultingBindings.diff = true;
+          resultingBindings = this.bindingsFactory.fromBindings(this.otherArray[this.index]);
+          resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), true);
         } else {
           // Otherwise merge bindings
-          resultingBindings = this.funJoin(this.activeElement, this.otherArray[this.index]);
+          resultingBindings = <Bindings>this.funJoin(this.activeElement, this.otherArray[this.index]);
         }
 
         this.index++;
@@ -118,17 +118,17 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = this.rightIterator.read();
+      let item = <Bindings>this.rightIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         const rightMemEl = this.rightMemory.get(hash);
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
           const otherArray = this.leftMemory.get(hash);
           if (otherArray !== undefined) {
-            if (item.diff && (rightMemEl === undefined || rightMemEl.length === 0)) {
+            if (item.getContextEntry(new ActionContextKeyIsAddition()) && (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
-            if (!item.diff && this.rightMemory.get(hash)?.length === 1) {
+            if (!item.getContextEntry(new ActionContextKeyIsAddition()) && this.rightMemory.get(hash)?.length === 1) {
               this.appendArray = true;
             }
             this.activeElement = item;
@@ -138,7 +138,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         continue;
       }
 
-      item = this.leftIterator.read();
+      item = <Bindings>this.leftIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {

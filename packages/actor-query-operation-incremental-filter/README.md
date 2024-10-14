@@ -23,8 +23,10 @@ After installing, this package can be added to your engine's configuration as fo
     ...
     {
       "@id": "urn:comunica:default:query-operation/actors#filter",
-      "@type": "ActorQueryOperationFilter",
-      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }    }
+      "@type": "ActorQueryOperationIncrementalFilter",
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" },
+      "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" }
+    }
   ]
 }
 ```

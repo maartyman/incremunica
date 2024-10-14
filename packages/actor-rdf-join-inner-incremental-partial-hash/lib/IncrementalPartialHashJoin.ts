@@ -1,5 +1,7 @@
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { Bindings } from '@comunica/bindings-factory';
+import type { BindingsStream } from '@comunica/types';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
@@ -33,7 +35,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: string, memory: Map<string, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.diff) {
+    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);
@@ -75,7 +77,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
           continue;
         }
 
-        const resultingBindings = this.funJoin(this.activeElement, this.otherArray[this.index]);
+        const resultingBindings = <Bindings>this.funJoin(this.activeElement, this.otherArray[this.index]);
 
         this.index++;
 
@@ -89,7 +91,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = this.leftIterator.read();
+      let item = <Bindings>this.leftIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
@@ -102,7 +104,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
         continue;
       }
 
-      item = this.rightIterator.read();
+      item = <Bindings>this.rightIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {

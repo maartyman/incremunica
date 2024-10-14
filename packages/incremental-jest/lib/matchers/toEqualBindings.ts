@@ -1,23 +1,27 @@
-import type { Bindings } from '@incremunica/incremental-bindings-factory';
-import { bindingsToString } from '@incremunica/incremental-bindings-factory';
+import type { Bindings } from '@comunica/bindings-factory';
+import { bindingsToString } from '@comunica/bindings-factory';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 function fail(received: Bindings, actual: Bindings): any {
   return {
-    message: () => `expected ${bindingsToString(received, true)} and ${bindingsToString(actual, true)} to be equal`,
+    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry(new ActionContextKeyIsAddition())}`,
     pass: false,
   };
 }
 
 function succeed(received: Bindings, actual: Bindings): any {
   return {
-    message: () => `expected ${bindingsToString(received, true)} and ${bindingsToString(actual, true)} not to be equal`,
+    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry(new ActionContextKeyIsAddition())}`,
     pass: true,
   };
 }
 
 export default {
   toEqualBindings(received: Bindings, actual: Bindings) {
-    if (!received.equals(actual, true)) {
+    if (!received.equals(actual)) {
+      return fail(received, actual);
+    }
+    if (received.getContextEntry(new ActionContextKeyIsAddition()) !== actual.getContextEntry(new ActionContextKeyIsAddition())) {
       return fail(received, actual);
     }
 

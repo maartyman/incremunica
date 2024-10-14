@@ -1,4 +1,4 @@
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
 import { ActorQueryOperation } from '@comunica/bus-query-operation';
 import { KeysInitQuery } from '@comunica/context-entries';
 import { ActionContext, Bus } from '@comunica/core';
@@ -13,9 +13,14 @@ import { ActorQueryOperationIncrementalFilter } from '../lib';
 import '@comunica/jest';
 import '@incremunica/incremental-jest';
 import {EventEmitter} from "events";
+import {DevTools} from "@incremunica/dev-tools";
+import {
+  ActionContextKeyIsAddition,
+  ActorMergeBindingsContextIsAddition
+} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
 
 const DF = new DataFactory();
-const BF = new BindingsFactory();
 
 function template(expr: string) {
   return `
@@ -62,17 +67,19 @@ describe('ActorQueryOperationFilterSparqlee', () => {
     expressionType: 'operator',
     operator: 'DUMMY',
   };
+  let BF: BindingsFactory;
 
-  beforeEach(() => {
-    bus = new Bus({ name: 'bus' });
+  beforeEach(async () => {
+    BF = await DevTools.createBindingsFactory(DF);
+    bus = new Bus({name: 'bus'});
     mediatorQueryOperation = {
       mediate: (arg: any) => Promise.resolve({
         bindingsStream: new ArrayIterator([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
-        ], { autoStart: false }),
-        metadata: () => Promise.resolve({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]}),
+          BF.bindings([[DF.variable('a'), DF.literal('1')]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[DF.variable('a'), DF.literal('2')]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[DF.variable('a'), DF.literal('3')]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ], {autoStart: false}),
+        metadata: () => Promise.resolve({cardinality: 3, canContainUndefs: false, variables: [DF.variable('a')]}),
         operated: arg,
         type: 'bindings',
       }),
@@ -101,7 +108,13 @@ describe('ActorQueryOperationFilterSparqlee', () => {
     let factory: Factory;
 
     beforeEach(() => {
-      actor = new ActorQueryOperationIncrementalFilter({ name: 'actor', bus, mediatorQueryOperation });
+      let mediatorMergeBindingsContext: MediatorMergeBindingsContext = <any> {
+        mediate: async () => Promise.resolve((await new ActorMergeBindingsContextIsAddition({
+          bus: new Bus({name: 'bus'}),
+          name: 'actor'
+        }).run(<any>{})).mergeHandlers),
+      }
+      actor = new ActorQueryOperationIncrementalFilter({ name: 'actor', bus, mediatorQueryOperation, mediatorMergeBindingsContext });
       factory = new Factory();
     });
 
@@ -135,9 +148,9 @@ describe('ActorQueryOperationFilterSparqlee', () => {
         context: new ActionContext() };
       const output: IQueryOperationResultBindings = <any> await actor.run(op);
       expect(await partialArrayifyStream(output.bindingsStream, 3)).toEqualBindingsArray([
-        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
       expect(output.type).toEqual('bindings');
       expect(await output.metadata())
@@ -208,9 +221,9 @@ describe('ActorQueryOperationFilterSparqlee', () => {
       const op: any = { operation: { type: 'filter', input: {}, expression }, context };
       const output: IQueryOperationResultBindings = <any> await actor.run(op);
       await expect(output.bindingsStream).toEqualBindingsStream([
-        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
       expect(output.type).toEqual('bindings');
       expect(await output.metadata())
@@ -224,9 +237,9 @@ describe('ActorQueryOperationFilterSparqlee', () => {
           context: new ActionContext() };
         const output: IQueryOperationResultBindings = <any> await actor.run(op);
         expect(await partialArrayifyStream(output.bindingsStream, 3)).toBeIsomorphicBindingsArray([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]);
         expect(await output.metadata())
           .toMatchObject({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});
@@ -239,12 +252,12 @@ describe('ActorQueryOperationFilterSparqlee', () => {
           context: new ActionContext() };
         const output: IQueryOperationResultBindings = <any> await actor.run(op);
         expect(await partialArrayifyStream(output.bindingsStream, 6)).toBeIsomorphicBindingsArray([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]], false),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), false),
         ]);
         expect(await output.metadata())
           .toMatchObject({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});

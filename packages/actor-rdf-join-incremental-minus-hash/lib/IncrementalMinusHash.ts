@@ -1,9 +1,9 @@
-import type { Bindings as bindingsFactoryBindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { Bindings } from '@comunica/bindings-factory';
+import type { BindingsStream } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalMinusHash extends AsyncIterator<Bindings> {
   private readonly leftIterator: BindingsStream;
@@ -11,7 +11,6 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
   private readonly hashBindings: HashBindings;
   private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
   private readonly rightMemory: Map<string, number> = new Map<string, number>();
-  private readonly bindingsFactory = new BindingsFactory();
   private readonly bindingBuffer: Bindings[] = [];
   public constructor(
     leftIterator: BindingsStream,
@@ -67,7 +66,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     return !this.leftIterator.ended || !this.rightIterator.ended || (this.bindingBuffer.length > 0);
   }
 
-  public read(): Bindings | null {
+  public read(): RDF.Bindings | null {
     if (this.ended) {
       return null;
     }
@@ -81,10 +80,10 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
       return buffer;
     }
 
-    let element = this.rightIterator.read();
+    let element = <Bindings>this.rightIterator.read();
     if (element) {
       const hash = this.hashBindings.hash(element);
-      if (element.diff) {
+      if (element.getContextEntry(new ActionContextKeyIsAddition())) {
         let currentCount = this.rightMemory.get(hash);
         if (currentCount === undefined) {
           currentCount = 0;
@@ -96,9 +95,8 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
           const matchingBindings = this.leftMemory.get(hash);
           if (matchingBindings !== undefined) {
             for (let matchingBinding of matchingBindings) {
-              matchingBinding = <Bindings><any> this.bindingsFactory
-                .fromBindings(<bindingsFactoryBindings><any>matchingBinding);
-              matchingBinding.diff = false;
+              //TODO check if the 2 bindings are equal for common variables
+              matchingBinding = matchingBinding.setContextEntry(new ActionContextKeyIsAddition(), false);
               this.bindingBuffer.push(matchingBinding);
             }
           }
@@ -124,10 +122,10 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
       }
       return this.read();
     }
-    element = this.leftIterator.read();
+    element = <Bindings>this.leftIterator.read();
     if (element) {
       const hash = this.hashBindings.hash(element);
-      if (element.diff) {
+      if (element.getContextEntry(new ActionContextKeyIsAddition())) {
         let currentArray = this.leftMemory.get(hash);
         if (currentArray === undefined) {
           currentArray = [];

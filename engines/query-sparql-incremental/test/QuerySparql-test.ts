@@ -4,15 +4,16 @@
 import 'jest-rdf';
 import '@incremunica/incremental-jest';
 import { DataFactory } from 'rdf-data-factory';
-import type { BindingsStream, QueryStringContext} from '@comunica/types';
-import {Factory} from 'sparqlalgebrajs';
+import type {Bindings, BindingsStream, QueryStringContext} from '@comunica/types';
 import {QueryEngine} from '../lib/QueryEngine';
 import {usePolly} from './util';
 import {EventEmitter} from "events";
 import * as http from "http";
 import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 import {Quad} from "@incremunica/incremental-types";
-import {BindingsFactory} from "@incremunica/incremental-bindings-factory";
+import {BindingsFactory} from "@comunica/bindings-factory";
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {DevTools} from "@incremunica/dev-tools";
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
   let array: any[] = [];
@@ -25,22 +26,21 @@ async function partialArrayifyStream(stream: EventEmitter, num: number): Promise
   return array;
 }
 
-const BF = new BindingsFactory();
-
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
 }
 
 const quad = require('rdf-quad');
-const stringifyStream = require('stream-to-string');
 
 const DF = new DataFactory();
-const factory = new Factory();
 
 describe('System test: QuerySparql (without polly)', () => {
+  let BF: BindingsFactory;
   let engine: QueryEngine;
-  beforeEach(() => {
+
+  beforeEach(async () => {
     engine = new QueryEngine();
+    BF = await DevTools.createBindingsFactory(DF);
   });
 
   describe("using Streaming Store", () => {
@@ -65,12 +65,12 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('s'), DF.namedNode('s1')],
           [DF.variable('p'), DF.namedNode('p1')],
           [DF.variable('o'), DF.namedNode('o1')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         BF.bindings([
           [DF.variable('s'), DF.namedNode('s2')],
           [DF.variable('p'), DF.namedNode('p2')],
           [DF.variable('o'), DF.namedNode('o2')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.addQuad(quad("s3", "p3", "o3"));
@@ -80,7 +80,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('s'), DF.namedNode('s3')],
           [DF.variable('p'), DF.namedNode('p3')],
           [DF.variable('o'), DF.namedNode('o3')],
-        ])
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true)
       ]);
 
       streamingStore.removeQuad(quad("s3", "p3", "o3"));
@@ -90,7 +90,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('s'), DF.namedNode('s3')],
           [DF.variable('p'), DF.namedNode('p3')],
           [DF.variable('o'), DF.namedNode('o3')],
-        ], false)
+        ]).setContextEntry(new ActionContextKeyIsAddition(), false)
       ]);
 
       streamingStore.end();
@@ -114,7 +114,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('o1'), DF.namedNode('o1')],
           [DF.variable('p2'), DF.namedNode('p2')],
           [DF.variable('o2'), DF.namedNode('o2')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.addQuad(quad("o1", "p3", "o3"));
@@ -126,7 +126,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('o1'), DF.namedNode('o1')],
           [DF.variable('p2'), DF.namedNode('p3')],
           [DF.variable('o2'), DF.namedNode('o3')],
-        ])
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true)
       ]);
 
       streamingStore.removeQuad(quad("o1", "p3", "o3"));
@@ -138,14 +138,14 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('o1'), DF.namedNode('o1')],
           [DF.variable('p2'), DF.namedNode('p3')],
           [DF.variable('o2'), DF.namedNode('o3')],
-        ], false)
+        ]).setContextEntry(new ActionContextKeyIsAddition(), false)
       ]);
 
       streamingStore.end();
     });
   });
 
-  describe('simple static queries', () => {
+  describe('simple hypermedia queries', () => {
     let fetchData = {
       dataString: "",
       etag: "0",
@@ -167,8 +167,8 @@ describe('System test: QuerySparql (without polly)', () => {
         } else {
           res.setHeader("etag", fetchData.etag);
           res.setHeader("content-type", "text/turtle");
-          res.setHeader("cache-control", "cache-control");
-          res.setHeader("age", "fetchData.age");
+          res.setHeader("cache-control", fetchData["cache-control"]);
+          res.setHeader("age", fetchData.age);
           res.write(fetchData.dataString);
         }
         res.end();
@@ -184,10 +184,11 @@ describe('System test: QuerySparql (without polly)', () => {
       await new Promise<void>(resolve => server.close(() => {
         resolve();
       }));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
     })
 
     it('simple query', async () => {
-      fetchData.dataString = "<s1> <p1> <o1> .";
+      fetchData.dataString = "<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .";
       fetchData.etag = "0";
 
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
@@ -196,96 +197,73 @@ describe('System test: QuerySparql (without polly)', () => {
         sources: ['http://localhost:8787']
       });
 
-      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
-        expect(true).toEqual(true);
-        resolve();
-      }));
+      await expect(new Promise<Bindings>((resolve) => bindingStream.once("data", (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [DF.variable('s'), DF.namedNode('http://localhost:8787/s1')],
+        [DF.variable('p'), DF.namedNode('http://localhost:8787/p1')],
+        [DF.variable('o'), DF.namedNode('http://localhost:8787/o1')],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), true));
     });
-  });
-
-  describe('simple update queries', () => {
-    let fetchData = {
-      dataString: "",
-      etag: "0"
-    }
-    let eventEmitter = new EventEmitter();
-    let server: http.Server;
-    let bindingStream: BindingsStream;
-
-    beforeEach(async () => {
-      server = http.createServer((req, res) => {
-        if (req.method == "HEAD") {
-          res.writeHead(200, "OK", {
-            "etag": fetchData.etag,
-            "content-type": "text/turtle"
-          });
-        } else {
-          res.setHeader("etag", fetchData.etag);
-          res.setHeader("content-type", "text/turtle");
-          res.write(fetchData.dataString);
-        }
-        res.end();
-      });
-
-      await new Promise<void>(resolve => server.listen(6565, 'localhost', () => {
-        resolve();
-      }));
-      await engine.invalidateHttpCache()
-    });
-
-    afterEach(async () => {
-      bindingStream.destroy();
-      await new Promise<void>(resolve => server.close(() => {
-        resolve();
-      }));
-    })
 
     it('simple addition update query', async () => {
-      fetchData.dataString = "<s1> <p1> <o1> .";
+      fetchData.dataString = "<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .";
       fetchData.etag = "0";
 
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
           ?s ?p ?o.
           }`, {
-        sources: ['http://localhost:6565']
+        sources: ['http://localhost:8787']
       });
 
-      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
-        expect(true).toEqual(true);
-        resolve();
-      }));
+      await expect(new Promise<Bindings>((resolve) => bindingStream.once("data", (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [DF.variable('s'), DF.namedNode('http://localhost:8787/s1')],
+        [DF.variable('p'), DF.namedNode('http://localhost:8787/p1')],
+        [DF.variable('o'), DF.namedNode('http://localhost:8787/o1')],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), true));
 
-      fetchData.dataString = "<s1> <p1> <o1> . <s2> <p2> <o2> .";
+      fetchData.dataString += "\n<http://localhost:8787/s2> <http://localhost:8787/p2> <http://localhost:8787/o2> .";
       fetchData.etag = "1";
 
-      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
-        expect(true).toEqual(true);
-        resolve();
-      }));
+      await expect(new Promise<Bindings>((resolve) => bindingStream.once("data", (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [DF.variable('s'), DF.namedNode('http://localhost:8787/s2')],
+        [DF.variable('p'), DF.namedNode('http://localhost:8787/p2')],
+        [DF.variable('o'), DF.namedNode('http://localhost:8787/o2')],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), true));
     });
 
     it('simple deletion update query', async () => {
-      fetchData.dataString = "<s1> <p1> <o1> .";
+      fetchData.dataString = "<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .";
       fetchData.etag = "0";
 
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
           ?s ?p ?o.
           }`, {
-        sources: ['http://localhost:6565']
+        sources: ['http://localhost:8787']
       });
 
-      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
-        expect(bindings.diff).toEqual(true);
-        resolve();
-      }));
+      await expect(new Promise<Bindings>((resolve) => bindingStream.once("data", (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [DF.variable('s'), DF.namedNode('http://localhost:8787/s1')],
+        [DF.variable('p'), DF.namedNode('http://localhost:8787/p1')],
+        [DF.variable('o'), DF.namedNode('http://localhost:8787/o1')],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), true));
 
       fetchData.dataString = "";
       fetchData.etag = "1";
 
-      await new Promise<void>((resolve) => bindingStream.once("data", async (bindings) => {
-        expect(bindings.diff).toEqual(false);
-        resolve();
-      }));
+      await expect(new Promise<Bindings>((resolve) => bindingStream.once("data", (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [DF.variable('s'), DF.namedNode('http://localhost:8787/s1')],
+        [DF.variable('p'), DF.namedNode('http://localhost:8787/p1')],
+        [DF.variable('o'), DF.namedNode('http://localhost:8787/o1')],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), false));
     });
 
     /*

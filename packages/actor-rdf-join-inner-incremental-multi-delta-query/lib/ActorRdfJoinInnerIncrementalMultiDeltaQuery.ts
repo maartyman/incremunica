@@ -8,7 +8,7 @@ import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings } from '@comunica/types';
+import type {BindingsStream, MetadataBindings} from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DeltaQueryIterator } from './DeltaQueryIterator';
 
@@ -36,7 +36,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
     return {
       result: {
         type: 'bindings',
-        bindingsStream: deltaQuery,
+        bindingsStream: <BindingsStream><any>deltaQuery,
         metadata: async() => await this.constructResultMetadata(
           action.entries,
           await ActorRdfJoin.getMetadatas(action.entries),

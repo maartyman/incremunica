@@ -11,7 +11,9 @@ import {usePolly} from '../test/util';
 import {EventEmitter} from "events";
 import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
 import {Quad} from "@incremunica/incremental-types";
-import {BindingsFactory} from "@incremunica/incremental-bindings-factory";
+import {BindingsFactory} from "@comunica/bindings-factory";
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {DevTools} from "@incremunica/dev-tools";
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
   let array: any[] = [];
@@ -24,23 +26,21 @@ async function partialArrayifyStream(stream: EventEmitter, num: number): Promise
   return array;
 }
 
-const BF = new BindingsFactory();
-
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
 }
 
 const quad = require('rdf-quad');
-const stringifyStream = require('stream-to-string');
 
 const DF = new DataFactory();
-const factory = new Factory();
 
 describe('System test: QuerySparql (without polly)', () => {
+  let BF: BindingsFactory;
   let engine: QueryEngine;
 
   beforeEach(async () => {
     engine = new QueryEngine();
+    BF = await DevTools.createBindingsFactory(DF);
   });
 
   describe("using Streaming Store", () => {
@@ -65,12 +65,12 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('s'), DF.namedNode('s1')],
           [DF.variable('p'), DF.namedNode('p1')],
           [DF.variable('o'), DF.namedNode('o1')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         BF.bindings([
           [DF.variable('s'), DF.namedNode('s2')],
           [DF.variable('p'), DF.namedNode('p2')],
           [DF.variable('o'), DF.namedNode('o2')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.addQuad(quad("s3", "p3", "o3"));
@@ -90,7 +90,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('s'), DF.namedNode('s3')],
           [DF.variable('p'), DF.namedNode('p3')],
           [DF.variable('o'), DF.namedNode('o3')],
-        ], false)
+        ]).setContextEntry(new ActionContextKeyIsAddition(), false)
       ]);
 
       streamingStore.end();
@@ -114,7 +114,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('o1'), DF.namedNode('o1')],
           [DF.variable('p2'), DF.namedNode('p2')],
           [DF.variable('o2'), DF.namedNode('o2')],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.addQuad(quad("o1", "p3", "o3"));
@@ -138,7 +138,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [DF.variable('o1'), DF.namedNode('o1')],
           [DF.variable('p2'), DF.namedNode('p3')],
           [DF.variable('o2'), DF.namedNode('o3')],
-        ], false)
+        ]).setContextEntry(new ActionContextKeyIsAddition(), false)
       ]);
 
       streamingStore.end();

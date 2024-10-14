@@ -1,17 +1,19 @@
 import '@incremunica/incremental-jest';
 import 'jest-rdf';
 import {HashBindings} from "../lib";
-import {Bindings, BindingsFactory} from "@incremunica/incremental-bindings-factory";
+import {Bindings, BindingsFactory} from "@comunica/bindings-factory";
 import {DataFactory} from "rdf-data-factory";
+import {DevTools} from "@incremunica/dev-tools";
 
 const DF = new DataFactory();
-const BF = new BindingsFactory();
 
 describe('HashBindings', () => {
   let hashBindings: HashBindings;
+  let BF: BindingsFactory;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     hashBindings = new HashBindings();
+    BF = await DevTools.createBindingsFactory(DF);
   });
 
   it('should hash bindings', () => {

@@ -8,7 +8,7 @@ import {
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { MetadataBindings } from '@comunica/types';
-import type { BindingsStream } from '@incremunica/incremental-types';
+import type { BindingsStream } from '@comunica/types';
 import { IncrementalFullHashJoin } from './IncrementalFullHashJoin';
 
 /**
@@ -36,7 +36,7 @@ export class ActorRdfJoinInnerIncrementalFullHash extends ActorRdfJoin {
     return {
       result: {
         type: 'bindings',
-        bindingsStream: join,
+        bindingsStream: <BindingsStream><any>join,
         metadata: async() => await this.constructResultMetadata(
           action.entries,
           metadatas,

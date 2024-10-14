@@ -6,8 +6,10 @@ import {
 import type { IActorTest } from '@comunica/core';
 import type { IActionContext, IQueryOperationResult, IQueryOperationResultBindings } from '@comunica/types';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { Bindings } from '@comunica/bindings-factory';
+import type { BindingsStream } from '@comunica/types';
 import type { Algebra } from 'sparqlalgebrajs';
+import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
@@ -47,7 +49,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     return (bindings: Bindings) => {
       const hash: string = hashBindings.hash(bindings);
       const hasMapValue = hashes.get(hash);
-      if (bindings.diff) {
+      if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;
