@@ -12,8 +12,8 @@ import type { BindingsStream } from '@comunica/types';
 import { EmptyIterator, SingletonIterator, UnionIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {DevTools} from "@incremunica/dev-tools";
 import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
+import {AsyncIterator} from "asynciterator";
 
 /**
  * A comunica Filter Sparqlee Query Operation Actor.
@@ -90,24 +90,26 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
               bindings: bindingsToString(item),
             }));
           } else {
+            //TODO is this the correct way of making the bindingsStream emit an error?
             bindingsStream.emit('error', error);
           }
         }
         done();
       };
 
-      const bindingsStream = output.bindingsStream.transform<Bindings>({ transform, autoStart: false });
+      const bindingsStream = <BindingsStream><unknown>(<AsyncIterator<Bindings>><unknown>output.bindingsStream)
+        .transform<Bindings>({ transform, autoStart: false });
       return { type: 'bindings', bindingsStream, metadata: output.metadata };
     }
     const transformMap = new Map<string, {
       count: number;
-      iterator: BindingsStream;
+      iterator: AsyncIterator<Bindings>;
       currentState: boolean;
     }>();
 
     const hashBindings = new HashBindings();
 
-    const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
+    const binder = async(bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
@@ -177,7 +179,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
             doneTransform();
           };
 
-          const it = intermediateOutput.bindingsStream.transform({
+          const it = (<AsyncIterator<Bindings>><unknown>intermediateOutput.bindingsStream).transform({
             transform,
             prepend: currentOperation.not ? [ bindings ] : undefined,
           });
@@ -207,9 +209,10 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       done();
     };
 
-    const bindingsStream = new UnionIterator(output.bindingsStream.transform({
-      transform: binder,
-    }), { autoStart: false });
+    const bindingsStream = <BindingsStream><unknown>new UnionIterator((<AsyncIterator<Bindings>><unknown>output.bindingsStream)
+      .transform({
+        transform: binder,
+      }), { autoStart: false });
     return { type: 'bindings', bindingsStream, metadata: output.metadata };
   }
 }

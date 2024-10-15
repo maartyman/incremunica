@@ -20,6 +20,7 @@ import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
 import {BindingsFactory, Bindings} from "@comunica/bindings-factory";
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import type { AsyncIterator } from 'asynciterator';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -64,22 +65,23 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
    * @param operationBinder A callback to retrieve the bindings stream of bound operations.
    * @param optional If the original bindings should be emitted when the resulting bindings stream is empty.
    * @param sources The sources of the query.
-   * @return {BindingsStream}
+   * @return {AsyncIterator<Bindings>}
    */
   public static async createBindStream(
-    baseStream: BindingsStream,
+    baseStream: AsyncIterator<Bindings>,
     operations: Algebra.Operation[],
     operationBinder: (boundOperations: Algebra.Operation[], operationBindings: Bindings)
-    => Promise<[BindingsStream, () => void]>,
+    => Promise<[AsyncIterator<Bindings>, () => void]>,
     optional: boolean,
     sources: any,
-  ): Promise<BindingsStream> {
+  ): Promise<AsyncIterator<Bindings>> {
+    //TODO change to BindingsFactory.create()
     const bindingsFactory = new BindingsFactory();
     const transformMap = new Map<
     string,
     {
       elements: {
-        iterator: BindingsStream;
+        iterator: AsyncIterator<Bindings>;
         stopFunction: (() => void);
       }[];
       subOperations: Algebra.Operation[];
@@ -88,7 +90,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const hashBindings = new HashBindings();
 
     // Create bindings function
-    const binder = async(bindings: Bindings, done: () => void, push: (i: BindingsStream) => void): Promise<void> => {
+    const binder = async(bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
@@ -152,8 +154,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           transformMap.delete(hash);
         }
 
-        push(<BindingsStream><any>new TransformIterator(
-          () => <any>newIterator.map(bindingsMerger),
+        push(new TransformIterator(
+          () => newIterator.map(bindingsMerger),
           { maxBufferSize: 128, autoStart: false },
         ));
         done();
@@ -162,7 +164,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       done();
     };
 
-    return <any>new UnionIterator(<any>baseStream.transform({
+    return new UnionIterator(baseStream.transform({
       transform: binder,
       optional,
     }), { autoStart: false });
@@ -262,8 +264,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, entries[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream: BindingsStream = await ActorRdfJoinInnerIncrementalComputationalMultiBind.createBindStream(
-      smallestStream.bindingsStream,
+    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind.createBindStream(
+      <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
         // Send the materialized patterns to the mediator for recursive join evaluation.
@@ -283,7 +285,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           }
         };
 
-        return [ output.bindingsStream, stopFunction ];
+        return [ <AsyncIterator<Bindings>><unknown>output.bindingsStream, stopFunction ];
       },
       false,
       sources === undefined ? [] : sources,

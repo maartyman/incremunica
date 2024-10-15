@@ -96,7 +96,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       }
     }
 
-    let quads = filterMatchingQuotedQuads(operation, wrapAsyncIterator<Quad>(rawStream, { autoStart: false }));
+    let quads = filterMatchingQuotedQuads(operation, wrapAsyncIterator<RDF.Quad>(rawStream, { autoStart: false }));
 
     // Set up-to-date property
     quads.setProperty('up-to-date', true);

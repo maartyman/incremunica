@@ -27,7 +27,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   }
 
   public async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
-    const deltaQuery = new DeltaQueryIterator(
+    const bindingsStream = <BindingsStream><unknown>new DeltaQueryIterator(
       action.entries,
       action.context,
       this.mediatorQueryOperation,
@@ -36,7 +36,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
     return {
       result: {
         type: 'bindings',
-        bindingsStream: <BindingsStream><any>deltaQuery,
+        bindingsStream,
         metadata: async() => await this.constructResultMetadata(
           action.entries,
           await ActorRdfJoin.getMetadatas(action.entries),

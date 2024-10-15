@@ -54,7 +54,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
           continue;
         }
 
-        const resultingBindings = <Bindings>(this.activeSide === Side.right ?
+        const resultingBindings = (this.activeSide === Side.right ?
           this.funJoin(otherArray[this.index], this.activeElement) :
           this.funJoin(this.activeElement, otherArray[this.index]));
 
@@ -70,7 +70,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = <Bindings>this.leftIterator.read();
+      let item = this.leftIterator.read();
       if (item !== null) {
         if (this.addOrDeleteFromMemory(item, this.leftMemory)) {
           this.activeElement = item;
@@ -80,7 +80,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
         continue;
       }
 
-      item = <Bindings>this.rightIterator.read();
+      item = this.rightIterator.read();
       if (item !== null) {
         if (this.addOrDeleteFromMemory(item, this.rightMemory)) {
           this.activeElement = item;

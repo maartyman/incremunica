@@ -1,7 +1,7 @@
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
-import type { BindingsStream } from '@comunica/types';
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import type { AsyncIterator } from 'asynciterator';
 
 export class IncrementalOptionalHash extends IncrementalInnerJoin {
   private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
@@ -15,8 +15,8 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
   private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
-    left: BindingsStream,
-    right: BindingsStream,
+    left: AsyncIterator<Bindings>,
+    right: AsyncIterator<Bindings>,
     funHash: (entry: Bindings) => string,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
   ) {
@@ -103,7 +103,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
           resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), true);
         } else {
           // Otherwise merge bindings
-          resultingBindings = <Bindings>this.funJoin(this.activeElement, this.otherArray[this.index]);
+          resultingBindings = this.funJoin(this.activeElement, this.otherArray[this.index]);
         }
 
         this.index++;
@@ -118,7 +118,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = <Bindings>this.rightIterator.read();
+      let item = this.rightIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         const rightMemEl = this.rightMemory.get(hash);
@@ -138,7 +138,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         continue;
       }
 
-      item = <Bindings>this.leftIterator.read();
+      item = this.leftIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {

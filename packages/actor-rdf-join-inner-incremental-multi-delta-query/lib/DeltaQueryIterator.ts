@@ -5,7 +5,6 @@ import { ActionContext } from '@comunica/core';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
-import type { BindingsStream } from '@comunica/types';
 import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
@@ -15,7 +14,7 @@ import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-cont
 
 export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private count = 0;
-  private currentSource?: BindingsStream = undefined;
+  private currentSource?: AsyncIterator<Bindings> = undefined;
   protected destroySources = true;
   public static readonly FACTORY = new Factory();
   private readonly entries: IJoinEntry[];
@@ -23,6 +22,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private readonly subContext: IActionContext;
   private readonly store = new Store();
   private pending = false;
+  //TODO change to BindingsFactory.create()
   private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
@@ -56,9 +56,9 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     }
   }
 
-  public read(): Bindings | null {
+  public override read(): Bindings | null {
     if (this.currentSource !== undefined && !this.currentSource.done && this.currentSource.readable) {
-      const binding = <Bindings>this.currentSource.read();
+      const binding = this.currentSource.read();
       if (binding !== null) {
         return binding;
       }
@@ -96,14 +96,15 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
         continue;
       }
 
-      let bindings = source.output.bindingsStream.read();
+      let bindings = (<AsyncIterator<Bindings>><unknown>source.output.bindingsStream).read();
       if (bindings === null) {
         continue;
       }
+      //TODO check if this casting is correct
       let quad = BindingsToQuadsIterator.bindQuad(bindings, <Quad><any>source.operation);
 
       while (quad === undefined) {
-        bindings = source.output.bindingsStream.read();
+        bindings = (<AsyncIterator<Bindings>><unknown>source.output.bindingsStream).read();
         if (bindings === null) {
           break;
         }
@@ -113,7 +114,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
         continue;
       }
 
-      const constBindings = <Bindings>bindings;
+      const constBindings = bindings;
       const constQuad = quad;
       const subEntries = [ ...this.entries ];
       subEntries[this.count] = subEntries[subEntries.length - 1];
@@ -133,13 +134,14 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       ).then(unsafeOutput => {
         const output = ActorQueryOperation.getSafeBindings(unsafeOutput);
         // Figure out diff (change diff if needed)
-        let bindingsStream: BindingsStream | undefined = <BindingsStream><unknown>output.bindingsStream.map(
-          (resultBindings: Bindings) => {
-            let tempBindings = <Bindings>resultBindings.merge(constBindings);
+        let bindingsStream: AsyncIterator<Bindings> | undefined = (<AsyncIterator<Bindings>><unknown>output.bindingsStream).map(
+          (resultBindings) => {
+            let tempBindings = resultBindings.merge(constBindings);
             if (tempBindings === undefined) {
               return null;
             }
-            tempBindings = tempBindings.setContextEntry(new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition()));
+            //TODO I don't think this is needed
+            //tempBindings = tempBindings.setContextEntry(new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition()));
             return tempBindings;
           },
         );
@@ -155,6 +157,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
             this.store.delete(constQuad);
           }
           this.currentSource = undefined;
+          //TODO why set it to undefined?
           bindingsStream = undefined;
           this.readable = true;
         });
@@ -163,7 +166,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
           this.readable = true;
         });
 
-        this.currentSource = <BindingsStream><unknown>bindingsStream;
+        this.currentSource = bindingsStream;
       }).catch(() => {
         this.pending = false;
         this.currentSource = undefined;
@@ -173,7 +176,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     }
   }
 
-  protected _end(destroy = false): void {
+  protected override _end(destroy = false): void {
     super._end(destroy);
 
     // Destroy all sources that are still readable

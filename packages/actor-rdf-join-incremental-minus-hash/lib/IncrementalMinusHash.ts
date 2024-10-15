@@ -1,20 +1,19 @@
 import { HashBindings } from '@incremunica/hash-bindings';
 import type { Bindings } from '@comunica/bindings-factory';
-import type { BindingsStream } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalMinusHash extends AsyncIterator<Bindings> {
-  private readonly leftIterator: BindingsStream;
-  private readonly rightIterator: BindingsStream;
+  private readonly leftIterator: AsyncIterator<Bindings>;
+  private readonly rightIterator: AsyncIterator<Bindings>;
   private readonly hashBindings: HashBindings;
   private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
   private readonly rightMemory: Map<string, number> = new Map<string, number>();
   private readonly bindingBuffer: Bindings[] = [];
   public constructor(
-    leftIterator: BindingsStream,
-    rightIterator: BindingsStream,
+    leftIterator: AsyncIterator<Bindings>,
+    rightIterator: AsyncIterator<Bindings>,
     commonVariables: RDF.Variable[],
   ) {
     super();
@@ -56,7 +55,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     this.rightMemory.clear();
   }
 
-  protected _end(): void {
+  protected override _end(): void {
     super._end();
     this.leftIterator.destroy();
     this.rightIterator.destroy();
@@ -66,7 +65,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     return !this.leftIterator.ended || !this.rightIterator.ended || (this.bindingBuffer.length > 0);
   }
 
-  public read(): RDF.Bindings | null {
+  public override read(): Bindings | null {
     if (this.ended) {
       return null;
     }
@@ -80,7 +79,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
       return buffer;
     }
 
-    let element = <Bindings>this.rightIterator.read();
+    let element = this.rightIterator.read();
     if (element) {
       const hash = this.hashBindings.hash(element);
       if (element.getContextEntry(new ActionContextKeyIsAddition())) {
@@ -122,7 +121,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
       }
       return this.read();
     }
-    element = <Bindings>this.leftIterator.read();
+    element = this.leftIterator.read();
     if (element) {
       const hash = this.hashBindings.hash(element);
       if (element.getContextEntry(new ActionContextKeyIsAddition())) {

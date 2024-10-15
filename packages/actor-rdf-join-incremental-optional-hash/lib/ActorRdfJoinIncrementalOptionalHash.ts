@@ -3,6 +3,9 @@ import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { MetadataBindings } from '@comunica/types';
 import { IncrementalOptionalHash } from './IncrementalOptionalHash';
+import type { Bindings } from '@comunica/bindings-factory';
+import type { AsyncIterator } from 'asynciterator';
+import type {BindingsStream} from '@comunica/types';
 
 /**
  * An Incremunica Optional Hash RDF Join Actor.
@@ -20,11 +23,11 @@ export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
   protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
     const variables = ActorRdfJoin.overlappingVariables(metadatas);
-    const bindingsStream = new IncrementalOptionalHash(
-      action.entries[0].output.bindingsStream,
-      action.entries[1].output.bindingsStream,
+    const bindingsStream = <BindingsStream><unknown>new IncrementalOptionalHash(
+      <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
+      <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       entry => ActorRdfJoinIncrementalOptionalHash.hash(entry, variables),
-      <any> ActorRdfJoin.joinBindings,
+      <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
     );
     return {
       result: {

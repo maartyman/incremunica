@@ -10,6 +10,7 @@ import type { Bindings } from '@comunica/bindings-factory';
 import type { BindingsStream } from '@comunica/types';
 import type { Algebra } from 'sparqlalgebrajs';
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import type {AsyncIterator} from "asynciterator";
 
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
@@ -27,7 +28,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     const output: IQueryOperationResultBindings = ActorQueryOperation.getSafeBindings(
       await this.mediatorQueryOperation.mediate({ operation: operation.input, context }),
     );
-    const bindingsStream: BindingsStream = <BindingsStream>output.bindingsStream.filter(
+    const bindingsStream = <BindingsStream><unknown>(<AsyncIterator<Bindings>><unknown>output.bindingsStream).filter(
       this.newHashFilter(),
     );
     return {

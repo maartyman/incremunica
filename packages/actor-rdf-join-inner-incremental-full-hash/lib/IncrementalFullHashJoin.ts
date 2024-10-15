@@ -1,10 +1,10 @@
 import { HashBindings } from '@incremunica/hash-bindings';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { Bindings } from '@comunica/bindings-factory';
-import type { BindingsStream } from '@comunica/types';
 import type { IMapObject } from './DualKeyHashMap';
 import { DualKeyHashMap } from './DualKeyHashMap';
 import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import {AsyncIterator} from "asynciterator";
 
 export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   private readonly rightMemory: DualKeyHashMap<Bindings> = new DualKeyHashMap<Bindings>();
@@ -17,8 +17,8 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   private readonly hashBindings = new HashBindings();
 
   public constructor(
-    left: BindingsStream,
-    right: BindingsStream,
+    left: AsyncIterator<Bindings>,
+    right: AsyncIterator<Bindings>,
     funHash: (entry: Bindings) => string,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
   ) {
@@ -66,7 +66,7 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
           }
 
           if (resultingBindings !== null) {
-            return <Bindings>resultingBindings;
+            return resultingBindings;
           }
         }
         const next = this.otherArray.next();
@@ -83,7 +83,7 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
         this._end();
       }
 
-      let item = <Bindings>this.leftIterator.read();
+      let item = this.leftIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
@@ -96,7 +96,7 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
         continue;
       }
 
-      item = <Bindings>this.rightIterator.read();
+      item = this.rightIterator.read();
       if (item !== null) {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {

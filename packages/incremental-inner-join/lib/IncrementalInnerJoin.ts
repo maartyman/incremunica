@@ -1,15 +1,14 @@
-import type { BindingsStream } from '@comunica/types';
 import type {Bindings} from "@comunica/bindings-factory";
 import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
-  protected leftIterator: BindingsStream;
-  protected rightIterator: BindingsStream;
+  protected leftIterator: AsyncIterator<Bindings>;
+  protected rightIterator: AsyncIterator<Bindings>;
   protected funJoin: (...bindings: Bindings[]) => Bindings | null;
 
   public constructor(
-    left: BindingsStream,
-    right: BindingsStream,
+    left: AsyncIterator<Bindings>,
+    right: AsyncIterator<Bindings>,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
   ) {
     super();
@@ -49,13 +48,13 @@ export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
 
   protected abstract hasResults(): boolean;
 
-  public _end(): void {
+  public override _end(): void {
     super._end();
     this.leftIterator.destroy();
     this.rightIterator.destroy();
   }
 
-  public abstract read(): Bindings | null;
+  public abstract override read(): Bindings | null;
 }
 
 export enum Side {
