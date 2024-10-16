@@ -8,7 +8,7 @@ import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type {BindingsStream, MetadataBindings} from '@comunica/types';
+import type { BindingsStream, MetadataBindings } from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DeltaQueryIterator } from './DeltaQueryIterator';
 
@@ -27,7 +27,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   }
 
   public async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
-    const bindingsStream = <BindingsStream><unknown>new DeltaQueryIterator(
+    const bindingsStream = <BindingsStream><unknown> new DeltaQueryIterator(
       action.entries,
       action.context,
       this.mediatorQueryOperation,
@@ -48,7 +48,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
 
   public async getJoinCoefficients(
     action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     // Throw when the previous join was a delta query join or when it is a static query
     if (action.context

@@ -1,3 +1,4 @@
+import type { Bindings } from '@comunica/bindings-factory';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
@@ -7,11 +8,9 @@ import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings } from '@comunica/types';
-import type { BindingsStream } from '@comunica/types';
-import { IncrementalPartialHashJoin } from './IncrementalPartialHashJoin';
-import type { Bindings } from '@comunica/bindings-factory';
+import type { MetadataBindings, BindingsStream } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
+import { IncrementalPartialHashJoin } from './IncrementalPartialHashJoin';
 
 /**
  * A comunica Inner Incremental Partial Hash RDF Join Actor.
@@ -29,7 +28,7 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
   protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
     const variables = ActorRdfJoin.overlappingVariables(metadatas);
-    const bindingsStream = <BindingsStream><unknown>new IncrementalPartialHashJoin(
+    const bindingsStream = <BindingsStream><unknown> new IncrementalPartialHashJoin(
       <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
@@ -49,8 +48,8 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
   }
 
   protected async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _action: IActionRdfJoin,
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     return {
       iterations: 0,

@@ -1,10 +1,10 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { HashBindings } from '@incremunica/hash-bindings';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import type { Bindings } from '@comunica/bindings-factory';
+import type { AsyncIterator } from 'asynciterator';
 import type { IMapObject } from './DualKeyHashMap';
 import { DualKeyHashMap } from './DualKeyHashMap';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {AsyncIterator} from "asynciterator";
 
 export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   private readonly rightMemory: DualKeyHashMap<Bindings> = new DualKeyHashMap<Bindings>();
@@ -47,7 +47,6 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   }
 
   public read(): Bindings | null {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.ended) {
         return null;

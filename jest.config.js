@@ -1,26 +1,26 @@
 module.exports = {
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': [ 'ts-jest', {
+      isolatedModules: true,
+    }],
   },
   testRegex: '/test/.*-test.ts$',
   moduleFileExtensions: [
     'ts',
-    'js'
+    'js',
   ],
   globals: {
-    'ts-jest': {
-      // Enabling this can fix issues when using prereleases of typings packages
-      //isolatedModules: true
+    window: {
+      location: new URL('http://localhost'),
     },
   },
   setupFilesAfterEnv: [ './setup-jest.js' ],
   collectCoverage: true,
   coveragePathIgnorePatterns: [
     '/actor-query-operation-incremental-filter/',
-    'util.ts',
     '/node_modules/',
     '/mocks/',
-    'index.js'
+    'index.js',
   ],
   testEnvironment: 'node',
   coverageThreshold: {
@@ -28,7 +28,7 @@ module.exports = {
       branches: 100,
       functions: 100,
       lines: 100,
-      statements: 100
-    }
-  }
+      statements: 100,
+    },
+  },
 };

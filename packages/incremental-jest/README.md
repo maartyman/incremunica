@@ -2,8 +2,8 @@
 
 [![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-jest.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-jest)
 
-Jest test helpers for Comunica. 
-This package is similar to the original one, 
+Jest test helpers for Comunica.
+This package is similar to the original one,
 it adds support for checking the diff boolean in incremunica bindings.
 
 ## Install
@@ -18,15 +18,16 @@ In order to use matchers in your tests,
 you'll have to make sure that they are imported.
 This can be done by adding the following entry to your Jest configuration:
 ```json
-"jest": {
-  "setupFilesAfterEnv": [ "@comunica/incremental-jest" ]
+{
+  "jest": {
+    "setupFilesAfterEnv": ["@comunica/incremental-jest"]
+  }
 }
 ```
 
 If you are already using an existing test framework script file,
 make sure to add @comunica/jest as follows to your file:
 ```javascript
-...
 require('@comunica/incremental-jest');
 ```
 
@@ -58,11 +59,11 @@ Check if two Bindings are equal.
 
 ```js
 expect(BF.bindings([
-    [ DF.variable('a'), DF.namedNode('a1') ],
-    [ DF.variable('b'), DF.namedNode('b1') ],
+  [ DF.variable('a'), DF.namedNode('a1') ],
+  [ DF.variable('b'), DF.namedNode('b1') ],
 ])).toEqualBindings(BF.bindings([
-    [ DF.variable('a'), DF.namedNode('a1') ],
-    [ DF.variable('b'), DF.namedNode('b1') ],
+  [ DF.variable('a'), DF.namedNode('a1') ],
+  [ DF.variable('b'), DF.namedNode('b1') ],
 ]));
 ```
 
@@ -72,23 +73,23 @@ Check if two Bindings arrays are equal.
 
 ```js
 expect([
-    BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-    ]),
-    BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-    ]),
+  BF.bindings([
+    [ DF.variable('a'), DF.namedNode('a1') ],
+    [ DF.variable('b'), DF.namedNode('b1') ],
+  ]),
+  BF.bindings([
+    [ DF.variable('b'), DF.namedNode('b1') ],
+    [ DF.variable('c'), DF.namedNode('c1') ],
+  ]),
 ]).toEqualBindingsArray([
-    BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-    ]),
-    BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-    ]),
+  BF.bindings([
+    [ DF.variable('a'), DF.namedNode('a1') ],
+    [ DF.variable('b'), DF.namedNode('b1') ],
+  ]),
+  BF.bindings([
+    [ DF.variable('b'), DF.namedNode('b1') ],
+    [ DF.variable('c'), DF.namedNode('c1') ],
+  ]),
 ]);
 ```
 
@@ -100,22 +101,22 @@ Check if a Bindings stream equals a Bindings array.
 import { ArrayIterator } from 'asynciterator';
 
 expect(new ArrayIterator([
-    BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-    ]),
-    BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-    ]),
+  BF.bindings([
+    [ DF.variable('a'), DF.namedNode('a1') ],
+    [ DF.variable('b'), DF.namedNode('b1') ],
+  ]),
+  BF.bindings([
+    [ DF.variable('b'), DF.namedNode('b1') ],
+    [ DF.variable('c'), DF.namedNode('c1') ],
+  ]),
 ], { autoStart: false })).toEqualBindingsStream([
-    BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-    ]),
-    BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-    ]),
+  BF.bindings([
+    [ DF.variable('a'), DF.namedNode('a1') ],
+    [ DF.variable('b'), DF.namedNode('b1') ],
+  ]),
+  BF.bindings([
+    [ DF.variable('b'), DF.namedNode('b1') ],
+    [ DF.variable('c'), DF.namedNode('c1') ],
+  ]),
 ]);
 ```

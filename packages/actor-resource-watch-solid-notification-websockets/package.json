@@ -3,34 +3,39 @@
   "version": "1.3.0",
   "description": "An incremunica solid notification resource watch actor",
   "lsd:module": true,
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/actor-resource-watch-solid-notification-websockets"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "sideEffects": false,
   "keywords": [
     "comunica",
     "actor",
     "resource-watch",
     "solid-notification-websockets"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
   },
-  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
     "lib/**/*.js.map"
   ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
   "dependencies": {
     "@comunica/bus-http": "^3.2.1",
     "@comunica/core": "^3.2.1",
@@ -38,10 +43,5 @@
     "@solid-notifications/subscription": "^0.1.0",
     "@solid-notifications/types": "^0.1.0",
     "websocket-polyfill": "^0.0.3"
-  },
-  "scripts": {
-    "build": "npm run build:ts && npm run build:components",
-    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
-    "build:components": "componentsjs-generator"
   }
 }

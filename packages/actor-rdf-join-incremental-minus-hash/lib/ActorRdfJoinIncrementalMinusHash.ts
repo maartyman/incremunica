@@ -1,11 +1,11 @@
+import type { Bindings } from '@comunica/bindings-factory';
 import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type {BindingsStream, MetadataBindings} from '@comunica/types';
+import type { BindingsStream, MetadataBindings } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
-import { IncrementalMinusHash } from './IncrementalMinusHash';
-import type { Bindings } from '@comunica/bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
+import { IncrementalMinusHash } from './IncrementalMinusHash';
 
 /**
  * An Incremunica Minus Hash RDF Join Actor.
@@ -27,7 +27,7 @@ export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
     const commonVariables: RDF.Variable[] = ActorRdfJoin.overlappingVariables(metadatas);
     if (commonVariables.length > 0) {
-      const bindingsStream = <BindingsStream><unknown>new IncrementalMinusHash(
+      const bindingsStream = <BindingsStream><unknown> new IncrementalMinusHash(
         <AsyncIterator<Bindings>><unknown>output.bindingsStream,
         <AsyncIterator<Bindings>><unknown>buffer.bindingsStream,
         commonVariables,
@@ -46,8 +46,8 @@ export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
   }
 
   protected async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _action: IActionRdfJoin,
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     return {
       iterations: 0,

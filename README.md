@@ -12,7 +12,7 @@
 <a href="https://maartyman.github.io/incremunica/"><img src="https://img.shields.io/badge/doc-code_documentation-blueviolet"/></a>
 </p>
 
-This is a monorepo that builds upon the core comunica packages to allow for incremental query evaluation. 
+This is a monorepo that builds upon the core comunica packages to allow for incremental query evaluation.
 
 ## Querying with Incremunica
 

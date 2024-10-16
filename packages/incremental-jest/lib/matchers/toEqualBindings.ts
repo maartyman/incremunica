@@ -1,17 +1,17 @@
 import type { Bindings } from '@comunica/bindings-factory';
 import { bindingsToString } from '@comunica/bindings-factory';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 
 function fail(received: Bindings, actual: Bindings): any {
   return {
-    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry(new ActionContextKeyIsAddition())}`,
+    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry<boolean>(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry<boolean>(new ActionContextKeyIsAddition())}`,
     pass: false,
   };
 }
 
 function succeed(received: Bindings, actual: Bindings): any {
   return {
-    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry(new ActionContextKeyIsAddition())}`,
+    message: () => `\nExpected:\n${bindingsToString(actual)}, isAddition: ${actual.getContextEntry<boolean>(new ActionContextKeyIsAddition())}\nReceived:\n${bindingsToString(received)}, isAddition: ${received.getContextEntry<boolean>(new ActionContextKeyIsAddition())}`,
     pass: true,
   };
 }
@@ -21,7 +21,8 @@ export default {
     if (!received.equals(actual)) {
       return fail(received, actual);
     }
-    if (received.getContextEntry(new ActionContextKeyIsAddition()) !== actual.getContextEntry(new ActionContextKeyIsAddition())) {
+    if (received.getContextEntry(new ActionContextKeyIsAddition()) !==
+      actual.getContextEntry(new ActionContextKeyIsAddition())) {
       return fail(received, actual);
     }
 

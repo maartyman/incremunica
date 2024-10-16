@@ -1,16 +1,20 @@
+import type { Bindings } from '@comunica/bindings-factory';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
 import {
   ActorQueryOperation,
   ActorQueryOperationTypedMediated,
 } from '@comunica/bus-query-operation';
 import type { IActorTest } from '@comunica/core';
-import type { IActionContext, IQueryOperationResult, IQueryOperationResultBindings } from '@comunica/types';
+import type {
+  IActionContext,
+  IQueryOperationResult,
+  IQueryOperationResultBindings,
+  BindingsStream,
+} from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { Bindings } from '@comunica/bindings-factory';
-import type { BindingsStream } from '@comunica/types';
+import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import type {AsyncIterator} from "asynciterator";
 
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
@@ -20,7 +24,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     super(args, 'distinct');
   }
 
-  public async testOperation(operation: Algebra.Distinct, context: IActionContext): Promise<IActorTest> {
+  public async testOperation(_operation: Algebra.Distinct, _context: IActionContext): Promise<IActorTest> {
     return true;
   }
 

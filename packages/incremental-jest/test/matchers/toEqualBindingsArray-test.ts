@@ -1,24 +1,25 @@
-import { BindingsFactory } from '@comunica/bindings-factory';
-import { DataFactory } from 'rdf-data-factory';
+import type { BindingsFactory } from '@comunica/bindings-factory';
 import '../../lib';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {DevTools} from "@incremunica/dev-tools";
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { DevTools } from '@incremunica/dev-tools';
+import { DataFactory } from 'rdf-data-factory';
 
 const DF = new DataFactory();
 
+// TODO check if all test still do what they are supposed to do
 describe('toEqualBindingsArray', () => {
   let BF: BindingsFactory;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     BF = await DevTools.createBindingsFactory(DF);
   });
 
   it('should succeed for equal empty bindings', () => {
-    return expect([]).toEqualBindingsArray([]);
+    expect([]).toEqualBindingsArray([]);
   });
 
   it('should succeed for equal non-empty bindings', () => {
-    return expect([
+    expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -40,7 +41,7 @@ describe('toEqualBindingsArray', () => {
   });
 
   it('should not succeed for non-equal bindings', () => {
-    return expect([
+    expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -62,7 +63,7 @@ describe('toEqualBindingsArray', () => {
   });
 
   it('should not succeed for non-equal bindings due to different length', () => {
-    return expect([
+    expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -80,8 +81,8 @@ describe('toEqualBindingsArray', () => {
   });
 
   it('should not fail for equal empty bindings', () => {
-    return expect(() => expect([]).not.toEqualBindingsArray([]))
-      .toThrowError(`
+    expect(() => expect([]).not.toEqualBindingsArray([]))
+      .toThrow(`
 Expected:
 [ ]
 Received:
@@ -89,7 +90,7 @@ Received:
   });
 
   it('should not fail for equal non-empty bindings', () => {
-    return expect(() => expect([
+    expect(() => expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -108,7 +109,7 @@ Received:
         [ DF.variable('c'), DF.namedNode('c1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
     ]))
-      .toThrowError(`
+      .toThrow(`
 Expected:
 [
 \t{
@@ -134,7 +135,7 @@ Received:
   });
 
   it('should fail for non-equal non-empty bindings', () => {
-    return expect(() => expect([
+    expect(() => expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -153,7 +154,7 @@ Received:
         [ DF.variable('c'), DF.namedNode('c1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
     ]))
-      .toThrowError(`
+      .toThrow(`
 Expected:
 [
 \t{
@@ -180,7 +181,7 @@ Index 0 is different.`);
   });
 
   it('should fail for non-equal non-empty bindings due to different length', () => {
-    return expect(() => expect([
+    expect(() => expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -195,7 +196,7 @@ Index 0 is different.`);
         [ DF.variable('b'), DF.namedNode('b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
     ]))
-      .toThrowError(`
+      .toThrow(`
 Expected:
 [
 \t{
@@ -217,7 +218,7 @@ Received:
   });
 
   it('should succeed for equal non-empty false bindings', () => {
-    return expect([
+    expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -239,7 +240,7 @@ Received:
   });
 
   it('should not succeed for equal non-empty bindings with different diffs', () => {
-    return expect([
+    expect([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
@@ -257,260 +258,6 @@ Received:
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]);
-  });
-});
-
-describe('toBeIsomorphicBindingsArray', () => {
-  let BF: BindingsFactory;
-
-  beforeEach(async () => {
-    BF = await DevTools.createBindingsFactory(DF);
-  });
-
-  it('should succeed for equal empty bindings', () => {
-    return expect([]).toBeIsomorphicBindingsArray([]);
-  });
-
-  it('should succeed for equal non-empty bindings', () => {
-    return expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]);
-  });
-
-  it('should not succeed for non-equal bindings', () => {
-    return expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).not.toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b2') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]);
-  });
-
-  it('should not succeed for non-equal bindings due to different length', () => {
-    return expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).not.toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]);
-  });
-
-  it('should not fail for equal empty bindings', () => {
-    return expect(() => expect([]).not.toBeIsomorphicBindingsArray([]))
-      .toThrowError(`
-Expected:
-[ ]
-Received:
-[ ]`);
-  });
-
-  it('should not fail for equal non-empty bindings', () => {
-    return expect(() => expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).not.toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]))
-      .toThrowError(`
-Expected:
-[
-\t{
-\t  "b": "b1",
-\t  "c": "c1"
-\t}, isAddition: true
-\t{
-\t  "a": "a1",
-\t  "b": "b1"
-\t}, isAddition: true
-]
-Received:
-[
-\t{
-\t  "a": "a1",
-\t  "b": "b1"
-\t}, isAddition: true
-\t{
-\t  "b": "b1",
-\t  "c": "c1"
-\t}, isAddition: true
-]`);
-  });
-
-  it('should fail for non-equal non-empty bindings', () => {
-    return expect(() => expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b2') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a2') ],
-        [ DF.variable('b'), DF.namedNode('b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]))
-      .toThrowError(`
-Expected:
-[
-\t{
-\t  "b": "b2",
-\t  "c": "c1"
-\t}, isAddition: true
-\t{
-\t  "a": "a2",
-\t  "b": "b2"
-\t}, isAddition: true
-]
-Received:
-[
-\t{
-\t  "a": "a1",
-\t  "b": "b1"
-\t}, isAddition: true
-\t{
-\t  "b": "b1",
-\t  "c": "c1"
-\t}, isAddition: true
-]`);
-  });
-
-  it('should fail for non-equal non-empty bindings due to different length', () => {
-    return expect(() => expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a2') ],
-        [ DF.variable('b'), DF.namedNode('b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]))
-      .toThrowError(`
-Expected:
-[
-\t{
-\t  "a": "a2",
-\t  "b": "b2"
-\t}, isAddition: true
-]
-Received:
-[
-\t{
-\t  "a": "a1",
-\t  "b": "b1"
-\t}, isAddition: true
-\t{
-\t  "b": "b1",
-\t  "c": "c1"
-\t}, isAddition: true
-]`);
-  });
-
-  it('should succeed for equal non-empty false bindings', () => {
-    return expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
-    ]);
-  });
-
-  it('should not succeed for equal non-empty bindings with different diffs', () => {
-    return expect([
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ]).not.toBeIsomorphicBindingsArray([
-      BF.bindings([
-        [ DF.variable('b'), DF.namedNode('b1') ],
-        [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-      BF.bindings([
-        [ DF.variable('a'), DF.namedNode('a1') ],
-        [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
     ]);
   });
 });

@@ -1,8 +1,9 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest } from '@comunica/core';
 import type {
-  IActionResourceWatch, IActorResourceWatchArgs,
+  IActionResourceWatch,
+  IActorResourceWatchArgs,
   IActorResourceWatchOutput,
   IResourceWatchEventEmitter,
 } from '@incremunica/bus-resource-watch';
@@ -11,7 +12,7 @@ import {
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import { ChannelType } from '@solid-notifications/types';
-// eslint-disable-next-line import/no-unassigned-import
+
 import 'websocket-polyfill';
 
 /**
@@ -62,7 +63,7 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
 
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
-    socket.onmessage = message => {
+    socket.onmessage = (message) => {
       // TODO: For now ignoring the Buffer options => tests?
       // let data: string | Buffer | ArrayBuffer | Buffer[] = message.data;
       // if (Array.isArray(data)) {

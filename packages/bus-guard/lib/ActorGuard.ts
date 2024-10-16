@@ -1,8 +1,7 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
+import type { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
 import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvents';
-import {IQuerySource} from "@comunica/types";
-import {StreamingQuerySourceRdfJs} from "@incremunica/actor-query-source-identify-streaming-rdfjs";
 
 /**
  * A comunica actor for guard events.
@@ -47,8 +46,12 @@ export interface IActorGuardOutput extends IActorOutput {
 }
 
 export type IActorGuardArgs = IActorArgs<
-IActionGuard, IActorTest, IActorGuardOutput>;
+IActionGuard,
+IActorTest,
+IActorGuardOutput
+>;
 
 export type MediatorGuard = Mediate<
-IActionGuard, IActorGuardOutput>;
-
+IActionGuard,
+IActorGuardOutput
+>;

@@ -1,20 +1,20 @@
 import { Readable } from 'node:stream';
-import { BindingsFactory } from '@comunica/bindings-factory';
+import type { BindingsFactory } from '@comunica/bindings-factory';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { DevTools } from '@incremunica/dev-tools';
+import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { Quad } from '@incremunica/incremental-types';
 import arrayifyStream from 'arrayify-stream';
+import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
 import { StreamingQuerySourceRdfJs } from '../lib';
 import '@incremunica/incremental-jest';
-import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
-import {Quad} from "@incremunica/incremental-types";
 import 'jest-rdf';
-import {DevTools} from "@incremunica/dev-tools";
-import {ArrayIterator} from "asynciterator";
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 const quad = require('rdf-quad');
 
@@ -26,8 +26,8 @@ describe('StreamingQuerySourceRdfJs', () => {
 
   let store: StreamingStore<Quad>;
   let source: StreamingQuerySourceRdfJs;
-  let BF: BindingsFactory
-  beforeEach(async () => {
+  let BF: BindingsFactory;
+  beforeEach(async() => {
     ctx = new ActionContext({});
     store = new StreamingStore();
     BF = await DevTools.createBindingsFactory(DF);
@@ -85,15 +85,15 @@ describe('StreamingQuerySourceRdfJs', () => {
           o: DF.namedNode('o1'),
         }).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      /*
-      await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-        .toEqual({
-          cardinality: { type: 'exact', value: 2 },
-          canContainUndefs: false,
-          state: expect.any(MetadataValidationState),
-          variables: [ DF.variable('s'), DF.variable('o') ],
-        });
-       */
+      //
+      // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+      // .toEqual({
+      //     cardinality: { type: 'exact', value: 2 },
+      //     canContainUndefs: false,
+      //     state: expect.any(MetadataValidationState),
+      //     variables: [ DF.variable('s'), DF.variable('o') ],
+      // });
+      //
     });
 
     it('should return triples in a named graph', async() => {
@@ -138,15 +138,15 @@ describe('StreamingQuerySourceRdfJs', () => {
           g: DF.namedNode('g1'),
         }).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      /*
-      await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-        .toEqual({
-          cardinality: { type: 'estimate', value: 2 },
-          canContainUndefs: false,
-          state: expect.any(MetadataValidationState),
-          variables: [ DF.variable('s'), DF.variable('o'), DF.variable('g') ],
-        });
-       */
+      //
+      // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+      // .toEqual({
+      //     cardinality: { type: 'estimate', value: 2 },
+      //     canContainUndefs: false,
+      //     state: expect.any(MetadataValidationState),
+      //     variables: [ DF.variable('s'), DF.variable('o'), DF.variable('g') ],
+      // });
+      //
     });
 
     it('should return quads in named graphs and the default graph with union default graph', async() => {
@@ -173,15 +173,15 @@ describe('StreamingQuerySourceRdfJs', () => {
           g: DF.namedNode('g1'),
         }).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      /*
-      await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-        .toEqual({
-          cardinality: { type: 'exact', value: 2 },
-          canContainUndefs: false,
-          state: expect.any(MetadataValidationState),
-          variables: [ DF.variable('s'), DF.variable('o'), DF.variable('g') ],
-        });
-       */
+      //
+      // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+      // .toEqual({
+      //     cardinality: { type: 'exact', value: 2 },
+      //     canContainUndefs: false,
+      //     state: expect.any(MetadataValidationState),
+      //     variables: [ DF.variable('s'), DF.variable('o'), DF.variable('g') ],
+      // });
+      //
     });
 
     it('should use countQuads if available', async() => {
@@ -206,15 +206,15 @@ describe('StreamingQuerySourceRdfJs', () => {
           o: DF.namedNode('o1'),
         }).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      /*
-      await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-        .toEqual({
-          cardinality: { type: 'exact', value: 123 },
-          canContainUndefs: false,
-          state: expect.any(MetadataValidationState),
-          variables: [ DF.variable('s'), DF.variable('o') ],
-        });
-       */
+      //
+      // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+      // .toEqual({
+      //     cardinality: { type: 'exact', value: 123 },
+      //     canContainUndefs: false,
+      //     state: expect.any(MetadataValidationState),
+      //     variables: [ DF.variable('s'), DF.variable('o') ],
+      // });
+      //
     });
 
     it('should fallback to match if countQuads is not available', async() => {
@@ -241,15 +241,15 @@ describe('StreamingQuerySourceRdfJs', () => {
           o: DF.namedNode('o1'),
         }).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      /*
-      await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-        .toEqual({
-          cardinality: { type: 'exact', value: 2 },
-          canContainUndefs: false,
-          state: expect.any(MetadataValidationState),
-          variables: [ DF.variable('s'), DF.variable('o') ],
-        });
-       */
+      //
+      // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+      // .toEqual({
+      //     cardinality: { type: 'exact', value: 2 },
+      //     canContainUndefs: false,
+      //     state: expect.any(MetadataValidationState),
+      //     variables: [ DF.variable('s'), DF.variable('o') ],
+      // });
+      //
     });
 
     it('should delegate errors', async() => {
@@ -312,15 +312,15 @@ describe('StreamingQuerySourceRdfJs', () => {
               o: DF.namedNode('o1'),
             }).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          /*
-          await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-            .toEqual({
-              cardinality: { type: 'exact', value: 3 },
-              canContainUndefs: false,
-              state: expect.any(MetadataValidationState),
-              variables: [ DF.variable('s'), DF.variable('o') ],
-            });
-           */
+          //
+          // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+          // .toEqual({
+          //     cardinality: { type: 'exact', value: 3 },
+          //     canContainUndefs: false,
+          //     state: expect.any(MetadataValidationState),
+          //     variables: [ DF.variable('s'), DF.variable('o') ],
+          // });
+          //
         });
 
         it('should run when containing quoted triples with a quoted pattern (1)', async() => {
@@ -513,15 +513,15 @@ describe('StreamingQuerySourceRdfJs', () => {
               o: DF.namedNode('o1'),
             }).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          /*
-          await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-            .toEqual({
-              cardinality: { type: 'exact', value: 3 },
-              canContainUndefs: false,
-              state: expect.any(MetadataValidationState),
-              variables: [ DF.variable('s'), DF.variable('o') ],
-            });
-            */
+          //
+          // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+          // .toEqual({
+          //     cardinality: { type: 'exact', value: 3 },
+          //     canContainUndefs: false,
+          //     state: expect.any(MetadataValidationState),
+          //     variables: [ DF.variable('s'), DF.variable('o') ],
+          // });
+          //
         });
 
         it('should run when containing quoted triples with a quoted pattern (1)', async() => {
@@ -556,16 +556,16 @@ describe('StreamingQuerySourceRdfJs', () => {
               o1: DF.namedNode('oa3'),
             }).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          /*
-          await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-            .toEqual({
-              cardinality: { type: 'estimate', value: 3 },
-              canContainUndefs: false,
-              state: expect.any(MetadataValidationState),
-              variables: [ DF.variable('s'), DF.variable('s1'), DF.variable('p1'), DF.variable('o1') ],
-            });
-
-           */
+          //
+          // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+          // .toEqual({
+          //     cardinality: { type: 'estimate', value: 3 },
+          //     canContainUndefs: false,
+          //     state: expect.any(MetadataValidationState),
+          //     variables: [ DF.variable('s'), DF.variable('s1'), DF.variable('p1'), DF.variable('o1') ],
+          // });
+          //
+          //
         });
 
         it('should run when containing quoted triples with a quoted pattern (2)', async() => {
@@ -600,15 +600,15 @@ describe('StreamingQuerySourceRdfJs', () => {
               o1: DF.namedNode('ob3'),
             }).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          /*
-          await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
-            .toEqual({
-              cardinality: { type: 'estimate', value: 5 },
-              canContainUndefs: false,
-              state: expect.any(MetadataValidationState),
-              variables: [ DF.variable('s'), DF.variable('p'), DF.variable('s1'), DF.variable('o1') ],
-            });
-           */
+          //
+          // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
+          // .toEqual({
+          //     cardinality: { type: 'estimate', value: 5 },
+          //     canContainUndefs: false,
+          //     state: expect.any(MetadataValidationState),
+          //     variables: [ DF.variable('s'), DF.variable('p'), DF.variable('s1'), DF.variable('o1') ],
+          // });
+          //
         });
       });
     });

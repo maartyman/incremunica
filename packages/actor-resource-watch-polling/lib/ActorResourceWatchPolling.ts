@@ -1,10 +1,11 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest } from '@comunica/core';
 import type {
   IActionResourceWatch,
   IActorResourceWatchArgs,
-  IActorResourceWatchOutput, IResourceWatchEventEmitter,
+  IActorResourceWatchOutput,
+  IResourceWatchEventEmitter,
 } from '@incremunica/bus-resource-watch';
 import {
   ActorResourceWatch,
@@ -23,7 +24,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
     super(args);
   }
 
-  public async test(action: IActionResourceWatch): Promise<IActorTest> {
+  public async test(_action: IActionResourceWatch): Promise<IActorTest> {
     return { priority: this.priority };
   }
 
@@ -32,6 +33,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
 
     let etag = action.metadata.etag;
     const checkForChanges = async(): Promise<void> => {
+      // TODO maybe add a log if something goes wrong
       const responseHead = await this.mediatorHttp.mediate(
         {
           context: action.context,
@@ -56,7 +58,9 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
 
     const startCheckLoop = (maxAge: number): void => {
       timeoutId = setInterval(
-        checkForChanges,
+        () => {
+          checkForChanges().catch(() => {});
+        },
         maxAge * 1_000,
       );
     };
@@ -72,12 +76,15 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
 
     const age = Number.parseInt(action.metadata.age, 10);
     if (age) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      new Promise<void>(resolve => {
+      // eslint-disable-next-line ts/no-floating-promises
+      new Promise<void>((resolve) => {
         timeoutId = setTimeout(
-          async() => {
-            await checkForChanges();
-            resolve();
+          () => {
+            checkForChanges().then(
+              () => resolve(),
+            ).catch(
+              () => resolve(),
+            );
           },
           (pollingFrequency - age) * 1_000,
         );

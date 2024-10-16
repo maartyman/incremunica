@@ -1,3 +1,5 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
@@ -13,14 +15,13 @@ import type {
   IQueryOperationResultBindings,
   MetadataBindings,
 } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysStreamingSource } from '@incremunica/context-entries';
 import { HashBindings } from '@incremunica/hash-bindings';
 import { TransformIterator, UnionIterator } from 'asynciterator';
+import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
-import {BindingsFactory, Bindings} from "@comunica/bindings-factory";
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import type { AsyncIterator } from 'asynciterator';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -75,7 +76,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     optional: boolean,
     sources: any,
   ): Promise<AsyncIterator<Bindings>> {
-    //TODO change to BindingsFactory.create()
+    // TODO change to BindingsFactory.create()
     const bindingsFactory = new BindingsFactory();
     const transformMap = new Map<
     string,
@@ -85,12 +86,17 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         stopFunction: (() => void);
       }[];
       subOperations: Algebra.Operation[];
-    }>();
+    }
+>();
 
     const hashBindings = new HashBindings();
 
     // Create bindings function
-    const binder = async(bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): Promise<void> => {
+    const binder = async(
+      bindings: Bindings,
+      done: () => void,
+      push: (i: AsyncIterator<Bindings>) => void,
+    ): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
@@ -109,7 +115,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
         const bindingsMerger = (subBindings: Bindings): Bindings | null => {
           const subBindingsOrUndefined = subBindings.merge(bindings);
-          return subBindingsOrUndefined === undefined ? null : subBindingsOrUndefined;
+          return subBindingsOrUndefined ?? null;
         };
 
         const [ bindingStream, stopFunction ] = await operationBinder(hashData.subOperations, bindings);
@@ -118,12 +124,12 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           iterator: bindingStream.map(bindingsMerger),
         });
 
-        push(hashData.elements[hashData.elements.length - 1].iterator);
+        push(hashData.elements.at(-1)!.iterator);
         done();
         return;
       }
       if (hashData !== undefined && hashData.elements.length > 0) {
-        const activeElement = hashData.elements[hashData.elements.length - 1];
+        const activeElement = hashData.elements.at(-1)!;
         hashData.elements.pop();
 
         ActorRdfJoinInnerIncrementalComputationalMultiBind.haltSources(sources);
@@ -238,7 +244,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         }
         return leftWithoutCommonVariables ?
           1 :
-          -1;
+            -1;
       });
   }
 
@@ -264,7 +270,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, entries[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind.createBindStream(
+    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind
+      .createBindStream(
       <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
@@ -288,8 +295,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         return [ <AsyncIterator<Bindings>><unknown>output.bindingsStream, stopFunction ];
       },
       false,
-      sources === undefined ? [] : sources,
-    );
+      sources ?? [],
+      );
 
     return {
       result: {
@@ -304,8 +311,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   }
 
   public async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _action: IActionRdfJoin,
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     return {
       iterations: 0,

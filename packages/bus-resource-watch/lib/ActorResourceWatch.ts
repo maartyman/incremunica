@@ -1,4 +1,4 @@
-import type { EventEmitter } from 'events';
+import type { EventEmitter } from 'node:events';
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
 
@@ -16,8 +16,8 @@ import { Actor } from '@comunica/core';
 export abstract class ActorResourceWatch extends Actor<IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
   public readonly priority: number;
   /**
-  * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
-  */
+   * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
+   */
   public constructor(args: IActorResourceWatchArgs) {
     super(args);
   }
@@ -51,7 +51,10 @@ export interface IActorResourceWatchOutput extends IActorOutput {
 }
 
 export interface IActorResourceWatchArgs extends IActorArgs<
-IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+IActionResourceWatch,
+IActorTest,
+IActorResourceWatchOutput
+> {
   /**
    * The priority of the actor.
    */
@@ -59,4 +62,6 @@ IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
 }
 
 export type MediatorResourceWatch = Mediate<
-IActionResourceWatch, IActorResourceWatchOutput>;
+IActionResourceWatch,
+IActorResourceWatchOutput
+>;

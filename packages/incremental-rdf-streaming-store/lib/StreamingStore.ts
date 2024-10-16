@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
@@ -53,7 +53,7 @@ export class StreamingStore<Q extends Quad>
   }
 
   private handleQuad(quad: Q): void {
-    if ((quad.diff && this.store.has(quad)) || (!quad.diff && !this.store.has(quad))) {
+    if (quad.diff ? this.store.has(quad) : !this.store.has(quad)) {
       return;
     }
     for (const pendingStream of this.pendingStreams.getPendingStreamsForQuad(quad)) {
@@ -85,9 +85,9 @@ export class StreamingStore<Q extends Quad>
 
   public copyOfStore(): Store {
     const newStore = new Store<Quad>();
-    this.store.forEach(quad => {
+    for (const quad of this.store) {
       newStore.add(quad);
-    }, null, null, null, null);
+    }
     return newStore;
   }
 
@@ -188,7 +188,11 @@ export class StreamingStore<Q extends Quad>
     storeResult.pipe(unionStream, { end: false });
 
     // If the store hasn't ended yet, also create a new pendingStream
-    if (!this.ended) {
+    if (this.ended) {
+      storeResult.on('close', () => {
+        unionStream.end();
+      });
+    } else {
       // The new pendingStream remains open, until the store is ended.
       const pendingStream = new PassThrough({ objectMode: true });
       if (options) {
@@ -215,10 +219,6 @@ export class StreamingStore<Q extends Quad>
         if (pendingStreamEnded) {
           unionStream.end();
         }
-      });
-    } else {
-      storeResult.on('close', () => {
-        unionStream.end();
       });
     }
 

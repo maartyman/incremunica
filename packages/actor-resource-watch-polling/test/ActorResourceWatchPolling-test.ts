@@ -1,8 +1,9 @@
-import { Actor, Bus, IActorTest, Mediator} from '@comunica/core';
+import type { IActionHttp, IActorHttpOutput } from '@comunica/bus-http';
+import type { Actor, IActorTest, Mediator } from '@comunica/core';
+import { Bus } from '@comunica/core';
+import type { IActionResourceWatch } from '@incremunica/bus-resource-watch';
 import { ActorResourceWatchPolling } from '../lib/ActorResourceWatchPolling';
-import {IActionHttp, IActorHttpOutput } from "@comunica/bus-http";
 import 'jest-rdf';
-import {IActionResourceWatch} from "@incremunica/bus-resource-watch";
 
 describe('ActorGuardPolling', () => {
   let bus: any;
@@ -15,14 +16,17 @@ describe('ActorGuardPolling', () => {
     let actor: ActorResourceWatchPolling;
     let mediatorHttp: Mediator<
       Actor<IActionHttp, IActorTest, IActorHttpOutput>,
-      IActionHttp, IActorTest, IActorHttpOutput>;
+      IActionHttp,
+IActorTest,
+IActorHttpOutput
+>;
     let priority: number;
 
     let action: IActionResourceWatch;
     let headersObject: {
-      age: string | undefined,
-      'cache-control': string | undefined,
-      etag: number,
+      age: string | undefined;
+      'cache-control': string | undefined;
+      etag: number;
     };
 
     beforeEach(() => {
@@ -34,55 +38,55 @@ describe('ActorGuardPolling', () => {
       };
 
       mediatorHttp = <any>{
-        mediate: async (action: IActionHttp) => {
+        mediate: async(action: IActionHttp) => {
           return {
             headers: {
               age: headersObject.age,
-              'cache-control': headersObject["cache-control"],
+              'cache-control': headersObject['cache-control'],
               etag: headersObject.etag,
               get: (key: string) => {
-                if (key == "etag") {
+                if (key === 'etag') {
                   return headersObject.etag;
                 }
                 return undefined;
-              }
-            }
-          }
+              },
+            },
+          };
         },
       };
 
       actor = new ActorResourceWatchPolling({
         beforeActors: [],
-        mediatorHttp: mediatorHttp,
+        mediatorHttp,
         defaultPollingFrequency: 1,
-        priority: priority,
+        priority,
         name: 'actor',
-        bus
+        bus,
       });
 
       action = {
         context: <any>{},
-        url: "www.test.com",
+        url: 'www.test.com',
         metadata: {
           etag: 0,
-          "cache-control": undefined,
-          age: undefined
+          'cache-control': undefined,
+          age: undefined,
         },
-      }
+      };
     });
 
-    it('should test', () => {
-      return expect(actor.test(action)).resolves.toEqual({ priority: priority });
+    it('should test', async() => {
+      await expect(actor.test(action)).resolves.toEqual({ priority });
     });
 
-    it('should get an update if the etag changes', async () => {
+    it('should get an update if the etag changes', async() => {
       headersObject.etag = 0;
 
-      let result = await actor.run(action);
+      const result = await actor.run(action);
 
       headersObject.etag = 1;
 
-      await new Promise<void>(resolve => result.events.on("update", () => {
+      await new Promise<void>(resolve => result.events.on('update', () => {
         resolve();
       }));
 
@@ -91,20 +95,20 @@ describe('ActorGuardPolling', () => {
       result.stopFunction();
     });
 
-    it('should use cache control', async () => {
-      //set data of file by setting etag and store
+    it('should use cache control', async() => {
+      // Set data of file by setting etag and store
       action.metadata = {
         etag: 0,
-        "cache-control": "max-age=5",
-        age: "0"
-      }
+        'cache-control': 'max-age=5',
+        age: '0',
+      };
 
-      let result = await actor.run(action);
+      const result = await actor.run(action);
 
       headersObject.etag = 1;
 
-      let time = process.hrtime();
-      await new Promise<void>(resolve => result.events.on("update", () => {
+      const time = process.hrtime();
+      await new Promise<void>(resolve => result.events.on('update', () => {
         resolve();
       }));
       expect(process.hrtime(time)[0]).toBeGreaterThanOrEqual(3);
@@ -112,20 +116,20 @@ describe('ActorGuardPolling', () => {
       result.stopFunction();
     });
 
-    it('should use age', async () => {
-      //set data of file by setting etag and store
+    it('should use age', async() => {
+      // Set data of file by setting etag and store
       action.metadata = {
         etag: 0,
-        "cache-control": "max-age=30",
-        age: "25"
-      }
+        'cache-control': 'max-age=30',
+        age: '25',
+      };
 
-      let result = await actor.run(action);
+      const result = await actor.run(action);
 
       headersObject.etag = 1;
 
-      let time = process.hrtime();
-      await new Promise<void>(resolve => result.events.on("update", () => {
+      const time = process.hrtime();
+      await new Promise<void>(resolve => result.events.on('update', () => {
         resolve();
       }));
       expect(process.hrtime(time)[0]).toBeGreaterThanOrEqual(3);

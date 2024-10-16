@@ -2,39 +2,39 @@
   "name": "@incremunica/context-entries",
   "version": "1.3.0",
   "description": "A collection of reusable Incremunica context key definitions.",
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/context-entries"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "sideEffects": false,
   "keywords": [
     "incremunica",
     "context",
     "entries",
     "keys"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
   },
-  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
     "lib/**/*.js.map"
   ],
+  "scripts": {
+    "build": "node \"../../node_modules/typescript/bin/tsc\""
+  },
   "dependencies": {
     "@comunica/core": "^3.2.1",
     "@incremunica/incremental-types": "^1.3.0"
-  },
-  "scripts": {
-    "build": "node \"../../node_modules/typescript/bin/tsc\""
   }
 }

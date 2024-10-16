@@ -1,6 +1,6 @@
-import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
 import type { Bindings } from '@comunica/bindings-factory';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
 
 export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Bindings[] = [];
@@ -26,7 +26,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
     }
     const index = memory.findIndex((bindings: Bindings) => item.equals(bindings));
     if (index !== -1) {
-      memory[index] = memory[memory.length - 1];
+      memory[index] = memory.at(-1)!;
       memory.pop();
       return true;
     }
@@ -40,7 +40,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
     } else {
       otherArray = this.rightMemory;
     }
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       if (this.ended) {
         return null;

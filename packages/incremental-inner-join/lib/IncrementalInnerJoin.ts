@@ -1,4 +1,4 @@
-import type {Bindings} from "@comunica/bindings-factory";
+import type { Bindings } from '@comunica/bindings-factory';
 import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
@@ -59,5 +59,5 @@ export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {
 
 export enum Side {
   right,
-  left
+  left,
 }

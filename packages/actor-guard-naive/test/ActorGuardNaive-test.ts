@@ -1,12 +1,16 @@
-import {Bus} from '@comunica/core';
-import {IActionDereferenceRdf, MediatorDereferenceRdf} from "@comunica/bus-dereference-rdf";
-import {IActionGuard} from "@incremunica/bus-guard";
-import {Transform} from "readable-stream";
+import EventEmitter = require('events');
+import type { IActionDereferenceRdf, MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
+import { Bus } from '@comunica/core';
+import type { IActionGuard } from '@incremunica/bus-guard';
+import type {
+  IActionResourceWatch,
+  IActorResourceWatchOutput,
+  MediatorResourceWatch,
+} from '@incremunica/bus-resource-watch';
+import { Store, DataFactory } from 'n3';
+import type { Transform } from 'readable-stream';
 import 'jest-rdf';
-import { Store, DataFactory} from "n3";
-import EventEmitter = require("events");
-import {ActorGuardNaive} from "../lib";
-import {IActionResourceWatch, IActorResourceWatchOutput, MediatorResourceWatch} from "@incremunica/bus-resource-watch";
+import { ActorGuardNaive } from '../lib';
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
@@ -16,7 +20,9 @@ function captureEvents(item: EventEmitter, ...events: string[]) {
   const counts = (<any>item)._eventCounts = Object.create(null);
   for (const event of events) {
     counts[event] = 0;
-    item.on(event, () => { counts[event]++; });
+    item.on(event, () => {
+      counts[event]++;
+    });
   }
   return item;
 }
@@ -41,7 +47,7 @@ describe('ActorGuardNaive', () => {
     let addQuadFn = jest.fn();
     let stopFn = jest.fn();
     let onFn: () => void;
-    let hasEnded: {value: boolean};
+    let hasEnded: { value: boolean };
 
     beforeEach(() => {
       quadArray = [];
@@ -51,35 +57,35 @@ describe('ActorGuardNaive', () => {
       removeQuadFn = jest.fn();
       addQuadFn = jest.fn();
       stopFn = jest.fn();
-      hasEnded = {value: false};
+      hasEnded = { value: false };
 
       mediatorDereferenceRdf = <any>{
-        mediate: async (action: IActionDereferenceRdf) => {
+        mediate: async(action: IActionDereferenceRdf) => {
           return {
-            data: streamifyArray(quadArray)
+            data: streamifyArray(quadArray),
           };
-        }
-      }
+        },
+      };
 
       mediatorResourceWatch = <any>{
-        mediate: async (action: IActionResourceWatch): Promise<IActorResourceWatchOutput> => {
+        mediate: async(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> => {
           return {
             events: changeNotificationEventEmitter,
-            stopFunction: stopFn
+            stopFunction: stopFn,
           };
-        }
-      }
+        },
+      };
 
       actor = new ActorGuardNaive({
         name: 'actor',
         bus,
         mediatorResourceWatch,
-        mediatorDereferenceRdf
+        mediatorDereferenceRdf,
       });
 
       action = {
         context: <any>{},
-        url: "www.test.com",
+        url: 'www.test.com',
         metadata: {},
         streamingSource: <any>{
           store: {
@@ -90,7 +96,7 @@ describe('ActorGuardNaive', () => {
               return hasEnded.value;
             },
             import: (stream: Transform) => {
-              streamingStoreEventEmitter.emit("data", stream);
+              streamingStoreEventEmitter.emit('data', stream);
               return stream;
             },
             copyOfStore: () => {
@@ -101,139 +107,130 @@ describe('ActorGuardNaive', () => {
             },
             removeQuad: (quad: any) => removeQuadFn(quad),
             addQuad: (quad: any) => addQuadFn(quad),
-          }
-        }
-      }
+          },
+        },
+      };
     });
 
-    it('should test', () => {
-      return expect(actor.test(action)).resolves.toBeTruthy();
+    it('should test', async() => {
+      await expect(actor.test(action)).resolves.toBeTruthy();
     });
 
-    it('should stop resource watcher if store stops', async () => {
+    it('should stop resource watcher if store stops', async() => {
       await actor.run(action);
 
       onFn();
 
-      expect(stopFn).toHaveBeenCalled();
+      expect(stopFn).toHaveBeenCalledWith();
     });
 
-
-    it('should stop resource when the store has stopped really early', async () => {
+    it('should stop resource when the store has stopped really early', async() => {
       hasEnded.value = true;
 
       await actor.run(action);
 
-      expect(stopFn).toHaveBeenCalled();
+      expect(stopFn).toHaveBeenCalledWith();
     });
 
-    it('should attach a positive changes stream', async () => {
+    it('should attach a positive changes stream', async() => {
       quadArrayStore = [
         quad('s1', 'p1', 'o1'),
-        quad('s2', 'p2', 'o2')
+        quad('s2', 'p2', 'o2'),
       ];
 
-      let {guardEvents} = await actor.run(action);
+      const { guardEvents } = await actor.run(action);
       captureEvents(guardEvents, 'modified', 'up-to-date');
 
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toBe(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toBe(1);
 
       quadArray = [
         quad('s1', 'p1', 'o1'),
         quad('s2', 'p2', 'o2'),
-        quad('s3', 'p3', 'o3')
+        quad('s3', 'p3', 'o3'),
       ];
 
-      changeNotificationEventEmitter.emit("update");
+      changeNotificationEventEmitter.emit('update');
 
       await new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
-      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
-      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
+      expect((<any>guardEvents)._eventCounts.modified).toBe(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toBe(1);
       expect(addQuadFn).toHaveBeenCalledTimes(1);
       expect(addQuadFn).toHaveBeenCalledWith(quad('s3', 'p3', 'o3'));
     });
 
-    it('should attach a negative changes stream', async () => {
+    it('should attach a negative changes stream', async() => {
       quadArrayStore = [
         quad('s1', 'p1', 'o1'),
         quad('s2', 'p2', 'o2'),
-        quad('s3', 'p3', 'o3')
+        quad('s3', 'p3', 'o3'),
       ];
 
-      let {guardEvents} = await actor.run(action);
+      const { guardEvents } = await actor.run(action);
       captureEvents(guardEvents, 'modified', 'up-to-date');
 
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toBe(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toBe(1);
 
       quadArray = [
         quad('s1', 'p1', 'o1'),
-        quad('s2', 'p2', 'o2')
+        quad('s2', 'p2', 'o2'),
       ];
 
-      changeNotificationEventEmitter.emit("update");
+      changeNotificationEventEmitter.emit('update');
 
       await new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
-      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
-      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
+      expect((<any>guardEvents)._eventCounts.modified).toBe(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toBe(1);
       expect(removeQuadFn).toHaveBeenCalledTimes(1);
       expect(removeQuadFn).toHaveBeenCalledWith(
         DataFactory.quad(
           DataFactory.namedNode('s3'),
           DataFactory.namedNode('p3'),
-          DataFactory.namedNode('o3')
-        )
+          DataFactory.namedNode('o3'),
+        ),
       );
     });
 
-    it('should handle delete events', async () => {
+    it('should handle delete events', async() => {
       quadArrayStore = [
         quad('s1', 'p1', 'o1'),
         quad('s2', 'p2', 'o2'),
-        quad('s3', 'p3', 'o3')
+        quad('s3', 'p3', 'o3'),
       ];
 
-      let {guardEvents} = await actor.run(action);
+      const { guardEvents } = await actor.run(action);
       captureEvents(guardEvents, 'modified', 'up-to-date');
 
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toEqual(1);
-      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toEqual(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'update')).toBe(1);
+      expect(EventEmitter.listenerCount(changeNotificationEventEmitter, 'delete')).toBe(1);
 
-      let updatePromise = new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
+      const updatePromise = new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
 
-      changeNotificationEventEmitter.emit("delete");
+      changeNotificationEventEmitter.emit('delete');
 
       await updatePromise;
 
-      expect((<any>guardEvents)._eventCounts.modified).toEqual(1);
-      expect((<any>guardEvents)._eventCounts['up-to-date']).toEqual(1);
+      expect((<any>guardEvents)._eventCounts.modified).toBe(1);
+      expect((<any>guardEvents)._eventCounts['up-to-date']).toBe(1);
       expect(removeQuadFn).toHaveBeenCalledTimes(3);
-      expect(removeQuadFn).toHaveBeenNthCalledWith(1,
-        DataFactory.quad(
-          DataFactory.namedNode('s1'),
-          DataFactory.namedNode('p1'),
-          DataFactory.namedNode('o1')
-        )
-      );
-      expect(removeQuadFn).toHaveBeenNthCalledWith(2,
-        DataFactory.quad(
-          DataFactory.namedNode('s2'),
-          DataFactory.namedNode('p2'),
-          DataFactory.namedNode('o2')
-        )
-      );
-      expect(removeQuadFn).toHaveBeenNthCalledWith(3,
-        DataFactory.quad(
-          DataFactory.namedNode('s3'),
-          DataFactory.namedNode('p3'),
-          DataFactory.namedNode('o3')
-        )
-      );
+      expect(removeQuadFn).toHaveBeenNthCalledWith(1, DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+      ));
+      expect(removeQuadFn).toHaveBeenNthCalledWith(2, DataFactory.quad(
+        DataFactory.namedNode('s2'),
+        DataFactory.namedNode('p2'),
+        DataFactory.namedNode('o2'),
+      ));
+      expect(removeQuadFn).toHaveBeenNthCalledWith(3, DataFactory.quad(
+        DataFactory.namedNode('s3'),
+        DataFactory.namedNode('p3'),
+        DataFactory.namedNode('o3'),
+      ));
     });
   });
 });
-
-

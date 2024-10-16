@@ -3,5 +3,5 @@ module.exports = {
   out: 'documentation',
   theme: 'default',
   entryPointStrategy: 'packages',
-  entryPoints: [ 'engines/*', 'packages/*' ]
-}
+  entryPoints: [ 'engines/*', 'packages/*' ],
+};

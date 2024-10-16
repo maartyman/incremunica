@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
 import type { IActorTest } from '@comunica/core';
 import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremunica/bus-guard';
@@ -17,7 +17,7 @@ export class ActorGuardNaive extends ActorGuard {
     super(args);
   }
 
-  public async test(action: IActionGuard): Promise<IActorTest> {
+  public async test(_action: IActionGuard): Promise<IActorTest> {
     return true;
   }
 
@@ -40,31 +40,34 @@ export class ActorGuardNaive extends ActorGuard {
       resourceWatch.stopFunction();
     });
 
-    resourceWatch.events.on('update', async() => {
+    resourceWatch.events.on('update', () => {
       guardEvents.emit('modified');
       const deletionStore = action.streamingSource.store.copyOfStore();
       const additionArray: Quad[] = [];
-      const responseGet = await this.mediatorDereferenceRdf.mediate({
+      this.mediatorDereferenceRdf.mediate({
         context: action.context,
         url: action.url,
-      });
+      }).then((responseGet) => {
+        responseGet.data.on('data', (quad) => {
+          if (deletionStore.has(quad)) {
+            deletionStore.delete(quad);
+            return;
+          }
+          additionArray.push(quad);
+        });
 
-      responseGet.data.on('data', quad => {
-        if (deletionStore.has(quad)) {
-          deletionStore.delete(quad);
-          return;
-        }
-        additionArray.push(quad);
-      });
-
-      responseGet.data.on('end', () => {
-        for (const quad of deletionStore) {
-          action.streamingSource.store.removeQuad(<Quad>quad);
-        }
-        for (const quad of additionArray) {
-          action.streamingSource.store.addQuad(quad);
-        }
-        guardEvents.emit('up-to-date');
+        responseGet.data.on('end', () => {
+          for (const quad of deletionStore) {
+            action.streamingSource.store.removeQuad(<Quad>quad);
+          }
+          for (const quad of additionArray) {
+            action.streamingSource.store.addQuad(quad);
+          }
+          guardEvents.emit('up-to-date');
+        });
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.warn(error);
       });
     });
 

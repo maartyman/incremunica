@@ -1,6 +1,6 @@
+import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
-import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
-import {Quad} from "@incremunica/incremental-types";
 
 export interface IIncementalRdfJsSourceExtended extends RDF.Source {
   /**
@@ -17,7 +17,7 @@ export interface IIncementalRdfJsSourceExtended extends RDF.Source {
   /**
    *
    */
-  streamingStore: StreamingStore<Quad>
+  streamingStore: StreamingStore<Quad>;
   /**
    * Return an estimated count of the number of quads matching the given pattern.
    *

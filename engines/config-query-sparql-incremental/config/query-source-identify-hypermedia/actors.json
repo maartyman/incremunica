@@ -10,7 +10,7 @@
     {
       "@id": "urn:comunica:default:query-source-identify-hypermedia/actors#stream-none",
       "@type": "ActorQuerySourceIdentifyHypermediaStreamNone",
-      "mediatorGuard": { "@id": "urn:comunica:default:guard/mediators#main"  },
+      "mediatorGuard": { "@id": "urn:comunica:default:guard/mediators#main" },
       "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" }
     }
   ]

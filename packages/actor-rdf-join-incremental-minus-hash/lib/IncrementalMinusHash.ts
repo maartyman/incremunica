@@ -1,8 +1,8 @@
-import { HashBindings } from '@incremunica/hash-bindings';
 import type { Bindings } from '@comunica/bindings-factory';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { HashBindings } from '@incremunica/hash-bindings';
 import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class IncrementalMinusHash extends AsyncIterator<Bindings> {
   private readonly leftIterator: AsyncIterator<Bindings>;
@@ -94,7 +94,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
           const matchingBindings = this.leftMemory.get(hash);
           if (matchingBindings !== undefined) {
             for (let matchingBinding of matchingBindings) {
-              //TODO check if the 2 bindings are equal for common variables
+              // TODO check if the 2 bindings are equal for common variables
               matchingBinding = matchingBinding.setContextEntry(new ActionContextKeyIsAddition(), false);
               this.bindingBuffer.push(matchingBinding);
             }
@@ -145,7 +145,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
       } else {
         for (let i = 0; i < currentArray.length; i++) {
           if (currentArray[i].equals(element)) {
-            currentArray[i] = currentArray[currentArray.length - 1];
+            currentArray[i] = currentArray.at(-1)!;
             currentArray.pop();
             break;
           }

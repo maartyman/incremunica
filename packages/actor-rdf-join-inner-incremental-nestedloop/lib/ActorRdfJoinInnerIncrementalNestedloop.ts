@@ -1,3 +1,4 @@
+import type { Bindings } from '@comunica/bindings-factory';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
@@ -7,11 +8,9 @@ import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings } from '@comunica/types';
-import type { BindingsStream } from '@comunica/types';
-import { IncrementalNestedLoopJoin } from './IncrementalNestedLoopJoin';
-import type { Bindings } from '@comunica/bindings-factory';
+import type { MetadataBindings, BindingsStream } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
+import { IncrementalNestedLoopJoin } from './IncrementalNestedLoopJoin';
 
 /**
  * A comunica Inner Incremental Nestedloop RDF Join Actor.
@@ -27,7 +26,7 @@ export class ActorRdfJoinInnerIncrementalNestedloop extends ActorRdfJoin {
   }
 
   protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
-    const bindingsStream = <BindingsStream><unknown>new IncrementalNestedLoopJoin(
+    const bindingsStream = <BindingsStream><unknown> new IncrementalNestedLoopJoin(
       <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
@@ -46,8 +45,8 @@ export class ActorRdfJoinInnerIncrementalNestedloop extends ActorRdfJoin {
   }
 
   protected async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _action: IActionRdfJoin,
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     return {
       iterations: 0,

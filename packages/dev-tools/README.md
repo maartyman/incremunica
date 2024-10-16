@@ -4,7 +4,6 @@
 
 A collection of reusable incremunica Typescript functions for debugging.
 
-
 ## Install
 
 ```bash

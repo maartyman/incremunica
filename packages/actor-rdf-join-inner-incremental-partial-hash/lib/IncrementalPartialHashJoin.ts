@@ -1,6 +1,6 @@
-import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { Bindings } from '@comunica/bindings-factory';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 
 export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
@@ -55,7 +55,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
 
     const index = array.findIndex((bindings: Bindings) => item.equals(bindings));
     if (index !== -1) {
-      array[index] = array[array.length - 1];
+      array[index] = array.at(-1)!;
       array.pop();
       return true;
     }
@@ -63,7 +63,6 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
   }
 
   public read(): Bindings | null {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.ended) {
         return null;

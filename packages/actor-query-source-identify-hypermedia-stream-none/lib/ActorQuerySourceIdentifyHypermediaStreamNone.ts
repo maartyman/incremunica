@@ -1,9 +1,3 @@
-import { ActionContext } from '@comunica/core';
-import type { MediatorGuard } from '@incremunica/bus-guard';
-import { KeysGuard } from '@incremunica/context-entries';
-import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
-import type { Quad } from '@incremunica/incremental-types';
-import type * as RDF from '@rdfjs/types';
 import { BindingsFactory } from '@comunica/bindings-factory';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type {
@@ -13,7 +7,13 @@ import type {
   IActorQuerySourceIdentifyHypermediaTest,
 } from '@comunica/bus-query-source-identify-hypermedia';
 import { ActorQuerySourceIdentifyHypermedia } from '@comunica/bus-query-source-identify-hypermedia';
-import {StreamingQuerySourceRdfJs} from "@incremunica/actor-query-source-identify-streaming-rdfjs";
+import { ActionContext } from '@comunica/core';
+import { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
+import type { MediatorGuard } from '@incremunica/bus-guard';
+import { KeysGuard } from '@incremunica/context-entries';
+import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { Quad } from '@incremunica/incremental-types';
+import type * as RDF from '@rdfjs/types';
 
 /**
  * An incremunica Stream None Query Source Identify Hypermedia Actor.

@@ -3,26 +3,26 @@
   "version": "1.3.0",
   "description": "Development tools for comunica/incremunica.",
   "lsd:module": true,
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "license": "MIT",
+  "homepage": "https://github.com/comunica",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/dev-tools"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/comunica/issues"
   },
-  "sideEffects": false,
   "keywords": [
     "dev",
     "utils"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/comunica/issues"
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
   },
-  "homepage": "https://github.com/comunica",
   "files": [
     "components",
     "lib/**/*.d.ts",
@@ -35,6 +35,10 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@incremunica/incremental-types": "^1.3.0"
+    "@comunica/bindings-factory": "^3.3.0",
+    "@comunica/core": "^3.3.0",
+    "@comunica/types": "3.3.0",
+    "@incremunica/actor-merge-bindings-context-is-addition": "^1.3.0",
+    "rdf-data-factory": "^1.1.2"
   }
 }

@@ -1,19 +1,20 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory, bindingsToString } from '@comunica/bindings-factory';
+import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
-import { ActorQueryOperation,
+import {
+  ActorQueryOperation,
   ActorQueryOperationTypedMediated,
-  materializeOperation } from '@comunica/bus-query-operation';
+  materializeOperation,
+} from '@comunica/bus-query-operation';
 import type { IActorTest } from '@comunica/core';
 import { AsyncEvaluator, isExpressionError } from '@comunica/expression-evaluator';
-import type {IActionContext, IQueryOperationResult} from '@comunica/types';
-import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
-import { bindingsToString } from '@comunica/bindings-factory';
+import type { IActionContext, IQueryOperationResult, BindingsStream } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { HashBindings } from '@incremunica/hash-bindings';
-import type { BindingsStream } from '@comunica/types';
+import type { AsyncIterator } from 'asynciterator';
 import { EmptyIterator, SingletonIterator, UnionIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
-import {AsyncIterator} from "asynciterator";
 
 /**
  * A comunica Filter Sparqlee Query Operation Actor.
@@ -32,7 +33,11 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       return true;
     }
     if (operation.expression.expressionType === 'operator') {
-      const config = { ...ActorQueryOperation.getAsyncExpressionContext(context, this.mediatorQueryOperation, new BindingsFactory()) };
+      const config = { ...ActorQueryOperation.getAsyncExpressionContext(
+        context,
+        this.mediatorQueryOperation,
+        await BindingsFactory.create(this.mediatorMergeBindingsContext, context),
+      ) };
       const _ = new AsyncEvaluator(operation.expression, config);
       return true;
     }
@@ -90,7 +95,7 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
               bindings: bindingsToString(item),
             }));
           } else {
-            //TODO is this the correct way of making the bindingsStream emit an error?
+            // TODO is this the correct way of making the bindingsStream emit an error?
             bindingsStream.emit('error', error);
           }
         }
@@ -109,7 +114,11 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
 
     const hashBindings = new HashBindings();
 
-    const binder = async(bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): Promise<void> => {
+    const binder = async(
+      bindings: Bindings,
+      done: () => void,
+      push: (i: AsyncIterator<Bindings>) => void,
+    ): Promise<void> => {
       const hash = hashBindings.hash(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
@@ -209,10 +218,13 @@ export class ActorQueryOperationIncrementalFilter extends ActorQueryOperationTyp
       done();
     };
 
-    const bindingsStream = <BindingsStream><unknown>new UnionIterator((<AsyncIterator<Bindings>><unknown>output.bindingsStream)
-      .transform({
-        transform: binder,
-      }), { autoStart: false });
+    const bindingsStream = <BindingsStream><unknown> new UnionIterator(
+      (<AsyncIterator<Bindings>><unknown>output.bindingsStream)
+        .transform({
+          transform: binder,
+        }),
+      { autoStart: false },
+    );
     return { type: 'bindings', bindingsStream, metadata: output.metadata };
   }
 }

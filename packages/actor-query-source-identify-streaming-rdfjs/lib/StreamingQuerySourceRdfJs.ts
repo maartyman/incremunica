@@ -1,27 +1,34 @@
+import type { BindingsFactory } from '@comunica/bindings-factory';
+import { ClosableIterator } from '@comunica/bus-query-operation';
+import {
+  filterMatchingQuotedQuads,
+  getVariables,
+  getDuplicateElementLinks,
+  setMetadata,
+} from '@comunica/bus-query-source-identify';
+import { KeysQueryOperation } from '@comunica/context-entries';
 import { MetadataValidationState } from '@comunica/metadata';
-import type {IQuerySource, BindingsStream, IActionContext, FragmentSelectorShape, Bindings} from '@comunica/types';
+import type { IQuerySource, BindingsStream, IActionContext, FragmentSelectorShape, Bindings } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
-import {IGuardEvents, Quad} from '@incremunica/incremental-types';
+import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
+import type { AsyncIterator } from 'asynciterator';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
-import { AsyncIterator } from 'asynciterator';
-import {Algebra, Factory} from 'sparqlalgebrajs';
 import { DataFactory } from 'rdf-data-factory';
-import {BindingsFactory} from "@comunica/bindings-factory";
+import type {
+  QuadTermName,
+} from 'rdf-terms';
 import {
   filterTermsNested,
   getValueNestedPath,
-  QuadTermName,
   reduceTermsNested,
   someTermsNested,
-  uniqTerms
-} from "rdf-terms";
-import { filterMatchingQuotedQuads, getVariables, getDuplicateElementLinks, setMetadata } from '@comunica/bus-query-source-identify';
-import {KeysQueryOperation} from "@comunica/context-entries";
-import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
-import { ClosableIterator } from '@comunica/bus-query-operation';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {Duplex, Transform} from "readable-stream";
+  uniqTerms,
+} from 'rdf-terms';
+import { Factory } from 'sparqlalgebrajs';
+import type { Algebra } from 'sparqlalgebrajs';
 
 const AF = new Factory();
 const DF = new DataFactory<RDF.BaseQuad>();
@@ -85,7 +92,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       StreamingQuerySourceRdfJs.nullifyVariables(operation.object, false),
       StreamingQuerySourceRdfJs.nullifyVariables(operation.graph, false),
       matchOptions,
-    )
+    );
 
     if (context) {
       const matchOptionsArray: ({ stopMatch: () => void })[] | undefined = context.get(
@@ -96,7 +103,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       }
     }
 
-    let quads = filterMatchingQuotedQuads(operation, wrapAsyncIterator<RDF.Quad>(rawStream, { autoStart: false }));
+    const quads = filterMatchingQuotedQuads(operation, wrapAsyncIterator<RDF.Quad>(rawStream, { autoStart: false }));
 
     // Set up-to-date property
     quads.setProperty('up-to-date', true);
@@ -129,7 +136,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
   // TODO implement setMetadata make a proper estimation for the cardinality
   protected async setMetadata(
     it: AsyncIterator<RDF.Quad>,
-    operation: Algebra.Pattern,
+    _operation: Algebra.Pattern,
   ): Promise<void> {
     const cardinality = 1;
 
@@ -165,7 +172,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     return `StreamingQuerySourceRdfJs(${this.store.constructor.name})`;
   }
 
-  static quadsToBindings(
+  private static quadsToBindings(
     quads: AsyncIterator<RDF.Quad>,
     pattern: Algebra.Pattern,
     bindingsFactory: BindingsFactory,
@@ -174,8 +181,8 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     const variables = getVariables(pattern);
 
     // If non-default-graph triples need to be filtered out
-    const filterNonDefaultQuads = pattern.graph.termType === 'Variable'
-      && !unionDefaultGraph;
+    const filterNonDefaultQuads = pattern.graph.termType === 'Variable' &&
+      !unionDefaultGraph;
 
     // Detect duplicate variables in the pattern
     const duplicateElementLinks: Record<string, QuadTermName[][]> | undefined = getDuplicateElementLinks(pattern);
@@ -220,21 +227,28 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     }
 
     // Wrap it in a ClosableIterator, so we can propagate destroy calls
-    const bindingsStream = new ClosableIterator(filteredOutput.map<Bindings>(quad => {
-      return bindingsFactory
-        .bindings(Object.keys(elementVariables).map((key) => {
-          const keys: QuadTermName[] = <any>key.split('_');
-          const variable = elementVariables[key];
-          const term = getValueNestedPath(quad, keys);
-          return [ DF.variable(variable), term ];
-          //TODO write a test for this
-        })).setContextEntry(new ActionContextKeyIsAddition(), ((<any>quad).diff == undefined)? true : (<any>quad).diff);
-    }), {
+    const bindingsStream = new ClosableIterator(filteredOutput.map<Bindings>(quad => bindingsFactory
+      .bindings(Object.keys(elementVariables).map((key) => {
+        const keys: QuadTermName[] = <any>key.split('_');
+        const variable = elementVariables[key];
+        const term = getValueNestedPath(quad, keys);
+        return [ DF.variable(variable), term ];
+        // TODO write a test for this
+      })).setContextEntry(
+        new ActionContextKeyIsAddition(),
+        ((<any>quad).diff === undefined) ? true : (<any>quad).diff,
+      )), {
       onClose: () => quads.destroy(),
     });
 
     // Set the metadata property
-    setMetadata(bindingsStream, quads, elementVariables, variables, filterNonDefaultQuads || Boolean(duplicateElementLinks));
+    setMetadata(
+      bindingsStream,
+      quads,
+      elementVariables,
+      variables,
+      filterNonDefaultQuads || Boolean(duplicateElementLinks),
+    );
 
     return bindingsStream;
   }

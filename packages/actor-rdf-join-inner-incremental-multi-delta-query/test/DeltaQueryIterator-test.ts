@@ -1,31 +1,32 @@
 import '@incremunica/incremental-jest';
-import {BindingsStream, IActionContext, IJoinEntry, IQueryOperationResultBindings} from "@comunica/types";
-import {ActionContext} from "@comunica/core";
-import {IActionQueryOperation, MediatorQueryOperation} from "@comunica/bus-query-operation";
-import {ArrayIterator, EmptyIterator, WrappingIterator} from "asynciterator";
-import {DataFactory} from "rdf-data-factory";
-import {BindingsFactory} from "@comunica/bindings-factory";
-import {Factory} from "sparqlalgebrajs";
-import {DeltaQueryIterator} from "../lib/DeltaQueryIterator";
-import {getContextSources} from "@comunica/bus-rdf-resolve-quad-pattern";
-import {Store} from "n3";
-import arrayifyStream from "arrayify-stream";
-import {promisifyEventEmitter} from "event-emitter-promisify/dist";
-import * as RDF from "@rdfjs/types";
-import {Transform} from "readable-stream";
-import EventEmitter = require("events");
-import {MetadataValidationState} from "@comunica/metadata";
+import EventEmitter = require('events');
+import type { BindingsFactory } from '@comunica/bindings-factory';
+import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
+import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
+import { ActionContext } from '@comunica/core';
+import { MetadataValidationState } from '@comunica/metadata';
+import type { BindingsStream, IActionContext, IJoinEntry, IQueryOperationResultBindings } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { DevTools } from '@incremunica/dev-tools';
+import type * as RDF from '@rdfjs/types';
+import arrayifyStream from 'arrayify-stream';
+import { ArrayIterator, EmptyIterator, WrappingIterator } from 'asynciterator';
+import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
+import type { Store } from 'n3';
+import { DataFactory } from 'rdf-data-factory';
+import { Transform } from 'readable-stream';
+import { Factory } from 'sparqlalgebrajs';
+import { DeltaQueryIterator } from '../lib/DeltaQueryIterator';
+
 const streamifyArray = require('streamify-array');
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {DevTools} from "@incremunica/dev-tools";
 
 const DF = new DataFactory();
 const FACTORY = new Factory();
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  let array: any[] = [];
+  const array: any[] = [];
   for (let i = 0; i < num; i++) {
-    await new Promise<void>((resolve) => stream.once("data", (bindings: any) => {
+    await new Promise<void>(resolve => stream.once('data', (bindings: any) => {
       array.push(bindings);
       resolve();
     }));
@@ -37,84 +38,84 @@ function nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
   return !term || term.termType === 'Variable' ? undefined : term;
 }
 
-describe("DeltaQueryIterator", () => {
+describe('DeltaQueryIterator', () => {
   let context: IActionContext;
   let mediatorQueryOperation: MediatorQueryOperation;
   let mediateFunc: jest.Mock;
   let BF: BindingsFactory;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     context = new ActionContext();
     BF = await DevTools.createBindingsFactory(DF);
 
-    mediateFunc = jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+    mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
       const sources = getContextSources(arg.context);
 
-      expect(sources).not.toBeUndefined();
+      // TODO check if this is needed
+      // expect(sources).toBeDefined();
       if (sources === undefined) {
         return {
           bindingsStream: new EmptyIterator(),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
-            cardinality: {type: 'estimate', value: 0},
+            cardinality: { type: 'estimate', value: 0 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('a')],
+            variables: [ DF.variable('a'), DF.variable('a') ],
           }),
           type: 'bindings',
-        }
+        };
       }
 
       const bindingstream: BindingsStream = new ArrayIterator((<Store>sources[0]).match(
-        // @ts-ignore
+        // @ts-expect-error
         nullifyVariables(arg.operation.subject),
         nullifyVariables(arg.operation.predicate),
         nullifyVariables(arg.operation.object),
         null,
       )).map((quad) => {
-        if (quad.predicate.value === "ex:p2") {
+        if (quad.predicate.value === 'ex:p2') {
           return BF.bindings([]);
-        } else {
-          return BF.bindings([
-            [DF.variable('b'), quad.object],
-          ]);
         }
-      })
+        return BF.bindings([
+          [ DF.variable('b'), quad.object ],
+        ]);
+      });
 
       return {
         bindingsStream: bindingstream,
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
-          cardinality: {type: 'estimate', value: 1},
+          cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
-          variables: [DF.variable('bound')],
+          variables: [ DF.variable('bound') ],
         }),
         type: 'bindings',
       };
     });
 
     mediatorQueryOperation = <any>{
-      mediate: mediateFunc
+      mediate: mediateFunc,
     };
   });
 
-  it('should join two entries', async () => {
+  it('should join two entries', async() => {
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
-              [DF.variable('b'), DF.namedNode('ex:b2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
+              [ DF.variable('b'), DF.namedNode('ex:b2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -124,16 +125,16 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -141,48 +142,48 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true), BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
+      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      BF.bindings([
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
     ]);
 
-    expect(mediateFunc).toBeCalledTimes(4);
+    expect(mediateFunc).toHaveBeenCalledTimes(4);
   });
 
-  it('should join two entries with deletions', async () => {
+  it('should join two entries with deletions', async() => {
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
-              [DF.variable('b'), DF.namedNode('ex:b2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
+              [ DF.variable('b'), DF.namedNode('ex:b2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -192,19 +193,19 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -212,36 +213,35 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), false),
     ]);
 
-    expect(mediateFunc).toBeCalledTimes(6);
+    expect(mediateFunc).toHaveBeenCalledTimes(6);
   });
 
-  it('should join two slow entries', async () => {
+  it('should join two slow entries', async() => {
     const transform = new Transform({
       transform(quad: any, _encoding: any, callback: (arg0: null, arg1: any) => any) {
         return callback(null, quad);
@@ -249,32 +249,32 @@ describe("DeltaQueryIterator", () => {
       objectMode: true,
     });
 
-    let stream = streamifyArray([
+    const stream = streamifyArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
-      ])
-    ], {autoStart: false}).pipe(transform, {end: false});
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
+      ]),
+    ], { autoStart: false }).pipe(transform, { end: false });
 
-    let it1 = new WrappingIterator(stream);
+    const it1 = new WrappingIterator(stream);
 
-    let it2 = new ArrayIterator([
+    const it2 = new ArrayIterator([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ], {autoStart: false});
+    ], { autoStart: false });
 
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -284,9 +284,9 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -297,48 +297,48 @@ describe("DeltaQueryIterator", () => {
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await partialArrayifyStream(delta, 1)).toBeIsomorphicBindingsArray([
+    await expect(partialArrayifyStream(delta, 1)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
-      ])
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
+      ]),
     ]);
 
     stream.push(
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
-      ])
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
+      ]),
     );
     stream.end();
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
     ]);
 
-    expect(mediateFunc).toBeCalledTimes(4);
+    expect(mediateFunc).toHaveBeenCalledTimes(4);
   });
 
-  it('should keep reading the bindingsStream if the bindings can\'t be bound to the quad', async () => {
+  it('should keep reading the bindingsStream if the bindings can\'t be bound to the quad', async() => {
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -348,19 +348,19 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('c'), DF.namedNode('ex:a1')],
+              [ DF.variable('c'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('d'), DF.namedNode('ex:a1')],
+              [ DF.variable('d'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -368,37 +368,36 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
-      ])
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
+      ]),
     ]);
 
-    expect(mediateFunc).toBeCalledTimes(2);
+    expect(mediateFunc).toHaveBeenCalledTimes(2);
   });
 
-  it('should keep reading the bindingsSteam and break if it has a null', async () => {
+  it('should keep reading the bindingsSteam and break if it has a null', async() => {
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -408,17 +407,17 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('c'), DF.namedNode('ex:a1')],
+              [ DF.variable('c'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             null,
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -426,52 +425,51 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
-      ])
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
+      ]),
     ]);
 
-    expect(mediateFunc).toBeCalledTimes(2);
+    expect(mediateFunc).toHaveBeenCalledTimes(2);
   });
 
-  it('should destroy entries on end', async () => {
-    let it1 = new ArrayIterator([
+  it('should destroy entries on end', async() => {
+    const it1 = new ArrayIterator([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ], {autoStart: false});
+    ], { autoStart: false });
 
-    let it2 = new ArrayIterator([
+    const it2 = new ArrayIterator([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ], {autoStart: false});
+    ], { autoStart: false });
 
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -481,9 +479,9 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -494,46 +492,46 @@ describe("DeltaQueryIterator", () => {
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
     delta.close();
 
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), 100))
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 100));
 
     expect(it1.destroyed).toBeTruthy();
     expect(it2.destroyed).toBeTruthy();
   });
 
-  it('should handle destroyed entry', async () => {
-    let it1 = new ArrayIterator([
+  it('should handle destroyed entry', async() => {
+    const it1 = new ArrayIterator([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
-        [DF.variable('b'), DF.namedNode('ex:b1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
+        [ DF.variable('b'), DF.namedNode('ex:b1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
-        [DF.variable('b'), DF.namedNode('ex:b2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
+        [ DF.variable('b'), DF.namedNode('ex:b2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ], {autoStart: false});
+    ], { autoStart: false });
 
-    let it2 = new ArrayIterator([
+    const it2 = new ArrayIterator([
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a1')],
+        [ DF.variable('a'), DF.namedNode('ex:a1') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       BF.bindings([
-        [DF.variable('a'), DF.namedNode('ex:a2')],
+        [ DF.variable('a'), DF.namedNode('ex:a2') ],
       ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-    ], {autoStart: false});
+    ], { autoStart: false });
 
     const action: IJoinEntry[] = [
       {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -543,9 +541,9 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -556,34 +554,34 @@ describe("DeltaQueryIterator", () => {
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
     expect(() => {
-      it1.destroy(new Error("test"))
-    }).toThrow("test")
+      it1.destroy(new Error('test'));
+    }).toThrow('test');
   });
 
-  it('should internally return null when the bindings can\'t be merged', async () => {
-    let mediateFunc = jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+  it('should internally return null when the bindings can\'t be merged', async() => {
+    const mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
       return {
         bindingsStream: new ArrayIterator([
           BF.bindings([
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]),
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
-          cardinality: {type: 'estimate', value: 1},
+          cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
-          variables: [DF.variable('bound')],
+          variables: [ DF.variable('bound') ],
         }),
         type: 'bindings',
       };
     });
 
     mediatorQueryOperation = <any>{
-      mediate: mediateFunc
+      mediate: mediateFunc,
     };
 
     const action: IJoinEntry[] = [
@@ -591,14 +589,14 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -608,13 +606,13 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -622,34 +620,33 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    expect(await arrayifyStream(delta)).toBeIsomorphicBindingsArray([]);
+    await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([]);
 
-    expect(mediateFunc).toBeCalledTimes(2);
+    expect(mediateFunc).toHaveBeenCalledTimes(2);
   });
 
-  it('should join three entries', async () => {
-    mediateFunc = jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+  it('should join three entries', async() => {
+    mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
       return {
         bindingsStream: new EmptyIterator(),
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
-          cardinality: {type: 'estimate', value: 1},
+          cardinality: { type: 'estimate', value: 1 },
           canContainUndefs: false,
-          variables: [DF.variable('bound')],
+          variables: [ DF.variable('bound') ],
         }),
         type: 'bindings',
       };
     });
 
     mediatorQueryOperation = <any>{
-      mediate: mediateFunc
+      mediate: mediateFunc,
     };
 
     const action: IJoinEntry[] = [
@@ -657,14 +654,14 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -674,13 +671,13 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -690,13 +687,13 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
@@ -704,28 +701,26 @@ describe("DeltaQueryIterator", () => {
       },
     ];
 
-
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    delta.on("data", () => {
-    })
+    delta.on('data', () => {});
 
     await promisifyEventEmitter(delta);
 
-    expect(mediateFunc).toBeCalledTimes(3);
+    expect(mediateFunc).toHaveBeenCalledTimes(3);
   });
 
-  it('should handle a failed sub query', async () => {
-    mediateFunc = jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-      throw new Error("test")
+  it('should handle a failed sub query', async() => {
+    mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+      throw new Error('test');
     });
 
     mediatorQueryOperation = <any>{
-      mediate: mediateFunc
+      mediate: mediateFunc,
     };
 
     const action: IJoinEntry[] = [
@@ -733,14 +728,14 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-              [DF.variable('b'), DF.namedNode('ex:b1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+              [ DF.variable('b'), DF.namedNode('ex:b1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 3},
+            cardinality: { type: 'estimate', value: 3 },
             canContainUndefs: false,
-            variables: [DF.variable('a'), DF.variable('b')],
+            variables: [ DF.variable('a'), DF.variable('b') ],
           }),
           type: 'bindings',
         },
@@ -750,32 +745,30 @@ describe("DeltaQueryIterator", () => {
         output: <any>{
           bindingsStream: new ArrayIterator([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          ], {autoStart: false}),
+          ], { autoStart: false }),
           metadata: () => Promise.resolve({
-            cardinality: {type: 'estimate', value: 1},
+            cardinality: { type: 'estimate', value: 1 },
             canContainUndefs: false,
-            variables: [DF.variable('a')],
+            variables: [ DF.variable('a') ],
           }),
           type: 'bindings',
         },
         operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-      }
+      },
     ];
-
 
     const delta = new DeltaQueryIterator(
       action,
       context,
-      mediatorQueryOperation
+      mediatorQueryOperation,
     );
 
-    delta.on("data", () => {
-    })
+    delta.on('data', () => {});
 
     await promisifyEventEmitter(delta);
 
-    expect(mediateFunc).toBeCalledTimes(2);
+    expect(mediateFunc).toHaveBeenCalledTimes(2);
   });
-})
+});

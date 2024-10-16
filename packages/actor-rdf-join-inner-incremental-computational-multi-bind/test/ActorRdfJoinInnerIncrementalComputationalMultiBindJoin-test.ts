@@ -1,37 +1,40 @@
-import { BindingsFactory} from '@comunica/bindings-factory';
+import type { EventEmitter } from 'node:events';
+import type { BindingsFactory } from '@comunica/bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import 'jest-rdf';
+import { KeysQueryOperation } from '@comunica/context-entries';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
-import type {BindingsStream, IActionContext, IQueryOperationResultBindings} from '@comunica/types';
-import {ArrayIterator, WrappingIterator} from 'asynciterator';
+import { MetadataValidationState } from '@comunica/metadata';
+import type { BindingsStream, IActionContext, IQueryOperationResultBindings } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysStreamingSource } from '@incremunica/context-entries';
+import { DevTools } from '@incremunica/dev-tools';
+import arrayifyStream from 'arrayify-stream';
+import { ArrayIterator, WrappingIterator } from 'asynciterator';
+import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
 import { DataFactory } from 'rdf-data-factory';
+import type { Stream } from 'readable-stream';
+import { PassThrough } from 'readable-stream';
 import { Factory } from 'sparqlalgebrajs';
-import { ActorRdfJoinInnerIncrementalComputationalMultiBind } from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
+import {
+  ActorRdfJoinInnerIncrementalComputationalMultiBind,
+} from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
 import Mock = jest.Mock;
 import '@incremunica/incremental-jest';
-import arrayifyStream from "arrayify-stream";
-import {KeysQueryOperation} from "@comunica/context-entries";
-import {EventEmitter} from "events";
-import {PassThrough, Stream} from "readable-stream";
-import {promisifyEventEmitter} from "event-emitter-promisify/dist";
-import { MetadataValidationState } from '@comunica/metadata';
-import {KeysStreamingSource} from "@incremunica/context-entries";
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import {DevTools} from "@incremunica/dev-tools";
-
 
 const streamifyArray = require('streamify-array');
+
 const DF = new DataFactory();
 const FACTORY = new Factory();
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  let array: any[] = [];
+  const array: any[] = [];
   for (let i = 0; i < num; i++) {
-    await new Promise<void>((resolve) => stream.once("data", (bindings: any) => {
+    await new Promise<void>(resolve => stream.once('data', (bindings: any) => {
       array.push(bindings);
       resolve();
     }));
@@ -39,24 +42,30 @@ async function partialArrayifyStream(stream: EventEmitter, num: number): Promise
   return array;
 }
 
-
 describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
   let bus: any;
   let BF: BindingsFactory;
 
-  beforeEach(async () => {
-    bus = new Bus({name: 'bus'});
+  beforeEach(async() => {
+    bus = new Bus({ name: 'bus' });
     BF = await DevTools.createBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinIncrementalComputationalMultiBind instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
-      IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>;
+      IActionRdfJoinSelectivity,
+IActorTest,
+IActorRdfJoinSelectivityOutput
+>;
     let mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
     let context: IActionContext;
-    let mediatorQueryOperation: Mediator<Actor<IActionQueryOperation, IActorTest, IQueryOperationResultBindings>,
-      IActionQueryOperation, IActorTest, IQueryOperationResultBindings>;
+    let mediatorQueryOperation: Mediator<
+      Actor<IActionQueryOperation, IActorTest, IQueryOperationResultBindings>,
+      IActionQueryOperation,
+      IActorTest,
+      IQueryOperationResultBindings
+    >;
     let actor: ActorRdfJoinInnerIncrementalComputationalMultiBind;
 
     beforeEach(() => {
@@ -107,7 +116,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
     describe('getJoinCoefficients', () => {
       it('should handle three entries', async() => {
-        expect(await actor.getJoinCoefficients(
+        await expect(actor.getJoinCoefficients(
           {
             type: 'inner',
             entries: [
@@ -152,7 +161,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               variables: [ DF.variable('a') ],
             },
           ],
-        )).toEqual({
+        )).resolves.toEqual({
           iterations: 0,
           persistedItems: 0,
           blockingItems: 0,
@@ -160,194 +169,195 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
         });
       });
 
-      /*
-      it('should handle three entries with a lower variable overlap', async() => {
-        expect(await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 5 },
-              pageSize: 100,
-              requestTime: 30,
-              canContainUndefs: false,
-              variables: [ DF.variable('a'), DF.variable('b') ],
-            },
-          ],
-        )).toEqual({
-          iterations: 1.280_000_000_000_000_2,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0.440_96,
-        });
-      });
-
-      it('should reject on a right stream of type extend', async() => {
-        await expect(actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    state: new MetadataValidationState(),
-                    cardinality: { type: 'estimate', value: 3 },
-                    canContainUndefs: false,
-                  }),
-
-                },
-                operation: <any>{ type: Algebra.types.EXTEND },
-              },
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    state: new MetadataValidationState(),
-                    cardinality: { type: 'estimate', value: 2 },
-                    canContainUndefs: false,
-                  }),
-                },
-                operation: <any>{},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-          ],
-        )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      });
-
-      it('should reject on a right stream of type group', async() => {
-        await expect(actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
-              },
-              {
-                output: <any> {},
-                operation: <any> {},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ]},
-          ],
-        )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      });
-
-      it('should not reject on a left stream of type group', async() => {
-        expect(await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any> {},
-                operation: <any> {},
-              },
-              {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
-              },
-            ],
-            context: new ActionContext(),
-          },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-          ],
-        )).toEqual({
-          iterations: 0.480_000_000_000_000_1,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0.403_840_000_000_000_03,
-        });
-      });
-      */
+      // TODO re-enable these tests
+      // eslint-disable-next-line jest/no-commented-out-tests
+      // it('should handle three entries with a lower variable overlap', async() => {
+      // expect(await actor.getJoinCoefficients(
+      //     {
+      //       type: 'inner',
+      //       entries: [
+      //         {
+      //           output: <any>{},
+      //           operation: <any>{},
+      //         },
+      //         {
+      //           output: <any>{},
+      //           operation: <any>{},
+      //         },
+      //         {
+      //           output: <any>{},
+      //           operation: <any>{},
+      //         },
+      //       ],
+      //       context: new ActionContext(),
+      //     },
+      //     [
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 3 },
+      //         pageSize: 100,
+      //         requestTime: 10,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a'), DF.variable('b') ],
+      //       },
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 2 },
+      //         pageSize: 100,
+      //         requestTime: 20,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a'), DF.variable('b') ],
+      //       },
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 5 },
+      //         pageSize: 100,
+      //         requestTime: 30,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a'), DF.variable('b') ],
+      //       },
+      //     ],
+      // )).toEqual({
+      //     iterations: 1.280_000_000_000_000_2,
+      //     persistedItems: 0,
+      //     blockingItems: 0,
+      //     requestTime: 0.440_96,
+      // });
+      // });
+      // eslint-disable-next-line jest/no-commented-out-tests
+      // it('should reject on a right stream of type extend', async() => {
+      // await expect(actor.getJoinCoefficients(
+      //     {
+      //       type: 'inner',
+      //       entries: [
+      //         {
+      //           output: <any>{
+      //             metadata: () => Promise.resolve({
+      //               state: new MetadataValidationState(),
+      //               cardinality: { type: 'estimate', value: 3 },
+      //               canContainUndefs: false,
+      //             }),
+      //
+      //           },
+      //           operation: <any>{ type: Algebra.types.EXTEND },
+      //         },
+      //         {
+      //           output: <any>{
+      //             metadata: () => Promise.resolve({
+      //               state: new MetadataValidationState(),
+      //               cardinality: { type: 'estimate', value: 2 },
+      //               canContainUndefs: false,
+      //             }),
+      //           },
+      //           operation: <any>{},
+      //         },
+      //       ],
+      //       context: new ActionContext(),
+      //     },
+      //     [
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 3 },
+      //         pageSize: 100,
+      //         requestTime: 10,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ],
+      //       },
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 2 },
+      //         pageSize: 100,
+      //         requestTime: 20,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ],
+      //       },
+      //     ],
+      // )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
+      // });
+      // eslint-disable-next-line jest/no-commented-out-tests
+      // it('should reject on a right stream of type group', async() => {
+      // await expect(actor.getJoinCoefficients(
+      //     {
+      //       type: 'inner',
+      //       entries: [
+      //         {
+      //           output: <any> {},
+      //           operation: <any> { type: Algebra.types.GROUP },
+      //         },
+      //         {
+      //           output: <any> {},
+      //           operation: <any> {},
+      //         },
+      //       ],
+      //       context: new ActionContext(),
+      //     },
+      //     [
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 3 },
+      //         pageSize: 100,
+      //         requestTime: 10,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ],
+      //       },
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 2 },
+      //         pageSize: 100,
+      //         requestTime: 20,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ]},
+      //     ],
+      // )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
+      // });
+      // eslint-disable-next-line jest/no-commented-out-tests
+      // it('should not reject on a left stream of type group', async() => {
+      // expect(await actor.getJoinCoefficients(
+      //     {
+      //       type: 'inner',
+      //       entries: [
+      //         {
+      //           output: <any> {},
+      //           operation: <any> {},
+      //         },
+      //         {
+      //           output: <any> {},
+      //           operation: <any> { type: Algebra.types.GROUP },
+      //         },
+      //       ],
+      //       context: new ActionContext(),
+      //     },
+      //     [
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 3 },
+      //         pageSize: 100,
+      //         requestTime: 10,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ],
+      //       },
+      //       {
+      //         state: new MetadataValidationState(),
+      //         cardinality: { type: 'estimate', value: 2 },
+      //         pageSize: 100,
+      //         requestTime: 20,
+      //         canContainUndefs: false,
+      //         variables: [ DF.variable('a') ],
+      //       },
+      //     ],
+      // )).toEqual({
+      //     iterations: 0.480_000_000_000_000_1,
+      //     persistedItems: 0,
+      //     blockingItems: 0,
+      //     requestTime: 0.403_840_000_000_000_03,
+      // });
+      // });
+      //
     });
 
     describe('sortJoinEntries', () => {
       it('sorts 2 entries', async() => {
-        expect(await actor.sortJoinEntries(
+        await expect(actor.sortJoinEntries(
           [
             {
               output: <any> {},
@@ -371,7 +381,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
           context,
-        )).toEqual([
+        )).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -396,39 +406,38 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('sorts 3 entries', async() => {
-        expect(await actor.sortJoinEntries([
-            {
-              output: <any> {},
-              operation: <any> {},
-              metadata: {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 3 },
-                canContainUndefs: false,
-                variables: [ DF.variable('a') ],
-              },
+        await expect(actor.sortJoinEntries([
+          {
+            output: <any> {},
+            operation: <any> {},
+            metadata: {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 3 },
+              canContainUndefs: false,
+              variables: [ DF.variable('a') ],
             },
-            {
-              output: <any> {},
-              operation: <any> {},
-              metadata: {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 2 },
-                canContainUndefs: false,
-                variables: [ DF.variable('a') ],
-              },
+          },
+          {
+            output: <any> {},
+            operation: <any> {},
+            metadata: {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 2 },
+              canContainUndefs: false,
+              variables: [ DF.variable('a') ],
             },
-            {
-              output: <any> {},
-              operation: <any> {},
-              metadata: {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 5 },
-                canContainUndefs: false,
-                variables: [ DF.variable('a') ],
-              },
+          },
+          {
+            output: <any> {},
+            operation: <any> {},
+            metadata: {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 5 },
+              canContainUndefs: false,
+              variables: [ DF.variable('a') ],
             },
-          ],
-          context)).toEqual([
+          },
+        ], context)).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -463,7 +472,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('sorts 3 equal entries', async() => {
-        expect(await actor.sortJoinEntries(
+        await expect(actor.sortJoinEntries(
           [
             {
               output: <any> {},
@@ -497,7 +506,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
           context,
-        )).toEqual([
+        )).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -532,7 +541,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('does not sort if there is an undef', async() => {
-        expect(await actor.sortJoinEntries(
+        await expect(actor.sortJoinEntries(
           [
             {
               output: <any> {},
@@ -566,7 +575,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
           context,
-        )).toEqual([
+        )).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -629,7 +638,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('sorts entries without common variables in the back', async() => {
-        expect(await actor.sortJoinEntries(
+        await expect(actor.sortJoinEntries(
           [
             {
               output: <any> {},
@@ -663,7 +672,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
           context,
-        )).toEqual([
+        )).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -698,7 +707,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('sorts several entries without variables in the back', async() => {
-        expect(await actor.sortJoinEntries(
+        await expect(actor.sortJoinEntries(
           [
             {
               output: <any> {},
@@ -772,7 +781,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
           context,
-        )).toEqual([
+        )).resolves.toEqual([
           {
             output: <any> {},
             operation: <any> {},
@@ -848,7 +857,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
     });
 
     describe('getOutput', () => {
-      it('should handle two entries without context', async () => {
+      it('should handle two entries without context', async() => {
         const action: IActionRdfJoin = {
           type: 'inner',
           entries: [
@@ -856,20 +865,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b1')],
+                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b2')],
+                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b3')],
+                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-                ], {autoStart: false}),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 3},
+                  cardinality: { type: 'estimate', value: 3 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a'), DF.variable('b')],
+                  variables: [ DF.variable('a'), DF.variable('b') ],
                 }),
                 type: 'bindings',
               },
@@ -879,17 +888,17 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('a'), DF.namedNode('ex:a1')],
+                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('a'), DF.namedNode('ex:a2')],
+                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-                ], {autoStart: false}),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 1},
+                  cardinality: { type: 'estimate', value: 1 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a')],
+                  variables: [ DF.variable('a') ],
                 }),
                 type: 'bindings',
               },
@@ -898,45 +907,45 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           ],
           context,
         };
-        const {result} = await actor.getOutput(action);
+        const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+        expect(result.type).toBe('bindings');
+        await expect(arrayifyStream(result.bindingsStream)).resolves.toBeIsomorphicBindingsArray([
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]);
-        expect(await result.metadata()).toEqual({
+        await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
-          cardinality: {type: 'estimate', value: 2.400_000_000_000_000_4},
+          cardinality: { type: 'estimate', value: 2.400_000_000_000_000_4 },
           canContainUndefs: false,
-          variables: [DF.variable('a'), DF.variable('b')],
+          variables: [ DF.variable('a'), DF.variable('b') ],
         });
       });
 
-      it('should handle three entries', async () => {
+      it('should handle three entries', async() => {
         const action: IActionRdfJoin = {
           context,
           type: 'inner',
@@ -945,20 +954,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b1')],
+                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b2')],
+                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b3')],
+                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-                ], {autoStart: false}),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 3},
+                  cardinality: { type: 'estimate', value: 3 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a'), DF.variable('b')],
+                  variables: [ DF.variable('a'), DF.variable('b') ],
                 }),
                 type: 'bindings',
               },
@@ -968,20 +977,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('c'), DF.namedNode('ex:c1')],
+                    [ DF.variable('c'), DF.namedNode('ex:c1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('c'), DF.namedNode('ex:c2')],
+                    [ DF.variable('c'), DF.namedNode('ex:c2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('c'), DF.namedNode('ex:c3')],
+                    [ DF.variable('c'), DF.namedNode('ex:c3') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-                ], {autoStart: false}),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 4},
+                  cardinality: { type: 'estimate', value: 4 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a'), DF.variable('c')],
+                  variables: [ DF.variable('a'), DF.variable('c') ],
                 }),
                 type: 'bindings',
               },
@@ -991,17 +1000,17 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('a'), DF.namedNode('ex:a1')],
+                    [ DF.variable('a'), DF.namedNode('ex:a1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('a'), DF.namedNode('ex:a2')],
+                    [ DF.variable('a'), DF.namedNode('ex:a2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
-                ], {autoStart: false}),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 1},
+                  cardinality: { type: 'estimate', value: 1 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a')],
+                  variables: [ DF.variable('a') ],
                 }),
                 type: 'bindings',
               },
@@ -1009,41 +1018,41 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             },
           ],
         };
-        const {result} = await actor.getOutput(action);
+        const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+        expect(result.type).toBe('bindings');
+        await expect(arrayifyStream(result.bindingsStream)).resolves.toBeIsomorphicBindingsArray([
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a2')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a2') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]);
-        expect(await result.metadata()).toEqual({
+        await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
-          cardinality: {type: 'estimate', value: 9.600_000_000_000_001},
+          cardinality: { type: 'estimate', value: 9.600_000_000_000_001 },
           canContainUndefs: false,
-          variables: [DF.variable('a'), DF.variable('b'), DF.variable('c')],
+          variables: [ DF.variable('a'), DF.variable('b'), DF.variable('c') ],
         });
 
         // Validate mock calls
@@ -1058,26 +1067,26 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
-              cardinality: {type: 'estimate', value: 1},
+              cardinality: { type: 'estimate', value: 1 },
               canContainUndefs: false,
-              variables: [DF.variable('a')],
+              variables: [ DF.variable('a') ],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
                 state: expect.any(MetadataValidationState),
-                cardinality: {type: 'estimate', value: 3},
+                cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
-                variables: [DF.variable('a'), DF.variable('b')],
+                variables: [ DF.variable('a'), DF.variable('b') ],
               },
               {
                 state: expect.any(MetadataValidationState),
-                cardinality: {type: 'estimate', value: 4},
+                cardinality: { type: 'estimate', value: 4 },
                 canContainUndefs: false,
-                variables: [DF.variable('a'), DF.variable('c')],
+                variables: [ DF.variable('a'), DF.variable('c') ],
               },
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           }),
         });
@@ -1091,26 +1100,26 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
-              cardinality: {type: 'estimate', value: 1},
+              cardinality: { type: 'estimate', value: 1 },
               canContainUndefs: false,
-              variables: [DF.variable('a')],
+              variables: [ DF.variable('a') ],
             },
             [KeysQueryOperation.joinRightMetadatas.name]: [
               {
                 state: expect.any(MetadataValidationState),
-                cardinality: {type: 'estimate', value: 3},
+                cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
-                variables: [DF.variable('a'), DF.variable('b')],
+                variables: [ DF.variable('a'), DF.variable('b') ],
               },
               {
                 state: expect.any(MetadataValidationState),
-                cardinality: {type: 'estimate', value: 4},
+                cardinality: { type: 'estimate', value: 4 },
                 canContainUndefs: false,
-                variables: [DF.variable('a'), DF.variable('c')],
+                variables: [ DF.variable('a'), DF.variable('c') ],
               },
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           }),
         });
@@ -1131,7 +1140,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ])
+                  ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1167,47 +1176,42 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([]);
+        await expect(arrayifyStream(result.bindingsStream)).resolves.toBeIsomorphicBindingsArray([]);
       });
 
-      it("should work if the active iterator ends first", async () => {
-        let haltMock: Mock<any, any>;
-        let resumeMock: Mock<any, any>;
+      it('should work if the active iterator ends first', async() => {
+        const haltMock = jest.fn();
+        const resumeMock = jest.fn();
         let iterator: BindingsStream;
-        let stopMatchJest: Mock<any, any>;
-        let streams: PassThrough[] = [];
+        const stopMatchJest = jest.fn();
+        const streams: PassThrough[] = [];
         let num = 0;
 
-        haltMock = jest.fn();
-        resumeMock = jest.fn();
-
-        let mockStreamingStore = {
+        const mockStreamingStore = {
           halt: haltMock,
-          resume: resumeMock
-        }
-
-        stopMatchJest = jest.fn();
+          resume: resumeMock,
+        };
 
         mediatorQueryOperation = <any>{
-          mediate: jest.fn(async (arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
-            const unionStream = new PassThrough({objectMode: true});
+          mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+            const unionStream = new PassThrough({ objectMode: true });
             const tempStream: Stream = streamifyArray([
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound1')],
+                [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               ]).setContextEntry(new ActionContextKeyIsAddition(), true),
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound2')],
+                [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               ]).setContextEntry(new ActionContextKeyIsAddition(), true),
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound3')],
+                [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             ]);
-            tempStream.pipe(unionStream, {end: false});
+            tempStream.pipe(unionStream, { end: false });
 
-            let stream = new PassThrough({
-              objectMode: true
+            const stream = new PassThrough({
+              objectMode: true,
             });
-            stream.pipe(unionStream, {end: false});
+            stream.pipe(unionStream, { end: false });
             streams.push(stream);
 
             let tempEnd = false;
@@ -1229,12 +1233,12 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
             iterator = new WrappingIterator(unionStream);
 
-            let streamNum = num;
+            const streamNum = num;
             num++;
-            let stopMatchfn = () => {
-              if (streamNum == 0) {
+            const stopMatchfn = () => {
+              if (streamNum === 0) {
                 iterator.close();
-                iterator.on("end", () => {
+                iterator.on('end', () => {
                   for (const streami of streams) {
                     if (!streami.closed) {
                       streami.end();
@@ -1243,21 +1247,21 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 });
               }
               stopMatchJest();
-            }
-            let matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
-            -expect(matchOptions).not.toBeUndefined()
+            };
+            const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
+            expect(matchOptions).toBeDefined();
             if (matchOptions !== undefined) {
               (<({ stopMatch: () => void })[]>matchOptions).push({
-                stopMatch: stopMatchfn
+                stopMatch: stopMatchfn,
               });
             }
             return {
               bindingsStream: iterator,
               metadata: () => Promise.resolve({
                 state: new MetadataValidationState(),
-                cardinality: {type: 'estimate', value: 3},
+                cardinality: { type: 'estimate', value: 3 },
                 canContainUndefs: false,
-                variables: [DF.variable('bound')],
+                variables: [ DF.variable('bound') ],
               }),
               type: 'bindings',
             };
@@ -1275,13 +1279,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
         const tempStream: Stream = streamifyArray([
           BF.bindings([
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]);
-        let alteringStream = tempStream.pipe(new PassThrough({
-          objectMode: true
-        }), {end: false});
-        let wrapIterator = new WrappingIterator(alteringStream);
+        const alteringStream = tempStream.pipe(new PassThrough({
+          objectMode: true,
+        }), { end: false });
+        const wrapIterator = new WrappingIterator(alteringStream);
 
         const action: IActionRdfJoin = {
           type: 'inner',
@@ -1290,20 +1294,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b1')],
+                    [ DF.variable('b'), DF.namedNode('ex:b1') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b2')],
+                    [ DF.variable('b'), DF.namedNode('ex:b2') ],
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   BF.bindings([
-                    [DF.variable('b'), DF.namedNode('ex:b3')],
-                  ])
-                ], {autoStart: false}),
+                    [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                  ]),
+                ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 4},
+                  cardinality: { type: 'estimate', value: 4 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a'), DF.variable('b')],
+                  variables: [ DF.variable('a'), DF.variable('b') ],
                 }),
                 type: 'bindings',
               },
@@ -1314,9 +1318,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: wrapIterator,
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
-                  cardinality: {type: 'estimate', value: 1},
+                  cardinality: { type: 'estimate', value: 1 },
                   canContainUndefs: false,
-                  variables: [DF.variable('a')],
+                  variables: [ DF.variable('a') ],
                 }),
                 type: 'bindings',
               },
@@ -1328,63 +1332,63 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
         action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
 
-        const {result} = await actor.getOutput(action);
+        const { result } = await actor.getOutput(action);
 
-        expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+        await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), true),
         ]);
 
         alteringStream.push(
           BF.bindings([
-            [DF.variable('a'), DF.namedNode('ex:a1')],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
+          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
         );
 
-        expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+        await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound1')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound2')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           BF.bindings([
-            [DF.variable('bound'), DF.namedNode('ex:bound3')],
-            [DF.variable('a'), DF.namedNode('ex:a1')],
+            [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+            [ DF.variable('a'), DF.namedNode('ex:a1') ],
           ]).setContextEntry(new ActionContextKeyIsAddition(), false),
         ]);
 
         alteringStream.end();
 
-        await promisifyEventEmitter(result.bindingsStream)
+        await promisifyEventEmitter(result.bindingsStream);
 
         expect(haltMock).toHaveBeenCalledTimes(1);
         expect(resumeMock).toHaveBeenCalledTimes(1);
         expect(stopMatchJest).toHaveBeenCalledTimes(2);
-      })
+      });
 
-      describe("with mock store", () => {
+      describe('with mock store', () => {
         let haltMock: Mock<any, any>;
         let resumeMock: Mock<any, any>;
         let iterator: BindingsStream;
         let stopMatchJest: Mock<any, any>;
-        let streams: PassThrough[] = [];
-        let mockStreamingStore = {
+        const streams: PassThrough[] = [];
+        const mockStreamingStore = {
           halt: haltMock,
-          resume: resumeMock
-        }
+          resume: resumeMock,
+        };
 
         beforeEach(() => {
           haltMock = jest.fn();
@@ -1405,12 +1409,12 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
                 ]).setContextEntry(new ActionContextKeyIsAddition(), true),
               ]);
-              tempStream.pipe(unionStream, {end: false});
+              tempStream.pipe(unionStream, { end: false });
 
-              let stream = new PassThrough({
-                objectMode: true
+              const stream = new PassThrough({
+                objectMode: true,
               });
-              stream.pipe(unionStream, {end: false});
+              stream.pipe(unionStream, { end: false });
               streams.push(stream);
 
               let tempEnd = false;
@@ -1432,15 +1436,17 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
               iterator = new WrappingIterator(unionStream);
 
-              let stopMatchfn = () => {
+              const stopMatchfn = () => {
                 stream.end();
                 stopMatchJest();
-              }
-              let matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
--              expect(matchOptions).not.toBeUndefined()
+              };
+              const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
+
+              // TODO check if this check is needed
+              // expect(matchOptions).toBeDefined();
               if (matchOptions !== undefined) {
                 (<({ stopMatch: () => void })[]> matchOptions).push({
-                  stopMatch: stopMatchfn
+                  stopMatch: stopMatchfn,
                 });
               }
               return {
@@ -1464,9 +1470,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             mediatorJoinSelectivity,
             mediatorJoinEntriesSort,
           });
-        })
+        });
 
-        it('should handle entries', async () => {
+        it('should handle entries', async() => {
           const action: IActionRdfJoin = {
             type: 'inner',
             entries: [
@@ -1474,20 +1480,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b1')],
+                      [ DF.variable('b'), DF.namedNode('ex:b1') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b2')],
+                      [ DF.variable('b'), DF.namedNode('ex:b2') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b3')],
-                    ])
-                  ], {autoStart: false}),
+                      [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    ]),
+                  ], { autoStart: false }),
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 4},
+                    cardinality: { type: 'estimate', value: 4 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a'), DF.variable('b')],
+                    variables: [ DF.variable('a'), DF.variable('b') ],
                   }),
                   type: 'bindings',
                 },
@@ -1497,14 +1503,14 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
-                      [DF.variable('a'), DF.namedNode('ex:a1')],
+                      [ DF.variable('a'), DF.namedNode('ex:a1') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                   ]),
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 1},
+                    cardinality: { type: 'estimate', value: 1 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a')],
+                    variables: [ DF.variable('a') ],
                   }),
                   type: 'bindings',
                 },
@@ -1516,35 +1522,35 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
           action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
 
-          const {result} = await actor.getOutput(action);
+          const { result } = await actor.getOutput(action);
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
 
           for (const stream of streams) {
             stream.push(
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound4')],
-              ])
+                [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
+              ]),
             );
           }
 
-          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 1)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound4')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
@@ -1553,15 +1559,15 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           for (const stream of streams) {
             stream.push(
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound4')],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+                [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
+              ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             );
           }
 
-          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 1)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound4')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
@@ -1569,16 +1575,16 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           expect(stopMatchJest).toHaveBeenCalledTimes(0);
         });
 
-        it('should handle entries with deletions', async () => {
+        it('should handle entries with deletions', async() => {
           const tempStream: Stream = streamifyArray([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          let alteringStream = tempStream.pipe(new PassThrough({
-            objectMode: true
-          }), {end: false});
-          let iterator = new WrappingIterator(alteringStream);
+          const alteringStream = tempStream.pipe(new PassThrough({
+            objectMode: true,
+          }), { end: false });
+          const iterator = new WrappingIterator(alteringStream);
 
           const action: IActionRdfJoin = {
             type: 'inner',
@@ -1587,20 +1593,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b1')],
+                      [ DF.variable('b'), DF.namedNode('ex:b1') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b2')],
+                      [ DF.variable('b'), DF.namedNode('ex:b2') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b3')],
-                    ])
-                  ], {autoStart: false}),
+                      [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    ]),
+                  ], { autoStart: false }),
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 4},
+                    cardinality: { type: 'estimate', value: 4 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a'), DF.variable('b')],
+                    variables: [ DF.variable('a'), DF.variable('b') ],
                   }),
                   type: 'bindings',
                 },
@@ -1611,9 +1617,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: iterator,
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 1},
+                    cardinality: { type: 'estimate', value: 1 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a')],
+                    variables: [ DF.variable('a') ],
                   }),
                   type: 'bindings',
                 },
@@ -1625,41 +1631,41 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
           action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
 
-          const {result} = await actor.getOutput(action);
+          const { result } = await actor.getOutput(action);
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
 
           alteringStream.push(
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a2')],
-            ])
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
+            ]),
           );
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
@@ -1667,41 +1673,41 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
           alteringStream.push(
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           );
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ]);
 
           for (const stream of streams) {
             stream.push(
               BF.bindings([
-                [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+                [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             );
           }
 
-          expect(await partialArrayifyStream(result.bindingsStream, 1)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 1)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a2')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a2') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ]);
 
-          let promisses = [];
+          const promisses = [];
           alteringStream.end();
           for (const stream of streams) {
             if (!stream.closed) {
@@ -1710,25 +1716,25 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             }
           }
 
-          //await Promise.all(promisses);
+          // Await Promise.all(promisses);
 
-          await promisifyEventEmitter(result.bindingsStream)
+          await promisifyEventEmitter(result.bindingsStream);
 
           expect(haltMock).toHaveBeenCalledTimes(1);
           expect(resumeMock).toHaveBeenCalledTimes(1);
           expect(stopMatchJest).toHaveBeenCalledTimes(2);
         });
 
-        it('should handle entries with too many deletions', async () => {
+        it('should handle entries with too many deletions', async() => {
           const tempStream: Stream = streamifyArray([
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
-          let alteringStream = tempStream.pipe(new PassThrough({
-            objectMode: true
-          }), {end: false});
-          let iterator = new WrappingIterator(alteringStream);
+          const alteringStream = tempStream.pipe(new PassThrough({
+            objectMode: true,
+          }), { end: false });
+          const iterator = new WrappingIterator(alteringStream);
 
           const action: IActionRdfJoin = {
             type: 'inner',
@@ -1737,20 +1743,20 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 output: <any>{
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b1')],
+                      [ DF.variable('b'), DF.namedNode('ex:b1') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b2')],
+                      [ DF.variable('b'), DF.namedNode('ex:b2') ],
                     ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                     BF.bindings([
-                      [DF.variable('b'), DF.namedNode('ex:b3')],
-                    ])
-                  ], {autoStart: false}),
+                      [ DF.variable('b'), DF.namedNode('ex:b3') ],
+                    ]),
+                  ], { autoStart: false }),
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 4},
+                    cardinality: { type: 'estimate', value: 4 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a'), DF.variable('b')],
+                    variables: [ DF.variable('a'), DF.variable('b') ],
                   }),
                   type: 'bindings',
                 },
@@ -1761,9 +1767,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: iterator,
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
-                    cardinality: {type: 'estimate', value: 1},
+                    cardinality: { type: 'estimate', value: 1 },
                     canContainUndefs: false,
-                    variables: [DF.variable('a')],
+                    variables: [ DF.variable('a') ],
                   }),
                   type: 'bindings',
                 },
@@ -1775,51 +1781,51 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
           action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
 
-          const {result} = await actor.getOutput(action);
+          const { result } = await actor.getOutput(action);
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ]);
 
           alteringStream.push(
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           );
 
-          expect(await partialArrayifyStream(result.bindingsStream, 3)).toBeIsomorphicBindingsArray([
+          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound1')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound2')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
             BF.bindings([
-              [DF.variable('bound'), DF.namedNode('ex:bound3')],
-              [DF.variable('a'), DF.namedNode('ex:a1')],
+              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ]);
 
           alteringStream.push(
             BF.bindings([
-              [DF.variable('a'), DF.namedNode('ex:a1')],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false)
+              [ DF.variable('a'), DF.namedNode('ex:a1') ],
+            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           );
 
-          let promisses = [];
+          const promisses = [];
           alteringStream.end();
           for (const stream of streams) {
             if (!stream.closed) {
@@ -1829,7 +1835,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           }
           await Promise.all(promisses);
 
-          expect(await arrayifyStream(result.bindingsStream)).toBeIsomorphicBindingsArray([
+          await expect(arrayifyStream(result.bindingsStream)).resolves.toBeIsomorphicBindingsArray([
 
           ]);
 

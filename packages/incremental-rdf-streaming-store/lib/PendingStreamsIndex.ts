@@ -63,7 +63,7 @@ export class PendingStreamsIndex<Q extends RDF.BaseQuad = RDF.Quad> {
       }
       for (let i = 0; i < existingListeners.length; i++) {
         if (existingListeners[i].closed) {
-          existingListeners[i] = existingListeners[existingListeners.length - 1];
+          existingListeners[i] = existingListeners.at(-1)!;
           existingListeners.pop();
         }
       }

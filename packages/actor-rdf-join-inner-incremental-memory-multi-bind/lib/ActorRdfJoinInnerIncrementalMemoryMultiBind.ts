@@ -1,3 +1,5 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type {
@@ -10,20 +12,22 @@ import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
-  BindingsStream, IQueryOperationResultBindings,
-  MetadataBindings, IActionContext, IJoinEntryWithMetadata
+  BindingsStream,
+  IQueryOperationResultBindings,
+  MetadataBindings,
+  IActionContext,
+  IJoinEntryWithMetadata,
 } from '@comunica/types';
-import { BindingsFactory, Bindings} from "@comunica/bindings-factory";
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { HashBindings } from '@incremunica/hash-bindings';
 import {
   ArrayIterator,
   EmptyIterator,
   UnionIterator,
 } from 'asynciterator';
+import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
-import type { AsyncIterator } from 'asynciterator';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -60,7 +64,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     => Promise<AsyncIterator<Bindings>>,
     optional: boolean,
   ): Promise<AsyncIterator<Bindings>> {
-    //TODO change to BindingsFactory.create()
+    // TODO change to BindingsFactory.create()
     const bindingsFactory = new BindingsFactory();
     const transformMap = new Map<
     string,
@@ -71,9 +75,11 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
       {
         bindings: Bindings;
         count: number;
-      }>;
+      }
+>;
       count: number;
-    }>();
+    }
+>();
 
     const hashBindings = new HashBindings();
     const hashSubBindings = new HashBindings();
@@ -126,8 +132,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
             subDone();
           };
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          operationBinder(subOperations, bindings).then(bindingStream => {
+          // eslint-disable-next-line ts/no-floating-promises
+          operationBinder(subOperations, bindings).then((bindingStream) => {
             const transformIterator = bindingStream.transform({
               transform: transformFunc,
             });
@@ -259,7 +265,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
         }
         return leftWithoutCommonVariables ?
           1 :
-          -1;
+            -1;
       });
   }
 
@@ -283,7 +289,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, entries[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream = <BindingsStream><unknown>await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(
+    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(
       <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
@@ -312,8 +318,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
   }
 
   public async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
+    _action: IActionRdfJoin,
+    _metadatas: MetadataBindings[],
   ): Promise<IMediatorTypeJoinCoefficients> {
     return {
       iterations: 0,

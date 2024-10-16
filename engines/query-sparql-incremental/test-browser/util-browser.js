@@ -1,3 +1,3 @@
 export function usePolly() {
-    // No-op
+  // No-op
 }

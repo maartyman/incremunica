@@ -1,16 +1,17 @@
 import { BindingsToQuadsIterator } from '@comunica/actor-query-operation-construct';
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
 import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
+import { KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import type { IActionContext, IJoinEntry } from '@comunica/types';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
-import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';
-import {KeysQueryOperation} from "@comunica/context-entries";
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 
 export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private count = 0;
@@ -22,7 +23,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private readonly subContext: IActionContext;
   private readonly store = new Store();
   private pending = false;
-  //TODO change to BindingsFactory.create()
+  // TODO change to BindingsFactory.create()
   private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
@@ -86,7 +87,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     ) {
       return;
     }
-    for (const nonUsedVar of this.entries) {
+    for (const _nonUsedVar of this.entries) {
       this.count++;
       this.count %= this.entries.length;
 
@@ -100,7 +101,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       if (bindings === null) {
         continue;
       }
-      //TODO check if this casting is correct
+      // TODO check if this casting is correct
       let quad = BindingsToQuadsIterator.bindQuad(bindings, <Quad><any>source.operation);
 
       while (quad === undefined) {
@@ -117,13 +118,14 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       const constBindings = bindings;
       const constQuad = quad;
       const subEntries = [ ...this.entries ];
-      subEntries[this.count] = subEntries[subEntries.length - 1];
+      subEntries[this.count] = subEntries.at(-1)!;
       subEntries.pop();
 
       // Do query
       this.pending = true;
       const subOperations = subEntries
-        .map(entry => materializeOperation(entry.operation, constBindings, this.bindingsFactory, { bindFilter: false }));
+        .map(entry =>
+          materializeOperation(entry.operation, constBindings, this.bindingsFactory, { bindFilter: false }));
 
       const operation = subOperations.length === 1 ?
         subOperations[0] :
@@ -131,20 +133,23 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
       this.mediatorQueryOperation.mediate(
         { operation, context: this.subContext },
-      ).then(unsafeOutput => {
+      ).then((unsafeOutput) => {
         const output = ActorQueryOperation.getSafeBindings(unsafeOutput);
         // Figure out diff (change diff if needed)
-        let bindingsStream: AsyncIterator<Bindings> | undefined = (<AsyncIterator<Bindings>><unknown>output.bindingsStream).map(
-          (resultBindings) => {
-            let tempBindings = resultBindings.merge(constBindings);
-            if (tempBindings === undefined) {
-              return null;
-            }
-            //TODO I don't think this is needed
-            //tempBindings = tempBindings.setContextEntry(new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition()));
-            return tempBindings;
-          },
-        );
+        let bindingsStream: AsyncIterator<Bindings> | undefined =
+          (<AsyncIterator<Bindings>><unknown>output.bindingsStream).map(
+            (resultBindings) => {
+              const tempBindings = resultBindings.merge(constBindings);
+              if (tempBindings === undefined) {
+                return null;
+              }
+              // TODO I don't think this is needed
+              // tempBindings = tempBindings.setContextEntry(
+              // new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition())
+              // );
+              return tempBindings;
+            },
+          );
 
         this.pending = false;
 
@@ -157,7 +162,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
             this.store.delete(constQuad);
           }
           this.currentSource = undefined;
-          //TODO why set it to undefined?
+          // TODO why set it to undefined?
           bindingsStream = undefined;
           this.readable = true;
         });
@@ -187,4 +192,3 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
     }
   }
 }
-

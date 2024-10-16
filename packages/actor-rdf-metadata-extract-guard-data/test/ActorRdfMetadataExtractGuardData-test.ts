@@ -15,57 +15,57 @@ describe('ActorRdfMetadataExtractGuardData', () => {
       actor = new ActorRdfMetadataExtractGuardData({ name: 'actor', bus });
     });
 
-    it('should test', () => {
-      return expect(actor.test(<any>{})).resolves.toBeTruthy();
+    it('should test', async() => {
+      await expect(actor.test(<any>{})).resolves.toBeTruthy();
     });
 
-    it('should run and extract data from headers', () => {
-      return expect(actor.run({
+    it('should run and extract data from headers', async() => {
+      await expect(actor.run({
         metadata: <any>{},
         context: <any>{},
         requestTime: 0,
-        url: "http://test.com",
+        url: 'http://test.com',
         headers: <any> {
           get: (key: string) => {
-            if (key === "etag") {
-              return "123";
+            if (key === 'etag') {
+              return '123';
             }
-            if (key === "cache-control") {
-              return "max-age:20";
+            if (key === 'cache-control') {
+              return 'max-age:20';
             }
-            if (key === "age") {
-              return "5";
+            if (key === 'age') {
+              return '5';
             }
-            return null
-          }
-        }
+            return null;
+          },
+        },
       })).resolves.toMatchObject({
         metadata: {
-          etag: "123",
-          "cache-control": "max-age:20",
-          age: "5"
-        }
+          etag: '123',
+          'cache-control': 'max-age:20',
+          age: '5',
+        },
       });
     });
 
-    it('should run with not all headers available', () => {
-      return expect(actor.run({
+    it('should run with not all headers available', async() => {
+      await expect(actor.run({
         metadata: <any>{},
         context: <any>{},
         requestTime: 0,
-        url: "http://test.com",
-        headers: <any> {
+        url: 'http://test.com',
+        headers: <any>{
           get: (key: string) => {
-            if (key === "etag") {
-              return "123";
+            if (key === 'etag') {
+              return '123';
             }
-            return null
-          }
-        }
+            return null;
+          },
+        },
       })).resolves.toMatchObject({
         metadata: {
-          etag: "123"
-        }
+          etag: '123',
+        },
       });
     });
   });

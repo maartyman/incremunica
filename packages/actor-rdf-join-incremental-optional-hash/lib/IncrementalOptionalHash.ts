@@ -1,6 +1,7 @@
+import type { Bindings } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/bindings-factory';
+import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import {Bindings, BindingsFactory} from '@comunica/bindings-factory';
-import {ActionContextKeyIsAddition} from "@incremunica/actor-merge-bindings-context-is-addition";
 import type { AsyncIterator } from 'asynciterator';
 
 export class IncrementalOptionalHash extends IncrementalInnerJoin {
@@ -58,7 +59,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
     const index = array.findIndex((bindings: Bindings) => item.equals(bindings));
     if (index !== -1) {
-      array[index] = array[array.length - 1];
+      array[index] = array.at(-1)!;
       array.pop();
       return true;
     }
@@ -66,7 +67,6 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
   }
 
   public read(): Bindings | null {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.ended) {
         return null;
@@ -125,7 +125,9 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
           const otherArray = this.leftMemory.get(hash);
           if (otherArray !== undefined) {
-            if (item.getContextEntry(new ActionContextKeyIsAddition()) && (rightMemEl === undefined || rightMemEl.length === 0)) {
+            if (
+              item.getContextEntry(new ActionContextKeyIsAddition()) &&
+              (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
             if (!item.getContextEntry(new ActionContextKeyIsAddition()) && this.rightMemory.get(hash)?.length === 1) {
@@ -143,12 +145,11 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         const hash = this.funHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
           const otherArray = this.rightMemory.get(hash);
-          if (otherArray !== undefined) {
-            this.activeElement = item;
-            this.otherArray = otherArray;
-          } else {
+          if (otherArray === undefined) {
             return item;
           }
+          this.activeElement = item;
+          this.otherArray = otherArray;
         }
         continue;
       }

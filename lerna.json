@@ -22,7 +22,5 @@
   "loglevel": "success",
   "registry": "https://registry.npmjs.org/",
   "npmClient": "yarn",
-  "npmClientArgs": [
-    "--pure-lockfile"
-  ]
+  "lerna-script-tasks": "./node_modules/@comunica/utils-monorepo/lib/depCheck.js"
 }
