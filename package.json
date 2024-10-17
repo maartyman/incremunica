@@ -75,7 +75,7 @@
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.0",
     "ws": "^8.14.2",
-    "@comunica/jest": "^2.10.0"
+    "@comunica/jest": "^3.0.0"
   },
   "pre-commit": [
     "build",
