@@ -18,7 +18,6 @@ import type {
   IJoinEntryWithMetadata, ComunicaDataFactory,
 } from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { HashBindings } from '@incremunica/hash-bindings';
 import {
   ArrayIterator,
   EmptyIterator,
@@ -30,7 +29,7 @@ import { Factory } from 'sparqlalgebrajs';
 import {passTestWithSideData, TestResult} from "@comunica/core";
 import { getSafeBindings } from '@comunica/utils-query-operation';
 import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
-import {factory} from "ts-jest/dist/transformers/hoist-jest";
+import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -40,6 +39,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+  public readonly mediatorHashBindings: MediatorHashBindings;
 
   public constructor(args: IActorRdfJoinInnerIncrementalMemoryMultiBindArgs) {
     super(args, {
@@ -59,6 +59,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
    * @param optional If the original bindings should be emitted when the resulting bindings stream is empty.
    * @param algebraFactory The algebra factory.
    * @param bindingsFactory The bindingsFactory created with bindings context merger.
+   * @param hashBindings A function that hashes bindings.
    * @return {AsyncIterator<Bindings>}
    */
   public static async createBindStream(
@@ -69,34 +70,31 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     optional: boolean,
     algebraFactory: Factory,
     bindingsFactory: BindingsFactory,
+    hashBindings: (bindings: Bindings) => number,
   ): Promise<AsyncIterator<Bindings>> {
     const transformMap = new Map<
-    string,
-    {
-      iterator: AsyncIterator<Bindings>;
-      memory: Map<
-      string,
+      number,
       {
-        bindings: Bindings;
+        iterator: AsyncIterator<Bindings>;
+        memory: Map<
+          number,
+          {
+            bindings: Bindings;
+            count: number;
+          }
+        >;
         count: number;
       }
->;
-      count: number;
-    }
->();
-
-    const hashBindings = new HashBindings();
-    const hashSubBindings = new HashBindings();
-
+    >();
     // Create bindings function
     const binder = (bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): void => {
-      const hash = hashBindings.hash(bindings);
+      const hash = hashBindings(bindings);
       if (bindings) {
         const hashData = transformMap.get(hash);
         if (hashData === undefined) {
           const data = {
             iterator: new EmptyIterator<Bindings>(),
-            memory: new Map<string, { bindings: Bindings; count: number }>(),
+            memory: new Map<number, { bindings: Bindings; count: number }>(),
             count: 1,
           };
           transformMap.set(hash, data);
@@ -118,7 +116,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               subDone();
               return;
             }
-            const bindingsHash = hashSubBindings.hash(newBindings);
+            const bindingsHash = hashBindings(newBindings);
             const bindingsData = data.memory.get(bindingsHash);
             if (newBindings.getContextEntry(new ActionContextKeyIsAddition())) {
               if (bindingsData === undefined) {
@@ -291,6 +289,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
       dataFactory,
     );
 
+    const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
+
     for (const [ i, element ] of entries.entries()) {
       if (i !== 0) {
         element.output.bindingsStream.close();
@@ -321,7 +321,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
       },
       false,
       algebraFactory,
-      bindingsFactory
+      bindingsFactory,
+      entry => hashFunction(entry, [...entry.keys()]),
     );
 
     return {
@@ -368,4 +369,8 @@ export interface IActorRdfJoinInnerIncrementalMemoryMultiBindArgs extends IActor
    * The merge bindings context mediator
    */
   mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+  /**
+   * The hash bindings mediator
+   */
+  mediatorHashBindings: MediatorHashBindings;
 }

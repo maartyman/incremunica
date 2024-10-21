@@ -20,7 +20,6 @@ import type {
 } from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysStreamingSource } from '@incremunica/context-entries';
-import { HashBindings } from '@incremunica/hash-bindings';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
@@ -28,6 +27,7 @@ import { Factory } from 'sparqlalgebrajs';
 import {passTestWithSideData, TestResult} from "@comunica/core";
 import {getSafeBindings, materializeOperation, getOperationSource} from '@comunica/utils-query-operation';
 import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
+import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -37,6 +37,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+  public readonly mediatorHashBindings: MediatorHashBindings;
 
   public constructor(args: IActorRdfJoinInnerIncrementalComputationalMultiBindArgs) {
     super(args, {
@@ -73,6 +74,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
    * @param sources The sources of the query.
    * @param algebraFactory The algebra factory.
    * @param bindingsFactory The bindingsFactory created with bindings context merger.
+   * @param hashBindings A function that hashes bindings.
    * @return {AsyncIterator<Bindings>}
    */
   public static async createBindStream(
@@ -84,27 +86,25 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     sources: any,
     algebraFactory: Factory,
     bindingsFactory: BindingsFactory,
+    hashBindings: (bindings: Bindings) => number,
   ): Promise<AsyncIterator<Bindings>> {
     const transformMap = new Map<
-    string,
-    {
-      elements: {
-        iterator: AsyncIterator<Bindings>;
-        stopFunction: (() => void);
-      }[];
-      subOperations: Algebra.Operation[];
-    }
->();
-
-    const hashBindings = new HashBindings();
-
+      number,
+      {
+        elements: {
+          iterator: AsyncIterator<Bindings>;
+          stopFunction: (() => void);
+        }[];
+        subOperations: Algebra.Operation[];
+      }
+    >();
     // Create bindings function
     const binder = async(
       bindings: Bindings,
       done: () => void,
       push: (i: AsyncIterator<Bindings>) => void,
     ): Promise<void> => {
-      const hash = hashBindings.hash(bindings);
+      const hash = hashBindings(bindings);
       let hashData = transformMap.get(hash);
       if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
         if (hashData === undefined) {
@@ -269,6 +269,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       dataFactory,
     );
 
+    const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
+
     for (const [ i, element ] of entries.entries()) {
       if (i !== 0) {
         element.output.bindingsStream.close();
@@ -313,7 +315,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         false,
         sources ?? [],
         algebraFactory,
-        bindingsFactory
+        bindingsFactory,
+        entry => hashFunction(entry, [...entry.keys()]),
       );
 
     return {
@@ -356,4 +359,12 @@ export interface IActorRdfJoinInnerIncrementalComputationalMultiBindArgs extends
    * The query operation mediator
    */
   mediatorQueryOperation: MediatorQueryOperation;
+  /**
+   * The merge bindings context mediator
+   */
+  mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+  /**
+   * The hash bindings mediator
+   */
+  mediatorHashBindings: MediatorHashBindings;
 }

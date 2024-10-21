@@ -1,6 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { HashBindings } from '@incremunica/hash-bindings';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 import type { IMapObject } from './DualKeyHashMap';
