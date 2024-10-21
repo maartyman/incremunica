@@ -1,16 +1,21 @@
-import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner,
+  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { BindingsStream, MetadataBindings } from '@comunica/types';
+import type {BindingsStream, ComunicaDataFactory} from '@comunica/types';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DeltaQueryIterator } from './DeltaQueryIterator';
+import {passTestWithSideData, TestResult} from "@comunica/core";
+import {KeysInitQuery} from "@comunica/context-entries";
+import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
+import {BindingsFactory} from "@comunica/utils-bindings-factory";
+import {MediatorQueryOperation} from "@comunica/bus-query-operation";
+import {Factory} from "sparqlalgebrajs";
 
 /**
  * A comunica Inner Incremental Nestedloop RDF Join Actor.
@@ -18,6 +23,8 @@ import { DeltaQueryIterator } from './DeltaQueryIterator';
 export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   public readonly selectivityModifier: number;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
+  public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
+
   public constructor(args: IActorRdfJoinMultiDeltaQueryArgs) {
     super(args, {
       logicalType: 'inner',
@@ -27,10 +34,19 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
   }
 
   public async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
+    const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
+    const algebraFactory = new Factory(dataFactory);
+    const bindingsFactory = await BindingsFactory.create(
+      this.mediatorMergeBindingsContext,
+      action.context,
+      dataFactory,
+    );
     const bindingsStream = <BindingsStream><unknown> new DeltaQueryIterator(
       action.entries,
-      action.context,
       this.mediatorQueryOperation,
+      dataFactory,
+      algebraFactory,
+      bindingsFactory
     );
 
     return {
@@ -46,21 +62,21 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
     };
   }
 
-  public async getJoinCoefficients(
+  protected async getJoinCoefficients(
     action: IActionRdfJoin,
-    _metadatas: MetadataBindings[],
-  ): Promise<IMediatorTypeJoinCoefficients> {
+    sideData: IActorRdfJoinTestSideData,
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
     // Throw when the previous join was a delta query join or when it is a static query
     if (action.context
       .get(KeysDeltaQueryJoin.fromDeltaQuery)) {
       throw new Error('Can\'t do two delta query joins after each other');
     }
-    return {
+    return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    };
+    }, sideData);
   }
 }
 
@@ -72,8 +88,11 @@ export interface IActorRdfJoinMultiDeltaQueryArgs extends IActorRdfJoinArgs {
    */
   selectivityModifier: number;
   /**
-  /**
    * The query operation mediator
    */
   mediatorQueryOperation: MediatorQueryOperation;
+  /**
+   * The merge bindings context mediator
+   */
+  mediatorMergeBindingsContext: MediatorMergeBindingsContext;
 }

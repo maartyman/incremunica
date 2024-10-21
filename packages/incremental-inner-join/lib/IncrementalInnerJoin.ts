@@ -1,4 +1,4 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import { AsyncIterator } from 'asynciterator';
 
 export abstract class IncrementalInnerJoin extends AsyncIterator<Bindings> {

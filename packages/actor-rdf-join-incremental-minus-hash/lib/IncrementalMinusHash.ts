@@ -1,26 +1,25 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { HashBindings } from '@incremunica/hash-bindings';
-import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
 
 export class IncrementalMinusHash extends AsyncIterator<Bindings> {
   private readonly leftIterator: AsyncIterator<Bindings>;
   private readonly rightIterator: AsyncIterator<Bindings>;
-  private readonly hashBindings: HashBindings;
-  private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
-  private readonly rightMemory: Map<string, number> = new Map<string, number>();
+  private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
+  private readonly rightMemory: Map<number, number> = new Map<number, number>();
   private readonly bindingBuffer: Bindings[] = [];
+  private readonly joinHash: (entry: Bindings) => number;
+
   public constructor(
     leftIterator: AsyncIterator<Bindings>,
     rightIterator: AsyncIterator<Bindings>,
-    commonVariables: RDF.Variable[],
+    joinHash: (entry: Bindings) => number,
   ) {
     super();
 
     this.leftIterator = leftIterator;
     this.rightIterator = rightIterator;
-    this.hashBindings = new HashBindings(commonVariables);
+    this.joinHash = joinHash;
 
     this.on('end', () => this._cleanup());
 
@@ -81,7 +80,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
 
     let element = this.rightIterator.read();
     if (element) {
-      const hash = this.hashBindings.hash(element);
+      const hash = this.joinHash(element);
       if (element.getContextEntry(new ActionContextKeyIsAddition())) {
         let currentCount = this.rightMemory.get(hash);
         if (currentCount === undefined) {
@@ -123,7 +122,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     }
     element = this.leftIterator.read();
     if (element) {
-      const hash = this.hashBindings.hash(element);
+      const hash = this.joinHash(element);
       if (element.getContextEntry(new ActionContextKeyIsAddition())) {
         let currentArray = this.leftMemory.get(hash);
         if (currentArray === undefined) {

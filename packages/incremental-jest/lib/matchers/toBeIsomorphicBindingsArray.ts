@@ -1,4 +1,4 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import toEqualBindings from './toEqualBindings';
 import { bindingsArrayToString } from './toEqualBindingsArray';
 

@@ -6,7 +6,7 @@ import type {
 import {
   ActorMergeBindingsContext,
 } from '@comunica/bus-merge-bindings-context';
-import type { IActorTest } from '@comunica/core';
+import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
 import type { IActionContextKey } from '@comunica/types';
 
 /**
@@ -17,8 +17,8 @@ export class ActorMergeBindingsContextIsAddition extends ActorMergeBindingsConte
     super(args);
   }
 
-  public async test(_action: IActionMergeBindingsContext): Promise<IActorTest> {
-    return true;
+  public async test(_action: IActionMergeBindingsContext): Promise<TestResult<IActorTest>> {
+    return passTestVoid();
   }
 
   public async run(_action: IActionMergeBindingsContext): Promise<IActorMergeBindingsContextOutput> {
@@ -35,5 +35,6 @@ export class ActorMergeBindingsContextIsAddition extends ActorMergeBindingsConte
 }
 
 export class ActionContextKeyIsAddition implements IActionContextKey<boolean> {
-  public readonly name = 'isAddition';
+  public readonly name = '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition';
+  public readonly dummy: boolean | undefined;
 }

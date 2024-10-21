@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
-import type { IActorTest } from '@comunica/core';
+import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
 import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremunica/bus-guard';
 import { ActorGuard } from '@incremunica/bus-guard';
 import type { MediatorResourceWatch } from '@incremunica/bus-resource-watch';
@@ -17,8 +17,8 @@ export class ActorGuardNaive extends ActorGuard {
     super(args);
   }
 
-  public async test(_action: IActionGuard): Promise<IActorTest> {
-    return true;
+  public async test(_action: IActionGuard): Promise<TestResult<IActorTest>> {
+    return passTestVoid();
   }
 
   public async run(action: IActionGuard): Promise<IActorGuardOutput> {

@@ -1,6 +1,6 @@
 import '@incremunica/incremental-jest';
 import EventEmitter = require('events');
-import type { BindingsFactory } from '@comunica/bindings-factory';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { ActionContext } from '@comunica/core';

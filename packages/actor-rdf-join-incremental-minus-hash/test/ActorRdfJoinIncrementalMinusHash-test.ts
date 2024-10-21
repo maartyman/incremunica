@@ -1,4 +1,4 @@
-import type { BindingsFactory } from '@comunica/bindings-factory';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';

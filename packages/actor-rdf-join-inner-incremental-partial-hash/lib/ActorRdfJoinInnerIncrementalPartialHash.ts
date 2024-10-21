@@ -1,8 +1,8 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner,
+  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
@@ -11,12 +11,16 @@ import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-
 import type { MetadataBindings, BindingsStream } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalPartialHashJoin } from './IncrementalPartialHashJoin';
+import {passTestWithSideData, TestResult} from "@comunica/core";
+import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * A comunica Inner Incremental Partial Hash RDF Join Actor.
  */
 export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
-  public constructor(args: IActorRdfJoinArgs) {
+  public readonly mediatorHashBindings: MediatorHashBindings;
+
+  public constructor(args: IActorRdfJoinInnerIncrementalPartialHashArgs) {
     super(args, {
       logicalType: 'inner',
       physicalName: 'partial-hash',
@@ -27,12 +31,13 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
 
   protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
-    const variables = ActorRdfJoin.overlappingVariables(metadatas);
+    const commonVariables = ActorRdfJoin.overlappingVariables(metadatas).map(v => v.variable);
+    const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
     const bindingsStream = <BindingsStream><unknown> new IncrementalPartialHashJoin(
       <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
-      entry => ActorRdfJoinInnerIncrementalPartialHash.hash(entry, variables),
+      entry => hashFunction(entry, commonVariables),
     );
     return {
       result: {
@@ -49,13 +54,17 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
 
   protected async getJoinCoefficients(
     _action: IActionRdfJoin,
-    _metadatas: MetadataBindings[],
-  ): Promise<IMediatorTypeJoinCoefficients> {
-    return {
+    sideData: IActorRdfJoinTestSideData,
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+    return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    };
+    }, sideData);
   }
+}
+
+export interface IActorRdfJoinInnerIncrementalPartialHashArgs extends IActorRdfJoinArgs {
+  mediatorHashBindings: MediatorHashBindings;
 }

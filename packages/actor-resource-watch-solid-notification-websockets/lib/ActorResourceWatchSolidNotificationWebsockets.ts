@@ -1,14 +1,11 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
-import type { IActorTest } from '@comunica/core';
-import type {
-  IActionResourceWatch,
-  IActorResourceWatchArgs,
-  IActorResourceWatchOutput,
-  IResourceWatchEventEmitter,
-} from '@incremunica/bus-resource-watch';
+import {failTest, IActorTest, passTestWithSideData, TestResult} from '@comunica/core';
 import {
   ActorResourceWatch,
+  IActionResourceWatch, IActorResourceWatchArgs,
+  IActorResourceWatchOutput,
+  IResourceWatchEventEmitter,
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import { ChannelType } from '@solid-notifications/types';
@@ -18,7 +15,7 @@ import 'websocket-polyfill';
 /**
  * An incremunica Resource Watch Solid Notification Websockets Actor.
  */
-export class ActorResourceWatchSolidNotificationWebsockets extends ActorResourceWatch {
+export class ActorResourceWatchSolidNotificationWebsockets extends ActorResourceWatch<SideData> {
   public readonly mediatorHttp: MediatorHttp;
   private readonly channelType: ChannelType = ChannelType.WebSocketChannel2023;
 
@@ -26,7 +23,7 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
     super(args);
   }
 
-  public async test(action: IActionResourceWatch): Promise<IActorTest> {
+  public async test(action: IActionResourceWatch): Promise<TestResult<IActorTest, SideData>> {
     const customFetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> =>
       this.mediatorHttp.mediate({
         context: action.context,
@@ -38,28 +35,17 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
     const notificationChannel = await client.subscribe(action.url, this.channelType);
 
     if (notificationChannel.receiveFrom === undefined) {
-      throw new Error('Resource does not support Solid Notifications with Websockets');
+      return failTest('Resource does not support Solid Notifications with Websockets');
     }
 
-    return { priority: this.priority };
+    return passTestWithSideData({ priority: this.priority }, { notificationChannel: notificationChannel.receiveFrom });
   }
 
-  public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
-    const customFetch = (input: RequestInfo, init?: RequestInit | undefined): Promise<Response> =>
-      this.mediatorHttp.mediate({
-        context: action.context,
-        input,
-        init,
-      });
-
-    const client = new SubscriptionClient(<typeof fetch>customFetch);
-    const notificationChannel = await client.subscribe(action.url, this.channelType);
-
-    if (notificationChannel.receiveFrom === undefined) {
-      throw new Error('No receiveFrom in notificationChannel');
-    }
-
-    const socket = new WebSocket(notificationChannel.receiveFrom);
+  public async run(
+    _action: IActionResourceWatch,
+    sideData: SideData
+  ): Promise<IActorResourceWatchOutput> {
+    const socket = new WebSocket(sideData.notificationChannel);
 
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
@@ -95,9 +81,13 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
   }
 }
 
-export interface IActorSolidNotificationWebsocketsArgs extends IActorResourceWatchArgs {
+export interface IActorSolidNotificationWebsocketsArgs extends IActorResourceWatchArgs<SideData> {
   /**
    * The HTTP mediator
    */
   mediatorHttp: MediatorHttp;
+}
+
+interface SideData {
+  notificationChannel: string;
 }

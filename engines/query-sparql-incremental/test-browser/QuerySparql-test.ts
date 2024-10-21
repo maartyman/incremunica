@@ -4,7 +4,7 @@
 import 'jest-rdf';
 import '@incremunica/incremental-jest';
 import type { EventEmitter } from 'node:events';
-import type { BindingsFactory } from '@comunica/bindings-factory';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { BindingsStream, QueryStringContext } from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';

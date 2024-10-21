@@ -37,7 +37,7 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/bindings-factory": "^3.3.0",
+    "@comunica/utils-bindings-factory": "^4.0.1",
     "asynciterator": "^3.9.0"
   }
 }

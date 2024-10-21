@@ -1,4 +1,4 @@
-import type { BindingsFactory } from '@comunica/bindings-factory';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import { DevTools } from '@incremunica/dev-tools';

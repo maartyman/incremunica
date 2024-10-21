@@ -1,19 +1,22 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
-import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
-import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
+import type {
+  IActionRdfJoin,
+  IActorRdfJoinArgs,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData
+} from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
-import { KeysQueryOperation } from '@comunica/context-entries';
+import {KeysInitQuery, KeysQueryOperation} from '@comunica/context-entries';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
   IQuerySource,
   IActionContext,
   IJoinEntryWithMetadata,
-  IQueryOperationResultBindings,
-  MetadataBindings,
+  IQueryOperationResultBindings, ComunicaDataFactory,
 } from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysStreamingSource } from '@incremunica/context-entries';
@@ -22,6 +25,9 @@ import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
+import {passTestWithSideData, TestResult} from "@comunica/core";
+import {getSafeBindings, materializeOperation, getOperationSource} from '@comunica/utils-query-operation';
+import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -30,8 +36,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   public readonly selectivityModifier: number;
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
-
-  public static readonly FACTORY = new Factory();
+  public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
 
   public constructor(args: IActorRdfJoinInnerIncrementalComputationalMultiBindArgs) {
     super(args, {
@@ -66,6 +71,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
    * @param operationBinder A callback to retrieve the bindings stream of bound operations.
    * @param optional If the original bindings should be emitted when the resulting bindings stream is empty.
    * @param sources The sources of the query.
+   * @param algebraFactory The algebra factory.
+   * @param bindingsFactory The bindingsFactory created with bindings context merger.
    * @return {AsyncIterator<Bindings>}
    */
   public static async createBindStream(
@@ -75,9 +82,9 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     => Promise<[AsyncIterator<Bindings>, () => void]>,
     optional: boolean,
     sources: any,
+    algebraFactory: Factory,
+    bindingsFactory: BindingsFactory,
   ): Promise<AsyncIterator<Bindings>> {
-    // TODO change to BindingsFactory.create()
-    const bindingsFactory = new BindingsFactory();
     const transformMap = new Map<
     string,
     {
@@ -106,6 +113,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
             subOperations: operations.map(operation => materializeOperation(
               operation,
               bindings,
+              algebraFactory,
               bindingsFactory,
               { bindFilter: false },
             )),
@@ -195,12 +203,12 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     // Calculate number of occurrences of each variable
     const variableOccurrences: Record<string, number> = {};
     for (const entry of entries) {
-      for (const variable of entry.metadata.variables) {
-        let counter = variableOccurrences[variable.value];
+      for (const metadataVariable of entry.metadata.variables) {
+        let counter = variableOccurrences[metadataVariable.variable.value];
         if (!counter) {
           counter = 0;
         }
-        variableOccurrences[variable.value] = ++counter;
+        variableOccurrences[metadataVariable.variable.value] = ++counter;
       }
     }
 
@@ -222,8 +230,8 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const entriesWithoutCommonVariables: IJoinEntryWithMetadata[] = [];
     for (const entry of entries) {
       let hasCommon = false;
-      for (const variable of entry.metadata.variables) {
-        if (multiOccurrenceVariables.includes(variable.value)) {
+      for (const metadataVariable of entry.metadata.variables) {
+        if (multiOccurrenceVariables.includes(metadataVariable.variable.value)) {
           hasCommon = true;
           break;
         }
@@ -253,6 +261,14 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const entriesUnsorted = await ActorRdfJoin.getEntriesWithMetadatas(action.entries);
     const entries = await this.sortJoinEntries(entriesUnsorted, action.context);
 
+    const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
+    const algebraFactory = new Factory(dataFactory);
+    const bindingsFactory = await BindingsFactory.create(
+      this.mediatorMergeBindingsContext,
+      action.context,
+      dataFactory,
+    );
+
     for (const [ i, element ] of entries.entries()) {
       if (i !== 0) {
         element.output.bindingsStream.close();
@@ -264,7 +280,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     const remainingEntries = [ ...entries ];
     remainingEntries.splice(0, 1);
 
-    const sources = ActorQueryOperation.getOperationSource(remainingEntries[0].operation);
+    const sources = getOperationSource(remainingEntries[0].operation);
 
     // Bind the remaining patterns for each binding in the stream
     const subContext = action.context
@@ -272,30 +288,32 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
     const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind
       .createBindStream(
-      <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
-      remainingEntries.map(entry => entry.operation),
-      async(operations: Algebra.Operation[], operationBindings: Bindings) => {
-        // Send the materialized patterns to the mediator for recursive join evaluation.
-        const matchOptions: ({ stopMatch: () => void })[] = [];
-        const currentSubContext = subContext
-          .set(KeysQueryOperation.joinBindings, operationBindings)
-          .set(KeysStreamingSource.matchOptions, matchOptions);
-        const operation = operations.length === 1 ?
-          operations[0] :
-          ActorRdfJoinInnerIncrementalComputationalMultiBind.FACTORY.createJoin(operations);
-        const output = ActorQueryOperation.getSafeBindings(await this.mediatorQueryOperation.mediate(
-          { operation, context: currentSubContext },
-        ));
-        const stopFunction = (): void => {
-          for (const MatchOption of matchOptions) {
-            MatchOption.stopMatch();
-          }
-        };
+        <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
+        remainingEntries.map(entry => entry.operation),
+        async(operations: Algebra.Operation[], operationBindings: Bindings) => {
+          // Send the materialized patterns to the mediator for recursive join evaluation.
+          const matchOptions: ({ stopMatch: () => void })[] = [];
+          const currentSubContext = subContext
+            .set(KeysQueryOperation.joinBindings, operationBindings)
+            .set(KeysStreamingSource.matchOptions, matchOptions);
+          const operation = operations.length === 1 ?
+            operations[0] :
+            algebraFactory.createJoin(operations);
+          const output = getSafeBindings(await this.mediatorQueryOperation.mediate(
+            { operation, context: currentSubContext },
+          ));
+          const stopFunction = (): void => {
+            for (const MatchOption of matchOptions) {
+              MatchOption.stopMatch();
+            }
+          };
 
-        return [ <AsyncIterator<Bindings>><unknown>output.bindingsStream, stopFunction ];
-      },
-      false,
-      sources ?? [],
+          return [ <AsyncIterator<Bindings>><unknown>output.bindingsStream, stopFunction ];
+        },
+        false,
+        sources ?? [],
+        algebraFactory,
+        bindingsFactory
       );
 
     return {
@@ -310,16 +328,16 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     };
   }
 
-  public async getJoinCoefficients(
+  protected async getJoinCoefficients(
     _action: IActionRdfJoin,
-    _metadatas: MetadataBindings[],
-  ): Promise<IMediatorTypeJoinCoefficients> {
-    return {
+    sideData: IActorRdfJoinTestSideData,
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+    return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    };
+    }, sideData);
   }
 }
 

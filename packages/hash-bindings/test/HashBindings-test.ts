@@ -1,6 +1,6 @@
 import '@incremunica/incremental-jest';
 import 'jest-rdf';
-import type { Bindings, BindingsFactory } from '@comunica/bindings-factory';
+import type { Bindings, BindingsFactory } from '@comunica/utils-bindings-factory';
 import { DevTools } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { HashBindings } from '../lib';

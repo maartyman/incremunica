@@ -1,5 +1,5 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { bindingsToString } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { bindingsToString } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 
 function fail(received: Bindings, actual: Bindings): any {

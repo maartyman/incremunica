@@ -1,5 +1,5 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { Bus } from '@comunica/core';
 import type { BindingsStream } from '@comunica/types';
 import {

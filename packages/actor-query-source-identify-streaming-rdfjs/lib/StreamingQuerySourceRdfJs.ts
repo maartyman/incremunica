@@ -1,14 +1,20 @@
-import type { BindingsFactory } from '@comunica/bindings-factory';
-import { ClosableIterator } from '@comunica/bus-query-operation';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { ClosableIterator } from '@comunica/utils-iterator';
 import {
   filterMatchingQuotedQuads,
   getVariables,
   getDuplicateElementLinks,
   setMetadata,
 } from '@comunica/bus-query-source-identify';
-import { KeysQueryOperation } from '@comunica/context-entries';
-import { MetadataValidationState } from '@comunica/metadata';
-import type { IQuerySource, BindingsStream, IActionContext, FragmentSelectorShape, Bindings } from '@comunica/types';
+import { KeysQueryOperation} from '@comunica/context-entries';
+import { MetadataValidationState } from '@comunica/utils-metadata';
+import type {
+  IQuerySource,
+  BindingsStream,
+  IActionContext,
+  FragmentSelectorShape,
+  Bindings, ComunicaDataFactory,
+} from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
@@ -16,7 +22,6 @@ import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
-import { DataFactory } from 'rdf-data-factory';
 import type {
   QuadTermName,
 } from 'rdf-terms';
@@ -30,32 +35,36 @@ import {
 import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
 
-const AF = new Factory();
-const DF = new DataFactory<RDF.BaseQuad>();
-
 export class StreamingQuerySourceRdfJs implements IQuerySource {
-  protected static readonly SELECTOR_SHAPE: FragmentSelectorShape = {
-    type: 'operation',
-    operation: {
-      operationType: 'pattern',
-      pattern: AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
-    },
-    variablesOptional: [
-      DF.variable('s'),
-      DF.variable('p'),
-      DF.variable('o'),
-    ],
-  };
-
   public referenceValue: string | RDF.Source;
   public context?: IActionContext;
   public store: StreamingStore<Quad>;
+  protected readonly selectorShape: FragmentSelectorShape;
+  private readonly dataFactory: ComunicaDataFactory;
   private readonly bindingsFactory: BindingsFactory;
 
-  public constructor(store: StreamingStore<Quad>, bindingsFactory: BindingsFactory) {
+  public constructor(store: StreamingStore<Quad>, dataFactory: ComunicaDataFactory, bindingsFactory: BindingsFactory) {
     this.store = store;
     this.referenceValue = store;
+    this.dataFactory = dataFactory;
     this.bindingsFactory = bindingsFactory;
+    const AF = new Factory(<RDF.DataFactory> this.dataFactory);
+    this.selectorShape = {
+      type: 'operation',
+      operation: {
+        operationType: 'pattern',
+        pattern: AF.createPattern(
+          this.dataFactory.variable('s'),
+          this.dataFactory.variable('p'),
+          this.dataFactory.variable('o'),
+        ),
+      },
+      variablesOptional: [
+        this.dataFactory.variable('s'),
+        this.dataFactory.variable('p'),
+        this.dataFactory.variable('o'),
+      ],
+    };
   }
 
   public static nullifyVariables(term: RDF.Term | undefined, quotedTripleFiltering: boolean): RDF.Term | undefined {
@@ -71,7 +80,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
   }
 
   public async getSelectorShape(): Promise<FragmentSelectorShape> {
-    return StreamingQuerySourceRdfJs.SELECTOR_SHAPE;
+    return this.selectorShape;
   }
 
   public queryBindings(operation: Algebra.Operation, context: IActionContext): BindingsStream {
@@ -128,6 +137,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     return StreamingQuerySourceRdfJs.quadsToBindings(
       quads,
       operation,
+      this.dataFactory,
       this.bindingsFactory,
       Boolean(context.get(KeysQueryOperation.unionDefaultGraph)),
     );
@@ -175,6 +185,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
   private static quadsToBindings(
     quads: AsyncIterator<RDF.Quad>,
     pattern: Algebra.Pattern,
+    dataFactory: ComunicaDataFactory,
     bindingsFactory: BindingsFactory,
     unionDefaultGraph: boolean,
   ): BindingsStream {
@@ -232,7 +243,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
         const keys: QuadTermName[] = <any>key.split('_');
         const variable = elementVariables[key];
         const term = getValueNestedPath(quad, keys);
-        return [ DF.variable(variable), term ];
+        return [ dataFactory.variable(variable), term ];
         // TODO write a test for this
       })).setContextEntry(
         new ActionContextKeyIsAddition(),
@@ -243,6 +254,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
 
     // Set the metadata property
     setMetadata(
+      dataFactory,
       bindingsStream,
       quads,
       elementVariables,

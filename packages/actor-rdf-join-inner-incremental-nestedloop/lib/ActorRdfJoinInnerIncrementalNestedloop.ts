@@ -1,8 +1,8 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner,
+  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
@@ -11,6 +11,7 @@ import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-
 import type { MetadataBindings, BindingsStream } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalNestedLoopJoin } from './IncrementalNestedLoopJoin';
+import {passTestWithSideData, TestResult} from "@comunica/core";
 
 /**
  * A comunica Inner Incremental Nestedloop RDF Join Actor.
@@ -46,13 +47,13 @@ export class ActorRdfJoinInnerIncrementalNestedloop extends ActorRdfJoin {
 
   protected async getJoinCoefficients(
     _action: IActionRdfJoin,
-    _metadatas: MetadataBindings[],
-  ): Promise<IMediatorTypeJoinCoefficients> {
-    return {
+    sideData: IActorRdfJoinTestSideData,
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+    return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    };
+    }, sideData);
   }
 }

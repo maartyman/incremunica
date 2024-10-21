@@ -1,28 +1,27 @@
-import type { Bindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 
 export class IncrementalOptionalHash extends IncrementalInnerJoin {
-  private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
-  private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
+  private readonly rightMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
+  private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
   private activeElement: Bindings | null = null;
   private otherArray: Bindings[] = [];
   private index = 0;
-  private readonly funHash: (entry: Bindings) => string;
+  private readonly joinHash: (entry: Bindings) => number;
   private prependArray: boolean;
   private appendArray: boolean;
-  private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
     left: AsyncIterator<Bindings>,
     right: AsyncIterator<Bindings>,
-    funHash: (entry: Bindings) => string,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
+    joinHash: (entry: Bindings) => number,
   ) {
     super(left, right, funJoin);
-    this.funHash = funHash;
+    this.joinHash = joinHash;
   }
 
   protected _cleanup(): void {
@@ -37,7 +36,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
       this.activeElement !== null;
   }
 
-  private addOrDeleteFromMemory(item: Bindings, hash: string, memory: Map<string, Bindings[]>): boolean {
+  private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
     if (item.getContextEntry(new ActionContextKeyIsAddition())) {
       if (array === undefined) {
@@ -94,12 +93,12 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         let resultingBindings: null | Bindings = null;
         if (this.prependArray) {
           // We need to delete the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(this.otherArray[this.index]);
+          resultingBindings = this.otherArray[this.index];
           resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), false);
         } else if (this.activeElement === null) {
           // If this.activeElement is null, then appendArray is true
           // we need to add the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(this.otherArray[this.index]);
+          resultingBindings = this.otherArray[this.index];
           resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), true);
         } else {
           // Otherwise merge bindings
@@ -120,7 +119,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
       let item = this.rightIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
+        const hash = this.joinHash(item);
         const rightMemEl = this.rightMemory.get(hash);
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
           const otherArray = this.leftMemory.get(hash);
@@ -142,7 +141,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
       item = this.leftIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
+        const hash = this.joinHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
           const otherArray = this.rightMemory.get(hash);
           if (otherArray === undefined) {

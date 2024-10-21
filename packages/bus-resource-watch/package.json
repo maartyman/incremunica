@@ -36,6 +36,6 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/core": "^3.2.1"
+    "@comunica/core": "^4.0.2"
   }
 }

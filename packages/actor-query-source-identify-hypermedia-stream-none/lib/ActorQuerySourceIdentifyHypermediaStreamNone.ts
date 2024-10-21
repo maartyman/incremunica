@@ -1,4 +1,4 @@
-import { BindingsFactory } from '@comunica/bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type {
   IActionQuerySourceIdentifyHypermedia,
@@ -7,13 +7,15 @@ import type {
   IActorQuerySourceIdentifyHypermediaTest,
 } from '@comunica/bus-query-source-identify-hypermedia';
 import { ActorQuerySourceIdentifyHypermedia } from '@comunica/bus-query-source-identify-hypermedia';
-import { ActionContext } from '@comunica/core';
+import {ActionContext, passTest, TestResult} from '@comunica/core';
 import { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
 import type { MediatorGuard } from '@incremunica/bus-guard';
 import { KeysGuard } from '@incremunica/context-entries';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
+import type {ComunicaDataFactory} from "@comunica/types";
+import {KeysInitQuery} from "@comunica/context-entries";
 
 /**
  * An incremunica Stream None Query Source Identify Hypermedia Actor.
@@ -28,17 +30,19 @@ export class ActorQuerySourceIdentifyHypermediaStreamNone extends ActorQuerySour
 
   public async testMetadata(
     _action: IActionQuerySourceIdentifyHypermedia,
-  ): Promise<IActorQuerySourceIdentifyHypermediaTest> {
-    return { filterFactor: 0 };
+  ): Promise<TestResult<IActorQuerySourceIdentifyHypermediaTest>> {
+    return passTest({ filterFactor: 0 });
   }
 
   public async run(action: IActionQuerySourceIdentifyHypermedia): Promise<IActorQuerySourceIdentifyHypermediaOutput> {
     this.logInfo(action.context, `Identified as file source: ${action.url}`);
     const store = new StreamingStore<Quad>();
     store.import(<RDF.Stream<Quad>><any>action.quads);
+    const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
     const source = new StreamingQuerySourceRdfJs(
       store,
-      await BindingsFactory.create(this.mediatorMergeBindingsContext, action.context),
+      dataFactory,
+      await BindingsFactory.create(this.mediatorMergeBindingsContext, action.context, dataFactory),
     );
     source.toString = () => `QueryStreamingSourceRdfJs(${action.url})`;
     source.referenceValue = action.url;

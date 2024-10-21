@@ -1,10 +1,9 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
 import {
-  ActorQueryOperation,
   ActorQueryOperationTypedMediated,
 } from '@comunica/bus-query-operation';
-import type { IActorTest } from '@comunica/core';
+import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
 import type {
   IActionContext,
   IQueryOperationResult,
@@ -15,6 +14,7 @@ import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-co
 import { HashBindings } from '@incremunica/hash-bindings';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
+import { getSafeBindings } from '@comunica/utils-query-operation';
 
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
@@ -24,12 +24,12 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     super(args, 'distinct');
   }
 
-  public async testOperation(_operation: Algebra.Distinct, _context: IActionContext): Promise<IActorTest> {
-    return true;
+  public async testOperation(_operation: Algebra.Distinct, _context: IActionContext): Promise<TestResult<IActorTest>> {
+    return passTestVoid();
   }
 
   public async runOperation(operation: Algebra.Distinct, context: IActionContext): Promise<IQueryOperationResult> {
-    const output: IQueryOperationResultBindings = ActorQueryOperation.getSafeBindings(
+    const output: IQueryOperationResultBindings = getSafeBindings(
       await this.mediatorQueryOperation.mediate({ operation: operation.input, context }),
     );
     const bindingsStream = <BindingsStream><unknown>(<AsyncIterator<Bindings>><unknown>output.bindingsStream).filter(

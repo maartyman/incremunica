@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
-import type { IActorTest } from '@comunica/core';
+import {IActorTest, passTest, TestResult} from '@comunica/core';
 import type {
   IActionResourceWatch,
   IActorResourceWatchArgs,
@@ -14,7 +14,7 @@ import {
 /**
  * An incremunica Polling Resource Watch Actor.
  */
-export class ActorResourceWatchPolling extends ActorResourceWatch {
+export class ActorResourceWatchPolling extends ActorResourceWatch<undefined> {
   public readonly mediatorHttp: MediatorHttp;
   public readonly defaultPollingFrequency: number;
 
@@ -24,8 +24,8 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
     super(args);
   }
 
-  public async test(_action: IActionResourceWatch): Promise<IActorTest> {
-    return { priority: this.priority };
+  public async test(_action: IActionResourceWatch): Promise<TestResult<IActorTest>> {
+    return passTest({ priority: this.priority });
   }
 
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
@@ -107,7 +107,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
   }
 }
 
-export interface IActorResourceWatchPollingArgs extends IActorResourceWatchArgs {
+export interface IActorResourceWatchPollingArgs extends IActorResourceWatchArgs<undefined> {
   /**
    * The HTTP mediator
    */

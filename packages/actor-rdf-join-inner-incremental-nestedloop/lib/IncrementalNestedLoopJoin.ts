@@ -1,4 +1,4 @@
-import type { Bindings } from '@comunica/bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
 

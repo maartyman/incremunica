@@ -1,40 +1,45 @@
 import { BindingsToQuadsIterator } from '@comunica/actor-query-operation-construct';
-import type { Bindings } from '@comunica/bindings-factory';
-import { BindingsFactory } from '@comunica/bindings-factory';
-import { ActorQueryOperation, materializeOperation } from '@comunica/bus-query-operation';
-import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
+import type {Bindings, BindingsFactory} from '@comunica/utils-bindings-factory';
+import { MediatorQueryOperation} from '@comunica/bus-query-operation';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
-import type { IActionContext, IJoinEntry } from '@comunica/types';
+import type {ComunicaDataFactory, IActionContext, IJoinEntry} from '@comunica/types';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Factory } from 'sparqlalgebrajs';
+import { QuerySourceRdfJs } from '@comunica/actor-query-source-identify-rdfjs';
+import {getSafeBindings, materializeOperation} from "@comunica/utils-query-operation";
 
 export class DeltaQueryIterator extends AsyncIterator<Bindings> {
   private count = 0;
   private currentSource?: AsyncIterator<Bindings> = undefined;
   protected destroySources = true;
-  public static readonly FACTORY = new Factory();
+  public readonly algebraFactory: Factory;
   private readonly entries: IJoinEntry[];
   private readonly mediatorQueryOperation: MediatorQueryOperation;
   private readonly subContext: IActionContext;
   private readonly store = new Store();
   private pending = false;
-  // TODO change to BindingsFactory.create()
-  private readonly bindingsFactory = new BindingsFactory();
+  private readonly bindingsFactory: BindingsFactory;
 
   public constructor(
     entries: IJoinEntry[],
-    context: IActionContext,
     mediatorQueryOperation: MediatorQueryOperation,
+    dataFactory: ComunicaDataFactory,
+    algebraFactory: Factory,
+    bindingsFactory: BindingsFactory,
   ) {
     super();
+    this.algebraFactory = algebraFactory;
+    this.bindingsFactory = bindingsFactory;
     this.entries = entries;
     this.subContext = new ActionContext()
-      .set(KeysQueryOperation.querySources, [ this.store ])
+      .set(KeysQueryOperation.querySources, [{
+        source: new QuerySourceRdfJs(this.store, dataFactory, this.bindingsFactory)
+      }])
       .set(KeysDeltaQueryJoin.fromDeltaQuery, true);
     this.mediatorQueryOperation = mediatorQueryOperation;
 
@@ -125,16 +130,22 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       this.pending = true;
       const subOperations = subEntries
         .map(entry =>
-          materializeOperation(entry.operation, constBindings, this.bindingsFactory, { bindFilter: false }));
+          materializeOperation(
+            entry.operation,
+            constBindings,
+            this.algebraFactory,
+            this.bindingsFactory,
+            { bindFilter: false }
+        ));
 
       const operation = subOperations.length === 1 ?
         subOperations[0] :
-        DeltaQueryIterator.FACTORY.createJoin(subOperations);
+        this.algebraFactory.createJoin(subOperations);
 
       this.mediatorQueryOperation.mediate(
         { operation, context: this.subContext },
       ).then((unsafeOutput) => {
-        const output = ActorQueryOperation.getSafeBindings(unsafeOutput);
+        const output = getSafeBindings(unsafeOutput);
         // Figure out diff (change diff if needed)
         let bindingsStream: AsyncIterator<Bindings> | undefined =
           (<AsyncIterator<Bindings>><unknown>output.bindingsStream).map(
