@@ -1,17 +1,19 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings, BindingsStream } from '@comunica/types';
+import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalNestedLoopJoin } from './IncrementalNestedLoopJoin';
-import {passTestWithSideData, TestResult} from "@comunica/core";
 
 /**
  * A comunica Inner Incremental Nestedloop RDF Join Actor.

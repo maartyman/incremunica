@@ -6,7 +6,8 @@ import type {
 import {
   ActorMergeBindingsContext,
 } from '@comunica/bus-merge-bindings-context';
-import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTestVoid } from '@comunica/core';
 import type { IActionContextKey } from '@comunica/types';
 
 /**

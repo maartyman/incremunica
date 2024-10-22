@@ -1,9 +1,9 @@
 import { Readable } from 'node:stream';
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContext } from '@comunica/core';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';

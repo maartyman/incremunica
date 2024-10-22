@@ -1,11 +1,11 @@
 import '@incremunica/incremental-jest';
 import EventEmitter = require('events');
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import { ActionContext } from '@comunica/core';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { BindingsStream, IActionContext, IJoinEntry, IQueryOperationResultBindings } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';

@@ -1,20 +1,21 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
 import {
   ActorQueryOperationTypedMediated,
 } from '@comunica/bus-query-operation';
-import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTestVoid } from '@comunica/core';
 import type {
   IActionContext,
   IQueryOperationResult,
   IQueryOperationResultBindings,
   BindingsStream,
 } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { getSafeBindings } from '@comunica/utils-query-operation';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
-import { getSafeBindings } from '@comunica/utils-query-operation';
-import {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
@@ -36,7 +37,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     );
     const { hashFunction } = await this.mediatorHashBindings.mediate({ context });
     const bindingsStream = <BindingsStream><unknown>(<AsyncIterator<Bindings>><unknown>output.bindingsStream).filter(
-      this.newHashFilter(entry => hashFunction(entry, [...entry.keys()])),
+      this.newHashFilter(entry => hashFunction(entry, [ ...entry.keys() ])),
     );
     return {
       type: 'bindings',

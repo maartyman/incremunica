@@ -1,6 +1,6 @@
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { DevTools } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { ActionContextKeyIsAddition, ActorMergeBindingsContextIsAddition } from '../lib';

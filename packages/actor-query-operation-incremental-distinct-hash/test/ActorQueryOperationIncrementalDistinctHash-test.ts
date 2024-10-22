@@ -1,5 +1,5 @@
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContext, Bus } from '@comunica/core';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';

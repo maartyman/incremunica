@@ -1,9 +1,9 @@
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import {
   ActionContextKeyIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';

@@ -4,7 +4,8 @@ import type {
   IActorRdfMetadataExtractArgs,
 } from '@comunica/bus-rdf-metadata-extract';
 import { ActorRdfMetadataExtract } from '@comunica/bus-rdf-metadata-extract';
-import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTestVoid } from '@comunica/core';
 
 /**
  * A comunica Guard Data RDF Metadata Extract Actor.

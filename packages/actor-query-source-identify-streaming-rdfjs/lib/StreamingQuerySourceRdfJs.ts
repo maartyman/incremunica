@@ -1,20 +1,21 @@
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
-import { ClosableIterator } from '@comunica/utils-iterator';
 import {
   filterMatchingQuotedQuads,
   getVariables,
   getDuplicateElementLinks,
   setMetadata,
 } from '@comunica/bus-query-source-identify';
-import { KeysQueryOperation} from '@comunica/context-entries';
-import { MetadataValidationState } from '@comunica/utils-metadata';
+import { KeysQueryOperation } from '@comunica/context-entries';
 import type {
   IQuerySource,
   BindingsStream,
   IActionContext,
   FragmentSelectorShape,
-  Bindings, ComunicaDataFactory,
+  Bindings,
+  ComunicaDataFactory,
 } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { ClosableIterator } from '@comunica/utils-iterator';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';

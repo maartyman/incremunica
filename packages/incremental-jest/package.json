@@ -38,8 +38,8 @@
     "build:ts": "node \"../../node_modules/typescript/bin/tsc\""
   },
   "dependencies": {
-    "@comunica/utils-bindings-factory": "^4.0.1",
     "@comunica/types": "^4.0.1",
+    "@comunica/utils-bindings-factory": "^4.0.1",
     "@incremunica/actor-merge-bindings-context-is-addition": "^1.3.0",
     "@rdfjs/types": "*",
     "arrayify-stream": "^2.0.1"

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
-import {IActorTest, passTestVoid, TestResult} from '@comunica/core';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTestVoid } from '@comunica/core';
 import type { IActionGuard, IActorGuardOutput, IActorGuardArgs } from '@incremunica/bus-guard';
 import { ActorGuard } from '@incremunica/bus-guard';
 import type { MediatorResourceWatch } from '@incremunica/bus-resource-watch';

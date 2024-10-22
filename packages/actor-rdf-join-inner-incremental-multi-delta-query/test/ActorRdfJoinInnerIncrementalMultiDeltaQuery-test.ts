@@ -1,4 +1,3 @@
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type {
@@ -7,6 +6,7 @@ import type {
 import { ActionContext, Bus } from '@comunica/core';
 import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';

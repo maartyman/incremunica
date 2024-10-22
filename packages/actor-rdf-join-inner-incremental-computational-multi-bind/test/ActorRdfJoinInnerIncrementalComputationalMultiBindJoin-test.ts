@@ -1,5 +1,4 @@
 import type { EventEmitter } from 'node:events';
-import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
@@ -8,8 +7,9 @@ import 'jest-rdf';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
-import { MetadataValidationState } from '@comunica/metadata';
 import type { BindingsStream, IActionContext, IQueryOperationResultBindings } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysStreamingSource } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';

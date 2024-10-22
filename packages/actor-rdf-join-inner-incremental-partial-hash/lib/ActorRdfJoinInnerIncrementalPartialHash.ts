@@ -1,18 +1,20 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings, BindingsStream } from '@comunica/types';
+import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalPartialHashJoin } from './IncrementalPartialHashJoin';
-import {passTestWithSideData, TestResult} from "@comunica/core";
-import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * A comunica Inner Incremental Partial Hash RDF Join Actor.

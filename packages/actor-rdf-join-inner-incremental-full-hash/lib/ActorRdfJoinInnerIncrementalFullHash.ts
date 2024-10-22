@@ -1,18 +1,20 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalFullHashJoin } from './IncrementalFullHashJoin';
-import {passTestWithSideData, TestResult} from "@comunica/core";
-import type {MediatorHashBindings} from "@comunica/bus-hash-bindings"
 
 /**
  * A comunica Inner Incremental Full Hash RDF Join Actor.
@@ -38,7 +40,7 @@ export class ActorRdfJoinInnerIncrementalFullHash extends ActorRdfJoin {
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
       entry => hashFunction(entry, commonVariables),
-      entry => hashFunction(entry, [...entry.keys()]),
+      entry => hashFunction(entry, [ ...entry.keys() ]),
     );
     return {
       result: {

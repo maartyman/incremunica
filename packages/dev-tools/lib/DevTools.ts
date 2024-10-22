@@ -1,7 +1,7 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
-import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { Bus } from '@comunica/core';
 import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import {
   ActionContextKeyIsAddition,
   ActorMergeBindingsContextIsAddition,

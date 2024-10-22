@@ -1,11 +1,15 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
-import {failTest, IActorTest, passTestWithSideData, TestResult} from '@comunica/core';
-import {
-  ActorResourceWatch,
-  IActionResourceWatch, IActorResourceWatchArgs,
+import type { IActorTest, TestResult } from '@comunica/core';
+import { failTest, passTestWithSideData } from '@comunica/core';
+import type {
+  IActionResourceWatch,
+  IActorResourceWatchArgs,
   IActorResourceWatchOutput,
   IResourceWatchEventEmitter,
+} from '@incremunica/bus-resource-watch';
+import {
+  ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import { ChannelType } from '@solid-notifications/types';
@@ -43,7 +47,7 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
 
   public async run(
     _action: IActionResourceWatch,
-    sideData: SideData
+    sideData: SideData,
   ): Promise<IActorResourceWatchOutput> {
     const socket = new WebSocket(sideData.notificationChannel);
 

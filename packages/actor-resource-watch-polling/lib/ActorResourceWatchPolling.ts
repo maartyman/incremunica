@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import type { MediatorHttp } from '@comunica/bus-http';
-import {IActorTest, passTest, TestResult} from '@comunica/core';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTest } from '@comunica/core';
 import type {
   IActionResourceWatch,
   IActorResourceWatchArgs,

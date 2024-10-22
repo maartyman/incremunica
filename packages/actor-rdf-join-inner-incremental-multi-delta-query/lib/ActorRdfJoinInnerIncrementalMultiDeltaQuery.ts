@@ -1,21 +1,23 @@
+import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
+import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
-  IActorRdfJoinOutputInner, IActorRdfJoinTestSideData,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import {
   ActorRdfJoin,
 } from '@comunica/bus-rdf-join';
+import { KeysInitQuery } from '@comunica/context-entries';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type {BindingsStream, ComunicaDataFactory} from '@comunica/types';
+import type { BindingsStream, ComunicaDataFactory } from '@comunica/types';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
+import { Factory } from 'sparqlalgebrajs';
 import { DeltaQueryIterator } from './DeltaQueryIterator';
-import {passTestWithSideData, TestResult} from "@comunica/core";
-import {KeysInitQuery} from "@comunica/context-entries";
-import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
-import {BindingsFactory} from "@comunica/utils-bindings-factory";
-import {MediatorQueryOperation} from "@comunica/bus-query-operation";
-import {Factory} from "sparqlalgebrajs";
 
 /**
  * A comunica Inner Incremental Nestedloop RDF Join Actor.
@@ -46,7 +48,7 @@ export class ActorRdfJoinInnerIncrementalMultiDeltaQuery extends ActorRdfJoin {
       this.mediatorQueryOperation,
       dataFactory,
       algebraFactory,
-      bindingsFactory
+      bindingsFactory,
     );
 
     return {

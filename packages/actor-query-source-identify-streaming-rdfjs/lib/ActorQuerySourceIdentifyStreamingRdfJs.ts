@@ -1,4 +1,3 @@
-import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type {
   IActionQuerySourceIdentify,
@@ -6,14 +5,14 @@ import type {
   IActorQuerySourceIdentifyArgs,
 } from '@comunica/bus-query-source-identify';
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
-import {IActorTest, passTest, passTestVoid, TestResult} from '@comunica/core';
-import { ActionContext } from '@comunica/core';
+import { KeysInitQuery } from '@comunica/context-entries';
+import type { IActorTest, TestResult } from '@comunica/core';
+import { passTestVoid, ActionContext } from '@comunica/core';
+import type { ComunicaDataFactory } from '@comunica/types';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { StreamingQuerySourceRdfJs } from './StreamingQuerySourceRdfJs';
-import {DataFactory} from "rdf-data-factory";
-import type {ComunicaDataFactory} from "@comunica/types";
-import {KeysInitQuery} from "@comunica/context-entries";
 
 /**
  * An incremunica Streaming RDFJS Query Source Identify Actor.

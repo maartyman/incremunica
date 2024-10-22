@@ -1,33 +1,35 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
-import { BindingsFactory } from '@comunica/utils-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
+import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
   IActorRdfJoinOutputInner,
-  IActorRdfJoinTestSideData
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
-import {KeysInitQuery, KeysQueryOperation} from '@comunica/context-entries';
+import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
   IQuerySource,
   IActionContext,
   IJoinEntryWithMetadata,
-  IQueryOperationResultBindings, ComunicaDataFactory,
+  IQueryOperationResultBindings,
+  ComunicaDataFactory,
 } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { getSafeBindings, materializeOperation, getOperationSource } from '@comunica/utils-query-operation';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysStreamingSource } from '@incremunica/context-entries';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
-import {passTestWithSideData, TestResult} from "@comunica/core";
-import {getSafeBindings, materializeOperation, getOperationSource} from '@comunica/utils-query-operation';
-import {MediatorMergeBindingsContext} from "@comunica/bus-merge-bindings-context";
-import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -179,6 +181,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     };
 
     return new UnionIterator(baseStream.transform({
+      // eslint-disable-next-line ts/no-misused-promises
       transform: binder,
       optional,
     }), { autoStart: false });
@@ -316,7 +319,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         sources ?? [],
         algebraFactory,
         bindingsFactory,
-        entry => hashFunction(entry, [...entry.keys()]),
+        entry => hashFunction(entry, [ ...entry.keys() ]),
       );
 
     return {

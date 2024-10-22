@@ -1,17 +1,18 @@
-import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type {
   IActionRdfJoin,
   IActorRdfJoinArgs,
   IActorRdfJoinOutputInner,
-  IActorRdfJoinTestSideData
+  IActorRdfJoinTestSideData,
 } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalMinusHash } from './IncrementalMinusHash';
-import {passTestWithSideData, TestResult} from "@comunica/core";
-import type {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 
 /**
  * An Incremunica Minus Hash RDF Join Actor.
