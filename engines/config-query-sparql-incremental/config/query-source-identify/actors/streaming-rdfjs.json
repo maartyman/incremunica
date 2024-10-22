@@ -1,6 +1,6 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^3.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
 
     "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-source-identify-streaming-rdfjs/^1.0.0/components/context.jsonld"
   ],

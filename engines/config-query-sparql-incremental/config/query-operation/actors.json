@@ -1,10 +1,9 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^3.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^4.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
   ],
   "import": [
-    "icqsi:config/query-operation/actors/query/filter.json",
     "ccqs:config/query-operation/actors/query/join.json",
     "ccqs:config/query-operation/actors/query/project.json",
     "icqsi:config/query-operation/actors/query/distinct.json",
