@@ -22,7 +22,7 @@ import {MediatorHashBindings} from "@comunica/bus-hash-bindings";
 export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperationTypedMediated<Algebra.Distinct> {
   public readonly mediatorHashBindings: MediatorHashBindings;
 
-  public constructor(args: ActorQueryOperationIncrementalDistinctHashArgs) {
+  public constructor(args: IActorQueryOperationIncrementalDistinctHashArgs) {
     super(args, 'distinct');
   }
 
@@ -77,6 +77,6 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
   }
 }
 
-export interface ActorQueryOperationIncrementalDistinctHashArgs extends IActorQueryOperationTypedMediatedArgs {
+export interface IActorQueryOperationIncrementalDistinctHashArgs extends IActorQueryOperationTypedMediatedArgs {
   mediatorHashBindings: MediatorHashBindings;
 }

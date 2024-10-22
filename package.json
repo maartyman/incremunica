@@ -94,7 +94,7 @@
     "typescript": "^5.0.0",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
-    "ws": "^8.14.2"
+    "ws": "^8.18.0"
   },
   "pre-commit": [
     "build",

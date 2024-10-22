@@ -13,7 +13,7 @@ import { Actor } from '@comunica/core';
  * @see IActionResourceWatch
  * @see IActorResourceWatchOutput
  */
-export abstract class ActorResourceWatch<TS> extends Actor<
+export abstract class ActorResourceWatch<TS = undefined> extends Actor<
   IActionResourceWatch,
   IActorTest,
   IActorResourceWatchOutput,
@@ -55,7 +55,7 @@ export interface IActorResourceWatchOutput extends IActorOutput {
   stopFunction: () => void;
 }
 
-export interface IActorResourceWatchArgs<TS> extends IActorArgs<
+export interface IActorResourceWatchArgs<TS = undefined> extends IActorArgs<
 IActionResourceWatch,
 IActorTest,
 IActorResourceWatchOutput,

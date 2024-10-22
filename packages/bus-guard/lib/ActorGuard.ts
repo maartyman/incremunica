@@ -14,11 +14,11 @@ import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvent
  * @see IActionGuard
  * @see IActorGuardOutput
  */
-export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorGuardOutput> {
+export abstract class ActorGuard<TS = undefined> extends Actor<IActionGuard, IActorTest, IActorGuardOutput, TS> {
   /**
    * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
    */
-  public constructor(args: IActorGuardArgs) {
+  public constructor(args: IActorGuardArgs<TS>) {
     super(args);
   }
 }
@@ -45,10 +45,11 @@ export interface IActorGuardOutput extends IActorOutput {
   guardEvents: IGuardEvents;
 }
 
-export type IActorGuardArgs = IActorArgs<
+export type IActorGuardArgs<TS = undefined> = IActorArgs<
 IActionGuard,
 IActorTest,
-IActorGuardOutput
+IActorGuardOutput,
+TS
 >;
 
 export type MediatorGuard = Mediate<

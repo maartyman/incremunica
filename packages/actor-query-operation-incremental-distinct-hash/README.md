@@ -28,9 +28,10 @@ After installing, this package can be added to your engine's configuration as fo
   "actors": [
     ...
     {
-      "@id": "urn:Incremunica:default:query-operation/actors#distinct",
+      "@id": "urn:comunica:default:query-operation/actors#distinct",
       "@type": "ActorQueryOperationIncrementalDistinctHash",
-      "mediatorQueryOperation": { "@id": "#mediatorQueryOperation" }
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" },
+      "mediatorHashBindings": { "@id": "urn:comunica:default:hash-bindings/mediators#main" }
     }
   ]
 }

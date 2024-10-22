@@ -8,7 +8,7 @@ import type {
 } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings, BindingsStream } from '@comunica/types';
+import type { BindingsStream } from '@comunica/types';
 import type { AsyncIterator } from 'asynciterator';
 import { IncrementalOptionalHash } from './IncrementalOptionalHash';
 import {passTestWithSideData, TestResult} from "@comunica/core";

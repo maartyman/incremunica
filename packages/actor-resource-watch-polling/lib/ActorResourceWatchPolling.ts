@@ -14,7 +14,7 @@ import {
 /**
  * An incremunica Polling Resource Watch Actor.
  */
-export class ActorResourceWatchPolling extends ActorResourceWatch<undefined> {
+export class ActorResourceWatchPolling extends ActorResourceWatch {
   public readonly mediatorHttp: MediatorHttp;
   public readonly defaultPollingFrequency: number;
 
@@ -107,7 +107,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch<undefined> {
   }
 }
 
-export interface IActorResourceWatchPollingArgs extends IActorResourceWatchArgs<undefined> {
+export interface IActorResourceWatchPollingArgs extends IActorResourceWatchArgs {
   /**
    * The HTTP mediator
    */
