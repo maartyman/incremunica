@@ -47,7 +47,7 @@ export class ActorRdfJoinInnerIncrementalNestedloop extends ActorRdfJoin {
     };
   }
 
-  protected async getJoinCoefficients(
+  public async getJoinCoefficients(
     _action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
   ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {

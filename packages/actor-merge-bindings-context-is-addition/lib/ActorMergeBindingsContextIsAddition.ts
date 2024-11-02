@@ -23,11 +23,10 @@ export class ActorMergeBindingsContextIsAddition extends ActorMergeBindingsConte
   }
 
   public async run(_action: IActionMergeBindingsContext): Promise<IActorMergeBindingsContextOutput> {
-    // TODO change to boolean[] => boolean when comuncia V4
-    const handlerFunc: (...args: any[]) => any = (...args: boolean[]): boolean => args.reduce((acc, cur) => acc && cur);
+    const handlerFunc = (...args: boolean[]): boolean => args.reduce((acc, cur) => acc && cur);
     return {
       mergeHandlers: {
-        isAddition: {
+        '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition': {
           run: handlerFunc,
         },
       },

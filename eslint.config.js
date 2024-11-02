@@ -15,6 +15,7 @@ module.exports = config([
       // Default
       'unicorn/consistent-destructuring': 'off',
       'unicorn/no-array-callback-reference': 'off',
+      'unicorn/prefer-node-protocol': 'off',
 
       // TODO: check if these can be enabled
       'ts/naming-convention': 'off',
@@ -51,6 +52,14 @@ module.exports = config([
       'ts/no-require-imports': 'off',
       'ts/no-var-requires': 'off',
       'unicorn/filename-case': 'off',
+    },
+  },
+  {
+    files: [
+      '**/test-browser/*-test.ts',
+    ],
+    rules: {
+      'import/no-extraneous-dependencies': 'off',
     },
   },
   {

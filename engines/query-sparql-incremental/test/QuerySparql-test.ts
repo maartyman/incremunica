@@ -11,7 +11,6 @@ import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-co
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
-import { expect } from '@playwright/test';
 import { DataFactory } from 'rdf-data-factory';
 import { QueryEngine } from '../lib/QueryEngine';
 import { usePolly } from './util';
@@ -41,7 +40,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
   beforeEach(async() => {
     engine = new QueryEngine();
-    BF = await DevTools.createBindingsFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
   });
 
   describe('using Streaming Store', () => {
@@ -318,7 +317,7 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
     });
 
     it('repeated with the same engine', async() => {
@@ -327,23 +326,11 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
 
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
-
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
-
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
-
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
-
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
-
-      bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      for (let i = 0; i < 5; i++) {
+        bindingStream = await engine.queryBindings(query, context);
+        await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
+        bindingStream.destroy();
+      }
     });
 
     it('repeated with the same engine and wait a bit until the polling is removed', async() => {
@@ -353,12 +340,15 @@ describe('System test: QuerySparql (with polly)', () => {
       const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
+      bindingStream.destroy();
 
+      // TODO decrease this by adding polling time to context
       await new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
+      bindingStream.destroy();
     });
 
     describe('simple SPS', () => {
@@ -367,7 +357,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 1)).length).toBeGreaterThan(0);
+        await expect((partialArrayifyStream(bindingStream, 1))).resolves.toHaveLength(1);
       });
     });
 
@@ -378,7 +368,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 20)).length).toBeGreaterThan(20);
+        await expect((partialArrayifyStream(bindingStream, 20))).resolves.toHaveLength(20);
       });
 
       it('for the single source entry', async() => {
@@ -387,7 +377,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 20)).length).toBeGreaterThan(20);
+        await expect((partialArrayifyStream(bindingStream, 20))).resolves.toHaveLength(20);
       });
 
       describe('SHACL Compact Syntax Serialisation', () => {
@@ -401,7 +391,7 @@ describe('System test: QuerySparql (with polly)', () => {
             ],
           });
 
-          expect((await partialArrayifyStream(bindingStream, 1)).length).toBeGreaterThan(0);
+          await expect((partialArrayifyStream(bindingStream, 1))).resolves.toHaveLength(1);
         });
       });
     });

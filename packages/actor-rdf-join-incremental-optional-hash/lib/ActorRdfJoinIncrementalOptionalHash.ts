@@ -29,7 +29,10 @@ export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
     });
   }
 
-  protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
+  protected async getOutput(
+    action: IActionRdfJoin,
+    _sideData: IActorRdfJoinTestSideData,
+  ): Promise<IActorRdfJoinOutputInner> {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
     const commonVariables = ActorRdfJoin.overlappingVariables(metadatas).map(v => v.variable);
     const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
@@ -52,7 +55,7 @@ export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
     };
   }
 
-  protected async getJoinCoefficients(
+  public async getJoinCoefficients(
     _action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
   ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {

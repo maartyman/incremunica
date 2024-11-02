@@ -1,4 +1,4 @@
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from 'events';
 import type { MediatorDereferenceRdf } from '@comunica/bus-dereference-rdf';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { passTestVoid } from '@comunica/core';
@@ -66,9 +66,11 @@ export class ActorGuardNaive extends ActorGuard {
           }
           guardEvents.emit('up-to-date');
         });
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.warn(error);
+      }).catch(() => {
+        for (const quad of deletionStore) {
+          action.streamingSource.store.removeQuad(<Quad>quad);
+        }
+        guardEvents.emit('up-to-date');
       });
     });
 

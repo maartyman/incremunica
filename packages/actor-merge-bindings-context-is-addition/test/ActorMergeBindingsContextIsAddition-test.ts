@@ -20,19 +20,25 @@ describe('ActorMergeBindingsContextIsAddition', () => {
   });
 
   it('should test', async() => {
-    await expect(actor.test({ context })).resolves.toBe(true);
+    expect((await actor.test({ context })).get()).toBe(true);
   });
 
   it('should run', async() => {
     await expect(actor.run({ context })).resolves.toMatchObject(
-      { mergeHandlers: { isAddition: { run: expect.any(Function) }}},
+      {
+        mergeHandlers: {
+          '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition': {
+            run: expect.any(Function),
+          },
+        },
+      },
     );
   });
   describe('merge handler', () => {
-    // TODO when comuncia V4 change to boolean[] => boolean
-    let mergeHandler: (...args: any) => any;
+    let mergeHandler: (...args: boolean[]) => boolean;
     beforeEach(async() => {
-      mergeHandler = (await actor.run({ context })).mergeHandlers.isAddition.run;
+      mergeHandler = (await actor.run({ context }))
+        .mergeHandlers['@incremunica/actor-query-operation-incremental-distinct-hash:isAddition'].run;
     });
 
     it('should return false if the first is false', async() => {
@@ -65,7 +71,7 @@ describe('ActorMergeBindingsContextIsAddition', () => {
     let BF: BindingsFactory;
 
     beforeEach(async() => {
-      BF = await DevTools.createBindingsFactory(DF);
+      BF = await DevTools.createTestBindingsFactory(DF);
     });
 
     it('should work with addition bindings', async() => {

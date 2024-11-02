@@ -1,11 +1,13 @@
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
+import '@comunica/utils-jest';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
-import { ActionContext, Bus } from '@comunica/core';
-import { MetadataValidationState } from '@comunica/metadata';
+import { Bus } from '@comunica/core';
 import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import {
   ActionContextKeyIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';
@@ -26,8 +28,8 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    context = new ActionContext();
-    BF = await DevTools.createBindingsFactory(DF);
+    context = DevTools.createTestContextWithDataFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
   });
 
   describe('The ActorRdfJoinIncrementalOptionalHash module', () => {
@@ -45,7 +47,7 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
     it('should not be able to create new ActorRdfJoinIncrementalOptionalHash objects without \'new\'', () => {
       expect(() => {
         (<any> ActorRdfJoinIncrementalOptionalHash)();
-      }).toThrow('');
+      }).toThrow('Class constructor ActorRdfJoinIncrementalOptionalHash cannot be invoked without \'new\'');
     });
   });
 
@@ -58,14 +60,21 @@ IActorRdfJoinSelectivityOutput
 >;
     let actor: ActorRdfJoinIncrementalOptionalHash;
     let action: IActionRdfJoin;
-    let variables0: RDF.Variable[];
-    let variables1: RDF.Variable[];
+    let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let mediatorHashBindings: MediatorHashBindings;
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any> {
         mediate: async() => ({ selectivity: 1 }),
       };
-      actor = new ActorRdfJoinIncrementalOptionalHash({ name: 'actor', bus, mediatorJoinSelectivity });
+      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      actor = new ActorRdfJoinIncrementalOptionalHash({
+        name: 'actor',
+        bus,
+        mediatorJoinSelectivity,
+        mediatorHashBindings,
+      });
       variables0 = [];
       variables1 = [];
       action = {
@@ -79,7 +88,6 @@ IActorRdfJoinSelectivityOutput
                 cardinality: { type: 'estimate', value: 4 },
                 pageSize: 100,
                 requestTime: 10,
-                canContainUndefs: false,
                 variables: variables0,
               }),
               type: 'bindings',
@@ -94,7 +102,6 @@ IActorRdfJoinSelectivityOutput
                 cardinality: { type: 'estimate', value: 5 },
                 pageSize: 100,
                 requestTime: 20,
-                canContainUndefs: false,
                 variables: variables1,
               }),
               type: 'bindings',
@@ -115,55 +122,72 @@ IActorRdfJoinSelectivityOutput
 
       it('should only handle 2 streams', async() => {
         action.entries.push(<any>{});
-        await expect(actor.test(action)).rejects.toBeTruthy();
+        await expect(actor.test(action))
+          .resolves.toFailTest('actor requires 2 join entries at most. The input contained 3.');
       });
 
-      it('should fail on undefs in left stream', async() => {
-        action.entries[0].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        await expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+      it('should fail on undefs on overlapping vars in left stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
-      it('should fail on undefs in right stream', async() => {
-        action.entries[1].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        await expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+      it('should fail on undefs on overlapping vars in right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
       it('should fail on undefs in left and right stream', async() => {
-        action.entries[0].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        action.entries[1].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        await expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
       it('should generate correct test metadata', async() => {
-        await expect(actor.test(action)).resolves.toHaveProperty('iterations', 0);
+        await expect(actor.test(action)).resolves.toEqual({
+          sideData: {
+            metadatas: [
+              {
+                cardinality: {
+                  type: 'estimate',
+                  value: 4,
+                },
+                pageSize: 100,
+                requestTime: 10,
+                state: {
+                  invalidateListeners: [],
+                  valid: true,
+                },
+                variables: [],
+              },
+              {
+                cardinality: {
+                  type: 'estimate',
+                  value: 5,
+                },
+                pageSize: 100,
+                requestTime: 20,
+                state: {
+                  invalidateListeners: [],
+                  valid: true,
+                },
+                variables: [],
+              },
+            ],
+          },
+          value: {
+            blockingItems: 0,
+            iterations: 0,
+            persistedItems: 0,
+            requestTime: 0,
+          },
+        });
       });
     });
 
     it('should generate correct metadata', async() => {
-      await actor.run(action).then(async(result: IQueryOperationResultBindings) => {
+      await actor.run(action, undefined).then(async(result: IQueryOperationResultBindings) => {
         await expect((<any> result).metadata()).resolves.toHaveProperty(
           'cardinality',
           {
@@ -178,13 +202,13 @@ IActorRdfJoinSelectivityOutput
     });
 
     it('should return an empty stream for empty input', async() => {
-      const output = await actor.run(action);
+      const output = await actor.run(action, undefined);
       expect((await output.metadata()).variables).toEqual([]);
       await expect(output.bindingsStream).toEqualBindingsStream([]);
     });
 
     it('should return null on read if join has ended', async() => {
-      const output = await actor.run(action);
+      const output = await actor.run(action, undefined);
       expect((await output.metadata()).variables).toEqual([]);
       await expect(output.bindingsStream).toEqualBindingsStream([]);
       expect(output.bindingsStream.ended).toBeTruthy();
@@ -203,7 +227,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -214,8 +241,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('4') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       output.bindingsStream.read();
       await new Promise<void>(resolve => setTimeout(() => resolve(), 100));
       expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
@@ -238,16 +268,26 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('b') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       await expect(output.bindingsStream).toEqualBindingsStream([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
@@ -269,16 +309,26 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('b') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('d') ],
           [ DF.variable('c'), DF.literal('c') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       await expect(output.bindingsStream).toEqualBindingsStream([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
@@ -319,7 +369,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('4') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -346,8 +399,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('7') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -390,7 +446,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('7') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -425,7 +485,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -440,8 +503,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -477,7 +543,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -512,7 +582,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = <any> new ArrayIterator([
         null,
         null,
@@ -532,8 +605,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -565,7 +641,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -592,7 +672,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -615,8 +698,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('4') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -632,7 +718,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -659,7 +749,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = <any> new ArrayIterator([
         null,
         null,
@@ -685,8 +778,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('4') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -766,7 +862,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('2') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -793,7 +893,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('b') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -808,8 +911,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('c') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -822,7 +928,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -849,7 +959,10 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('b'), DF.literal('b') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -864,8 +977,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('c') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
@@ -883,7 +999,11 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('6') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ];
-      expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
         expected,
@@ -910,15 +1030,21 @@ IActorRdfJoinSelectivityOutput
           }, 100);
         },
       });
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
         ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      const output = await actor.run(action);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
       const expected = [
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],

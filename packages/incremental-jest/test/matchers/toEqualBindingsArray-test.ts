@@ -11,7 +11,7 @@ describe('toEqualBindingsArray', () => {
   let BF: BindingsFactory;
 
   beforeEach(async() => {
-    BF = await DevTools.createBindingsFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
   });
 
   it('should succeed for equal empty bindings', () => {

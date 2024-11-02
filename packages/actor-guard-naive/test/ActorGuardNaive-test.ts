@@ -132,6 +132,47 @@ describe('ActorGuardNaive', () => {
       expect(stopFn).toHaveBeenCalledWith();
     });
 
+    it('should remove all items if mediatorDereferenceRdf errors', async() => {
+      quadArrayStore = [
+        quad('s1', 'p1', 'o1'),
+        quad('s2', 'p2', 'o2'),
+        quad('s3', 'p3', 'o3'),
+      ];
+
+      actor = new ActorGuardNaive({
+        name: 'actor',
+        bus,
+        mediatorResourceWatch,
+        mediatorDereferenceRdf,
+      });
+
+      const { guardEvents } = await actor.run(action);
+
+      mediatorDereferenceRdf.mediate = async() => {
+        throw new Error('mediatorDereferenceRdf errors');
+      };
+
+      changeNotificationEventEmitter.emit('update');
+      await new Promise<void>(resolve => guardEvents.once('up-to-date', resolve));
+
+      expect(removeQuadFn).toHaveBeenCalledTimes(3);
+      expect(removeQuadFn).toHaveBeenNthCalledWith(1, DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+      ));
+      expect(removeQuadFn).toHaveBeenNthCalledWith(2, DataFactory.quad(
+        DataFactory.namedNode('s2'),
+        DataFactory.namedNode('p2'),
+        DataFactory.namedNode('o2'),
+      ));
+      expect(removeQuadFn).toHaveBeenNthCalledWith(3, DataFactory.quad(
+        DataFactory.namedNode('s3'),
+        DataFactory.namedNode('p3'),
+        DataFactory.namedNode('o3'),
+      ));
+    });
+
     it('should attach a positive changes stream', async() => {
       quadArrayStore = [
         quad('s1', 'p1', 'o1'),

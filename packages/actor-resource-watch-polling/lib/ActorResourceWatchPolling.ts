@@ -1,4 +1,4 @@
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from 'events';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { passTest } from '@comunica/core';
@@ -33,9 +33,8 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
     let etag = action.metadata.etag;
-    const checkForChanges = async(): Promise<void> => {
-      // TODO maybe add a log if something goes wrong
-      const responseHead = await this.mediatorHttp.mediate(
+    const checkForChanges = (): void => {
+      this.mediatorHttp.mediate(
         {
           context: action.context,
           input: action.url,
@@ -43,31 +42,22 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
             method: 'HEAD',
           },
         },
-      );
+      ).then((responseHead) => {
+        // TODO have more specific error handling for example 304: Not Modified should not emit 'delete'
+        if (!responseHead.ok) {
+          events.emit('delete');
+        }
 
-      if (!responseHead.ok) {
+        if (responseHead.headers.get('etag') !== etag) {
+          events.emit('update');
+          etag = responseHead.headers.get('etag');
+        }
+      }).catch(() => {
         events.emit('delete');
-      }
-
-      if (responseHead.headers.get('etag') !== etag) {
-        events.emit('update');
-        etag = responseHead.headers.get('etag');
-      }
-    };
-
-    let timeoutId: NodeJS.Timeout | undefined;
-
-    const startCheckLoop = (maxAge: number): void => {
-      timeoutId = setInterval(
-        () => {
-          checkForChanges().catch(() => {});
-        },
-        maxAge * 1_000,
-      );
+      });
     };
 
     const maxAgeArray = this.regex.exec(action.metadata['cache-control']);
-
     let pollingFrequency: number;
     if (maxAgeArray) {
       pollingFrequency = Number.parseInt(maxAgeArray[1], 10);
@@ -75,25 +65,27 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
       pollingFrequency = this.defaultPollingFrequency;
     }
 
+    let loopId: NodeJS.Timeout | undefined;
+    const startCheckLoop = (): void => {
+      checkForChanges();
+      loopId = setInterval(
+        checkForChanges,
+        pollingFrequency * 1_000,
+      );
+    };
+
+    let timeoutId: NodeJS.Timeout | undefined;
     const age = Number.parseInt(action.metadata.age, 10);
     if (age) {
-      // eslint-disable-next-line ts/no-floating-promises
-      new Promise<void>((resolve) => {
-        timeoutId = setTimeout(
-          () => {
-            checkForChanges().then(
-              () => resolve(),
-            ).catch(
-              () => resolve(),
-            );
-          },
-          (pollingFrequency - age) * 1_000,
-        );
-      }).then(() => {
-        startCheckLoop(pollingFrequency);
-      });
+      timeoutId = setTimeout(
+        startCheckLoop,
+        (pollingFrequency - age) * 1_000,
+      );
     } else {
-      startCheckLoop(pollingFrequency);
+      timeoutId = setTimeout(
+        startCheckLoop,
+        pollingFrequency * 1_000,
+      );
     }
 
     return {
@@ -101,7 +93,10 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
       stopFunction(): void {
         events.removeAllListeners();
         if (timeoutId) {
-          clearInterval(timeoutId);
+          clearTimeout(timeoutId);
+        }
+        if (loopId) {
+          clearInterval(loopId);
         }
       },
     };

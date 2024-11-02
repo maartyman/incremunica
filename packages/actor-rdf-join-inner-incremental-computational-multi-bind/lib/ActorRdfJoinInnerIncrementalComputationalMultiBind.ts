@@ -11,7 +11,7 @@ import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
 import type { TestResult } from '@comunica/core';
-import { passTestWithSideData } from '@comunica/core';
+import { failTest, passTest, passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
@@ -196,11 +196,11 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   public async sortJoinEntries(
     entries: IJoinEntryWithMetadata[],
     context: IActionContext,
-  ): Promise<IJoinEntryWithMetadata[]> {
+  ): Promise<TestResult<IJoinEntryWithMetadata[]>> {
     // If there is a stream that can contain undefs, we don't modify the join order.
-    const canContainUndefs = entries.some(entry => entry.metadata.canContainUndefs);
-    if (canContainUndefs) {
-      return entries;
+    const hasUndefVars = entries.some(entry => entry.metadata.variables.some(variable => variable.canBeUndef));
+    if (hasUndefVars) {
+      return passTest(entries);
     }
 
     // Calculate number of occurrences of each variable
@@ -225,7 +225,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
     // Reject if no entries have common variables
     if (multiOccurrenceVariables.length === 0) {
-      throw new Error(`Bind join can only join entries with at least one common variable`);
+      return failTest(`Bind join can only join entries with at least one common variable`);
     }
 
     // Determine entries without common variables
@@ -244,7 +244,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       }
     }
 
-    return (await this.mediatorJoinEntriesSort.mediate({ entries, context })).entries
+    return passTest((await this.mediatorJoinEntriesSort.mediate({ entries, context })).entries
       .sort((entryLeft, entryRight) => {
         // Sort to make sure that entries without common variables come last in the array.
         // For all other entries, the original order is kept.
@@ -256,14 +256,13 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         return leftWithoutCommonVariables ?
           1 :
             -1;
-      });
+      }));
   }
 
-  public async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
-    // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
-    const entriesUnsorted = await ActorRdfJoin.getEntriesWithMetadatas(action.entries);
-    const entries = await this.sortJoinEntries(entriesUnsorted, action.context);
-
+  public async getOutput(
+    action: IActionRdfJoin,
+    sideData: IActorRdfJoinIncrementalComputationalMultiBindTestSideData,
+  ): Promise<IActorRdfJoinOutputInner> {
     const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
     const algebraFactory = new Factory(dataFactory);
     const bindingsFactory = await BindingsFactory.create(
@@ -274,22 +273,22 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
     const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
 
-    for (const [ i, element ] of entries.entries()) {
+    for (const [ i, element ] of sideData.entriesSorted.entries()) {
       if (i !== 0) {
         element.output.bindingsStream.close();
       }
     }
 
     // Take the stream with the lowest cardinality
-    const smallestStream: IQueryOperationResultBindings = entries[0].output;
-    const remainingEntries = [ ...entries ];
+    const smallestStream: IQueryOperationResultBindings = sideData.entriesSorted[0].output;
+    const remainingEntries = [ ...sideData.entriesSorted ];
     remainingEntries.splice(0, 1);
 
     const sources = getOperationSource(remainingEntries[0].operation);
 
     // Bind the remaining patterns for each binding in the stream
     const subContext = action.context
-      .set(KeysQueryOperation.joinLeftMetadata, entries[0].metadata)
+      .set(KeysQueryOperation.joinLeftMetadata, sideData.entriesSorted[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
     const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind
       .createBindStream(
@@ -319,31 +318,44 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         sources ?? [],
         algebraFactory,
         bindingsFactory,
-        entry => hashFunction(entry, [ ...entry.keys() ]),
+        entry => hashFunction(entry, sideData.entriesSorted[0].metadata.variables.map(v => v.variable)),
       );
 
     return {
       result: {
         type: 'bindings',
         bindingsStream,
-        metadata: () => this.constructResultMetadata(entries, entries.map(entry => entry.metadata), action.context),
+        metadata: () => this.constructResultMetadata(
+          sideData.entriesSorted,
+          sideData.entriesSorted.map(entry => entry.metadata),
+          action.context,
+        ),
       },
       physicalPlanMetadata: {
-        bindIndex: entriesUnsorted.indexOf(entries[0]),
+        bindIndex: sideData.entriesUnsorted.indexOf(sideData.entriesSorted[0]),
       },
     };
   }
 
-  protected async getJoinCoefficients(
-    _action: IActionRdfJoin,
+  public async getJoinCoefficients(
+    action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
-  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinIncrementalComputationalMultiBindTestSideData>> {
+    const { metadatas } = sideData;
+    // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
+    const entriesUnsorted = action.entries
+      .map((entry, i) => ({ ...entry, metadata: metadatas[i] }));
+    const entriesTest = await this.sortJoinEntries(entriesUnsorted, action.context);
+    if (entriesTest.isFailed()) {
+      return entriesTest;
+    }
+    const entriesSorted = entriesTest.get();
     return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    }, sideData);
+    }, { ...sideData, entriesUnsorted, entriesSorted });
   }
 }
 
@@ -370,4 +382,9 @@ export interface IActorRdfJoinInnerIncrementalComputationalMultiBindArgs extends
    * The hash bindings mediator
    */
   mediatorHashBindings: MediatorHashBindings;
+}
+
+export interface IActorRdfJoinIncrementalComputationalMultiBindTestSideData extends IActorRdfJoinTestSideData {
+  entriesUnsorted: IJoinEntryWithMetadata[];
+  entriesSorted: IJoinEntryWithMetadata[];
 }

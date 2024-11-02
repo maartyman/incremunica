@@ -2,6 +2,7 @@ import type { IActionHttp, IActorHttpOutput } from '@comunica/bus-http';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { Bus } from '@comunica/core';
 import 'jest-rdf';
+import '@comunica/utils-jest';
 import type { IActionResourceWatch } from '@incremunica/bus-resource-watch';
 import type { Server } from 'ws';
 import { WebSocket } from 'ws';
@@ -130,7 +131,7 @@ IActorHttpOutput
 
       const result = await actor.test(action);
 
-      expect(result).toEqual({ priority });
+      expect(result.get()).toEqual({ priority });
     });
 
     it('should not test if first get fails', async() => {
@@ -138,7 +139,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      await expect(actor.test(action)).rejects.toThrow('');
+      await expect(actor.test(action)).resolves.toFailTest('Failed fetching resource: www.test.com');
     });
 
     it('should not test if second get fails', async() => {
@@ -146,7 +147,8 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createFailedRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      await expect(actor.test(action)).rejects.toThrow('');
+      await expect(actor.test(action)).resolves
+        .toFailTest('Failed fetching resource: http://localhost:3000/.well-known/solid');
     });
 
     it('should not test if third get fails', async() => {
@@ -154,7 +156,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createFailedRequest;
 
-      await expect(actor.test(action)).rejects.toThrow('');
+      await expect(actor.test(action)).resolves.toFailTest('unexpected Content Type');
     });
 
     it('should not test if subscriptionService is undefined', async() => {
@@ -162,7 +164,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      await expect(actor.test(action)).rejects.toThrow('');
+      await expect(actor.test(action)).resolves.toFailTest('Cannot read properties of null (reading \'replace\')');
     });
 
     it('should not test if notificationChannel.receiveFrom is undefined', async() => {
@@ -170,7 +172,8 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createEmptyChannelDescriptionRequest;
 
-      await expect(actor.test(action)).rejects.toThrow('');
+      await expect(actor.test(action))
+        .resolves.toFailTest('Resource does not support Solid Notifications with Websockets');
     });
   });
 
@@ -190,7 +193,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      const result = await actor.run(action);
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
 
       websocket.on('connection', (ws: WebSocket) => {
         message.type = 'Add';
@@ -211,7 +214,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      const result = await actor.run(action);
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
 
       websocket.on('connection', (ws: WebSocket) => {
         message.type = 'Remove';
@@ -232,7 +235,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      const result = await actor.run(action);
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
 
       websocket.on('connection', (ws: WebSocket) => {
         message.type = 'Create';
@@ -253,7 +256,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      const result = await actor.run(action);
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
 
       websocket.on('connection', (ws: WebSocket) => {
         message.type = 'Update';
@@ -274,7 +277,7 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      const result = await actor.run(action);
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
 
       websocket.on('connection', (ws: WebSocket) => {
         message.type = 'Delete';
@@ -368,14 +371,5 @@ IActorHttpOutput
     //
     // result.stopFunction();
     // });
-    //
-
-    it('should fail if websocket is not working', async() => {
-      createResourceRequestFn = createResourceRequest;
-      createDescriptionResourceRequestFn = createDescriptionResourceRequest;
-      createChannelDescriptionRequestFn = createEmptyChannelDescriptionRequest;
-
-      await expect(actor.run(action)).rejects.toThrow('');
-    });
   });
 });

@@ -2,10 +2,9 @@ import '@incremunica/incremental-jest';
 import EventEmitter = require('events');
 import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
-import { ActionContext } from '@comunica/core';
-import { MetadataValidationState } from '@comunica/metadata';
-import type { BindingsStream, IActionContext, IJoinEntry, IQueryOperationResultBindings } from '@comunica/types';
+import type { BindingsStream, IJoinEntry, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
@@ -39,14 +38,12 @@ function nullifyVariables(term?: RDF.Term): RDF.Term | undefined {
 }
 
 describe('DeltaQueryIterator', () => {
-  let context: IActionContext;
   let mediatorQueryOperation: MediatorQueryOperation;
   let mediateFunc: jest.Mock;
   let BF: BindingsFactory;
 
   beforeEach(async() => {
-    context = new ActionContext();
-    BF = await DevTools.createBindingsFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
 
     mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
       const sources = getContextSources(arg.context);
@@ -59,8 +56,16 @@ describe('DeltaQueryIterator', () => {
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 0 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('a') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         };
@@ -86,8 +91,10 @@ describe('DeltaQueryIterator', () => {
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
-          canContainUndefs: false,
-          variables: [ DF.variable('bound') ],
+          variables: [{
+            variable: DF.variable('bound'),
+            canBeUndef: false,
+          }],
         }),
         type: 'bindings',
       };
@@ -113,9 +120,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -132,9 +148,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -144,8 +163,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
@@ -181,9 +202,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -203,9 +233,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), false),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -215,8 +248,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
@@ -272,9 +307,18 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -284,9 +328,12 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -296,8 +343,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(partialArrayifyStream(delta, 1)).resolves.toBeIsomorphicBindingsArray([
@@ -336,9 +385,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -358,9 +416,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -370,8 +431,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
@@ -395,9 +458,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -415,9 +487,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -427,8 +502,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([
@@ -467,9 +544,18 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -479,9 +565,12 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -491,8 +580,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     delta.close();
@@ -529,9 +620,18 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it1,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -541,9 +641,12 @@ describe('DeltaQueryIterator', () => {
         output: <any>{
           bindingsStream: it2,
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -553,8 +656,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     expect(() => {
@@ -573,8 +678,10 @@ describe('DeltaQueryIterator', () => {
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
-          canContainUndefs: false,
-          variables: [ DF.variable('bound') ],
+          variables: [{
+            variable: DF.variable('bound'),
+            canBeUndef: false,
+          }],
         }),
         type: 'bindings',
       };
@@ -594,9 +701,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -610,9 +726,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -622,8 +741,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     await expect(arrayifyStream(delta)).resolves.toBeIsomorphicBindingsArray([]);
@@ -638,8 +759,10 @@ describe('DeltaQueryIterator', () => {
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 1 },
-          canContainUndefs: false,
-          variables: [ DF.variable('bound') ],
+          variables: [{
+            variable: DF.variable('bound'),
+            canBeUndef: false,
+          }],
         }),
         type: 'bindings',
       };
@@ -659,9 +782,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -675,9 +807,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -691,9 +826,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -703,8 +841,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     delta.on('data', () => {});
@@ -733,9 +873,18 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 3 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a'), DF.variable('b') ],
+            variables: [
+              {
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              },
+              {
+                variable: DF.variable('b'),
+                canBeUndef: false,
+              },
+            ],
           }),
           type: 'bindings',
         },
@@ -749,9 +898,12 @@ describe('DeltaQueryIterator', () => {
             ]).setContextEntry(new ActionContextKeyIsAddition(), true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
+            state: new MetadataValidationState(),
             cardinality: { type: 'estimate', value: 1 },
-            canContainUndefs: false,
-            variables: [ DF.variable('a') ],
+            variables: [{
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            }],
           }),
           type: 'bindings',
         },
@@ -761,8 +913,10 @@ describe('DeltaQueryIterator', () => {
 
     const delta = new DeltaQueryIterator(
       action,
-      context,
       mediatorQueryOperation,
+      DF,
+      FACTORY,
+      BF,
     );
 
     delta.on('data', () => {});

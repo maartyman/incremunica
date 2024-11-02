@@ -7,7 +7,7 @@ import type {
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
 import { KeysInitQuery } from '@comunica/context-entries';
 import type { IActorTest, TestResult } from '@comunica/core';
-import { passTestVoid, ActionContext } from '@comunica/core';
+import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
@@ -27,10 +27,10 @@ export class ActorQuerySourceIdentifyStreamingRdfJs extends ActorQuerySourceIden
   public async test(action: IActionQuerySourceIdentify): Promise<TestResult<IActorTest>> {
     const source = action.querySourceUnidentified;
     if (source.type !== undefined && source.type !== 'rdfjs') {
-      return fail(`${this.name} requires a single query source with rdfjs type to be present in the context.`);
+      return failTest(`${this.name} requires a single query source with rdfjs type to be present in the context.`);
     }
     if (typeof source.value === 'string' || !('match' in source.value)) {
-      return fail(`${this.name} actor received an invalid streaming rdfjs query source.`);
+      return failTest(`${this.name} actor received an invalid streaming rdfjs query source.`);
     }
     // TODO add check to make sure the store is a streaming store
     // if (!(source.value instanceof StreamingStore)

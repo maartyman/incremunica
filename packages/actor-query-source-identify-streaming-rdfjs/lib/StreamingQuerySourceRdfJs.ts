@@ -17,9 +17,9 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ClosableIterator } from '@comunica/utils-iterator';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysGuard, KeysStreamingSource } from '@incremunica/context-entries';
+import { KeysStreamingSource } from '@incremunica/context-entries';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
-import type { IGuardEvents, Quad } from '@incremunica/incremental-types';
+import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
@@ -27,11 +27,9 @@ import type {
   QuadTermName,
 } from 'rdf-terms';
 import {
-  filterTermsNested,
   getValueNestedPath,
   reduceTermsNested,
   someTermsNested,
-  uniqTerms,
 } from 'rdf-terms';
 import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
@@ -75,11 +73,6 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       term;
   }
 
-  public static hasDuplicateVariables(pattern: RDF.BaseQuad): boolean {
-    const variables = filterTermsNested(pattern, term => term.termType === 'Variable');
-    return variables.length > 1 && uniqTerms(variables).length < variables.length;
-  }
-
   public async getSelectorShape(): Promise<FragmentSelectorShape> {
     return this.selectorShape;
   }
@@ -116,18 +109,18 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     const quads = filterMatchingQuotedQuads(operation, wrapAsyncIterator<RDF.Quad>(rawStream, { autoStart: false }));
 
     // Set up-to-date property
-    quads.setProperty('up-to-date', true);
-    if (context) {
-      const guardEvents = context.get<IGuardEvents>(KeysGuard.events);
-      if (guardEvents) {
-        guardEvents.on('modified', () => {
-          quads.setProperty('up-to-date', false);
-        });
-        guardEvents.on('up-to-date', () => {
-          quads.setProperty('up-to-date', true);
-        });
-      }
-    }
+    // quads.setProperty('up-to-date', true);
+    // if (context) {
+    //  const guardEvents = context.get<IGuardEvents>(KeysGuard.events);
+    //  if (guardEvents) {
+    //    guardEvents.on('modified', () => {
+    //      quads.setProperty('up-to-date', false);
+    //    });
+    //   guardEvents.on('up-to-date', () => {
+    //      quads.setProperty('up-to-date', true);
+    //    });
+    //  }
+    // }
 
     // Determine metadata
     if (!quads.getProperty('metadata')) {
@@ -154,7 +147,6 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     it.setProperty('metadata', {
       state: new MetadataValidationState(),
       cardinality: { type: 'exact', value: cardinality },
-      canContainUndefs: false,
     });
   }
 

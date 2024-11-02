@@ -40,7 +40,8 @@ export class ActorRdfJoinInnerIncrementalFullHash extends ActorRdfJoin {
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
       entry => hashFunction(entry, commonVariables),
-      entry => hashFunction(entry, [ ...entry.keys() ]),
+      entry => hashFunction(entry, metadatas[0].variables.map(v => v.variable)),
+      entry => hashFunction(entry, metadatas[1].variables.map(v => v.variable)),
     );
     return {
       result: {
@@ -55,7 +56,7 @@ export class ActorRdfJoinInnerIncrementalFullHash extends ActorRdfJoin {
     };
   }
 
-  protected async getJoinCoefficients(
+  public async getJoinCoefficients(
     _action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
   ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {

@@ -1,4 +1,4 @@
-import type { EventEmitter } from 'node:events';
+import type { EventEmitter } from 'events';
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
 

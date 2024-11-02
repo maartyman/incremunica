@@ -1,4 +1,4 @@
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from 'events';
 import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestWithSideData } from '@comunica/core';
@@ -12,6 +12,7 @@ import {
   ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
 import { SubscriptionClient } from '@solid-notifications/subscription';
+import type { NotificationChannel } from '@solid-notifications/types';
 import { ChannelType } from '@solid-notifications/types';
 
 import 'websocket-polyfill';
@@ -35,8 +36,13 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
         init,
       });
 
-    const client = new SubscriptionClient(<typeof fetch>customFetch);
-    const notificationChannel = await client.subscribe(action.url, this.channelType);
+    let notificationChannel: NotificationChannel;
+    try {
+      const client = new SubscriptionClient(<typeof fetch>customFetch);
+      notificationChannel = await client.subscribe(action.url, this.channelType);
+    } catch (error) {
+      return failTest((<any>error).message);
+    }
 
     if (notificationChannel.receiveFrom === undefined) {
       return failTest('Resource does not support Solid Notifications with Websockets');

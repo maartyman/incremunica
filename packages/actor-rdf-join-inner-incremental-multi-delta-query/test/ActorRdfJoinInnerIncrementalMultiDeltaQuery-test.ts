@@ -1,12 +1,13 @@
+import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { IActionQueryOperation, MediatorQueryOperation } from '@comunica/bus-query-operation';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type {
   MediatorRdfJoinSelectivity,
 } from '@comunica/bus-rdf-join-selectivity';
 import { ActionContext, Bus } from '@comunica/core';
-import { MetadataValidationState } from '@comunica/metadata';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
@@ -26,13 +27,14 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    BF = await DevTools.createBindingsFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinInnerIncrementalMultiDeltaQuery instance', () => {
     let mediatorJoinSelectivity: MediatorRdfJoinSelectivity;
     let context: IActionContext;
     let mediatorQueryOperation: MediatorQueryOperation;
+    let mediatorMergeBindingsContext: MediatorMergeBindingsContext;
     let actor: ActorRdfJoinInnerIncrementalMultiDeltaQuery;
 
     beforeEach(() => {
@@ -57,19 +59,23 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
             metadata: () => Promise.resolve({
               state: new MetadataValidationState(),
               cardinality: { type: 'estimate', value: 3 },
-              canContainUndefs: false,
-              variables: [ DF.variable('bound') ],
+              variables: [{
+                variable: DF.variable('bound'),
+                canBeUndef: false,
+              }],
             }),
             type: 'bindings',
           };
         }),
       };
+      mediatorMergeBindingsContext = DevTools.createTestMediatorMergeBindingsContext();
       actor = new ActorRdfJoinInnerIncrementalMultiDeltaQuery({
         name: 'actor',
         bus,
         selectivityModifier: 0.1,
         mediatorQueryOperation,
         mediatorJoinSelectivity,
+        mediatorMergeBindingsContext,
       });
     });
 
@@ -94,33 +100,40 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
             ],
             context: new ActionContext(),
           },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              pageSize: 100,
-              requestTime: 20,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 5 },
-              pageSize: 100,
-              requestTime: 30,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-          ],
-          // TODO
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  variable: DF.variable('a'),
+                  canBeUndef: false,
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  variable: DF.variable('a'),
+                  canBeUndef: false,
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 5 },
+                pageSize: 100,
+                requestTime: 30,
+                variables: [{
+                  variable: DF.variable('a'),
+                  canBeUndef: false,
+                }],
+              },
+            ],
+          },
         )).resolves.toEqual({
           iterations: 0,
           persistedItems: 0,
@@ -142,16 +155,20 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
             context: new ActionContext()
               .set(KeysDeltaQueryJoin.fromDeltaQuery, true),
           },
-          [
-            {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              pageSize: 100,
-              requestTime: 10,
-              canContainUndefs: false,
-              variables: [ DF.variable('a') ],
-            },
-          ],
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  variable: DF.variable('a'),
+                  canBeUndef: false,
+                }],
+              },
+            ],
+          },
         )).rejects.toEqual(new Error('Can\'t do two delta query joins after each other'));
       });
     });
@@ -177,8 +194,16 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 3 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -197,8 +222,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    variable: DF.variable('a'),
+                    canBeUndef: false,
+                  }],
                 }),
                 type: 'bindings',
               },
@@ -240,8 +267,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
         await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 2.400_000_000_000_000_4 },
-          canContainUndefs: false,
-          variables: [ DF.variable('a'), DF.variable('b') ],
+          variables: [{
+            canBeUndef: false,
+            variable: DF.variable('a'),
+          }, {
+            canBeUndef: false,
+            variable: DF.variable('b'),
+          }],
         });
       });
 
@@ -264,9 +296,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 3 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -286,9 +327,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('c') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('c'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -305,9 +355,12 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    variable: DF.variable('a'),
+                    canBeUndef: false,
+                  }],
                 }),
                 type: 'bindings',
               },
@@ -365,9 +418,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -382,9 +444,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('bound') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('bound'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -417,9 +488,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -439,9 +519,12 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    variable: DF.variable('a'),
+                    canBeUndef: false,
+                  }],
                 }),
                 type: 'bindings',
               },
@@ -511,9 +594,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -536,9 +628,12 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    variable: DF.variable('a'),
+                    canBeUndef: false,
+                  }],
                 }),
                 type: 'bindings',
               },
@@ -620,9 +715,18 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      variable: DF.variable('a'),
+                      canBeUndef: false,
+                    },
+                    {
+                      variable: DF.variable('b'),
+                      canBeUndef: false,
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
@@ -648,9 +752,12 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   ]).setContextEntry(new ActionContextKeyIsAddition(), false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
+                  state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 1 },
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    variable: DF.variable('a'),
+                    canBeUndef: false,
+                  }],
                 }),
                 type: 'bindings',
               },

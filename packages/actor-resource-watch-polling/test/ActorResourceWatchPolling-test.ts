@@ -73,10 +73,49 @@ IActorHttpOutput
           age: undefined,
         },
       };
+
+      jest.spyOn(globalThis, 'setTimeout');
+      jest.spyOn(globalThis, 'clearTimeout');
+      jest.spyOn(globalThis, 'setInterval');
+      jest.spyOn(globalThis, 'clearInterval');
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
     it('should test', async() => {
-      await expect(actor.test(action)).resolves.toEqual({ priority });
+      await expect(actor.test(action)).resolves.toEqual({
+        sideData: undefined,
+        value: {
+          priority: 0,
+        },
+      });
+    });
+
+    it('should emit "delete" if HTTP mediator errors', async() => {
+      mediatorHttp.mediate = async(): Promise<IActorHttpOutput> => {
+        throw new Error('Test error in HTTP mediator');
+      };
+      headersObject.etag = 0;
+
+      const result = await actor.run(action);
+      expect(setInterval).toHaveBeenCalledTimes(0);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 1000);
+
+      headersObject.etag = 1;
+      await new Promise<void>(resolve => result.events.on('delete', () => {
+        resolve();
+      }));
+
+      expect(true).toBeTruthy();
+      expect(setInterval).toHaveBeenCalledTimes(1);
+      expect(setInterval).toHaveBeenNthCalledWith(1, expect.any(Function), 1000);
+
+      result.stopFunction();
+      expect(clearTimeout).toHaveBeenCalledTimes(1);
+      expect(clearInterval).toHaveBeenCalledTimes(1);
     });
 
     it('should get an update if the etag changes', async() => {
@@ -93,6 +132,8 @@ IActorHttpOutput
       expect(true).toBeTruthy();
 
       result.stopFunction();
+      expect(clearTimeout).toHaveBeenCalledTimes(1);
+      expect(clearInterval).toHaveBeenCalledTimes(1);
     });
 
     it('should use cache control', async() => {
@@ -104,6 +145,9 @@ IActorHttpOutput
       };
 
       const result = await actor.run(action);
+      expect(setInterval).toHaveBeenCalledTimes(0);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 5000);
 
       headersObject.etag = 1;
 
@@ -114,6 +158,29 @@ IActorHttpOutput
       expect(process.hrtime(time)[0]).toBeGreaterThanOrEqual(3);
 
       result.stopFunction();
+      expect(setInterval).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(setInterval).toHaveBeenNthCalledWith(1, expect.any(Function), 5000);
+      expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 5000);
+      expect(clearTimeout).toHaveBeenCalledTimes(1);
+      expect(clearInterval).toHaveBeenCalledTimes(1);
+    });
+
+    it('should clear timeout if immediately stopped', async() => {
+      // Set data of file by setting etag and store
+      action.metadata = {
+        etag: 0,
+        'cache-control': 'max-age=30',
+        age: '25',
+      };
+
+      const result = await actor.run(action);
+      expect(setInterval).toHaveBeenCalledTimes(0);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 5000);
+      result.stopFunction();
+      expect(clearTimeout).toHaveBeenCalledTimes(1);
+      expect(clearInterval).toHaveBeenCalledTimes(0);
     });
 
     it('should use age', async() => {
@@ -133,8 +200,14 @@ IActorHttpOutput
         resolve();
       }));
       expect(process.hrtime(time)[0]).toBeGreaterThanOrEqual(3);
+      expect(setInterval).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(setInterval).toHaveBeenNthCalledWith(1, expect.any(Function), 30000);
+      expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 5000);
 
       result.stopFunction();
+      expect(clearTimeout).toHaveBeenCalledTimes(1);
+      expect(clearInterval).toHaveBeenCalledTimes(1);
     });
   });
 });

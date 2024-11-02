@@ -1,9 +1,10 @@
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
 import { ActionContext, Bus } from '@comunica/core';
-import type { IActionContext } from '@comunica/types';
+import { DevTools } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import { ActorQuerySourceIdentifyStreamingRdfJs, StreamingQuerySourceRdfJs } from '..';
 import 'jest-rdf';
+import '@comunica/utils-jest';
 
 const mediatorMergeBindingsContext: any = {
   mediate(arg: any) {
@@ -13,11 +14,9 @@ const mediatorMergeBindingsContext: any = {
 
 describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
   let bus: any;
-  let context: IActionContext;
 
   beforeEach(() => {
     bus = new Bus({ name: 'bus' });
-    context = new ActionContext();
   });
 
   describe('The ActorQuerySourceIdentifyStreamingRdfJs module', () => {
@@ -60,27 +59,27 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
         await expect(actor.test({
           querySourceUnidentified: { type: 'sparql', value: source },
           context: new ActionContext(),
-        })).rejects.toThrow(`actor requires a single query source with rdfjs type to be present in the context.`);
+        })).resolves.toFailTest(`actor requires a single query source with rdfjs type to be present in the context.`);
       });
 
       it('should not test with string value', async() => {
         await expect(actor.test({
           querySourceUnidentified: { type: 'rdfjs', value: 'abc' },
           context: new ActionContext(),
-        })).rejects.toThrow(`actor received an invalid streaming rdfjs query source.`);
+        })).resolves.toFailTest(`actor received an invalid streaming rdfjs query source.`);
       });
 
       it('should not test with invalid source value', async() => {
         await expect(actor.test({
           querySourceUnidentified: { type: 'rdfjs', value: <any>{}},
           context: new ActionContext(),
-        })).rejects.toThrow(`actor received an invalid streaming rdfjs query source.`);
+        })).resolves.toFailTest(`actor received an invalid streaming rdfjs query source.`);
       });
     });
 
     describe('run', () => {
       it('should get the source', async() => {
-        const contextIn = new ActionContext();
+        const contextIn = DevTools.createTestContextWithDataFactory();
         const ret = await actor.run({
           querySourceUnidentified: { type: 'rdfjs', value: source },
           context: contextIn,
@@ -90,7 +89,7 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
       });
 
       it('should get the source with context', async() => {
-        const contextIn = new ActionContext();
+        const contextIn = DevTools.createTestContextWithDataFactory();
         const contextSource = new ActionContext();
         const ret = await actor.run({
           querySourceUnidentified: { type: 'rdfjs', value: source, context: contextSource },

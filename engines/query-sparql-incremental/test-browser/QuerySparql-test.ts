@@ -3,14 +3,13 @@
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
 import '@incremunica/incremental-jest';
-import type { EventEmitter } from 'node:events';
+import type { EventEmitter } from 'events';
 import type { BindingsStream, QueryStringContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
-import { expect } from '@playwright/test';
 import { DataFactory } from 'rdf-data-factory';
 import { QueryEngine } from '../lib/QueryEngine';
 import { usePolly } from '../test/util';
@@ -40,7 +39,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
   beforeEach(async() => {
     engine = new QueryEngine();
-    BF = await DevTools.createBindingsFactory(DF);
+    BF = await DevTools.createTestBindingsFactory(DF);
   });
 
   describe('using Streaming Store', () => {
@@ -80,7 +79,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('s'), DF.namedNode('s3') ],
           [ DF.variable('p'), DF.namedNode('p3') ],
           [ DF.variable('o'), DF.namedNode('o3') ],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.removeQuad(quad('s3', 'p3', 'o3'));
@@ -126,7 +125,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('o1'), DF.namedNode('o1') ],
           [ DF.variable('p2'), DF.namedNode('p3') ],
           [ DF.variable('o2'), DF.namedNode('o3') ],
-        ]),
+        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
       ]);
 
       streamingStore.removeQuad(quad('o1', 'p3', 'o3'));
@@ -166,7 +165,7 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine', async() => {
@@ -176,22 +175,22 @@ describe('System test: QuerySparql (with polly)', () => {
       const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine and wait a bit until the polling is removed', async() => {
@@ -201,12 +200,12 @@ describe('System test: QuerySparql (with polly)', () => {
       const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
 
-      await new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 4000));
 
       bindingStream = await engine.queryBindings(query, context);
-      expect((await partialArrayifyStream(bindingStream, 100)).length).toBeGreaterThan(100);
+      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
     });
 
     describe('simple SPS', () => {
@@ -215,7 +214,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 1)).length).toBeGreaterThan(0);
+        expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
       });
     });
 
@@ -226,7 +225,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 20)).length).toBeGreaterThan(20);
+        expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
       });
 
       it('for the single source entry', async() => {
@@ -235,7 +234,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, { sources: [ 'https://www.rubensworks.net/' ]});
 
-        expect((await partialArrayifyStream(bindingStream, 20)).length).toBeGreaterThan(20);
+        expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
       });
 
       describe('SHACL Compact Syntax Serialisation', () => {
@@ -249,7 +248,7 @@ describe('System test: QuerySparql (with polly)', () => {
             ],
           });
 
-          expect((await partialArrayifyStream(bindingStream, 1)).length).toBeGreaterThan(0);
+          expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
         });
       });
     });
