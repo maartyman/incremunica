@@ -12,8 +12,7 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { BindingsStream, IActionContext, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysStreamingSource } from '@incremunica/context-entries';
+import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator, WrappingIterator } from 'asynciterator';
@@ -92,13 +91,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             bindingsStream: new ArrayIterator([
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
             ], { autoStart: false }),
             metadata: () => Promise.resolve({
               state: new MetadataValidationState(),
@@ -998,13 +997,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1029,10 +1028,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1057,27 +1056,27 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
@@ -1102,13 +1101,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1133,13 +1132,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1164,10 +1163,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1191,27 +1190,27 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
@@ -1276,7 +1275,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           }),
         });
         expect(mediatorQueryOperation.mediate).toHaveBeenNthCalledWith(2, {
@@ -1321,7 +1320,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             ],
             [KeysQueryOperation.joinBindings.name]: BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           }),
         });
       });
@@ -1335,10 +1334,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -1367,7 +1366,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   BF.bindings([
                     [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1415,13 +1414,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             const tempStream: Stream = streamifyArray([
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
             ]);
             tempStream.pipe(unionStream, { end: false });
 
@@ -1501,7 +1500,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
         const tempStream: Stream = streamifyArray([
           BF.bindings([
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         const alteringStream = tempStream.pipe(new PassThrough({
           objectMode: true,
@@ -1516,10 +1515,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -1569,36 +1568,36 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
 
         alteringStream.push(
           BF.bindings([
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         );
 
         await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
 
         alteringStream.end();
@@ -1632,13 +1631,13 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               const tempStream: Stream = streamifyArray([
                 BF.bindings([
                   [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-                ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                ]).setContextEntry(KeysBindings.isAddition, true),
                 BF.bindings([
                   [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-                ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                ]).setContextEntry(KeysBindings.isAddition, true),
                 BF.bindings([
                   [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-                ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                ]).setContextEntry(KeysBindings.isAddition, true),
               ]);
               tempStream.pipe(unionStream, { end: false });
 
@@ -1716,10 +1715,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b3') ],
                     ]),
@@ -1747,7 +1746,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
                       [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                   ]),
                   metadata: () => Promise.resolve({
                     state: new MetadataValidationState(),
@@ -1773,15 +1772,15 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           for (const stream of streams) {
@@ -1796,7 +1795,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
           expect(resumeMock).toHaveBeenCalledTimes(0);
@@ -1805,7 +1804,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             stream.push(
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+              ]).setContextEntry(KeysBindings.isAddition, false),
             );
           }
 
@@ -1813,7 +1812,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
           expect(resumeMock).toHaveBeenCalledTimes(0);
@@ -1824,7 +1823,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           const tempStream: Stream = streamifyArray([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
           const alteringStream = tempStream.pipe(new PassThrough({
             objectMode: true,
@@ -1839,10 +1838,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b3') ],
                     ]),
@@ -1892,15 +1891,15 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           alteringStream.push(
@@ -1913,15 +1912,15 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
           expect(haltMock).toHaveBeenCalledTimes(0);
           expect(resumeMock).toHaveBeenCalledTimes(0);
@@ -1929,29 +1928,29 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           alteringStream.push(
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           );
 
           await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ]);
 
           for (const stream of streams) {
             stream.push(
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+              ]).setContextEntry(KeysBindings.isAddition, false),
             );
           }
 
@@ -1959,7 +1958,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ]);
 
           const promisses = [];
@@ -1984,7 +1983,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           const tempStream: Stream = streamifyArray([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
           const alteringStream = tempStream.pipe(new PassThrough({
             objectMode: true,
@@ -1999,10 +1998,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
                   bindingsStream: new ArrayIterator([
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                    ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                    ]).setContextEntry(KeysBindings.isAddition, true),
                     BF.bindings([
                       [ DF.variable('b'), DF.namedNode('ex:b3') ],
                     ]),
@@ -2052,42 +2051,42 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           alteringStream.push(
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           );
 
           await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
             BF.bindings([
               [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ]);
 
           alteringStream.push(
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           );
 
           const promisses = [];

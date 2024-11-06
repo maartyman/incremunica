@@ -1,11 +1,11 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { bindingsToString } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import toEqualBindings from './toEqualBindings';
 
 export function bindingsArrayToString(bindings: Bindings[]): string {
   if (bindings.length > 0) {
-    return `[${bindings.map(term => (`\n\t${bindingsToString(term).replaceAll('\n', '\n\t')}, isAddition: ${term.getContextEntry<boolean>(new ActionContextKeyIsAddition())}`)).join('')}\n]`;
+    return `[${bindings.map(term => (`\n\t${bindingsToString(term).replaceAll('\n', '\n\t')}, isAddition: ${term.getContextEntry<boolean>(KeysBindings.isAddition)}`)).join('')}\n]`;
   }
   return `[ ]`;
 }

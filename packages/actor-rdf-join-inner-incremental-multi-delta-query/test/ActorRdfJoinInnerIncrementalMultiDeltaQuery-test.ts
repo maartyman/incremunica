@@ -8,8 +8,7 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
+import { KeysBindings, KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
@@ -48,13 +47,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
             bindingsStream: new ArrayIterator([
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+              ]).setContextEntry(KeysBindings.isAddition, true),
             ], { autoStart: false }),
             metadata: () => Promise.resolve({
               state: new MetadataValidationState(),
@@ -183,13 +182,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -214,10 +213,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -242,27 +241,27 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
@@ -287,13 +286,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -318,13 +317,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('c'), DF.namedNode('ex:c3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -349,10 +348,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -376,27 +375,27 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
@@ -409,10 +408,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -441,7 +440,7 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                   BF.bindings([
                     [ DF.variable('bound'), DF.namedNode('ex:bound4') ],
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -479,10 +478,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -510,13 +509,13 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -540,39 +539,39 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -585,10 +584,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -616,16 +615,16 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -649,51 +648,51 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -706,10 +705,10 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
                   ]),
@@ -737,19 +736,19 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -773,63 +772,63 @@ describe('ActorRdfJoinInnerIncrementalMultiDeltaQuery', () => {
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
             [ DF.variable('a'), DF.namedNode('ex:a1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
     });

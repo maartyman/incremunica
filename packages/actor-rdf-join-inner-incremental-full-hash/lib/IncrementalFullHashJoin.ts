@@ -1,5 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 import type { IMapObject } from './DualKeyHashMap';
@@ -48,7 +48,7 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
     memory: DualKeyHashMap<Bindings>,
     hash: number,
   ): boolean {
-    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       memory.set(hash, joinHash, item);
       return true;
     }

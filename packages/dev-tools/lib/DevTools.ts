@@ -6,9 +6,9 @@ import type { BindingsStream, IActionContext } from '@comunica/types';
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import {
-  ActionContextKeyIsAddition,
   ActorMergeBindingsContextIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
 import MurmurHash3 from 'imurmurhash';
 import { DataFactory } from 'rdf-data-factory';
@@ -18,7 +18,7 @@ const DF = new DataFactory();
 
 export const DevTools = {
   bindingsToString(bindings: Bindings) {
-    let string = `bindings, ${bindings.getContextEntry<boolean>(new ActionContextKeyIsAddition())} :`;
+    let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
     for (const [ key, value ] of bindings) {
       string += `\n\t${key.value}: ${value.value}`;
     }
@@ -26,7 +26,7 @@ export const DevTools = {
   },
 
   printBindings(bindings: Bindings) {
-    let string = `bindings, ${bindings.getContextEntry<boolean>(new ActionContextKeyIsAddition())} :`;
+    let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
     for (const [ key, value ] of bindings) {
       string += `\n\t${key.value}: ${value.value}`;
     }
@@ -48,7 +48,7 @@ export const DevTools = {
 
   quad(isAddition: boolean, s: string, p: string, o: string, g?: string): Quad {
     const quad = <Quad>(DF.quad(DF.namedNode(s), DF.namedNode(p), DF.namedNode(o), g ? DF.namedNode(g) : undefined));
-    quad.diff = isAddition;
+    quad.isAddition = isAddition;
     return quad;
   },
 

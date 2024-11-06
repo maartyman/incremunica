@@ -1,5 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
 
 export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
@@ -20,7 +20,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   }
 
   private addOrDeleteFromMemory(item: Bindings, memory: Bindings[]): boolean {
-    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       memory.push(item);
       return true;
     }

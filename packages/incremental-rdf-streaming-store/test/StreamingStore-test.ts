@@ -97,8 +97,8 @@ describe('StreamStore', () => {
 
     const quad1 = <Quad>quad('s1', 'p1', 'o1');
     const quad2 = <Quad>quad('s2', 'p2', 'o2');
-    quad1.diff = false;
-    quad2.diff = false;
+    quad1.isAddition = false;
+    quad2.isAddition = false;
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad1,
@@ -551,7 +551,7 @@ describe('StreamStore', () => {
     const match1 = store.match();
     const match2 = store.match();
     const posQuad = quad('s5', 'p5', 'o5');
-    posQuad.diff = true;
+    posQuad.isAddition = true;
 
     await promisifyEventEmitter(store.remove(streamifyArray([
       quad('s2', 'p2', 'o2'),
@@ -892,8 +892,8 @@ describe('StreamStore', () => {
     const quad1 = quad('s1', 'p1', 'o1');
     const quad2 = quad('s2', 'p2', 'o2');
 
-    quad1.diff = false;
-    quad2.diff = false;
+    quad1.isAddition = false;
+    quad2.isAddition = false;
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad1,
@@ -922,7 +922,7 @@ describe('StreamStore', () => {
     ]);
 
     const quad1 = <Quad>quad('s2', 'p2', 'o2');
-    quad1.diff = true;
+    quad1.isAddition = true;
     store.addQuad(quad1);
 
     await expect(
@@ -933,7 +933,7 @@ describe('StreamStore', () => {
     ]);
 
     const quad2 = <Quad>quad('s2', 'p2', 'o2');
-    quad2.diff = false;
+    quad2.isAddition = false;
     store.addQuad(quad2);
 
     await expect(
@@ -953,11 +953,11 @@ describe('StreamStore', () => {
 
   it('should handle single quad removals', async() => {
     const quad1 = <Quad>quad('s1', 'p1', 'o1');
-    quad1.diff = true;
+    quad1.isAddition = true;
     store.removeQuad(quad1);
 
     const quad2 = <Quad>quad('s2', 'p2', 'o2');
-    quad2.diff = true;
+    quad2.isAddition = true;
     store.removeQuad(quad2);
 
     const match = store.match();
@@ -978,7 +978,7 @@ describe('StreamStore', () => {
     ]);
 
     const quad3 = <Quad>quad('s2', 'p2', 'o2');
-    quad3.diff = false;
+    quad3.isAddition = false;
     store.addQuad(quad3);
 
     await expect(

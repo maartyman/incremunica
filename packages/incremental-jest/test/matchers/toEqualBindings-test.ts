@@ -1,6 +1,6 @@
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import '../../lib';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 
@@ -22,20 +22,20 @@ describe('toEqualBindings', () => {
     expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)).toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, true)).toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+    ]).setContextEntry(KeysBindings.isAddition, true));
   });
 
   it('should not succeed for non-equal bindings', () => {
     expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)).not.toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, true)).not.toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a2') ],
       [ DF.variable('b'), DF.namedNode('b2') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+    ]).setContextEntry(KeysBindings.isAddition, true));
   });
 
   it('should not fail for equal empty bindings', () => {
@@ -51,10 +51,10 @@ Received:
     expect(() => expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)).not.toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, true)).not.toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)))
+    ]).setContextEntry(KeysBindings.isAddition, true)))
       .toThrow(`
 Expected:
 {
@@ -72,10 +72,10 @@ Received:
     expect(() => expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)).toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, true)).toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a2') ],
       [ DF.variable('b'), DF.namedNode('b2') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true)))
+    ]).setContextEntry(KeysBindings.isAddition, true)))
       .toThrow(`
 {
   "a": "a2",
@@ -92,19 +92,19 @@ Received:
     expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), false)).toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, false)).toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), false));
+    ]).setContextEntry(KeysBindings.isAddition, false));
   });
 
   it('should not succeed for equal bindings with different diffs', () => {
     expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), false)).not.toEqualBindings(BF.bindings([
+    ]).setContextEntry(KeysBindings.isAddition, false)).not.toEqualBindings(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],
       [ DF.variable('b'), DF.namedNode('b1') ],
-    ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+    ]).setContextEntry(KeysBindings.isAddition, true));
   });
 });

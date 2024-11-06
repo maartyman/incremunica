@@ -1,9 +1,10 @@
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
-import { ActionContextKeyIsAddition, ActorMergeBindingsContextIsAddition } from '../lib';
+import { ActorMergeBindingsContextIsAddition } from '../lib';
 import '@incremunica/incremental-jest';
 
 const DF = new DataFactory();
@@ -27,7 +28,7 @@ describe('ActorMergeBindingsContextIsAddition', () => {
     await expect(actor.run({ context })).resolves.toMatchObject(
       {
         mergeHandlers: {
-          '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition': {
+          '@incremunica/bindings:isAddition': {
             run: expect.any(Function),
           },
         },
@@ -38,7 +39,7 @@ describe('ActorMergeBindingsContextIsAddition', () => {
     let mergeHandler: (...args: boolean[]) => boolean;
     beforeEach(async() => {
       mergeHandler = (await actor.run({ context }))
-        .mergeHandlers['@incremunica/actor-query-operation-incremental-distinct-hash:isAddition'].run;
+        .mergeHandlers['@incremunica/bindings:isAddition'].run;
     });
 
     it('should return false if the first is false', async() => {
@@ -77,25 +78,25 @@ describe('ActorMergeBindingsContextIsAddition', () => {
     it('should work with addition bindings', async() => {
       const bindings1 = BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true);
+      ]).setContextEntry(KeysBindings.isAddition, true);
       const bindings2 = BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true);
+      ]).setContextEntry(KeysBindings.isAddition, true);
       expect(bindings1.merge(bindings2)).toEqualBindings(BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+      ]).setContextEntry(KeysBindings.isAddition, true));
     });
 
     it('should work with deletion bindings', async() => {
       const bindings1 = BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false);
+      ]).setContextEntry(KeysBindings.isAddition, false);
       const bindings2 = BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true);
+      ]).setContextEntry(KeysBindings.isAddition, true);
       expect(bindings1.merge(bindings2)).toEqualBindings(BF.bindings([
         [ DF.variable('a'), DF.literal('1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false));
+      ]).setContextEntry(KeysBindings.isAddition, false));
     });
   });
 });

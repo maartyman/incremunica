@@ -1,5 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 
@@ -35,7 +35,7 @@ export class IncrementalPartialHashJoin extends IncrementalInnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);

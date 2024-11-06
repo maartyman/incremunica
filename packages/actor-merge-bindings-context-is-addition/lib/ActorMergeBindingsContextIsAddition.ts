@@ -8,7 +8,6 @@ import {
 } from '@comunica/bus-merge-bindings-context';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { passTestVoid } from '@comunica/core';
-import type { IActionContextKey } from '@comunica/types';
 
 /**
  * A incremunica actor for the creation of merge handlers for binding context keys.
@@ -26,15 +25,10 @@ export class ActorMergeBindingsContextIsAddition extends ActorMergeBindingsConte
     const handlerFunc = (...args: boolean[]): boolean => args.reduce((acc, cur) => acc && cur);
     return {
       mergeHandlers: {
-        '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition': {
+        '@incremunica/bindings:isAddition': {
           run: handlerFunc,
         },
       },
     };
   }
-}
-
-export class ActionContextKeyIsAddition implements IActionContextKey<boolean> {
-  public readonly name = '@incremunica/actor-query-operation-incremental-distinct-hash:isAddition';
-  public readonly dummy: boolean | undefined;
 }

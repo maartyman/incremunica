@@ -3,8 +3,7 @@ import { KeysQueryOperation } from '@comunica/context-entries';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysStreamingSource } from '@incremunica/context-entries';
+import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
@@ -107,11 +106,11 @@ describe('StreamingQuerySourceRdfJs', () => {
         BF.fromRecord({
           s: DF.namedNode('s2'),
           o: DF.namedNode('o2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       //
@@ -144,7 +143,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
       await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
         .toEqual({
@@ -175,7 +174,7 @@ describe('StreamingQuerySourceRdfJs', () => {
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
           g: DF.namedNode('g1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
       //
       // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
@@ -205,12 +204,12 @@ describe('StreamingQuerySourceRdfJs', () => {
           s: DF.namedNode('s2'),
           o: DF.namedNode('o2'),
           g: DF.defaultGraph(),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
           g: DF.namedNode('g1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
       //
       // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
@@ -239,11 +238,11 @@ describe('StreamingQuerySourceRdfJs', () => {
         BF.fromRecord({
           s: DF.namedNode('s2'),
           o: DF.namedNode('o2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       //
@@ -280,11 +279,11 @@ describe('StreamingQuerySourceRdfJs', () => {
         BF.fromRecord({
           s: DF.namedNode('s2'),
           o: DF.namedNode('o2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       //
@@ -354,15 +353,15 @@ describe('StreamingQuerySourceRdfJs', () => {
                 DF.namedNode('pax'),
                 DF.namedNode('oa3'),
               ),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s2'),
               o: DF.namedNode('o2'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s1'),
               o: DF.namedNode('o1'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           //
@@ -412,7 +411,7 @@ describe('StreamingQuerySourceRdfJs', () => {
               s1: DF.namedNode('sa3'),
               p1: DF.namedNode('pax'),
               o1: DF.namedNode('oa3'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
@@ -464,7 +463,7 @@ describe('StreamingQuerySourceRdfJs', () => {
               p: DF.namedNode('px'),
               s1: DF.namedNode('sb3'),
               o1: DF.namedNode('ob3'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
@@ -531,7 +530,7 @@ describe('StreamingQuerySourceRdfJs', () => {
               s2: DF.namedNode('sb3'),
               pcx: DF.namedNode('pbx'),
               o2: DF.namedNode('ob3'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
@@ -594,15 +593,15 @@ describe('StreamingQuerySourceRdfJs', () => {
                 DF.namedNode('pax'),
                 DF.namedNode('oa3'),
               ),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s2'),
               o: DF.namedNode('o2'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s1'),
               o: DF.namedNode('o1'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           //
@@ -652,7 +651,7 @@ describe('StreamingQuerySourceRdfJs', () => {
               s1: DF.namedNode('sa3'),
               p1: DF.namedNode('pax'),
               o1: DF.namedNode('oa3'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
           //
@@ -707,7 +706,7 @@ describe('StreamingQuerySourceRdfJs', () => {
               p: DF.namedNode('px'),
               s1: DF.namedNode('sb3'),
               o1: DF.namedNode('ob3'),
-            }).setContextEntry(new ActionContextKeyIsAddition(), true),
+            }).setContextEntry(KeysBindings.isAddition, true),
           ]);
           //
           // await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
@@ -773,16 +772,16 @@ describe('StreamingQuerySourceRdfJs', () => {
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
           p: DF.namedNode('p1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p3'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), false),
+        }).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       // Check metadata
@@ -820,13 +819,13 @@ describe('StreamingQuerySourceRdfJs', () => {
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
           p: DF.namedNode('p1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p3'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       // Check metadata
@@ -889,13 +888,13 @@ describe('StreamingQuerySourceRdfJs', () => {
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
           p: DF.namedNode('p1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p3'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       // Check metadata
@@ -975,15 +974,15 @@ describe('StreamingQuerySourceRdfJs', () => {
         BF.fromRecord({
           p: DF.namedNode('p2'),
           g: DF.namedNode('g1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p3'),
           g: DF.namedNode('g2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p2'),
           g: DF.namedNode('g1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), false),
+        }).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       // Check metadata
@@ -1033,16 +1032,16 @@ describe('StreamingQuerySourceRdfJs', () => {
       //         BF.fromRecord({
       //           p: DF.namedNode('p1'),
       //           g: DF.defaultGraph(),
-      //         }).setContextEntry(new ActionContextKeyIsAddition(), true),
+      //         }).setContextEntry(KeysBindings.isAddition, true),
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
           p: DF.namedNode('p2'),
           g: DF.namedNode('g1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
           p: DF.namedNode('p3'),
           g: DF.namedNode('g2'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       //
@@ -1091,7 +1090,7 @@ describe('StreamingQuerySourceRdfJs', () => {
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
           x: DF.namedNode('s1'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       // Check metadata
@@ -1132,7 +1131,7 @@ describe('StreamingQuerySourceRdfJs', () => {
           p: DF.namedNode('p2'),
           os: DF.namedNode('o2s'),
           op: DF.namedNode('o2p'),
-        }).setContextEntry(new ActionContextKeyIsAddition(), true),
+        }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       // Check metadata

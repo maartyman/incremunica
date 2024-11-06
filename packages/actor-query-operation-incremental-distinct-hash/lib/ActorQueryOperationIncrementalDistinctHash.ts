@@ -15,7 +15,7 @@ import type {
 } from '@comunica/types';
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, getSafeQuads } from '@comunica/utils-query-operation';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
 import type { AsyncIterator } from 'asynciterator';
 import type * as RDF from 'rdf-js';
@@ -84,7 +84,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
     return (bindings: Bindings) => {
       const hash = hashFunction(bindings, variables);
       const hasMapValue = hashes.get(hash);
-      if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
+      if (bindings.getContextEntry(KeysBindings.isAddition)) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;
@@ -118,8 +118,8 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
       const quad = <Quad>rdfQuad;
       const hash = hashFunction(quad);
       const hasMapValue = hashes.get(hash);
-      quad.diff = quad.diff ?? true;
-      if (quad.diff) {
+      quad.isAddition = quad.isAddition ?? true;
+      if (quad.isAddition) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;

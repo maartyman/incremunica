@@ -8,9 +8,7 @@ import { Bus } from '@comunica/core';
 import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import {
-  ActionContextKeyIsAddition,
-} from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import arrayifyStream from 'arrayify-stream';
@@ -225,7 +223,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -235,11 +233,11 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -266,7 +264,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -276,7 +274,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -293,7 +291,7 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
     });
 
@@ -307,7 +305,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -317,7 +315,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('d') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -333,7 +331,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
     });
 
@@ -347,27 +345,27 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -377,27 +375,27 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('5') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('0') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('0') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('7') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -409,42 +407,42 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('5') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('5') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('7') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('4') ],
           [ DF.variable('c'), DF.literal('7') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -467,23 +465,23 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -493,15 +491,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -513,35 +511,35 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -564,23 +562,23 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -595,15 +593,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -614,32 +612,32 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -662,15 +660,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -680,23 +678,23 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -707,16 +705,16 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -739,15 +737,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -760,23 +758,23 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -787,80 +785,80 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
-        BF.bindings([
-          [ DF.variable('a'), DF.literal('1') ],
-          [ DF.variable('b'), DF.literal('2') ],
-          [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -883,15 +881,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -901,15 +899,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -921,12 +919,12 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -949,15 +947,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -967,15 +965,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -987,17 +985,17 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
         { variable: DF.variable('a'), canBeUndef: false },
@@ -1020,7 +1018,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]).transform({
         transform: (item: Bindings, done: () => void, push: (i: RDF.Bindings) => void) => {
           push(item);
@@ -1038,7 +1036,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -1050,12 +1048,12 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
       await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(

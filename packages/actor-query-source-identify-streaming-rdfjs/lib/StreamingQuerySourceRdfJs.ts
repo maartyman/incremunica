@@ -16,8 +16,7 @@ import type {
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ClosableIterator } from '@comunica/utils-iterator';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysStreamingSource } from '@incremunica/context-entries';
+import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
@@ -239,8 +238,8 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
         return [ dataFactory.variable(variable), term ];
         // TODO write a test for this
       })).setContextEntry(
-        new ActionContextKeyIsAddition(),
-        ((<any>quad).diff === undefined) ? true : (<any>quad).diff,
+        KeysBindings.isAddition,
+        ((<any>quad).isAddition === undefined) ? true : (<any>quad).isAddition,
       )), {
       onClose: () => quads.destroy(),
     });

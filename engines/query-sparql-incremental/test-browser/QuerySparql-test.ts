@@ -6,7 +6,7 @@ import '@incremunica/incremental-jest';
 import type { EventEmitter } from 'events';
 import type { BindingsStream, QueryStringContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
@@ -64,12 +64,12 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('s'), DF.namedNode('s1') ],
           [ DF.variable('p'), DF.namedNode('p1') ],
           [ DF.variable('o'), DF.namedNode('o1') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s2') ],
           [ DF.variable('p'), DF.namedNode('p2') ],
           [ DF.variable('o'), DF.namedNode('o2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       streamingStore.addQuad(quad('s3', 'p3', 'o3'));
@@ -79,7 +79,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('s'), DF.namedNode('s3') ],
           [ DF.variable('p'), DF.namedNode('p3') ],
           [ DF.variable('o'), DF.namedNode('o3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       streamingStore.removeQuad(quad('s3', 'p3', 'o3'));
@@ -89,7 +89,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('s'), DF.namedNode('s3') ],
           [ DF.variable('p'), DF.namedNode('p3') ],
           [ DF.variable('o'), DF.namedNode('o3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       streamingStore.end();
@@ -113,7 +113,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('o1'), DF.namedNode('o1') ],
           [ DF.variable('p2'), DF.namedNode('p2') ],
           [ DF.variable('o2'), DF.namedNode('o2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       streamingStore.addQuad(quad('o1', 'p3', 'o3'));
@@ -125,7 +125,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('o1'), DF.namedNode('o1') ],
           [ DF.variable('p2'), DF.namedNode('p3') ],
           [ DF.variable('o2'), DF.namedNode('o3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       streamingStore.removeQuad(quad('o1', 'p3', 'o3'));
@@ -137,7 +137,7 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('o1'), DF.namedNode('o1') ],
           [ DF.variable('p2'), DF.namedNode('p3') ],
           [ DF.variable('o2'), DF.namedNode('o3') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       streamingStore.end();

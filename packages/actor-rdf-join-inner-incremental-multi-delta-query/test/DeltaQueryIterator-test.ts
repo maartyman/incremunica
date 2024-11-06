@@ -5,7 +5,7 @@ import { getContextSources } from '@comunica/bus-rdf-resolve-quad-pattern';
 import type { BindingsStream, IJoinEntry, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import arrayifyStream from 'arrayify-stream';
@@ -113,11 +113,11 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
               [ DF.variable('b'), DF.namedNode('ex:b2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -142,10 +142,10 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -173,11 +173,11 @@ describe('DeltaQueryIterator', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
         [ DF.variable('b'), DF.namedNode('ex:b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]);
 
     expect(mediateFunc).toHaveBeenCalledTimes(4);
@@ -191,15 +191,15 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
               [ DF.variable('b'), DF.namedNode('ex:b2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -224,13 +224,13 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+            ]).setContextEntry(KeysBindings.isAddition, false),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -258,19 +258,19 @@ describe('DeltaQueryIterator', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
         [ DF.variable('b'), DF.namedNode('ex:b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
         [ DF.variable('b'), DF.namedNode('ex:b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+      ]).setContextEntry(KeysBindings.isAddition, false),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+      ]).setContextEntry(KeysBindings.isAddition, false),
     ]);
 
     expect(mediateFunc).toHaveBeenCalledTimes(6);
@@ -296,10 +296,10 @@ describe('DeltaQueryIterator', () => {
     const it2 = new ArrayIterator([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ], { autoStart: false });
 
     const action: IJoinEntry[] = [
@@ -368,7 +368,7 @@ describe('DeltaQueryIterator', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]);
 
     expect(mediateFunc).toHaveBeenCalledTimes(4);
@@ -382,7 +382,7 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -407,13 +407,13 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('c'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('d'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -455,7 +455,7 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -480,11 +480,11 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('c'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
             null,
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -523,20 +523,20 @@ describe('DeltaQueryIterator', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
         [ DF.variable('b'), DF.namedNode('ex:b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ], { autoStart: false });
 
     const it2 = new ArrayIterator([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ], { autoStart: false });
 
     const action: IJoinEntry[] = [
@@ -599,20 +599,20 @@ describe('DeltaQueryIterator', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
         [ DF.variable('b'), DF.namedNode('ex:b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
         [ DF.variable('b'), DF.namedNode('ex:b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ], { autoStart: false });
 
     const it2 = new ArrayIterator([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('ex:a2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ], { autoStart: false });
 
     const action: IJoinEntry[] = [
@@ -673,7 +673,7 @@ describe('DeltaQueryIterator', () => {
         bindingsStream: new ArrayIterator([
           BF.bindings([
             [ DF.variable('a'), DF.namedNode('ex:a2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]),
         metadata: () => Promise.resolve({
           state: new MetadataValidationState(),
@@ -698,7 +698,7 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -723,7 +723,7 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -779,7 +779,7 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -804,7 +804,7 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -823,7 +823,7 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -870,7 +870,7 @@ describe('DeltaQueryIterator', () => {
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
               [ DF.variable('b'), DF.namedNode('ex:b1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),
@@ -895,7 +895,7 @@ describe('DeltaQueryIterator', () => {
           bindingsStream: new ArrayIterator([
             BF.bindings([
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+            ]).setContextEntry(KeysBindings.isAddition, true),
           ], { autoStart: false }),
           metadata: () => Promise.resolve({
             state: new MetadataValidationState(),

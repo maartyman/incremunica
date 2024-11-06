@@ -6,8 +6,7 @@ import { ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory, IActionContext, IJoinEntry } from '@comunica/types';
 import type { Bindings, BindingsFactory } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, materializeOperation } from '@comunica/utils-query-operation';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysDeltaQueryJoin } from '@incremunica/context-entries';
+import { KeysBindings, KeysDeltaQueryJoin } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
 import { AsyncIterator } from 'asynciterator';
 import { Store } from 'n3';
@@ -156,7 +155,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
               }
               // TODO I don't think this is needed
               // tempBindings = tempBindings.setContextEntry(
-              // new ActionContextKeyIsAddition(), constBindings.getContextEntry(new ActionContextKeyIsAddition())
+              // KeysBindings.isAddition, constBindings.getContextEntry(KeysBindings.isAddition)
               // );
               return tempBindings;
             },
@@ -166,7 +165,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
 
         bindingsStream.once('end', () => {
           // Add or delete binding from store
-          if (constBindings.getContextEntry(new ActionContextKeyIsAddition()) ?? true) {
+          if (constBindings.getContextEntry(KeysBindings.isAddition) ?? true) {
             this.store.add(constQuad);
           } else {
             this.store.delete(constQuad);

@@ -5,11 +5,10 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IActionContextKey } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import {
-  ActionContextKeyIsAddition,
   ActorMergeBindingsContextIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';
 import type { IActionGuard, MediatorGuard } from '@incremunica/bus-guard';
-import { KeysGuard } from '@incremunica/context-entries';
+import { KeysBindings, KeysGuard } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
@@ -83,7 +82,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
 
     it('should run and make a streaming store', async() => {
       const deletedQuad = quad('s1', 'p1', 'o1');
-      deletedQuad.diff = false;
+      deletedQuad.isAddition = false;
       const action = <any> {
         context,
         url: 'http://test.com',
@@ -110,17 +109,17 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
           [ DF.variable('s'), DF.namedNode('s1') ],
           [ DF.variable('p'), DF.namedNode('p1') ],
           [ DF.variable('o'), DF.namedNode('o1') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s2') ],
           [ DF.variable('p'), DF.namedNode('p2') ],
           [ DF.variable('o'), DF.namedNode('o2') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s1') ],
           [ DF.variable('p'), DF.namedNode('p1') ],
           [ DF.variable('o'), DF.namedNode('o1') ],
-        ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
     });
 

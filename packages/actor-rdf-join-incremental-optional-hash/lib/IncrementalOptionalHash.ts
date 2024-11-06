@@ -1,5 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 
@@ -37,7 +37,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.getContextEntry(new ActionContextKeyIsAddition())) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);
@@ -93,12 +93,12 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
         if (this.prependArray) {
           // We need to delete the bindings with no optional bindings
           resultingBindings = this.otherArray[this.index];
-          resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), false);
+          resultingBindings = resultingBindings.setContextEntry(KeysBindings.isAddition, false);
         } else if (this.activeElement === null) {
           // If this.activeElement is null, then appendArray is true
           // we need to add the bindings with no optional bindings
           resultingBindings = this.otherArray[this.index];
-          resultingBindings = resultingBindings.setContextEntry(new ActionContextKeyIsAddition(), true);
+          resultingBindings = resultingBindings.setContextEntry(KeysBindings.isAddition, true);
         } else {
           // Otherwise merge bindings
           resultingBindings = this.funJoin(this.activeElement, this.otherArray[this.index]);
@@ -124,11 +124,11 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
           const otherArray = this.leftMemory.get(hash);
           if (otherArray !== undefined) {
             if (
-              item.getContextEntry(new ActionContextKeyIsAddition()) &&
+              item.getContextEntry(KeysBindings.isAddition) &&
               (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
-            if (!item.getContextEntry(new ActionContextKeyIsAddition()) && this.rightMemory.get(hash)?.length === 1) {
+            if (!item.getContextEntry(KeysBindings.isAddition) && this.rightMemory.get(hash)?.length === 1) {
               this.appendArray = true;
             }
             this.activeElement = item;

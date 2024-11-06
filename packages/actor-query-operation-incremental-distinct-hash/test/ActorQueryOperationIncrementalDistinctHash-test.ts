@@ -3,7 +3,7 @@ import type { MediatorHashQuads } from '@comunica/bus-hash-quads';
 import { ActionContext, Bus } from '@comunica/core';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, getSafeQuads } from '@comunica/utils-query-operation';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
@@ -27,11 +27,11 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     mediatorQueryOperation = {
       mediate: (arg: any) => Promise.resolve({
         bindingsStream: new ArrayIterator([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, false),
         ]),
         metadata: () => Promise.resolve({
           cardinality: 5,
@@ -177,36 +177,36 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
       const filter = await actor.newHashFilterBindings(<any>{}, []);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
     });
 
     it('should create a filter that only returns true once for equal objects', async() => {
       const filter = await actor.newHashFilterBindings(<any>{}, [ DF.variable('a') ]);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
 
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
     });
 
     it('should create a filters that are independent', async() => {
@@ -215,130 +215,130 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
       const filter3 = await actor.newHashFilterBindings(<any>{}, []);
       expect(filter1(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter1(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
 
       expect(filter2(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter2(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
 
       expect(filter3(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter3(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
     });
 
     it('should create a filter that returns true if everything is deleted', async() => {
       const filter = await actor.newHashFilterBindings(<any>{}, [ DF.variable('a') ]);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
 
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
     });
 
     it('should create a filter that returns false if too much is deleted', async() => {
       const filter = await actor.newHashFilterBindings(<any>{}, [ DF.variable('a') ]);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
 
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false))).toBe(false);
+      ]).setContextEntry(KeysBindings.isAddition, false))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true))).toBe(true);
+      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
     });
   });
 
@@ -388,10 +388,10 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
       });
       expect(output.type).toBe('bindings');
       await expect(output.bindingsStream).toEqualBindingsStream([
-        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), false),
+        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, false),
       ]);
     });
 

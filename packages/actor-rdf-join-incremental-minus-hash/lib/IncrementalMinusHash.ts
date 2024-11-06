@@ -1,5 +1,5 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { AsyncIterator } from 'asynciterator';
 
 export class IncrementalMinusHash extends AsyncIterator<Bindings> {
@@ -81,7 +81,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     let element = this.rightIterator.read();
     if (element) {
       const hash = this.joinHash(element);
-      if (element.getContextEntry(new ActionContextKeyIsAddition())) {
+      if (element.getContextEntry(KeysBindings.isAddition)) {
         let currentCount = this.rightMemory.get(hash);
         if (currentCount === undefined) {
           currentCount = 0;
@@ -94,7 +94,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
           if (matchingBindings !== undefined) {
             for (let matchingBinding of matchingBindings) {
               // TODO check if the 2 bindings are equal for common variables
-              matchingBinding = matchingBinding.setContextEntry(new ActionContextKeyIsAddition(), false);
+              matchingBinding = matchingBinding.setContextEntry(KeysBindings.isAddition, false);
               this.bindingBuffer.push(matchingBinding);
             }
           }
@@ -123,7 +123,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
     element = this.leftIterator.read();
     if (element) {
       const hash = this.joinHash(element);
-      if (element.getContextEntry(new ActionContextKeyIsAddition())) {
+      if (element.getContextEntry(KeysBindings.isAddition)) {
         let currentArray = this.leftMemory.get(hash);
         if (currentArray === undefined) {
           currentArray = [];

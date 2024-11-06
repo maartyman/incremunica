@@ -23,8 +23,7 @@ import type {
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { materializeOperation, getSafeBindings } from '@comunica/utils-query-operation';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-
+import { KeysBindings } from '@incremunica/context-entries';
 import {
   ArrayIterator,
   EmptyIterator,
@@ -121,7 +120,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
             }
             const bindingsHash = hashBindings(newBindings);
             const bindingsData = data.memory.get(bindingsHash);
-            if (newBindings.getContextEntry(new ActionContextKeyIsAddition())) {
+            if (newBindings.getContextEntry(KeysBindings.isAddition)) {
               if (bindingsData === undefined) {
                 data.memory.set(bindingsHash, { bindings: newBindings, count: 1 });
               } else {
@@ -188,7 +187,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
             push(new ArrayIterator(hashData.memory.values()).transform({
               transform(item, arrayDone, arrayPush) {
                 let transformBindings = bindingsFactory.fromBindings(item.bindings);
-                transformBindings = transformBindings.setContextEntry(new ActionContextKeyIsAddition(), false);
+                transformBindings = transformBindings.setContextEntry(KeysBindings.isAddition, false);
                 for (let i = 0; i < item.count; i++) {
                   arrayPush(transformBindings);
                 }

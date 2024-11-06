@@ -5,9 +5,7 @@ import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
-import {
-  ActionContextKeyIsAddition,
-} from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
@@ -200,13 +198,13 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -226,10 +224,10 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -262,7 +260,7 @@ IActorRdfJoinSelectivityOutput
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
             [ DF.variable('a'), DF.literal('3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
@@ -275,13 +273,13 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -299,22 +297,22 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
                   null,
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   null,
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('0') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -337,19 +335,19 @@ IActorRdfJoinSelectivityOutput
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
             [ DF.variable('a'), DF.literal('2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
@@ -362,25 +360,25 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('0') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -398,11 +396,11 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -425,10 +423,10 @@ IActorRdfJoinSelectivityOutput
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
             [ DF.variable('a'), DF.literal('3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('3') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -442,15 +440,15 @@ IActorRdfJoinSelectivityOutput
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
                     [ DF.variable('b'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
                     [ DF.variable('b'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
                     [ DF.variable('b'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -477,16 +475,16 @@ IActorRdfJoinSelectivityOutput
                   null,
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -510,19 +508,19 @@ IActorRdfJoinSelectivityOutput
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
             [ DF.variable('b'), DF.literal('1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
             [ DF.variable('b'), DF.literal('2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
             [ DF.variable('b'), DF.literal('1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
             [ DF.variable('b'), DF.literal('2') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -535,7 +533,7 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -553,7 +551,7 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -586,10 +584,10 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -607,12 +605,12 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
                   null,
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -637,7 +635,7 @@ IActorRdfJoinSelectivityOutput
         expect(result.bindingsStream.read())
           .toEqualBindings(BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+          ]).setContextEntry(KeysBindings.isAddition, true));
         action.entries[0].output.bindingsStream.close();
         action.entries[1].output.bindingsStream.close();
         await new Promise<void>(resolve => setTimeout(resolve, 0));
@@ -647,7 +645,7 @@ IActorRdfJoinSelectivityOutput
         expect(result.bindingsStream.read())
           .toEqualBindings(BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-          ]).setContextEntry(new ActionContextKeyIsAddition(), true));
+          ]).setContextEntry(KeysBindings.isAddition, true));
         expect(result.bindingsStream.read()).toBeNull();
         expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
         expect(action.entries[1].output.bindingsStream.ended).toBeTruthy();
@@ -893,13 +891,13 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('3') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
@@ -917,10 +915,10 @@ IActorRdfJoinSelectivityOutput
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.literal('1') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.literal('2') ],
-                  ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
@@ -946,9 +944,9 @@ IActorRdfJoinSelectivityOutput
             variable: DF.variable('a'),
           }]});
         await expect(result.bindingsStream).toEqualBindingsStream([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(new ActionContextKeyIsAddition(), true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
     });

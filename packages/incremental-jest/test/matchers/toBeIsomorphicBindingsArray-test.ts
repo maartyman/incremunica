@@ -1,6 +1,6 @@
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import '../../lib';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
+import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 
@@ -23,20 +23,20 @@ describe('toBeIsomorphicBindingsArray', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]);
   });
 
@@ -45,20 +45,20 @@ describe('toBeIsomorphicBindingsArray', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).not.toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b2') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]);
   });
 
@@ -67,16 +67,16 @@ describe('toBeIsomorphicBindingsArray', () => {
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).not.toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]);
   });
 
@@ -94,20 +94,20 @@ Received:
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).not.toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]))
       .toThrow(`
 Expected:
@@ -139,20 +139,20 @@ Received:
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b2') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a2') ],
         [ DF.variable('b'), DF.namedNode('b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]))
       .toThrow(`
 Expected:
@@ -184,16 +184,16 @@ Received:
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a2') ],
         [ DF.variable('b'), DF.namedNode('b2') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]))
       .toThrow(`
 Expected:
@@ -221,20 +221,20 @@ Received:
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+      ]).setContextEntry(KeysBindings.isAddition, false),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+      ]).setContextEntry(KeysBindings.isAddition, false),
     ]);
   });
 
@@ -243,20 +243,20 @@ Received:
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
     ]).not.toBeIsomorphicBindingsArray([
       BF.bindings([
         [ DF.variable('b'), DF.namedNode('b1') ],
         [ DF.variable('c'), DF.namedNode('c1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), true),
+      ]).setContextEntry(KeysBindings.isAddition, true),
       BF.bindings([
         [ DF.variable('a'), DF.namedNode('a1') ],
         [ DF.variable('b'), DF.namedNode('b1') ],
-      ]).setContextEntry(new ActionContextKeyIsAddition(), false),
+      ]).setContextEntry(KeysBindings.isAddition, false),
     ]);
   });
 });

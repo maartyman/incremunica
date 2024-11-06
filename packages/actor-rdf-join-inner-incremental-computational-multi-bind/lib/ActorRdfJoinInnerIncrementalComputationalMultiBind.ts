@@ -24,8 +24,7 @@ import type {
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, materializeOperation, getOperationSource } from '@comunica/utils-query-operation';
-import { ActionContextKeyIsAddition } from '@incremunica/actor-merge-bindings-context-is-addition';
-import { KeysStreamingSource } from '@incremunica/context-entries';
+import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
@@ -108,7 +107,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     ): Promise<void> => {
       const hash = hashBindings(bindings);
       let hashData = transformMap.get(hash);
-      if (bindings.getContextEntry(new ActionContextKeyIsAddition())) {
+      if (bindings.getContextEntry(KeysBindings.isAddition)) {
         if (hashData === undefined) {
           hashData = {
             elements: [],
