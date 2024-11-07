@@ -217,7 +217,6 @@
     "@comunica/actor-query-result-serialize-table": "^4.0.2",
     "@comunica/actor-query-result-serialize-tree": "^4.0.2",
     "@comunica/actor-query-source-identify-hypermedia": "^4.0.2",
-    "@comunica/actor-query-source-identify-serialized": "^4.0.2",
     "@comunica/actor-rdf-join-entries-sort-cardinality": "^4.0.2",
     "@comunica/actor-rdf-join-inner-multi-empty": "^4.0.2",
     "@comunica/actor-rdf-join-inner-multi-smallest": "^4.0.2",
