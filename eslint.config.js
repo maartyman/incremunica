@@ -2,6 +2,16 @@ const config = require('@rubensworks/eslint-config');
 
 module.exports = config([
   {
+    files: [ '**/*.ts', '**/*.js' ],
+    rules: {
+      'unicorn/expiring-todo-comments': [ 'error', {
+        ignoreDatesOnPullRequests: false,
+        terms: [ 'todo' ],
+        allowWarningComments: false,
+      }],
+    },
+  },
+  {
     files: [ '**/*.ts' ],
     languageOptions: {
       parserOptions: {
@@ -17,7 +27,7 @@ module.exports = config([
       'unicorn/no-array-callback-reference': 'off',
       'unicorn/prefer-node-protocol': 'off',
 
-      // TODO: check if these can be enabled
+      // TODO [2024-12-01]: check if these can be enabled
       'ts/naming-convention': 'off',
       'ts/no-unsafe-return': 'off',
       'ts/no-unsafe-argument': 'off',

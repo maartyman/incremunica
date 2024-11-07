@@ -6,7 +6,7 @@ import { DataFactory } from 'rdf-data-factory';
 
 const DF = new DataFactory();
 
-// TODO check if all test still do what they are supposed to do
+// TODO [2024-12-01]: check if all test still do what they are supposed to do
 describe('toEqualBindingsArray', () => {
   let BF: BindingsFactory;
 

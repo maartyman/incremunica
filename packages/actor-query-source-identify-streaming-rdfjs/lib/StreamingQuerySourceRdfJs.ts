@@ -136,7 +136,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     );
   }
 
-  // TODO implement setMetadata make a proper estimation for the cardinality
+  // [2024-12-01]: TODO implement setMetadata make a proper estimation for the cardinality
   protected async setMetadata(
     it: AsyncIterator<RDF.Quad>,
     _operation: Algebra.Pattern,
@@ -236,7 +236,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
         const variable = elementVariables[key];
         const term = getValueNestedPath(quad, keys);
         return [ dataFactory.variable(variable), term ];
-        // TODO write a test for this
+        // [2024-12-01]: TODO write a test for this
       })).setContextEntry(
         KeysBindings.isAddition,
         ((<any>quad).isAddition === undefined) ? true : (<any>quad).isAddition,

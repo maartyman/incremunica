@@ -48,7 +48,7 @@ describe('DeltaQueryIterator', () => {
     mediateFunc = jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
       const sources = getContextSources(arg.context);
 
-      // TODO check if this is needed
+      // TODO [2024-12-01]: check if this is needed
       // expect(sources).toBeDefined();
       if (sources === undefined) {
         return {

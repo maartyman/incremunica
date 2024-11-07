@@ -32,7 +32,7 @@ export class ActorQuerySourceIdentifyStreamingRdfJs extends ActorQuerySourceIden
     if (typeof source.value === 'string' || !('match' in source.value)) {
       return failTest(`${this.name} actor received an invalid streaming rdfjs query source.`);
     }
-    // TODO add check to make sure the store is a streaming store
+    // TODO [2024-12-01]: add check to make sure the store is a streaming store
     // if (!(source.value instanceof StreamingStore)
     // && !(!('match' in source) && (source.value instanceof StreamingStore))) {
     //  throw new Error(`${this.name} didn't receive a StreamingStore.`);

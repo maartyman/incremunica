@@ -93,7 +93,7 @@ export class IncrementalMinusHash extends AsyncIterator<Bindings> {
           const matchingBindings = this.leftMemory.get(hash);
           if (matchingBindings !== undefined) {
             for (let matchingBinding of matchingBindings) {
-              // TODO check if the 2 bindings are equal for common variables
+              // TODO [2024-12-01]: check if the 2 bindings are equal for common variables
               matchingBinding = matchingBinding.setContextEntry(KeysBindings.isAddition, false);
               this.bindingBuffer.push(matchingBinding);
             }

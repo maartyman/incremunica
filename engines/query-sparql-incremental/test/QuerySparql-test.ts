@@ -343,7 +343,7 @@ describe('System test: QuerySparql (with polly)', () => {
       await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
       bindingStream.destroy();
 
-      // TODO decrease this by adding polling time to context
+      // TODO [2024-12-01]: decrease this by adding polling time to context
       await new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       bindingStream = await engine.queryBindings(query, context);

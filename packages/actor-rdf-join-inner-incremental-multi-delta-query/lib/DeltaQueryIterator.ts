@@ -105,7 +105,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
       if (bindings === null) {
         continue;
       }
-      // TODO check if this casting is correct
+      // TODO [2024-12-01]: check if this casting is correct
       let quad = BindingsToQuadsIterator.bindQuad(bindings, <Quad><any>source.operation);
 
       while (quad === undefined) {
@@ -153,7 +153,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
               if (tempBindings === undefined) {
                 return null;
               }
-              // TODO I don't think this is needed
+              // TODO [2024-12-01]: I don't think this is needed
               // tempBindings = tempBindings.setContextEntry(
               // KeysBindings.isAddition, constBindings.getContextEntry(KeysBindings.isAddition)
               // );
@@ -171,7 +171,7 @@ export class DeltaQueryIterator extends AsyncIterator<Bindings> {
             this.store.delete(constQuad);
           }
           this.currentSource = undefined;
-          // TODO why set it to undefined?
+          // TODO [2024-12-01]: why set it to undefined?
           bindingsStream = undefined;
           this.readable = true;
         });

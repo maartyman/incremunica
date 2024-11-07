@@ -1027,7 +1027,7 @@ describe('StreamingQuerySourceRdfJs', () => {
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
 
-      // TODO check if the default graph should be included or not
+      // TODO [2024-12-01]: check if the default graph should be included or not
       // should the following be added:
       //         BF.fromRecord({
       //           p: DF.namedNode('p1'),

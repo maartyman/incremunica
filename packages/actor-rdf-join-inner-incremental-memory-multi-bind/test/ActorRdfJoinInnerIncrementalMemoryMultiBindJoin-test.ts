@@ -2140,7 +2140,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
         ]);
       });
 
-      // TODO re-enable these tests
+      // TODO [2024-12-01]: re-enable these tests
       // eslint-disable-next-line jest/no-commented-out-tests
       // it('should throw if operationBinder throws error', async() => {
       // await expect(await arrayifyStream(await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(

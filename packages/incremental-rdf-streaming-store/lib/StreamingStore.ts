@@ -164,7 +164,7 @@ export class StreamingStore<Q extends Quad>
     graph?: RDF.Term | null,
     options?: { stopMatch: () => void },
   ): RDF.Stream<Q> {
-    // TODO what if match is never called (=> streaming store should be removed) (Should not happen I think)
+    // TODO [2024-12-01]: what if match is never called (streaming store should be removed) (Should not happen I think)
     this.numberOfListeners++;
     const unionStream = new PassThrough({ objectMode: true });
 

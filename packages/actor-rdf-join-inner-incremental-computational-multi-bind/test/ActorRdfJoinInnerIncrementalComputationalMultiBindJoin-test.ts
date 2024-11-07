@@ -194,7 +194,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           .toEqual([ 2, 3, 5 ]);
       });
 
-      // TODO re-enable these tests
+      // TODO [2024-12-01]: re-enable these tests
       // eslint-disable-next-line jest/no-commented-out-tests
       // it('should handle three entries with a lower variable overlap', async() => {
       // expect(await actor.getJoinCoefficients(
@@ -1672,7 +1672,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               };
               const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
 
-              // TODO check if this check is needed
+              // TODO [2024-12-01]: check if this check is needed
               // expect(matchOptions).toBeDefined();
               if (matchOptions !== undefined) {
                 (<({ stopMatch: () => void })[]> matchOptions).push({

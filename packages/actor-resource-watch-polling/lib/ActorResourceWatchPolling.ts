@@ -43,7 +43,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
           },
         },
       ).then((responseHead) => {
-        // TODO have more specific error handling for example 304: Not Modified should not emit 'delete'
+        // TODO [2024-12-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
         if (!responseHead.ok) {
           events.emit('delete');
         }
