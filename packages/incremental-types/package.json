@@ -24,10 +24,6 @@
     "access": "public"
   },
   "files": [
-    "bin/**/*.d.ts",
-    "bin/**/*.js",
-    "bin/**/*.js.map",
-    "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
     "lib/**/*.js.map"
