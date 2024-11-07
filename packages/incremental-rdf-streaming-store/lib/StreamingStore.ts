@@ -20,7 +20,6 @@ export class StreamingStore<Q extends Quad>
   protected readonly store: Store;
   protected readonly pendingStreams: PendingStreamsIndex<Q> = new PendingStreamsIndex();
   protected ended = false;
-  protected numberOfListeners = 0;
   protected halted = false;
   protected haltBuffer = new Array<Q>();
 
@@ -76,6 +75,7 @@ export class StreamingStore<Q extends Quad>
     for (const quad of this.haltBuffer) {
       this.handleQuad(quad);
     }
+    this.haltBuffer = new Array<Q>();
     this.halted = false;
   }
 
@@ -164,8 +164,6 @@ export class StreamingStore<Q extends Quad>
     graph?: RDF.Term | null,
     options?: { stopMatch: () => void },
   ): RDF.Stream<Q> {
-    // TODO [2024-12-01]: what if match is never called (streaming store should be removed) (Should not happen I think)
-    this.numberOfListeners++;
     const unionStream = new PassThrough({ objectMode: true });
 
     const storedQuads = this.store.getQuads(
@@ -221,15 +219,6 @@ export class StreamingStore<Q extends Quad>
         }
       });
     }
-
-    unionStream.on('close', () => {
-      if (this.numberOfListeners < 2) {
-        this.end();
-      } else {
-        this.numberOfListeners--;
-      }
-    });
-
     return unionStream;
   }
 

@@ -33,7 +33,8 @@
     "clean-monorepo:top-level": "echo \"Deleting: ./node_modules\" && rm -rf ./node_modules",
     "clean-monorepo:packages": "find ./packages -type d \\( -path \"*/node_modules\" -o -path \"*/components\" \\) -exec echo \"Deleting: {}\" \\; -exec rm -rf '{}' +",
     "clean-monorepo:engines": "find ./engines -type d \\( -path \"*/node_modules\" -o -path \"*/components\" \\) -exec echo \"Deleting: {}\" \\; -exec rm -rf '{}' +",
-    "clean-monorepo": "yarn clean-monorepo:top-level && yarn clean-monorepo:packages && yarn clean-monorepo:engines"
+    "clean-monorepo:error": "find -path */yarn-error.log -exec echo \"Deleting: {}\" \\; -exec rm -rf '{}' +",
+    "clean-monorepo": "yarn clean-monorepo:top-level && yarn clean-monorepo:packages && yarn clean-monorepo:engines && yarn clean-monorepo:error"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",

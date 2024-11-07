@@ -1,4 +1,5 @@
 import 'jest-rdf';
+import { DevTools } from '@incremunica/dev-tools';
 import type { Quad } from '@incremunica/incremental-types';
 import arrayifyStream from 'arrayify-stream';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
@@ -9,6 +10,22 @@ import { StreamingStore } from '../lib/StreamingStore';
 
 const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
+
+async function partialArrayifyStream(stream: Readable, num: number): Promise<any[]> {
+  const array: any[] = [];
+  for (let i = 0; i < num; i++) {
+    await new Promise<void>((resolve) => {
+      stream.once('readable', resolve);
+    });
+    const element = stream.read();
+    if (!element) {
+      i--;
+      continue;
+    }
+    array.push(element);
+  }
+  return array;
+}
 
 const DF = new DataFactory();
 
@@ -61,30 +78,6 @@ describe('StreamStore', () => {
   it('should return hasEnded', async() => {
     expect(store.hasEnded()).toBeFalsy();
     store.end();
-    expect(store.hasEnded()).toBeTruthy();
-  });
-
-  it('should end if match stream is destroyed', async() => {
-    const stream = <Readable>store.match();
-    expect(store.hasEnded()).toBeFalsy();
-    stream.destroy();
-    await new Promise<void>(resolve => stream.on('close', () => resolve()));
-    expect(store.hasEnded()).toBeTruthy();
-  });
-
-  it('should only end if all match streams are destroyed', async() => {
-    const stream1 = <Readable>store.match();
-    const stream2 = <Readable>store.match();
-    const stream3 = <Readable>store.match();
-    expect(store.hasEnded()).toBeFalsy();
-    stream1.destroy();
-    await new Promise<void>(resolve => stream1.on('close', () => resolve()));
-    expect(store.hasEnded()).toBeFalsy();
-    stream2.destroy();
-    await new Promise<void>(resolve => stream2.on('close', () => resolve()));
-    expect(store.hasEnded()).toBeFalsy();
-    stream3.destroy();
-    await new Promise<void>(resolve => stream3.on('close', () => resolve()));
     expect(store.hasEnded()).toBeTruthy();
   });
 
@@ -673,6 +666,59 @@ describe('StreamStore', () => {
       quad('s4', 'p4', 'o4'),
       quad('s4', 'p4', 'o4'),
     ]);
+  });
+
+  it('handles multiple halting', async() => {
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ])));
+
+    const matchStream = store.match();
+
+    await expect(partialArrayifyStream(<Readable>matchStream, 2)).resolves.toBeRdfIsomorphic([
+      quad('s1', 'p1', 'o1'),
+      quad('s2', 'p2', 'o2'),
+    ]);
+
+    store.halt();
+
+    await promisifyEventEmitter(store.import(streamifyArray([
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+      DevTools.quad(false, 's4', 'p4', 'o4'),
+    ])));
+
+    store.resume();
+
+    let actualArray = await partialArrayifyStream(<Readable>matchStream, 3);
+    expect(actualArray).toBeRdfIsomorphic([
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+      quad('s4', 'p4', 'o4'),
+    ]);
+    expect(actualArray[0].isAddition).toBeTruthy();
+    expect(actualArray[1].isAddition).toBeTruthy();
+    expect(actualArray[2].isAddition).toBeFalsy();
+
+    store.halt();
+
+    await promisifyEventEmitter(store.import(streamifyArray([
+      DevTools.quad(false, 's3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ])));
+
+    store.resume();
+
+    actualArray = await partialArrayifyStream(<Readable>matchStream, 2);
+    expect(actualArray).toBeRdfIsomorphic([
+      quad('s3', 'p3', 'o3'),
+      quad('s4', 'p4', 'o4'),
+    ]);
+    expect(actualArray[0].isAddition).toBeFalsy();
+    expect(actualArray[1].isAddition).toBeTruthy();
+
+    store.end();
   });
 
   it('handles end during halting', async() => {
