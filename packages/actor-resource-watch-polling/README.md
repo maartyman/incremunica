@@ -22,7 +22,7 @@ After installing, this package can be added to your engine's configuration as fo
   "actors": [
     ...
     {
-      "@id": "urn:comunica:default:resource-watch/actors#polling-diff",
+      "@id": "urn:comunica:default:resource-watch/actors#polling",
       "@type": "ActorResourceWatchPolling"
     }
   ]

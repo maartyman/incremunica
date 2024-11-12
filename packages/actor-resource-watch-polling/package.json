@@ -17,7 +17,7 @@
     "comunica",
     "actor",
     "guard",
-    "polling-diff"
+    "polling"
   ],
   "sideEffects": false,
   "main": "lib/index.js",
