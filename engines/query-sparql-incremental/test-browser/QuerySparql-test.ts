@@ -11,7 +11,7 @@ import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { DataFactory } from 'rdf-data-factory';
-import { QueryEngine } from '../lib/QueryEngine';
+import { QueryEngine } from '../lib';
 import { usePolly } from '../test/util';
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
@@ -57,6 +57,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ streamingStore ],
+        pollingFrequency: 1000,
       });
 
       expect(await partialArrayifyStream(bindingStream, 2)).toBeIsomorphicBindingsArray([
@@ -104,6 +105,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?o1 ?p2 ?o2.
           }`, {
         sources: [ streamingStore ],
+        pollingFrequency: 1000,
       });
 
       expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
@@ -163,7 +165,10 @@ describe('System test: QuerySparql (with polly)', () => {
     it('with results', async() => {
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
     ?s ?p ?o.
-  }`, { sources: [ 'https://www.rubensworks.net/' ]});
+  }`, {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingFrequency: 1000,
+      });
 
       expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
     });
@@ -172,7 +177,10 @@ describe('System test: QuerySparql (with polly)', () => {
       const query = `SELECT * WHERE {
      ?s ?p ?o.
      }`;
-      const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
+      const context: QueryStringContext = {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingFrequency: 1000,
+      };
 
       bindingStream = await engine.queryBindings(query, context);
       expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
@@ -197,7 +205,10 @@ describe('System test: QuerySparql (with polly)', () => {
       const query = `SELECT * WHERE {
      ?s ?p ?o.
      }`;
-      const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
+      const context: QueryStringContext = {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingFrequency: 1000,
+      };
 
       bindingStream = await engine.queryBindings(query, context);
       expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
@@ -212,7 +223,10 @@ describe('System test: QuerySparql (with polly)', () => {
       it('Raw Source', async() => {
         bindingStream = await engine.queryBindings(`SELECT * WHERE {
         ?s ?p ?s.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingFrequency: 1000,
+        });
 
         expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
       });
@@ -223,7 +237,10 @@ describe('System test: QuerySparql (with polly)', () => {
         bindingStream = await engine.queryBindings(`SELECT ?name WHERE {
         <https://www.rubensworks.net/#me> <http://xmlns.com/foaf/0.1/knows> ?v0.
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingFrequency: 1000,
+        });
 
         expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
       });
@@ -232,7 +249,10 @@ describe('System test: QuerySparql (with polly)', () => {
         bindingStream = await engine.queryBindings(`SELECT ?name WHERE {
         <https://www.rubensworks.net/#me> <http://xmlns.com/foaf/0.1/knows> ?v0.
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingFrequency: 1000,
+        });
 
         expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
       });
@@ -246,6 +266,7 @@ describe('System test: QuerySparql (with polly)', () => {
               'https://raw.githubusercontent.com/w3c/data-shapes/gh-pages/shacl-compact-syntax/' +
               'tests/valid/basic-shape-iri.shaclc',
             ],
+            pollingFrequency: 1000,
           });
 
           expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);

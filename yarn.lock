@@ -2731,19 +2731,6 @@
     rdf-terms "^1.11.0"
     sparqlalgebrajs "^4.3.8"
 
-"@comunica/actor-query-source-identify-serialized@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-query-source-identify-serialized/-/actor-query-source-identify-serialized-4.0.2.tgz#44e20d844131ea501a38e6651e0714f8377d24f9"
-  integrity sha512-qe2C318FXAdWzJwA8m0amK5FNnDTaRVThnrcxrkPfgxglNOGUyaO+Sn4uJB1zMoYWRR8RQ5rEQTzaBm4CX73UA==
-  dependencies:
-    "@comunica/bus-query-source-identify" "^4.0.2"
-    "@comunica/bus-rdf-parse" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@rdfjs/types" "*"
-    rdf-store-stream "^2.0.0"
-    readable-stream "^4.2.0"
-
 "@comunica/actor-rdf-join-entries-sort-cardinality@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-entries-sort-cardinality/-/actor-rdf-join-entries-sort-cardinality-4.0.2.tgz#70131000d9d439085a77777b61a72e1eaa607178"
@@ -6416,15 +6403,15 @@ async@^3.2.3:
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.5.tgz#ebd52a8fdaf7a2289a24df399f8d8485c8a46b66"
   integrity sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==
 
-asynciterator@^3.8.0, asynciterator@^3.9.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.9.0.tgz#6e9a69623c4cec07e4cd85130416d52899f4e93f"
-  integrity sha512-bwLLTAnoE6Ap6XdjK/j8vDk2Vi9p3ojk0PFwM0SwktAG1k8pfRJF9ng+mmkaRFKdZCQQlOxcWnvOmX2NQ1HV0g==
-
 asynciterator@^3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.8.1.tgz#80be735b252332494e186ee733544e5b21dd2123"
   integrity sha512-SmdG0FUY3pYGOZZGdYq8Qb/DCRDXBFZUk08V1/4lbBXdAQvcC3Kxzz9FUDPBTik7VAVltt4cZirAPtJv3gOpEw==
+
+asynciterator@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/asynciterator/-/asynciterator-3.9.0.tgz#6e9a69623c4cec07e4cd85130416d52899f4e93f"
+  integrity sha512-bwLLTAnoE6Ap6XdjK/j8vDk2Vi9p3ojk0PFwM0SwktAG1k8pfRJF9ng+mmkaRFKdZCQQlOxcWnvOmX2NQ1HV0g==
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -14824,25 +14811,6 @@ rdf-store-stream@^1.1.0:
     "@rdfjs/types" "*"
     n3 "^1.11.1"
 
-rdf-store-stream@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/rdf-store-stream/-/rdf-store-stream-2.0.1.tgz#f61ab958e11876f763fdc3799eff58589f998181"
-  integrity sha512-znGaibHLvbRE0BrDcXHRleRcLKlHYP6ADr1RFJ3yA28QBmhOjxxgbBFTvCMzgsxvBIqdaFS8Vd2FG4NefJL4Mg==
-  dependencies:
-    "@rdfjs/types" "*"
-    rdf-stores "^1.0.0"
-
-rdf-stores@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/rdf-stores/-/rdf-stores-1.0.0.tgz#1689bd669853bda857620d0db32f3b59940db208"
-  integrity sha512-wqp7M5409rbhpWQE0C1vyVysbz++aD2vEkZ6yueSxhDtyLvznS41R3cKiuUpm3ikc/yTpaCZwPo4iyKEaAwBIg==
-  dependencies:
-    "@rdfjs/types" "*"
-    asynciterator "^3.8.0"
-    rdf-data-factory "^1.1.1"
-    rdf-string "^1.6.2"
-    rdf-terms "^1.9.1"
-
 rdf-streaming-store@^1.1.4:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/rdf-streaming-store/-/rdf-streaming-store-1.1.5.tgz#64f1cbb570ebdd532b9f3e7742d62f106e97cb5b"
@@ -15112,7 +15080,7 @@ readable-stream@^4.0.0, readable-stream@^4.1.0, readable-stream@^4.3.0, readable
     process "^0.11.10"
     string_decoder "^1.3.0"
 
-readable-stream@^4.2.0, readable-stream@^4.5.2:
+readable-stream@^4.5.2:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.5.2.tgz#9e7fc4c45099baeed934bff6eb97ba6cf2729e09"
   integrity sha512-yjavECdqeZ3GLXNgRXgeQEdz9fvDDkNKyHnbHRFtOr7/LcfgBcmct7t/ET+HaCTqfh06OzoAxrkN/IfjJBVe+g==

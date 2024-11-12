@@ -45,14 +45,14 @@ export class ActorQuerySourceIdentifyHypermediaStreamNone extends ActorQuerySour
       dataFactory,
       await BindingsFactory.create(this.mediatorMergeBindingsContext, action.context, dataFactory),
     );
-    source.toString = () => `QueryStreamingSourceRdfJs(${action.url})`;
+    source.toString = () => `ActorQuerySourceIdentifyHypermediaStreamNone(${action.url})`;
     source.referenceValue = action.url;
 
     const { guardEvents } = await this.mediatorGuard.mediate({
       context: action.context,
       url: action.url,
       metadata: action.metadata,
-      streamingSource: source,
+      streamingQuerySource: source,
     });
 
     if (source.context) {

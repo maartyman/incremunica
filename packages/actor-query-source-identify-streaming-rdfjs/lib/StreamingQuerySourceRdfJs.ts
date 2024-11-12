@@ -6,7 +6,6 @@ import {
 } from '@comunica/bus-query-source-identify';
 import { KeysQueryOperation } from '@comunica/context-entries';
 import type {
-  IQuerySource,
   BindingsStream,
   IActionContext,
   FragmentSelectorShape,
@@ -19,6 +18,7 @@ import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
+import { StreamingQuerySource, StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
@@ -33,17 +33,18 @@ import {
 import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
 
-export class StreamingQuerySourceRdfJs implements IQuerySource {
-  public referenceValue: string | RDF.Source;
-  public context?: IActionContext;
+export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
   public store: StreamingStore<Quad>;
+  private registeredQueries: number;
   protected readonly selectorShape: FragmentSelectorShape;
   private readonly dataFactory: ComunicaDataFactory;
   private readonly bindingsFactory: BindingsFactory;
 
   public constructor(store: StreamingStore<Quad>, dataFactory: ComunicaDataFactory, bindingsFactory: BindingsFactory) {
+    super();
     this.store = store;
     this.referenceValue = store;
+    this.registeredQueries = 0;
     this.dataFactory = dataFactory;
     this.bindingsFactory = bindingsFactory;
     const AF = new Factory(<RDF.DataFactory> this.dataFactory);
@@ -72,11 +73,16 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       term;
   }
 
-  public async getSelectorShape(): Promise<FragmentSelectorShape> {
+  public override async getSelectorShape(): Promise<FragmentSelectorShape> {
     return this.selectorShape;
   }
 
-  public queryBindings(operation: Algebra.Operation, context: IActionContext): BindingsStream {
+  public override queryBindings(operation: Algebra.Operation, context: IActionContext): BindingsStream {
+    this.registeredQueries++;
+    if (this.registeredQueries === 1) {
+      this.status = StreamingQuerySourceStatus.Running;
+    }
+
     if (operation.type !== 'pattern') {
       throw new Error(`Attempted to pass non-pattern operation '${operation.type}' to StreamingQuerySourceRdfJs`);
     }
@@ -133,10 +139,16 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
       this.dataFactory,
       this.bindingsFactory,
       Boolean(context.get(KeysQueryOperation.unionDefaultGraph)),
+      () => {
+        this.registeredQueries--;
+        if (this.registeredQueries === 0) {
+          this.status = StreamingQuerySourceStatus.Idle;
+        }
+      },
     );
   }
 
-  // [2024-12-01]: TODO implement setMetadata make a proper estimation for the cardinality
+  // TODO [2024-12-01]: implement setMetadata make a proper estimation for the cardinality
   protected async setMetadata(
     it: AsyncIterator<RDF.Quad>,
     _operation: Algebra.Pattern,
@@ -149,28 +161,28 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     });
   }
 
-  public queryQuads(
+  public override queryQuads(
     _operation: Algebra.Operation,
     _context: IActionContext,
   ): AsyncIterator<RDF.Quad> {
     throw new Error('queryQuads is not implemented in StreamingQuerySourceRdfJs');
   }
 
-  public queryBoolean(
+  public override queryBoolean(
     _operation: Algebra.Ask,
     _context: IActionContext,
   ): Promise<boolean> {
     throw new Error('queryBoolean is not implemented in StreamingQuerySourceRdfJs');
   }
 
-  public queryVoid(
+  public override queryVoid(
     _operation: Algebra.Update,
     _context: IActionContext,
   ): Promise<void> {
     throw new Error('queryVoid is not implemented in StreamingQuerySourceRdfJs');
   }
 
-  public toString(): string {
+  public override toString(): string {
     return `StreamingQuerySourceRdfJs(${this.store.constructor.name})`;
   }
 
@@ -180,6 +192,7 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
     dataFactory: ComunicaDataFactory,
     bindingsFactory: BindingsFactory,
     unionDefaultGraph: boolean,
+    onClose: () => void,
   ): BindingsStream {
     const variables = getVariables(pattern);
 
@@ -236,12 +249,15 @@ export class StreamingQuerySourceRdfJs implements IQuerySource {
         const variable = elementVariables[key];
         const term = getValueNestedPath(quad, keys);
         return [ dataFactory.variable(variable), term ];
-        // [2024-12-01]: TODO write a test for this
+        // TODO [2024-12-01]: write a test for this
       })).setContextEntry(
         KeysBindings.isAddition,
         ((<any>quad).isAddition === undefined) ? true : (<any>quad).isAddition,
       )), {
-      onClose: () => quads.destroy(),
+      onClose: () => {
+        quads.destroy();
+        onClose();
+      },
     });
 
     // Set the metadata property

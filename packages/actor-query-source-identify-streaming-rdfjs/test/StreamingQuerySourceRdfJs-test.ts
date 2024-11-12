@@ -7,9 +7,11 @@ import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries'
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
+import { StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
+import { PassThrough } from 'readable-stream';
 import { Factory } from 'sparqlalgebrajs';
 import { StreamingQuerySourceRdfJs } from '../lib';
 import '@incremunica/incremental-jest';
@@ -316,6 +318,51 @@ describe('StreamingQuerySourceRdfJs', () => {
         ctx,
       );
       await expect(arrayifyStream(data)).rejects.toThrow(new Error('RdfJsSource error'));
+    });
+
+    it('should destroy quadsStream and handle status', async() => {
+      store = <any>{
+        match: () => {
+          return null;
+        },
+      };
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+
+      const quadsStream1 = new PassThrough({ objectMode: true });
+      store.match = () => quadsStream1;
+      expect(source.status).toBe(StreamingQuerySourceStatus.Initializing);
+      const data1 = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
+        ctx,
+      );
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+
+      data1.destroy();
+      expect(quadsStream1.destroyed).toBe(true);
+      expect(source.status).toBe(StreamingQuerySourceStatus.Idle);
+
+      const quadsStream2 = new PassThrough({ objectMode: true });
+      store.match = () => quadsStream2;
+      const data2 = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
+        ctx,
+      );
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+      const quadsStream3 = new PassThrough({ objectMode: true });
+      store.match = () => quadsStream3;
+      const data3 = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
+        ctx,
+      );
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+
+      data2.destroy();
+      expect(quadsStream2.destroyed).toBe(true);
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+
+      data3.destroy();
+      expect(quadsStream3.destroyed).toBe(true);
+      expect(source.status).toBe(StreamingQuerySourceStatus.Idle);
     });
 
     describe('for quoted triples', () => {
@@ -744,6 +791,34 @@ describe('StreamingQuerySourceRdfJs', () => {
   });
 
   describe('quadsToBindings', () => {
+    it('destroys quadStream and calls the onClose function', async() => {
+      // Prepare data
+      const quadStream = new ArrayIterator([], { autoStart: false });
+      quadStream.setProperty('metadata', {
+        cardinality: { type: 'exact', value: 1 },
+        order: [
+          { term: 'subject', direction: 'asc' },
+          { term: 'predicate', direction: 'asc' },
+          { term: 'object', direction: 'asc' },
+          { term: 'graph', direction: 'asc' },
+        ],
+      });
+      const pattern = AF.createPattern(
+        DF.namedNode('s'),
+        DF.variable('p'),
+        DF.namedNode('o'),
+      );
+
+      const onCloseFn = jest.fn();
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, onCloseFn);
+
+      bindingsStream.destroy();
+
+      expect(quadStream.destroyed).toBe(true);
+      expect(onCloseFn).toHaveBeenCalledTimes(1);
+    });
+
     it('converts triples', async() => {
       // Prepare data
       const quadStream = new ArrayIterator([
@@ -766,7 +841,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('p'),
         DF.namedNode('o'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -813,7 +889,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('p'),
         DF.namedNode('o'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -882,7 +959,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('p'),
         DF.namedNode('o'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -967,7 +1045,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
         DF.variable('g'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1025,7 +1104,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
         DF.variable('g'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // TODO [2024-12-01]: check if the default graph should be included or not
       // should the following be added:
@@ -1084,7 +1164,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('x'),
         DF.namedNode('o'),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1122,7 +1203,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('p'),
         DF.quad(DF.variable('os'), DF.variable('op'), DF.variable('x')),
       );
-      const bindingsStream = (<any>StreamingQuerySourceRdfJs).quadsToBindings(quadStream, pattern, DF, BF, false);
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([

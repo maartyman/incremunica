@@ -55,38 +55,49 @@ export class ActorResourceWatchSolidNotificationWebsockets extends ActorResource
     _action: IActionResourceWatch,
     sideData: SideData,
   ): Promise<IActorResourceWatchOutput> {
-    const socket = new WebSocket(sideData.notificationChannel);
-
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
-    socket.onmessage = (message) => {
-      // TODO [2024-12-01]: For now ignoring the Buffer options => tests?
-      // let data: string | Buffer | ArrayBuffer | Buffer[] = message.data;
-      // if (Array.isArray(data)) {
-      // data = Buffer.concat(data);
-      // }
-      // if (data instanceof Buffer) {
-      // data = data.toString();
-      // }
-      // if (data instanceof ArrayBuffer) {
-      // const decoder = new TextDecoder('utf-8');
-      // data = decoder.decode(data);
-      // }
-
-      const messageData = JSON.parse(<string>message.data);
-      if (messageData.type === 'Delete') {
-        events.emit('delete');
-      } else {
-        events.emit('update');
+    let socket: WebSocket | undefined;
+    const start = (): void => {
+      if (socket) {
+        return;
       }
+      socket = new WebSocket(sideData.notificationChannel);
+      socket.onmessage = (message) => {
+        // TODO [2024-12-01]: For now ignoring the Buffer options => tests?
+        // let data: string | Buffer | ArrayBuffer | Buffer[] = message.data;
+        // if (Array.isArray(data)) {
+        // data = Buffer.concat(data);
+        // }
+        // if (data instanceof Buffer) {
+        // data = data.toString();
+        // }
+        // if (data instanceof ArrayBuffer) {
+        // const decoder = new TextDecoder('utf-8');
+        // data = decoder.decode(data);
+        // }
+
+        const messageData = JSON.parse(<string>message.data);
+        if (messageData.type === 'Delete') {
+          events.emit('delete');
+        } else {
+          events.emit('update');
+        }
+      };
+      socket.onopen = () => {
+        events.emit('update');
+      };
     };
 
     return {
       events,
-      stopFunction() {
-        events.removeAllListeners();
-        socket.close();
+      stop() {
+        if (socket) {
+          socket.close();
+        }
+        socket = undefined;
       },
+      start,
     };
   }
 }

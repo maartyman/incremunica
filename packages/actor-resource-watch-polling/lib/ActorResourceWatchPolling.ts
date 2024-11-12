@@ -11,6 +11,7 @@ import type {
 import {
   ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
+import { KeysResourceWatch } from '@incremunica/context-entries';
 
 /**
  * An incremunica Polling Resource Watch Actor.
@@ -32,6 +33,18 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
     const events: IResourceWatchEventEmitter = new EventEmitter();
 
+    const maxAgeArray = this.regex.exec(action.metadata['cache-control']);
+    let pollingFrequency: number;
+    if (maxAgeArray) {
+      pollingFrequency = Number.parseInt(maxAgeArray[1], 10);
+    } else if (action.context.has(KeysResourceWatch.pollingFrequency)) {
+      pollingFrequency = action.context.get(KeysResourceWatch.pollingFrequency)!;
+    } else {
+      pollingFrequency = this.defaultPollingFrequency;
+    }
+
+    let pollingStartTime = Date.now() + (pollingFrequency - Number.parseInt(action.metadata.age, 10)) * 1000;
+
     let etag = action.metadata.etag;
     const checkForChanges = (): void => {
       this.mediatorHttp.mediate(
@@ -43,11 +56,14 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
           },
         },
       ).then((responseHead) => {
+        if (responseHead.headers.has('age')) {
+          pollingStartTime = Date.now() + (pollingFrequency - Number.parseInt(action.metadata.age, 10)) * 1000;
+        }
+
         // TODO [2024-12-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
         if (!responseHead.ok) {
           events.emit('delete');
         }
-
         if (responseHead.headers.get('etag') !== etag) {
           events.emit('update');
           etag = responseHead.headers.get('etag');
@@ -56,14 +72,6 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
         events.emit('delete');
       });
     };
-
-    const maxAgeArray = this.regex.exec(action.metadata['cache-control']);
-    let pollingFrequency: number;
-    if (maxAgeArray) {
-      pollingFrequency = Number.parseInt(maxAgeArray[1], 10);
-    } else {
-      pollingFrequency = this.defaultPollingFrequency;
-    }
 
     let loopId: NodeJS.Timeout | undefined;
     const startCheckLoop = (): void => {
@@ -74,24 +82,41 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
       );
     };
 
+    let running = false;
     let timeoutId: NodeJS.Timeout | undefined;
-    const age = Number.parseInt(action.metadata.age, 10);
-    if (age) {
-      timeoutId = setTimeout(
-        startCheckLoop,
-        (pollingFrequency - age) * 1_000,
-      );
-    } else {
-      timeoutId = setTimeout(
-        startCheckLoop,
-        pollingFrequency * 1_000,
-      );
-    }
+    const start = (): void => {
+      if (running) {
+        return;
+      }
+      running = true;
+      if (pollingStartTime) {
+        let waitTime: number;
+        const now = Date.now();
+        if (now > pollingStartTime) {
+          waitTime = pollingFrequency * 1_000 - ((now - pollingStartTime) % (pollingFrequency * 1_000));
+          checkForChanges();
+        } else {
+          waitTime = (pollingStartTime - now);
+        }
+        timeoutId = setTimeout(
+          startCheckLoop,
+          waitTime,
+        );
+      } else {
+        timeoutId = setTimeout(
+          startCheckLoop,
+          pollingFrequency * 1_000,
+        );
+      }
+    };
 
     return {
       events,
-      stopFunction(): void {
-        events.removeAllListeners();
+      stop(): void {
+        if (!running) {
+          return;
+        }
+        running = false;
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
@@ -99,6 +124,7 @@ export class ActorResourceWatchPolling extends ActorResourceWatch {
           clearInterval(loopId);
         }
       },
+      start,
     };
   }
 }

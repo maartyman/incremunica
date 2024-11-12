@@ -1,15 +1,15 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
-import type { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
 import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvents';
+import type { StreamingQuerySource } from '@incremunica/streaming-query-source';
 
 /**
  * A comunica actor for guard events.
  *
  * Actor Guard:
- * * Input:  IActionGuard:      TODO: fill in.
+ * * Input:  IActionGuard:      // TODO [2024-12-01]: fill in.
  * * Test:   <none>
- * * Output: IActorGuardOutput: TODO: fill in.
+ * * Output: IActorGuardOutput: // TODO [2024-12-01]: fill in.
  *
  * @see IActionGuard
  * @see IActorGuardOutput
@@ -27,7 +27,7 @@ export interface IActionGuard extends IAction {
   /**
    * The source element of the data.
    */
-  streamingSource: StreamingQuerySourceRdfJs;
+  streamingQuerySource: StreamingQuerySource;
   /**
    * The URL of the source that was fetched.
    */

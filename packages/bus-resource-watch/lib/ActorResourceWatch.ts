@@ -6,9 +6,9 @@ import { Actor } from '@comunica/core';
  * An incremunica actor for resource-watch events.
  *
  * Actor types:
- * * Input:  IActionResourceWatch:      TODO: fill in.
+ * * Input:  IActionResourceWatch:      // TODO: fill in.
  * * Test:   <none>
- * * Output: IActorResourceWatchOutput: TODO: fill in.
+ * * Output: IActorResourceWatchOutput: // TODO: fill in.
  *
  * @see IActionResourceWatch
  * @see IActorResourceWatchOutput
@@ -52,7 +52,11 @@ export interface IActorResourceWatchOutput extends IActorOutput {
   /**
    * A function to stop watching the resource.
    */
-  stopFunction: () => void;
+  stop: () => void;
+  /**
+   * A function to start watching the resource.
+   */
+  start: () => void;
 }
 
 export interface IActorResourceWatchArgs<TS = undefined> extends IActorArgs<

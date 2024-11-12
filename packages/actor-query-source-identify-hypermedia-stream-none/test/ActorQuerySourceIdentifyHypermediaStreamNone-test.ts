@@ -130,7 +130,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
         quads: streamifyArray([]),
       };
       const result = (await actor.run(action));
-      expect(result.source.toString()).toBe('QueryStreamingSourceRdfJs(http://test.com)');
+      expect(result.source.toString()).toBe('ActorQuerySourceIdentifyHypermediaStreamNone(http://test.com)');
     });
 
     it('should run and add a guard', async() => {
@@ -150,7 +150,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
       }
 
       mediatorFn = jest.fn((action: IActionGuard) => {
-        action.streamingSource.context = (new ActionContext()).set(new ActionContextKeyTest(), true);
+        action.streamingQuerySource.context = (new ActionContext()).set(new ActionContextKeyTest(), true);
       });
       const action = <any> {
         context,
@@ -165,7 +165,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
 
     it('should add the guard events to the source even if the source has no context', async() => {
       mediatorFn = jest.fn((action: IActionGuard) => {
-        action.streamingSource.context = undefined;
+        action.streamingQuerySource.context = undefined;
       });
       const action = <any> {
         context,

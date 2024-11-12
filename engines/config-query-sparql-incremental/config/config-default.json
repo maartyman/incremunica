@@ -6,7 +6,7 @@
   "import": [
     "ccqs:config/bindings-aggregator-factory/actors.json",
     "ccqs:config/bindings-aggregator-factory/mediators.json",
-    "ccqs:config/context-preprocess/actors.json",
+    "icqsi:config/context-preprocess/actors.json",
     "ccqs:config/context-preprocess/mediators.json",
     "ccqs:config/expression-evaluator-factory/actors.json",
     "ccqs:config/expression-evaluator-factory/mediators.json",

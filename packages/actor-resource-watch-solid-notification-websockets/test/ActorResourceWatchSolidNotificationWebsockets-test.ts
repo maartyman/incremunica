@@ -179,13 +179,51 @@ IActorHttpOutput
 
   describe('ActorResourceWatchSolidNotificationWebsockets run', () => {
     let websocket: Server<typeof import('ws')>;
+    const onCloseFn = jest.fn();
+    const onConnectionFn = jest.fn((ws: WebSocket) => {
+      ws.send(JSON.stringify(message));
+      ws.onclose = onCloseFn;
+    });
 
     beforeEach(() => {
       websocket = new WebSocket.WebSocketServer({ port: 4015 });
+      websocket.on('connection', onConnectionFn);
     });
 
     afterEach(() => {
       websocket.close();
+      jest.clearAllMocks();
+    });
+
+    it('should handle multiple starts and stops', async() => {
+      createResourceRequestFn = createResourceRequest;
+      createDescriptionResourceRequestFn = createDescriptionResourceRequest;
+      createChannelDescriptionRequestFn = createChannelDescriptionRequest;
+
+      message.type = 'Add';
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
+      result.start();
+      result.start();
+
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
+
+      result.stop();
+      result.stop();
+      result.stop();
+      result.start();
+      result.start();
+      result.start();
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(2);
+      expect(onCloseFn).toHaveBeenCalledTimes(1);
+
+      result.stop();
     });
 
     it('should support ADD', async() => {
@@ -193,20 +231,15 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
+      message.type = 'Add';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
 
-      websocket.on('connection', (ws: WebSocket) => {
-        message.type = 'Add';
-        ws.send(JSON.stringify(message));
-      });
-
-      await new Promise<void>(resolve => result.events.on('update', () => {
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
-      }));
+      }))).resolves.toBeUndefined();
 
-      expect(true).toBeTruthy();
-
-      result.stopFunction();
+      result.stop();
     });
 
     it('should support Remove', async() => {
@@ -214,20 +247,16 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
+      message.type = 'Remove';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
 
-      websocket.on('connection', (ws: WebSocket) => {
-        message.type = 'Remove';
-        ws.send(JSON.stringify(message));
-      });
-
-      await new Promise<void>(resolve => result.events.on('update', () => {
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
-      }));
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
-      expect(true).toBeTruthy();
-
-      result.stopFunction();
+      result.stop();
     });
 
     it('should support Create', async() => {
@@ -235,20 +264,16 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
+      message.type = 'Create';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
 
-      websocket.on('connection', (ws: WebSocket) => {
-        message.type = 'Create';
-        ws.send(JSON.stringify(message));
-      });
-
-      await new Promise<void>(resolve => result.events.on('update', () => {
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
-      }));
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
-      expect(true).toBeTruthy();
-
-      result.stopFunction();
+      result.stop();
     });
 
     it('should support Update', async() => {
@@ -256,20 +281,16 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
+      message.type = 'Update';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
 
-      websocket.on('connection', (ws: WebSocket) => {
-        message.type = 'Update';
-        ws.send(JSON.stringify(message));
-      });
-
-      await new Promise<void>(resolve => result.events.on('update', () => {
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
-      }));
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
-      expect(true).toBeTruthy();
-
-      result.stopFunction();
+      result.stop();
     });
 
     it('should support Delete', async() => {
@@ -277,20 +298,16 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
+      message.type = 'Delete';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
 
-      websocket.on('connection', (ws: WebSocket) => {
-        message.type = 'Delete';
-        ws.send(JSON.stringify(message));
-      });
-
-      await new Promise<void>(resolve => result.events.on('delete', () => {
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
-      }));
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
-      expect(true).toBeTruthy();
-
-      result.stopFunction();
+      result.stop();
     });
 
     // TODO [2024-12-01]: re-enable these tests

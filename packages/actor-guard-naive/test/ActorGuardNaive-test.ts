@@ -46,8 +46,13 @@ describe('ActorGuardNaive', () => {
     let removeQuadFn = jest.fn();
     let addQuadFn = jest.fn();
     let stopFn = jest.fn();
+    let startFn = jest.fn();
     let onFn: () => void;
     let hasEnded: { value: boolean };
+    const setStatus = (status: number) => {
+      (<any>action.streamingQuerySource).status = status;
+      action.streamingQuerySource.statusEvents.emit('status', status);
+    };
 
     beforeEach(() => {
       quadArray = [];
@@ -57,6 +62,7 @@ describe('ActorGuardNaive', () => {
       removeQuadFn = jest.fn();
       addQuadFn = jest.fn();
       stopFn = jest.fn();
+      startFn = jest.fn();
       hasEnded = { value: false };
 
       mediatorDereferenceRdf = <any>{
@@ -71,7 +77,8 @@ describe('ActorGuardNaive', () => {
         mediate: async(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> => {
           return {
             events: changeNotificationEventEmitter,
-            stopFunction: stopFn,
+            stop: stopFn,
+            start: startFn,
           };
         },
       };
@@ -87,7 +94,9 @@ describe('ActorGuardNaive', () => {
         context: <any>{},
         url: 'www.test.com',
         metadata: {},
-        streamingSource: <any>{
+        streamingQuerySource: <any>{
+          status: 0,
+          statusEvents: new EventEmitter(),
           store: {
             on: (str: string, fn: () => void) => {
               onFn = fn;
@@ -116,20 +125,29 @@ describe('ActorGuardNaive', () => {
       await expect(actor.test(action)).resolves.toBeTruthy();
     });
 
-    it('should stop resource watcher if store stops', async() => {
+    it('should only start resource watcher if streamingQuerySource is running', async() => {
       await actor.run(action);
+      expect(startFn).toHaveBeenCalledTimes(0);
+      expect(stopFn).toHaveBeenCalledTimes(0);
 
-      onFn();
-
-      expect(stopFn).toHaveBeenCalledWith();
+      setStatus(1);
+      expect(startFn).toHaveBeenCalledTimes(1);
+      expect(stopFn).toHaveBeenCalledTimes(0);
+      setStatus(2);
+      expect(startFn).toHaveBeenCalledTimes(1);
+      expect(stopFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should stop resource when the store has stopped really early', async() => {
-      hasEnded.value = true;
+    it('should start resource watcher if streamingQuerySource is running early', async() => {
+      setStatus(1);
 
       await actor.run(action);
+      expect(startFn).toHaveBeenCalledTimes(1);
+      expect(stopFn).toHaveBeenCalledTimes(0);
 
-      expect(stopFn).toHaveBeenCalledWith();
+      setStatus(2);
+      expect(startFn).toHaveBeenCalledTimes(1);
+      expect(stopFn).toHaveBeenCalledTimes(1);
     });
 
     it('should remove all items if mediatorDereferenceRdf errors', async() => {

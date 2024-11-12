@@ -25,3 +25,7 @@ export const KeysDeltaQueryJoin = {
 export const KeysBindings = {
   isAddition: new ActionContextKey<boolean>('@incremunica/bindings:isAddition'),
 };
+
+export const KeysResourceWatch = {
+  pollingFrequency: new ActionContextKey<number>('@incremunica/resource-watch:pollingFrequency'),
+};
