@@ -2272,21 +2272,6 @@
     "@comunica/types" "^4.0.2"
     sparqlalgebrajs "^4.3.8"
 
-"@comunica/actor-query-operation-construct@^4.0.1":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-construct/-/actor-query-operation-construct-4.0.2.tgz#ec26651125b40cea8b4858410ba0e0a5dc4fb55f"
-  integrity sha512-KEqPAuRgCG0uaFelln0naRFJO8mcuB9PzJMwDRqDYc1nGWiVWxt0ZYP2vtCsor5jqEWAOYVyctp/Oq2UUCqElg==
-  dependencies:
-    "@comunica/bus-query-operation" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-query-operation" "^4.0.2"
-    "@rdfjs/types" "*"
-    asynciterator "^3.9.0"
-    rdf-terms "^1.11.0"
-    sparqlalgebrajs "^4.3.8"
-
 "@comunica/actor-query-operation-join@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-join/-/actor-query-operation-join-4.0.2.tgz#eff1b27e44aa07c648f27111fbdfeeb0e656d84e"
@@ -13097,7 +13082,7 @@ mute-stream@0.0.8, mute-stream@~0.0.4:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
-n3@^1.11.1, n3@^1.16.3, n3@^1.16.4, n3@^1.17.0, n3@^1.17.1, n3@^1.6.3:
+n3@^1.11.1, n3@^1.16.3, n3@^1.17.0, n3@^1.17.1, n3@^1.6.3:
   version "1.17.2"
   resolved "https://registry.yarnpkg.com/n3/-/n3-1.17.2.tgz#3370b2d07da98a5b2865fa43c2d4e5c563cc65df"
   integrity sha512-BxSM52wYFqXrbQQT5WUEzKUn6qpYV+2L4XZLfn3Gblz2kwZ09S+QxC33WNdVEQy2djenFL8SNkrjejEKlvI6+Q==

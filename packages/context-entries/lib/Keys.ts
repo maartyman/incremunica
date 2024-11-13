@@ -19,10 +19,6 @@ export const KeysStreamingSource = {
   matchOptions: new ActionContextKey<({ stopMatch: () => void })[]>('@incremunica/streaming-source:matchOptions'),
 };
 
-export const KeysDeltaQueryJoin = {
-  fromDeltaQuery: new ActionContextKey<boolean>('@incremunica/delta-query-join:fromDeltaQuery'),
-};
-
 export const KeysBindings = {
   isAddition: new ActionContextKey<boolean>('@incremunica/bindings:isAddition'),
 };
