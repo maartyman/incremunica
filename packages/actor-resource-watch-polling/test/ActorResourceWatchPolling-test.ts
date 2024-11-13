@@ -4,6 +4,7 @@ import type { IActionResourceWatch } from '@incremunica/bus-resource-watch';
 import { KeysResourceWatch } from '@incremunica/context-entries';
 import { ActorResourceWatchPolling } from '../lib';
 import 'jest-rdf';
+import '@comunica/utils-jest';
 
 expect.extend({
   toBeBetween(received, argumentOne, argumentTwo) {
@@ -114,11 +115,8 @@ describe('ActorGuardPolling', () => {
     });
 
     it('should test', async() => {
-      await expect(actor.test(action)).resolves.toEqual({
-        sideData: undefined,
-        value: {
-          priority: 0,
-        },
+      await expect(actor.test(action)).resolves.toPassTest({
+        priority: 0,
       });
     });
 

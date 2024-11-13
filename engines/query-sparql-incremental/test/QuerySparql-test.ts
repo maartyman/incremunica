@@ -3,7 +3,7 @@
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
 import '@incremunica/incremental-jest';
-import type { EventEmitter } from 'node:events';
+import { EventEmitter } from 'events';
 import * as http from 'node:http';
 import type { Bindings, BindingsStream, QueryStringContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
@@ -252,6 +252,48 @@ describe('System test: QuerySparql (without polly)', () => {
         [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
         [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
         [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+      ]).setContextEntry(KeysBindings.isAddition, true));
+    });
+
+    it('simple query with deferred evaluation', async() => {
+      fetchData.dataString = '<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .';
+      fetchData.etag = '0';
+
+      const deferredEventEmitter = new EventEmitter();
+      bindingStream = await engine.queryBindings(`SELECT * WHERE {
+          ?s ?p ?o.
+          }`, {
+        sources: [
+          'http://localhost:8787',
+        ],
+        pollingFrequency: 100,
+        deferredEvaluationEventEmitter: deferredEventEmitter,
+      });
+
+      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+      ]).setContextEntry(KeysBindings.isAddition, true));
+
+      fetchData.dataString = '<http://localhost:8787/s3> <http://localhost:8787/p3> <http://localhost:8787/o3> .';
+      fetchData.etag = '1';
+
+      setTimeout(() => {
+        fetchData.dataString = '<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .';
+        fetchData.dataString += '<http://localhost:8787/s2> <http://localhost:8787/p2> <http://localhost:8787/o2> .';
+        fetchData.etag = '2';
+      }, 500);
+      setTimeout(() => deferredEventEmitter.emit('update'), 1000);
+
+      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
+        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
+        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
       ]).setContextEntry(KeysBindings.isAddition, true));
     });
 

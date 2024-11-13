@@ -1,22 +1,23 @@
 {
-  "name": "@incremunica/context-entries",
+  "name": "@incremunica/actor-resource-watch-deferred",
   "version": "1.3.0",
-  "description": "A collection of reusable Incremunica context key definitions.",
+  "description": "A deferred-diff guard actor",
+  "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/context-entries"
+    "directory": "packages/actor-resource-watch-deferred"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
   },
   "keywords": [
-    "incremunica",
-    "context",
-    "entries",
-    "keys"
+    "comunica",
+    "actor",
+    "guard",
+    "deferred"
   ],
   "sideEffects": false,
   "main": "lib/index.js",
@@ -25,16 +26,19 @@
     "access": "public"
   },
   "files": [
+    "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
     "lib/**/*.js.map"
   ],
   "scripts": {
-    "build": "node \"../../node_modules/typescript/bin/tsc\""
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
   },
   "dependencies": {
     "@comunica/core": "^4.0.1",
     "@incremunica/bus-resource-watch": "^1.3.0",
-    "@incremunica/incremental-types": "^1.3.0"
+    "@incremunica/context-entries": "^1.3.0"
   }
 }

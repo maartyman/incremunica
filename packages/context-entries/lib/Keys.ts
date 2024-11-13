@@ -1,4 +1,5 @@
 import { ActionContextKey } from '@comunica/core';
+import type { IResourceWatchEventEmitter } from '@incremunica/bus-resource-watch';
 import type { IGuardEvents } from '@incremunica/incremental-types';
 
 /**
@@ -28,4 +29,6 @@ export const KeysBindings = {
 
 export const KeysResourceWatch = {
   pollingFrequency: new ActionContextKey<number>('@incremunica/resource-watch:pollingFrequency'),
+  deferredEvaluationEventEmitter:
+    new ActionContextKey<IResourceWatchEventEmitter>('@incremunica/resource-watch:deferredEvaluationEventEmitter'),
 };
