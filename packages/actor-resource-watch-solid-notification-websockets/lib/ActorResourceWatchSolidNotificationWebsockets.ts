@@ -14,8 +14,12 @@ import {
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import type { NotificationChannel } from '@solid-notifications/types';
 import { ChannelType } from '@solid-notifications/types';
-
-import 'websocket-polyfill';
+import { is_node } from 'tstl';
+if (is_node()) {
+  // Polyfill for WebSocket in Node.js
+  // eslint-disable-next-line ts/no-require-imports
+  (<any>globalThis).WebSocket ??= require('ws');
+}
 
 /**
  * An incremunica Resource Watch Solid Notification Websockets Actor.

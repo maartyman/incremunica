@@ -42,6 +42,7 @@
     "@incremunica/bus-resource-watch": "^1.3.0",
     "@solid-notifications/subscription": "^0.1.0",
     "@solid-notifications/types": "^0.1.0",
-    "websocket-polyfill": "^0.0.3"
+    "tstl": "^3.0.0",
+    "ws": "^8.18.0"
   }
 }

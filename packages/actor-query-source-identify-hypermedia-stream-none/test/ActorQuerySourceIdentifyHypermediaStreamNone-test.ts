@@ -10,7 +10,7 @@ import {
 import type { IActionGuard, MediatorGuard } from '@incremunica/bus-guard';
 import { KeysBindings, KeysGuard } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
-import arrayifyStream from 'arrayify-stream';
+import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
 import { ActorQuerySourceIdentifyHypermediaStreamNone } from '../lib';

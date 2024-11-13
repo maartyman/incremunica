@@ -41,6 +41,6 @@
     "@comunica/utils-bindings-factory": "^4.0.1",
     "@incremunica/context-entries": "^1.3.0",
     "@rdfjs/types": "*",
-    "arrayify-stream": "^2.0.1"
+    "arrayify-stream": "^3.0.0"
   }
 }
