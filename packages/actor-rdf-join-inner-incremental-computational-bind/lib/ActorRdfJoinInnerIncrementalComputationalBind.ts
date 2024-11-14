@@ -15,7 +15,6 @@ import { failTest, passTest, passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
 import type {
   BindingsStream,
-  IQuerySource,
   IActionContext,
   IJoinEntryWithMetadata,
   IQueryOperationResultBindings,
@@ -23,24 +22,25 @@ import type {
 } from '@comunica/types';
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
-import { getSafeBindings, materializeOperation, getOperationSource } from '@comunica/utils-query-operation';
+import { getSafeBindings, materializeOperation } from '@comunica/utils-query-operation';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
+import type { StreamingQuerySource } from '@incremunica/streaming-query-source';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
 
 /**
- * A comunica Multi-way Bind RDF Join Actor.
+ * An Incremunica computational Bind RDF Join Actor.
  */
-export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdfJoin {
+export class ActorRdfJoinInnerIncrementalComputationalBind extends ActorRdfJoin {
   public readonly selectivityModifier: number;
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   public readonly mediatorHashBindings: MediatorHashBindings;
 
-  public constructor(args: IActorRdfJoinInnerIncrementalComputationalMultiBindArgs) {
+  public constructor(args: IActorRdfJoinInnerIncrementalComputationalBindArgs) {
     super(args, {
       logicalType: 'inner',
       physicalName: 'bind',
@@ -48,19 +48,15 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     });
   }
 
-  public static haltSources(sources: IQuerySource[]): void {
+  public static haltSources(sources: StreamingQuerySource[]): void {
     for (const source of sources) {
-      if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
-        (<any>source).halt();
-      }
+      source.halt();
     }
   }
 
-  public static resumeSources(sources: IQuerySource[]): void {
+  public static resumeSources(sources: StreamingQuerySource[]): void {
     for (const source of sources) {
-      if (typeof source !== 'string' && 'resume' in source && 'halt' in source) {
-        (<any>source).resume();
-      }
+      source.resume();
     }
   }
 
@@ -84,7 +80,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
     operationBinder: (boundOperations: Algebra.Operation[], operationBindings: Bindings)
     => Promise<[AsyncIterator<Bindings>, () => void]>,
     optional: boolean,
-    sources: any,
+    sources: StreamingQuerySource[],
     algebraFactory: Factory,
     bindingsFactory: BindingsFactory,
     hashBindings: (bindings: Bindings) => number,
@@ -141,7 +137,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         const activeElement = hashData.elements.at(-1)!;
         hashData.elements.pop();
 
-        ActorRdfJoinInnerIncrementalComputationalMultiBind.haltSources(sources);
+        ActorRdfJoinInnerIncrementalComputationalBind.haltSources(sources);
 
         let activeIteratorStopped = false;
         let newIteratorStopped = false;
@@ -149,7 +145,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         activeElement.iterator.on('end', () => {
           activeIteratorStopped = true;
           if (newIteratorStopped) {
-            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+            ActorRdfJoinInnerIncrementalComputationalBind.resumeSources(sources);
           }
         });
         activeElement.stopFunction();
@@ -161,7 +157,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
         newIterator.on('end', () => {
           newIteratorStopped = true;
           if (activeIteratorStopped) {
-            ActorRdfJoinInnerIncrementalComputationalMultiBind.resumeSources(sources);
+            ActorRdfJoinInnerIncrementalComputationalBind.resumeSources(sources);
           }
         });
 
@@ -260,7 +256,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
   public async getOutput(
     action: IActionRdfJoin,
-    sideData: IActorRdfJoinIncrementalComputationalMultiBindTestSideData,
+    sideData: IActorRdfJoinIncrementalComputationalBindTestSideData,
   ): Promise<IActorRdfJoinOutputInner> {
     const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
     const algebraFactory = new Factory(dataFactory);
@@ -280,19 +276,15 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
 
     // Take the stream with the lowest cardinality
     const smallestStream: IQueryOperationResultBindings = sideData.entriesSorted[0].output;
-    const remainingEntries = [ ...sideData.entriesSorted ];
-    remainingEntries.splice(0, 1);
-
-    const sources = getOperationSource(remainingEntries[0].operation);
 
     // Bind the remaining patterns for each binding in the stream
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, sideData.entriesSorted[0].metadata)
-      .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalMultiBind
+      .set(KeysQueryOperation.joinRightMetadatas, sideData.remainingEntries.map(entry => entry.metadata));
+    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalComputationalBind
       .createBindStream(
         <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
-        remainingEntries.map(entry => entry.operation),
+        sideData.remainingEntries.map(entry => entry.operation),
         async(operations: Algebra.Operation[], operationBindings: Bindings) => {
           // Send the materialized patterns to the mediator for recursive join evaluation.
           const matchOptions: ({ stopMatch: () => void })[] = [];
@@ -314,7 +306,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
           return [ <AsyncIterator<Bindings>><unknown>output.bindingsStream, stopFunction ];
         },
         false,
-        sources ?? [],
+        sideData.streamingQuerySources,
         algebraFactory,
         bindingsFactory,
         entry => hashFunction(entry, sideData.entriesSorted[0].metadata.variables.map(v => v.variable)),
@@ -339,7 +331,7 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
   public async getJoinCoefficients(
     action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
-  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinIncrementalComputationalMultiBindTestSideData>> {
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinIncrementalComputationalBindTestSideData>> {
     const { metadatas } = sideData;
     // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
     const entriesUnsorted = action.entries
@@ -349,16 +341,31 @@ export class ActorRdfJoinInnerIncrementalComputationalMultiBind extends ActorRdf
       return entriesTest;
     }
     const entriesSorted = entriesTest.get();
+    const remainingEntries = [ ...entriesSorted ];
+    remainingEntries.splice(0, 1);
+
+    const sources = action.context.getSafe(KeysQueryOperation.querySources).map(sourceWrapper => sourceWrapper.source);
+    for (const source of sources) {
+      if (!('resume' in source && 'halt' in source)) {
+        return failTest('A source can\'t halt or resume');
+      }
+    }
     return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    }, { ...sideData, entriesUnsorted, entriesSorted });
+    }, {
+      ...sideData,
+      entriesUnsorted,
+      entriesSorted,
+      remainingEntries,
+      streamingQuerySources: <StreamingQuerySource[]>sources,
+    });
   }
 }
 
-export interface IActorRdfJoinInnerIncrementalComputationalMultiBindArgs extends IActorRdfJoinArgs {
+export interface IActorRdfJoinInnerIncrementalComputationalBindArgs extends IActorRdfJoinArgs {
   /**
    * Multiplier for selectivity values
    * @range {double}
@@ -383,7 +390,9 @@ export interface IActorRdfJoinInnerIncrementalComputationalMultiBindArgs extends
   mediatorHashBindings: MediatorHashBindings;
 }
 
-export interface IActorRdfJoinIncrementalComputationalMultiBindTestSideData extends IActorRdfJoinTestSideData {
+export interface IActorRdfJoinIncrementalComputationalBindTestSideData extends IActorRdfJoinTestSideData {
   entriesUnsorted: IJoinEntryWithMetadata[];
   entriesSorted: IJoinEntryWithMetadata[];
+  remainingEntries: IJoinEntryWithMetadata[];
+  streamingQuerySources: StreamingQuerySource[];
 }

@@ -66,6 +66,14 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     };
   }
 
+  public override halt(): void {
+    this.store.halt();
+  }
+
+  public override resume(): void {
+    this.store.resume();
+  }
+
   public static nullifyVariables(term: RDF.Term | undefined, quotedTripleFiltering: boolean): RDF.Term | undefined {
     return !term || term.termType === 'Variable' || (!quotedTripleFiltering &&
       term.termType === 'Quad' && someTermsNested(term, value => value.termType === 'Variable')) ?

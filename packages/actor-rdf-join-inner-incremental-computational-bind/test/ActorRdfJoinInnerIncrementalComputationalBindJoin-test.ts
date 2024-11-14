@@ -2,13 +2,13 @@ import type { EventEmitter } from 'node:events';
 import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
-import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
+import type { IActionRdfJoin, IActorRdfJoinTestSideData } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import 'jest-rdf';
-import { KeysQueryOperation } from '@comunica/context-entries';
+import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
-import { ActionContext, Bus } from '@comunica/core';
+import { failTest, ActionContext, Bus } from '@comunica/core';
 import type { BindingsStream, IActionContext, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
@@ -22,16 +22,15 @@ import type { Stream } from 'readable-stream';
 import { PassThrough } from 'readable-stream';
 import { Factory } from 'sparqlalgebrajs';
 import {
-  ActorRdfJoinInnerIncrementalComputationalMultiBind,
-} from '../lib/ActorRdfJoinInnerIncrementalComputationalMultiBind';
-import Mock = jest.Mock;
+  ActorRdfJoinInnerIncrementalComputationalBind,
+} from '../lib';
 import '@comunica/utils-jest';
 import '@incremunica/incremental-jest';
 
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
-const FACTORY = new Factory();
+const FACTORY = new Factory(DF);
 
 async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
   const array: any[] = [];
@@ -44,7 +43,7 @@ async function partialArrayifyStream(stream: EventEmitter, num: number): Promise
   return array;
 }
 
-describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
+describe('ActorRdfJoinIncrementalComputationalBind', () => {
   let bus: any;
   let BF: BindingsFactory;
 
@@ -53,7 +52,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
     BF = await DevTools.createTestBindingsFactory(DF);
   });
 
-  describe('An ActorRdfJoinIncrementalComputationalMultiBind instance', () => {
+  describe('An ActorRdfJoinIncrementalComputationalBind instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity,
@@ -70,7 +69,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
     >;
     let mediatorMergeBindingsContext: MediatorMergeBindingsContext;
     let mediatorHashBindings: MediatorHashBindings;
-    let actor: ActorRdfJoinInnerIncrementalComputationalMultiBind;
+    let actor: ActorRdfJoinInnerIncrementalComputationalBind;
+    let haltFn: () => void;
+    let resumeFn: () => void;
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any> {
@@ -83,8 +84,16 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           return { entries };
         },
       };
-      context = new ActionContext({ a: 'b' });
-      context = DevTools.createTestContextWithDataFactory(DF, context);
+      haltFn = jest.fn();
+      resumeFn = jest.fn();
+      context = DevTools.createTestContextWithDataFactory(DF);
+      context = context.set(KeysQueryOperation.querySources, [ <any>{
+        source: {
+          resume: resumeFn,
+          halt: haltFn,
+        },
+        context: <any>{},
+      } ]);
       mediatorQueryOperation = <any> {
         mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
           return {
@@ -113,7 +122,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       };
       mediatorMergeBindingsContext = DevTools.createTestMediatorMergeBindingsContext();
       mediatorHashBindings = DevTools.createTestMediatorHashBindings();
-      actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
+      actor = new ActorRdfJoinInnerIncrementalComputationalBind({
         name: 'actor',
         bus,
         selectivityModifier: 0.1,
@@ -126,72 +135,111 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
     });
 
     describe('getJoinCoefficients', () => {
+      let action: IActionRdfJoin;
+      let sideData: IActorRdfJoinTestSideData;
+      beforeEach(async() => {
+        action = {
+          type: 'inner',
+          entries: [
+            {
+              output: <any>{},
+              operation: FACTORY.createNop(),
+            },
+            {
+              output: <any>{},
+              operation: FACTORY.createNop(),
+            },
+            {
+              output: <any>{},
+              operation: FACTORY.createNop(),
+            },
+          ],
+          context,
+        };
+        sideData = {
+          metadatas: [
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 3 },
+              pageSize: 100,
+              requestTime: 10,
+              variables: [{
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              }],
+            },
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 2 },
+              pageSize: 100,
+              requestTime: 20,
+              variables: [{
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              }],
+            },
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 5 },
+              pageSize: 100,
+              requestTime: 30,
+              variables: [{
+                variable: DF.variable('a'),
+                canBeUndef: false,
+              }],
+            },
+          ],
+        };
+      });
+
+      it('should fail if sort fails', async() => {
+        jest.spyOn(actor, 'sortJoinEntries').mockResolvedValue(failTest('test message'));
+        const joinCoefficients = await actor.getJoinCoefficients(action, sideData);
+        expect(actor.sortJoinEntries).toHaveBeenCalledTimes(1);
+        expect(joinCoefficients).toFailTest('test message');
+      });
+
+      it('should fail if source can\'t halt', async() => {
+        action.context = action.context.set(KeysQueryOperation.querySources, [ <any>{
+          source: {
+            resume: resumeFn,
+          },
+          context: <any>{},
+        } ]);
+        const joinCoefficients = await actor.getJoinCoefficients(action, sideData);
+        expect(joinCoefficients).toFailTest('A source can\'t halt or resume');
+      });
+
+      it('should fail if source can\'t resume', async() => {
+        action.context = action.context.set(KeysQueryOperation.querySources, [ <any>{
+          source: {
+            halt: haltFn,
+          },
+          context: <any>{},
+        } ]);
+        const joinCoefficients = await actor.getJoinCoefficients(action, sideData);
+        expect(joinCoefficients).toFailTest('A source can\'t halt or resume');
+      });
+
       it('should handle three entries', async() => {
-        const joinCoeficients = await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-              {
-                output: <any>{},
-                operation: <any>{},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          {
-            metadatas: [
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 3 },
-                pageSize: 100,
-                requestTime: 10,
-                variables: [{
-                  variable: DF.variable('a'),
-                  canBeUndef: false,
-                }],
-              },
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 2 },
-                pageSize: 100,
-                requestTime: 20,
-                variables: [{
-                  variable: DF.variable('a'),
-                  canBeUndef: false,
-                }],
-              },
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 5 },
-                pageSize: 100,
-                requestTime: 30,
-                variables: [{
-                  variable: DF.variable('a'),
-                  canBeUndef: false,
-                }],
-              },
-            ],
-          },
-        );
-        expect(joinCoeficients.isPassed()).toBeTruthy();
-        expect(joinCoeficients.get()).toEqual({
+        const joinCoefficients = await actor.getJoinCoefficients(action, sideData);
+        expect(joinCoefficients.isPassed()).toBeTruthy();
+        expect(joinCoefficients.get()).toEqual({
           iterations: 0,
           persistedItems: 0,
           blockingItems: 0,
           requestTime: 0,
         });
-        expect(joinCoeficients.getSideData().entriesUnsorted.map(entry => entry.metadata.cardinality.value))
+        expect(joinCoefficients.getSideData().entriesUnsorted.map(entry => entry.metadata.cardinality.value))
           .toEqual([ 3, 2, 5 ]);
-        expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
+        expect(joinCoefficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
           .toEqual([ 2, 3, 5 ]);
+        expect(joinCoefficients.getSideData().remainingEntries.map(entry => entry.metadata.cardinality.value))
+          .toEqual([ 3, 5 ]);
+        expect(joinCoefficients.getSideData().streamingQuerySources).toEqual([{
+          halt: haltFn,
+          resume: resumeFn,
+        }]);
       });
 
       // TODO [2024-12-01]: re-enable these tests
@@ -1239,7 +1287,8 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             FACTORY.createPattern(DF.namedNode('ex:a1'), DF.namedNode('ex:p2'), DF.variable('c')),
           ]),
           context: new ActionContext({
-            a: 'b',
+            [KeysQueryOperation.querySources.name]: expect.any(Object),
+            [KeysInitQuery.dataFactory.name]: expect.any(DataFactory),
             [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
@@ -1284,7 +1333,8 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             FACTORY.createPattern(DF.namedNode('ex:a2'), DF.namedNode('ex:p2'), DF.variable('c')),
           ]),
           context: new ActionContext({
-            a: 'b',
+            [KeysQueryOperation.querySources.name]: expect.any(Object),
+            [KeysInitQuery.dataFactory.name]: expect.any(DataFactory),
             [KeysStreamingSource.matchOptions.name]: [],
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
@@ -1396,17 +1446,10 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
       });
 
       it('should work if the active iterator ends first', async() => {
-        const haltMock = jest.fn();
-        const resumeMock = jest.fn();
         let iterator: BindingsStream;
         const stopMatchJest = jest.fn();
         const streams: PassThrough[] = [];
         let num = 0;
-
-        const mockStreamingStore = {
-          halt: haltMock,
-          resume: resumeMock,
-        };
 
         mediatorQueryOperation = <any>{
           mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
@@ -1486,7 +1529,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           }),
         };
 
-        actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
+        actor = new ActorRdfJoinInnerIncrementalComputationalBind({
           name: 'actor',
           bus,
           selectivityModifier: 0.1,
@@ -1560,8 +1603,6 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
           context,
         };
 
-        action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
-
         const { result } = await actor.getOutput(action, <any>(await actor.test(action)).getSideData());
 
         await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
@@ -1604,25 +1645,17 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
         await promisifyEventEmitter(result.bindingsStream);
 
-        expect(haltMock).toHaveBeenCalledTimes(1);
-        expect(resumeMock).toHaveBeenCalledTimes(1);
+        expect(haltFn).toHaveBeenCalledTimes(1);
+        expect(resumeFn).toHaveBeenCalledTimes(1);
         expect(stopMatchJest).toHaveBeenCalledTimes(2);
       });
 
       describe('with mock store', () => {
-        let haltMock: Mock<any, any>;
-        let resumeMock: Mock<any, any>;
         let iterator: BindingsStream;
-        let stopMatchJest: Mock<any, any>;
+        let stopMatchJest: () => void;
         const streams: PassThrough[] = [];
-        const mockStreamingStore = {
-          halt: haltMock,
-          resume: resumeMock,
-        };
 
         beforeEach(() => {
-          haltMock = jest.fn();
-          resumeMock = jest.fn();
           stopMatchJest = jest.fn();
 
           mediatorQueryOperation = <any> {
@@ -1672,8 +1705,6 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               };
               const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
 
-              // TODO [2024-12-01]: check if this check is needed
-              // expect(matchOptions).toBeDefined();
               if (matchOptions !== undefined) {
                 (<({ stopMatch: () => void })[]> matchOptions).push({
                   stopMatch: stopMatchfn,
@@ -1694,7 +1725,7 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             }),
           };
 
-          actor = new ActorRdfJoinInnerIncrementalComputationalMultiBind({
+          actor = new ActorRdfJoinInnerIncrementalComputationalBind({
             name: 'actor',
             bus,
             selectivityModifier: 0.1,
@@ -1764,8 +1795,6 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             context,
           };
 
-          action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
-
           const { result } = await actor.getOutput(action, <any>(await actor.test(action)).getSideData());
 
           await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
@@ -1797,8 +1826,8 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(KeysBindings.isAddition, true),
           ]);
-          expect(haltMock).toHaveBeenCalledTimes(0);
-          expect(resumeMock).toHaveBeenCalledTimes(0);
+          expect(haltFn).toHaveBeenCalledTimes(0);
+          expect(resumeFn).toHaveBeenCalledTimes(0);
 
           for (const stream of streams) {
             stream.push(
@@ -1814,169 +1843,9 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
               [ DF.variable('a'), DF.namedNode('ex:a1') ],
             ]).setContextEntry(KeysBindings.isAddition, false),
           ]);
-          expect(haltMock).toHaveBeenCalledTimes(0);
-          expect(resumeMock).toHaveBeenCalledTimes(0);
+          expect(haltFn).toHaveBeenCalledTimes(0);
+          expect(resumeFn).toHaveBeenCalledTimes(0);
           expect(stopMatchJest).toHaveBeenCalledTimes(0);
-        });
-
-        it('should handle entries with deletions', async() => {
-          const tempStream: Stream = streamifyArray([
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-          ]);
-          const alteringStream = tempStream.pipe(new PassThrough({
-            objectMode: true,
-          }), { end: false });
-          const iterator = new WrappingIterator(alteringStream);
-
-          const action: IActionRdfJoin = {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{
-                  bindingsStream: new ArrayIterator([
-                    BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                    ]).setContextEntry(KeysBindings.isAddition, true),
-                    BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                    ]).setContextEntry(KeysBindings.isAddition, true),
-                    BF.bindings([
-                      [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                    ]),
-                  ], { autoStart: false }),
-                  metadata: () => Promise.resolve({
-                    state: new MetadataValidationState(),
-                    cardinality: { type: 'estimate', value: 4 },
-                    variables: [
-                      {
-                        variable: DF.variable('a'),
-                        canBeUndef: false,
-                      },
-                      {
-                        variable: DF.variable('b'),
-                        canBeUndef: false,
-                      },
-                    ],
-                  }),
-                  type: 'bindings',
-                },
-                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b')),
-              },
-              {
-                output: <any>{
-                  bindingsStream: iterator,
-                  metadata: () => Promise.resolve({
-                    state: new MetadataValidationState(),
-                    cardinality: { type: 'estimate', value: 1 },
-                    variables: [{
-                      variable: DF.variable('a'),
-                      canBeUndef: false,
-                    }],
-                  }),
-                  type: 'bindings',
-                },
-                operation: FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p2'), DF.namedNode('ex:o')),
-              },
-            ],
-            context,
-          };
-
-          action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
-
-          const { result } = await actor.getOutput(action, <any>(await actor.test(action)).getSideData());
-
-          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-          ]);
-
-          alteringStream.push(
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]),
-          );
-
-          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(KeysBindings.isAddition, true),
-          ]);
-          expect(haltMock).toHaveBeenCalledTimes(0);
-          expect(resumeMock).toHaveBeenCalledTimes(0);
-
-          alteringStream.push(
-            BF.bindings([
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, false),
-          );
-
-          await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, false),
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a1') ],
-            ]).setContextEntry(KeysBindings.isAddition, false),
-          ]);
-
-          for (const stream of streams) {
-            stream.push(
-              BF.bindings([
-                [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              ]).setContextEntry(KeysBindings.isAddition, false),
-            );
-          }
-
-          await expect(partialArrayifyStream(result.bindingsStream, 1)).resolves.toBeIsomorphicBindingsArray([
-            BF.bindings([
-              [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
-              [ DF.variable('a'), DF.namedNode('ex:a2') ],
-            ]).setContextEntry(KeysBindings.isAddition, false),
-          ]);
-
-          const promisses = [];
-          alteringStream.end();
-          for (const stream of streams) {
-            if (!stream.closed) {
-              stream.end();
-              promisses.push(promisifyEventEmitter(stream));
-            }
-          }
-
-          // Await Promise.all(promisses);
-
-          await promisifyEventEmitter(result.bindingsStream);
-
-          expect(haltMock).toHaveBeenCalledTimes(1);
-          expect(resumeMock).toHaveBeenCalledTimes(1);
-          expect(stopMatchJest).toHaveBeenCalledTimes(2);
         });
 
         it('should handle entries with too many deletions', async() => {
@@ -2043,8 +1912,6 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
             context,
           };
 
-          action.entries[0].operation.metadata.scopedSource = mockStreamingStore;
-
           const { result } = await actor.getOutput(action, <any>(await actor.test(action)).getSideData());
 
           await expect(partialArrayifyStream(result.bindingsStream, 3)).resolves.toBeIsomorphicBindingsArray([
@@ -2103,8 +1970,8 @@ describe('ActorRdfJoinIncrementalComputationalMultiBind', () => {
 
           ]);
 
-          expect(haltMock).toHaveBeenCalledTimes(1);
-          expect(resumeMock).toHaveBeenCalledTimes(1);
+          expect(haltFn).toHaveBeenCalledTimes(1);
+          expect(resumeFn).toHaveBeenCalledTimes(1);
           expect(stopMatchJest).toHaveBeenCalledTimes(2);
         });
       });

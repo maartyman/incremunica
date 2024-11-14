@@ -38,6 +38,16 @@ describe('StreamingQuerySourceRdfJs', () => {
     source = new StreamingQuerySourceRdfJs(store, DF, BF);
   });
 
+  describe('halt & resume', () => {
+    it('should halt & resume StreamingStore', async() => {
+      expect(store.isHalted()).toBe(false);
+      source.halt();
+      expect(store.isHalted()).toBe(true);
+      source.resume();
+      expect(store.isHalted()).toBe(false);
+    });
+  });
+
   describe('getSelectorShape', () => {
     it('should return a selector shape', async() => {
       await expect(source.getSelectorShape()).resolves.toEqual({
