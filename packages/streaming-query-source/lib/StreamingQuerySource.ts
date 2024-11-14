@@ -18,7 +18,7 @@ export enum StreamingQuerySourceStatus {
   Stopped,
 }
 
-export class StreamingQuerySource implements IQuerySource {
+export abstract class StreamingQuerySource implements IQuerySource {
   private _status: StreamingQuerySourceStatus = StreamingQuerySourceStatus.Initializing;
   public statusEvents: EventEmitter = new EventEmitter();
   public context?: IActionContext;
@@ -32,29 +32,23 @@ export class StreamingQuerySource implements IQuerySource {
     this.statusEvents.emit('status', value);
   }
 
-  public async getSelectorShape(_context: IActionContext): Promise<FragmentSelectorShape> {
-    throw new Error('Method not overridden in subclass');
-  }
+  public abstract halt(): void;
 
-  public queryBindings(
+  public abstract resume(): void;
+
+  public abstract getSelectorShape(_context: IActionContext): Promise<FragmentSelectorShape>;
+
+  public abstract queryBindings(
     _operation: Operation,
     _context: IActionContext,
     _options: IQueryBindingsOptions | undefined,
-  ): BindingsStream {
-    throw new Error('Method not overridden in subclass');
-  }
+  ): BindingsStream;
 
-  public async queryBoolean(_operation: Ask, _context: IActionContext): Promise<boolean> {
-    throw new Error('Method not overridden in subclass');
-  }
+  public abstract queryBoolean(_operation: Ask, _context: IActionContext): Promise<boolean>;
 
-  public queryQuads(_operation: Operation, _context: IActionContext): AsyncIterator<Quad> {
-    throw new Error('Method not overridden in subclass');
-  }
+  public abstract queryQuads(_operation: Operation, _context: IActionContext): AsyncIterator<Quad>;
 
-  public async queryVoid(_operation: Update, _context: IActionContext): Promise<void> {
-    throw new Error('Method not overridden in subclass');
-  }
+  public abstract queryVoid(_operation: Update, _context: IActionContext): Promise<void>;
 
   public referenceValue: QuerySourceReference;
 }
