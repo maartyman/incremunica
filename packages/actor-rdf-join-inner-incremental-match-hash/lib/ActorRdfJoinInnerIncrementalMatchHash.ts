@@ -14,18 +14,18 @@ import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-
 import type { BindingsStream } from '@comunica/types';
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
-import { IncrementalPartialHashJoin } from './IncrementalPartialHashJoin';
+import { IncrementalMatchHashJoin } from './IncrementalMatchHashJoin';
 
 /**
- * A comunica Inner Incremental Partial Hash RDF Join Actor.
+ * A comunica Inner Incremental Match Hash RDF Join Actor.
  */
-export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
+export class ActorRdfJoinInnerIncrementalMatchHash extends ActorRdfJoin {
   public readonly mediatorHashBindings: MediatorHashBindings;
 
-  public constructor(args: IActorRdfJoinInnerIncrementalPartialHashArgs) {
+  public constructor(args: IActorRdfJoinInnerIncrementalMatchHashArgs) {
     super(args, {
       logicalType: 'inner',
-      physicalName: 'partial-hash',
+      physicalName: 'match-hash',
       limitEntries: 2,
       canHandleUndefs: false,
     });
@@ -35,7 +35,7 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
     const commonVariables = ActorRdfJoin.overlappingVariables(metadatas).map(v => v.variable);
     const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
-    const bindingsStream = <BindingsStream><unknown> new IncrementalPartialHashJoin(
+    const bindingsStream = <BindingsStream><unknown> new IncrementalMatchHashJoin(
       <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
       <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
       <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
@@ -67,6 +67,6 @@ export class ActorRdfJoinInnerIncrementalPartialHash extends ActorRdfJoin {
   }
 }
 
-export interface IActorRdfJoinInnerIncrementalPartialHashArgs extends IActorRdfJoinArgs {
+export interface IActorRdfJoinInnerIncrementalMatchHashArgs extends IActorRdfJoinArgs {
   mediatorHashBindings: MediatorHashBindings;
 }

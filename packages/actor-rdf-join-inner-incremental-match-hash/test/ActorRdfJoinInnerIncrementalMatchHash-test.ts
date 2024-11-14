@@ -13,13 +13,13 @@ import type * as RDF from '@rdfjs/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { ActorRdfJoinInnerIncrementalPartialHash } from '../lib/ActorRdfJoinInnerIncrementalPartialHash';
+import { ActorRdfJoinInnerIncrementalMatchHash } from '../lib/ActorRdfJoinInnerIncrementalMatchHash';
 import '@incremunica/incremental-jest';
 import '@comunica/utils-jest';
 
 const DF = new DataFactory();
 
-describe('ActorRdfJoinPartialHash', () => {
+describe('ActorRdfJoinMatchHash', () => {
   let bus: any;
   let context: IActionContext;
   let BF: BindingsFactory;
@@ -30,26 +30,26 @@ describe('ActorRdfJoinPartialHash', () => {
     BF = await DevTools.createTestBindingsFactory(DF);
   });
 
-  describe('The ActorRdfJoinPartialHash module', () => {
+  describe('The ActorRdfJoinMatchHash module', () => {
     it('should be a function', () => {
-      expect(ActorRdfJoinInnerIncrementalPartialHash).toBeInstanceOf(Function);
+      expect(ActorRdfJoinInnerIncrementalMatchHash).toBeInstanceOf(Function);
     });
 
-    it('should be a ActorRdfJoinPartialHash constructor', () => {
-      expect(new (<any> ActorRdfJoinInnerIncrementalPartialHash)({ name: 'actor', bus }))
-        .toBeInstanceOf(ActorRdfJoinInnerIncrementalPartialHash);
-      expect(new (<any> ActorRdfJoinInnerIncrementalPartialHash)({ name: 'actor', bus }))
+    it('should be a ActorRdfJoinMatchHash constructor', () => {
+      expect(new (<any> ActorRdfJoinInnerIncrementalMatchHash)({ name: 'actor', bus }))
+        .toBeInstanceOf(ActorRdfJoinInnerIncrementalMatchHash);
+      expect(new (<any> ActorRdfJoinInnerIncrementalMatchHash)({ name: 'actor', bus }))
         .toBeInstanceOf(ActorRdfJoin);
     });
 
-    it('should not be able to create new ActorRdfJoinPartialHash objects without \'new\'', () => {
+    it('should not be able to create new ActorRdfJoinMatchHash objects without \'new\'', () => {
       expect(() => {
-        (<any> ActorRdfJoinInnerIncrementalPartialHash)();
-      }).toThrow('Class constructor ActorRdfJoinInnerIncrementalPartialHash cannot be invoked without \'new\'');
+        (<any> ActorRdfJoinInnerIncrementalMatchHash)();
+      }).toThrow('Class constructor ActorRdfJoinInnerIncrementalMatchHash cannot be invoked without \'new\'');
     });
   });
 
-  describe('An ActorRdfJoinPartialHash instance', () => {
+  describe('An ActorRdfJoinMatchHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity,
@@ -57,7 +57,7 @@ IActorTest,
 IActorRdfJoinSelectivityOutput
 >;
     let mediatorHashBindings: MediatorHashBindings;
-    let actor: ActorRdfJoinInnerIncrementalPartialHash;
+    let actor: ActorRdfJoinInnerIncrementalMatchHash;
     let action: IActionRdfJoin;
     let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
     let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
@@ -67,7 +67,7 @@ IActorRdfJoinSelectivityOutput
         mediate: async() => ({ selectivity: 1 }),
       };
       mediatorHashBindings = DevTools.createTestMediatorHashBindings();
-      actor = new ActorRdfJoinInnerIncrementalPartialHash({
+      actor = new ActorRdfJoinInnerIncrementalMatchHash({
         name: 'actor',
         bus,
         mediatorJoinSelectivity,

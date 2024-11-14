@@ -1,14 +1,14 @@
 {
-  "name": "@incremunica/actor-rdf-join-inner-incremental-partial-hash",
+  "name": "@incremunica/actor-rdf-join-inner-incremental-match-hash",
   "version": "1.3.0",
-  "description": "A inner-incremental-partial-hash rdf-join actor",
+  "description": "A inner-incremental-match-hash rdf-join actor",
   "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/actor-rdf-join-inner-incremental-partial-hash"
+    "directory": "packages/actor-rdf-join-inner-incremental-match-hash"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
@@ -17,7 +17,7 @@
     "comunica",
     "actor",
     "rdf-join",
-    "inner-incremental-partial-hash"
+    "inner-incremental-match-hash"
   ],
   "sideEffects": false,
   "main": "lib/index.js",
