@@ -30,13 +30,14 @@ import {
   UnionIterator,
 } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
+import type * as RDF from 'rdf-js';
 import type { Algebra } from 'sparqlalgebrajs';
 import { Factory } from 'sparqlalgebrajs';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
  */
-export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
+export class ActorRdfJoinInnerIncrementalMemoryBind extends ActorRdfJoin {
   public readonly selectivityModifier: number;
   public readonly mediatorJoinEntriesSort: MediatorRdfJoinEntriesSort;
   public readonly mediatorQueryOperation: MediatorQueryOperation;
@@ -61,7 +62,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
    * @param optional If the original bindings should be emitted when the resulting bindings stream is empty.
    * @param algebraFactory The algebra factory.
    * @param bindingsFactory The bindingsFactory created with bindings context merger.
-   * @param hashBindings A function that hashes bindings.
+   * @param hashInputBindings
+   * @param hashOutputBindings
    * @return {AsyncIterator<Bindings>}
    */
   public static async createBindStream(
@@ -72,7 +74,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     optional: boolean,
     algebraFactory: Factory,
     bindingsFactory: BindingsFactory,
-    hashBindings: (bindings: Bindings) => number,
+    hashInputBindings: (bindings: Bindings) => number,
+    hashOutputBindings: (bindings: Bindings) => number,
   ): Promise<AsyncIterator<Bindings>> {
     const transformMap = new Map<
       number,
@@ -90,8 +93,8 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     >();
     // Create bindings function
     const binder = (bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): void => {
-      const hash = hashBindings(bindings);
-      if (bindings) {
+      const hash = hashInputBindings(bindings);
+      if (bindings.getContextEntry(KeysBindings.isAddition)) {
         const hashData = transformMap.get(hash);
         if (hashData === undefined) {
           const data = {
@@ -118,7 +121,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
               subDone();
               return;
             }
-            const bindingsHash = hashBindings(newBindings);
+            const bindingsHash = hashOutputBindings(newBindings);
             const bindingsData = data.memory.get(bindingsHash);
             if (newBindings.getContextEntry(KeysBindings.isAddition)) {
               if (bindingsData === undefined) {
@@ -186,8 +189,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
           if (hashData.memory.size > 0) {
             push(new ArrayIterator(hashData.memory.values()).transform({
               transform(item, arrayDone, arrayPush) {
-                let transformBindings = bindingsFactory.fromBindings(item.bindings);
-                transformBindings = transformBindings.setContextEntry(KeysBindings.isAddition, false);
+                const transformBindings = item.bindings.setContextEntry(KeysBindings.isAddition, false);
                 for (let i = 0; i < item.count; i++) {
                   arrayPush(transformBindings);
                 }
@@ -303,11 +305,18 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
     const remainingEntries = [ ...sideData.entriesSorted ];
     remainingEntries.splice(0, 1);
 
+    const allVariablesSet = new Map<string, RDF.Variable>();
+    for (const entry of sideData.entriesSorted) {
+      for (const metadataVariable of entry.metadata.variables) {
+        allVariablesSet.set(metadataVariable.variable.value, metadataVariable.variable);
+      }
+    }
+
     // Bind the remaining patterns for each binding in the stream
     const subContext = action.context
       .set(KeysQueryOperation.joinLeftMetadata, sideData.entriesSorted[0].metadata)
       .set(KeysQueryOperation.joinRightMetadatas, remainingEntries.map(entry => entry.metadata));
-    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(
+    const bindingsStream = <BindingsStream><unknown> await ActorRdfJoinInnerIncrementalMemoryBind.createBindStream(
       <AsyncIterator<Bindings>><unknown>smallestStream.bindingsStream,
       remainingEntries.map(entry => entry.operation),
       async(operations: Algebra.Operation[], operationBindings: Bindings) => {
@@ -324,6 +333,7 @@ export class ActorRdfJoinInnerIncrementalMemoryMultiBind extends ActorRdfJoin {
       algebraFactory,
       bindingsFactory,
       entry => hashFunction(entry, sideData.entriesSorted[0].metadata.variables.map(v => v.variable)),
+      entry => hashFunction(entry, [ ...allVariablesSet.values() ]),
     );
 
     return {

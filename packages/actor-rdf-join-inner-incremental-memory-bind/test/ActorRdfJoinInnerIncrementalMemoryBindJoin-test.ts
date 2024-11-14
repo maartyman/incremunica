@@ -5,9 +5,9 @@ import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinEntriesSort, MediatorRdfJoinEntriesSort } from '@comunica/bus-rdf-join-entries-sort';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import 'jest-rdf';
-import { KeysQueryOperation } from '@comunica/context-entries';
+import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
-import { ActionContext, Bus } from '@comunica/core';
+import { failTest, ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IQueryOperationResultBindings } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
@@ -16,15 +16,15 @@ import { DevTools } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { Factory, Algebra } from 'sparqlalgebrajs';
-import { ActorRdfJoinInnerIncrementalMemoryMultiBind } from '../lib/ActorRdfJoinInnerIncrementalMemoryMultiBind';
+import { Factory } from 'sparqlalgebrajs';
+import { ActorRdfJoinInnerIncrementalMemoryBind } from '../lib';
 import '@comunica/utils-jest';
 import '@incremunica/incremental-jest';
 
 const DF = new DataFactory();
-const FACTORY = new Factory();
+const FACTORY = new Factory(DF);
 
-describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
+describe('ActorRdfJoinIncrementalMemoryBind', () => {
   let bus: any;
   let BF: BindingsFactory;
 
@@ -33,7 +33,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
     BF = await DevTools.createTestBindingsFactory(DF);
   });
 
-  describe('An ActorRdfJoinIncrementalMemoryMultiBind instance', () => {
+  describe('An ActorRdfJoinIncrementalMemoryBind instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity,
@@ -50,7 +50,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
     >;
     let mediatorMergeBindingsContext: MediatorMergeBindingsContext;
     let mediatorHashBindings: MediatorHashBindings;
-    let actor: ActorRdfJoinInnerIncrementalMemoryMultiBind;
+    let actor: ActorRdfJoinInnerIncrementalMemoryBind;
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any> {
@@ -63,8 +63,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
           return { entries };
         },
       };
-      context = new ActionContext({ a: 'b' });
-      context = DevTools.createTestContextWithDataFactory(DF, context);
+      context = DevTools.createTestContextWithDataFactory(DF);
       mediatorQueryOperation = <any> {
         mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
           return {
@@ -93,7 +92,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
       };
       mediatorMergeBindingsContext = DevTools.createTestMediatorMergeBindingsContext();
       mediatorHashBindings = DevTools.createTestMediatorHashBindings();
-      actor = new ActorRdfJoinInnerIncrementalMemoryMultiBind({
+      actor = new ActorRdfJoinInnerIncrementalMemoryBind({
         name: 'actor',
         bus,
         selectivityModifier: 0.1,
@@ -106,6 +105,35 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
     });
 
     describe('getJoinCoefficients', () => {
+      it('should fail if sort fails', async() => {
+        jest.spyOn(actor, 'sortJoinEntries').mockResolvedValue(failTest('test message'));
+        const joinCoefficients = await actor.getJoinCoefficients({
+          type: 'inner',
+          entries: [
+            {
+              output: <any>{},
+              operation: <any>{},
+            },
+          ],
+          context: new ActionContext(),
+        }, {
+          metadatas: [
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 3 },
+              pageSize: 100,
+              requestTime: 10,
+              variables: [{
+                canBeUndef: false,
+                variable: DF.variable('a'),
+              }],
+            },
+          ],
+        });
+        expect(actor.sortJoinEntries).toHaveBeenCalledTimes(1);
+        expect(joinCoefficients).toFailTest('test message');
+      });
+
       it('should handle three entries', async() => {
         const joinCoeficients = await actor.getJoinCoefficients(
           {
@@ -250,179 +278,6 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
         expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
           .toEqual([ 2, 3, 5 ]);
       });
-
-      it('should reject on a right stream of type extend', async() => {
-        const joinCoeficients = await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 3 },
-                    canContainUndefs: false,
-                  }),
-
-                },
-                operation: <any>{ type: Algebra.types.EXTEND },
-              },
-              {
-                output: <any>{
-                  metadata: () => Promise.resolve({
-                    cardinality: { type: 'estimate', value: 2 },
-                    canContainUndefs: false,
-                  }),
-                },
-                operation: <any>{},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          {
-            metadatas: [
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 3 },
-                pageSize: 100,
-                requestTime: 10,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 2 },
-                pageSize: 100,
-                requestTime: 20,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-            ],
-          },
-        );
-        expect(joinCoeficients.isFailed()).toBeTruthy();
-        expect(joinCoeficients.get()).toEqual({
-          iterations: 0,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0,
-        });
-        expect(joinCoeficients.getSideData().entriesUnsorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 3, 2 ]);
-        expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 2, 3 ]);
-      });
-
-      it('should reject on a right stream of type group', async() => {
-        const joinCoeficients = await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
-              },
-              {
-                output: <any> {},
-                operation: <any> {},
-              },
-            ],
-            context: new ActionContext(),
-          },
-          {
-            metadatas: [
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 3 },
-                pageSize: 100,
-                requestTime: 10,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 2 },
-                pageSize: 100,
-                requestTime: 20,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-            ],
-          },
-        );
-        expect(joinCoeficients.isFailed()).toBeTruthy();
-        expect(joinCoeficients.get()).toEqual({
-          iterations: 0,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0,
-        });
-        expect(joinCoeficients.getSideData().entriesUnsorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 3, 2 ]);
-        expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 2, 3 ]);
-      });
-
-      it('should not reject on a left stream of type group', async() => {
-        const joinCoeficients = await actor.getJoinCoefficients(
-          {
-            type: 'inner',
-            entries: [
-              {
-                output: <any> {},
-                operation: <any> {},
-              },
-              {
-                output: <any> {},
-                operation: <any> { type: Algebra.types.GROUP },
-              },
-            ],
-            context: new ActionContext(),
-          },
-          {
-            metadatas: [
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 3 },
-                pageSize: 100,
-                requestTime: 10,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-              {
-                state: new MetadataValidationState(),
-                cardinality: { type: 'estimate', value: 2 },
-                pageSize: 100,
-                requestTime: 20,
-                variables: [{
-                  canBeUndef: false,
-                  variable: DF.variable('a'),
-                }],
-              },
-            ],
-          },
-        );
-        expect(joinCoeficients.isPassed()).toBeTruthy();
-        expect(joinCoeficients.get()).toEqual({
-          iterations: 0,
-          persistedItems: 0,
-          blockingItems: 0,
-          requestTime: 0,
-        });
-        expect(joinCoeficients.getSideData().entriesUnsorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 3, 2 ]);
-        expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
-          .toEqual([ 2, 3 ]);
-      });
     });
 
     describe('sortJoinEntries', () => {
@@ -455,32 +310,34 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        )).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
 
       it('sorts 3 entries', async() => {
@@ -521,44 +378,46 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
               }],
             },
           },
-        ], context)).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        ], context)).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 5 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 5 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
 
       it('sorts 3 equal entries', async() => {
@@ -602,44 +461,46 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        )).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
 
       it('does not sort if there is an undef', async() => {
@@ -683,52 +544,54 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        )).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 5 },
-              variables: [{
-                canBeUndef: true,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 5 },
+                variables: [{
+                  canBeUndef: true,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
 
       it('throws if there are no overlapping variables', async() => {
         await expect(actor.sortJoinEntries(
           [
             {
-              output: <any> {},
-              operation: <any> {},
+              output: <any>{},
+              operation: <any>{},
               metadata: {
                 state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 3 },
@@ -742,8 +605,8 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
               },
             },
             {
-              output: <any> {},
-              operation: <any> {},
+              output: <any>{},
+              operation: <any>{},
               metadata: {
                 state: new MetadataValidationState(),
                 cardinality: { type: 'estimate', value: 2 },
@@ -758,7 +621,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).rejects.toThrow('Bind join can only join entries with at least one common variable');
+        )).resolves.toFailTest('Bind join can only join entries with at least one common variable');
       });
 
       it('sorts entries without common variables in the back', async() => {
@@ -802,44 +665,46 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        )).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 1 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('b'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('b'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
 
       it('sorts several entries without variables in the back', async() => {
@@ -931,92 +796,94 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             },
           ],
           context,
-        )).resolves.toEqual([
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 2 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+        )).resolves.toEqual({
+          value: [
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 3 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 10 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 10 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 20 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('a'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 20 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 1 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('b'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('b'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 10 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('d'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 10 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('d'),
+                }],
+              },
             },
-          },
-          {
-            output: <any> {},
-            operation: <any> {},
-            metadata: {
-              state: new MetadataValidationState(),
-              cardinality: { type: 'estimate', value: 20 },
-              variables: [{
-                canBeUndef: false,
-                variable: DF.variable('c'),
-              }],
+            {
+              output: <any> {},
+              operation: <any> {},
+              metadata: {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 20 },
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('c'),
+                }],
+              },
             },
-          },
-        ]);
+          ],
+        });
       });
     });
 
@@ -1248,8 +1115,20 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
         await expect(result.metadata()).resolves.toEqual({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 9.600_000_000_000_001 },
-          canContainUndefs: false,
-          variables: [ DF.variable('a'), DF.variable('b'), DF.variable('c') ],
+          variables: [
+            {
+              variable: DF.variable('a'),
+              canBeUndef: false,
+            },
+            {
+              variable: DF.variable('b'),
+              canBeUndef: false,
+            },
+            {
+              variable: DF.variable('c'),
+              canBeUndef: false,
+            },
+          ],
         });
 
         // Validate mock calls
@@ -1260,7 +1139,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             FACTORY.createPattern(DF.namedNode('ex:a1'), DF.namedNode('ex:p2'), DF.variable('c')),
           ]),
           context: new ActionContext({
-            a: 'b',
+            [KeysInitQuery.dataFactory.name]: DF,
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
               cardinality: { type: 'estimate', value: 1 },
@@ -1304,7 +1183,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
             FACTORY.createPattern(DF.namedNode('ex:a2'), DF.namedNode('ex:p2'), DF.variable('c')),
           ]),
           context: new ActionContext({
-            a: 'b',
+            [KeysInitQuery.dataFactory.name]: DF,
             [KeysQueryOperation.joinLeftMetadata.name]: {
               state: expect.any(MetadataValidationState),
               cardinality: { type: 'estimate', value: 1 },
@@ -1359,7 +1238,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1429,7 +1308,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1511,18 +1390,18 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
                   variables: [
                     {
-                      variable: DF.variable('a'),
+                      variable: DF.variable('bound'),
                       canBeUndef: false,
                     },
                     {
-                      variable: DF.variable('b'),
+                      variable: DF.variable('a'),
                       canBeUndef: false,
                     },
                   ],
@@ -1617,7 +1496,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
         ]);
       });
 
-      it('should handle two entries with multiple identical bindings and removal', async() => {
+      it('should handle two entries with ple identical bindings and removal', async() => {
         const action: IActionRdfJoin = {
           type: 'inner',
           entries: [
@@ -1632,18 +1511,18 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
                   cardinality: { type: 'estimate', value: 4 },
                   variables: [
                     {
-                      variable: DF.variable('a'),
+                      variable: DF.variable('bound'),
                       canBeUndef: false,
                     },
                     {
-                      variable: DF.variable('b'),
+                      variable: DF.variable('a'),
                       canBeUndef: false,
                     },
                   ],
@@ -1753,7 +1632,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
         ]);
       });
 
-      it('should handle two entries with multiple identical bindings and removal (other)', async() => {
+      it('should handle two entries with ple identical bindings and removal (other)', async() => {
         mediatorQueryOperation = <any> {
           mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
             return {
@@ -1784,7 +1663,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
           }),
         };
 
-        actor = new ActorRdfJoinInnerIncrementalMemoryMultiBind({
+        actor = new ActorRdfJoinInnerIncrementalMemoryBind({
           name: 'actor',
           bus,
           selectivityModifier: 0.1,
@@ -1921,7 +1800,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
           }),
         };
 
-        actor = new ActorRdfJoinInnerIncrementalMemoryMultiBind({
+        actor = new ActorRdfJoinInnerIncrementalMemoryBind({
           name: 'actor',
           bus,
           selectivityModifier: 0.1,
@@ -1946,7 +1825,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -2047,7 +1926,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
           }),
         };
 
-        actor = new ActorRdfJoinInnerIncrementalMemoryMultiBind({
+        actor = new ActorRdfJoinInnerIncrementalMemoryBind({
           name: 'actor',
           bus,
           selectivityModifier: 0.1,
@@ -2072,7 +1951,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
                   ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -2143,7 +2022,7 @@ describe('ActorRdfJoinIncrementalMemoryMultiBind', () => {
       // TODO [2024-12-01]: re-enable these tests
       // eslint-disable-next-line jest/no-commented-out-tests
       // it('should throw if operationBinder throws error', async() => {
-      // await expect(await arrayifyStream(await ActorRdfJoinInnerIncrementalMemoryMultiBind.createBindStream(
+      // await expect(await arrayifyStream(await ActorRdfJoinInnerIncrementalMemoryBind.createBindStream(
       //       new ArrayIterator([
       //         BF.bindings([
       //           [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
