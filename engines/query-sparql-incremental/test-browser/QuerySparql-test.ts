@@ -57,7 +57,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ streamingStore ],
-        pollingFrequency: 1000,
+        pollingFrequency: 500,
       });
 
       expect(await partialArrayifyStream(bindingStream, 2)).toBeIsomorphicBindingsArray([
@@ -105,7 +105,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?o1 ?p2 ?o2.
           }`, {
         sources: [ streamingStore ],
-        pollingFrequency: 1000,
+        pollingFrequency: 500,
       });
 
       expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
@@ -167,7 +167,7 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingFrequency: 1000,
+        pollingFrequency: 500,
       });
 
       expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
@@ -179,7 +179,7 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingFrequency: 1000,
+        pollingFrequency: 500,
       };
 
       bindingStream = await engine.queryBindings(query, context);
@@ -207,7 +207,7 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingFrequency: 1000,
+        pollingFrequency: 500,
       };
 
       bindingStream = await engine.queryBindings(query, context);
@@ -225,7 +225,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingFrequency: 1000,
+          pollingFrequency: 500,
         });
 
         expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
@@ -239,7 +239,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingFrequency: 1000,
+          pollingFrequency: 500,
         });
 
         expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
