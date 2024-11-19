@@ -1,0 +1,15 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
+  ],
+  "import": [
+    "icqsi:config/bindings-aggregator-factory/actors/average.json",
+    "icqsi:config/bindings-aggregator-factory/actors/count.json",
+    "icqsi:config/bindings-aggregator-factory/actors/group-concat.json",
+    "icqsi:config/bindings-aggregator-factory/actors/max.json",
+    "icqsi:config/bindings-aggregator-factory/actors/min.json",
+    "icqsi:config/bindings-aggregator-factory/actors/sample.json",
+    "icqsi:config/bindings-aggregator-factory/actors/sum.json",
+    "icqsi:config/bindings-aggregator-factory/actors/wildcard-count.json"
+  ]
+}

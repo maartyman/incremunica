@@ -421,98 +421,6 @@
     rdf-string "^1.6.1"
     sparqlalgebrajs "^4.3.8"
 
-"@comunica/actor-bindings-aggregator-factory-average@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-average/-/actor-bindings-aggregator-factory-average-4.0.2.tgz#cc050f3d56320cc0b232539cbb62c6ebb9b18e3b"
-  integrity sha512-oCdRVBYucSl6jN+GIGtIpU2jjJzVWFe6sdcPbrXapnqqDFHAnkkYE+CVNBddQ714J+uK0/luOY+MSSt+mJagYA==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/bus-function-factory" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-count@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-count/-/actor-bindings-aggregator-factory-count-4.0.2.tgz#b280882b9e6c684e89fa0c69ccf7d12597ae3b5a"
-  integrity sha512-KgX3ADbxRqjFIGt97nmtYVeW8S9skcsg9sBWU19A5ubmt9e9WRFxUfj0zsPiueqe7nq+WMzd2RKkRs6GNh+8pw==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-    sparqlalgebrajs "^4.2.0"
-
-"@comunica/actor-bindings-aggregator-factory-group-concat@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-group-concat/-/actor-bindings-aggregator-factory-group-concat-4.0.2.tgz#2e4c7baaa6ffc9c655b20de7e39d59f6a8d623c4"
-  integrity sha512-zUXgDrbI/0zopjCpoxlWCz0EEezqoTOoM1JqBGb29zTuYMcn9o+QswAyJTlbgBGjjIHW89xXCKUqPygOPf9qXg==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-max@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-max/-/actor-bindings-aggregator-factory-max-4.0.2.tgz#e93c611a5ffb9304f8c68097abd1766f2c7fe10d"
-  integrity sha512-QpX/YnIh8etnuWvNZTVo+59yRDMBFRIdyiR+IR5/yOk6mNshWKnHQDmOHog4AR2g5WLNbRO4QvEBviubFCxBLQ==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-min@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-min/-/actor-bindings-aggregator-factory-min-4.0.2.tgz#dc03435cb48a392c73a9927cdf3be56ef21235d5"
-  integrity sha512-09UZnVICC5Sh3/B1Lqoe1/nC0Yhvj1kMd4emDa686Vhd6knBqkU364kltT4ot7zItEo/HKwEOnn13CCnNlphsQ==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-sample@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-sample/-/actor-bindings-aggregator-factory-sample-4.0.2.tgz#8c68957c505f6706e48edb5accc3c3b9242b8788"
-  integrity sha512-o9LGwVNtUH94X/8aen1sj7R38Q/3MkED6kjut09OegyYKXNFRL3kmF3krgZIe0go79GTd1F+qUTo4R7pmoHzYg==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-sum@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-sum/-/actor-bindings-aggregator-factory-sum-4.0.2.tgz#1014500bb362d1a4c85c4c26484b8d82b78493cb"
-  integrity sha512-uwZPG1zAsjOkVYeKFQceyDmQjJkXClvHzRxPDQkVhuxyJvD8BxDQ4psH9kAOiOc1EyGAQB36IhoE3r1RaKF06A==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/bus-function-factory" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-
-"@comunica/actor-bindings-aggregator-factory-wildcard-count@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-bindings-aggregator-factory-wildcard-count/-/actor-bindings-aggregator-factory-wildcard-count-4.0.2.tgz#6625171025d7b4a6943096d3c5c874a67f0ed721"
-  integrity sha512-P4ixEDCtTH8+OFrHHCnDnQeZGGY8Q0fIi71cHcRi65kvYuHis/U+Au2Hc+6C+ljTr4B8D+hpEW/0LP3UlTeweQ==
-  dependencies:
-    "@comunica/bus-bindings-aggregator-factory" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-    rdf-string "^1.6.3"
-
 "@comunica/actor-context-preprocess-convert-shortcuts@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-context-preprocess-convert-shortcuts/-/actor-context-preprocess-convert-shortcuts-4.0.2.tgz#6a423aaccd036181f02222721f718604cf13fbc8"
@@ -1601,6 +1509,20 @@
     "@comunica/types" "^4.0.2"
     sparqlalgebrajs "^4.3.8"
 
+"@comunica/actor-query-operation-extend@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-extend/-/actor-query-operation-extend-4.0.2.tgz#e933695a661511d6a3137474c84fda6da5be5055"
+  integrity sha512-9YRIPPFE8p6FysH8zf+ONTxfterlldDAcn7xqSNuyZywTCF7fRXV5/7Fiym5DWjVIwZNNaxw0fe8CPv/yoVklg==
+  dependencies:
+    "@comunica/bus-expression-evaluator-factory" "^4.0.2"
+    "@comunica/bus-query-operation" "^4.0.2"
+    "@comunica/core" "^4.0.2"
+    "@comunica/types" "^4.0.2"
+    "@comunica/utils-bindings-factory" "^4.0.2"
+    "@comunica/utils-expression-evaluator" "^4.0.2"
+    "@comunica/utils-query-operation" "^4.0.2"
+    sparqlalgebrajs "^4.3.8"
+
 "@comunica/actor-query-operation-join@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-join/-/actor-query-operation-join-4.0.2.tgz#eff1b27e44aa07c648f27111fbdfeeb0e656d84e"
@@ -2480,20 +2402,6 @@
     "@comunica/utils-bindings-factory" "^4.0.2"
     "@comunica/utils-expression-evaluator" "^4.0.2"
     "@rdfjs/types" "*"
-
-"@comunica/bus-bindings-aggregator-factory@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/bus-bindings-aggregator-factory/-/bus-bindings-aggregator-factory-4.0.2.tgz#73cd5b174e28fddf3986164bee6a50c3b45cba32"
-  integrity sha512-XFpQW3o+Y3Gy5qNlDG4S8gmc3iYwR1tpM9qbcis1biI0f4mjA6dxAW8AAXLy8meMkMVYnaYC1iMWw2mP2ZzrqQ==
-  dependencies:
-    "@comunica/bus-expression-evaluator-factory" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-expression-evaluator" "^4.0.2"
-    "@rdfjs/types" "*"
-    rdf-string "^1.6.3"
-    sparqlalgebrajs "^4.2.0"
 
 "@comunica/bus-context-preprocess@^4.0.2":
   version "4.0.2"
@@ -5538,6 +5446,11 @@ available-typed-arrays@^1.0.7:
   integrity sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==
   dependencies:
     possible-typed-array-names "^1.0.0"
+
+avl@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/avl/-/avl-1.5.3.tgz#c1fedf023926fa598f23c9d65481b375af6c328a"
+  integrity sha512-1qcOJeREIosJxIBof2nefabU9+Y3wCxXBb3ElQmNVOHP+Hu2BLWAh8CpU7xFnJNDMVBt2H5UOE2S/B7MEqhTsg==
 
 axios@^1.0.0:
   version "1.7.7"
@@ -11620,6 +11533,15 @@ n3@^1.16.3, n3@^1.17.0, n3@^1.17.1:
   resolved "https://registry.yarnpkg.com/n3/-/n3-1.17.2.tgz#3370b2d07da98a5b2865fa43c2d4e5c563cc65df"
   integrity sha512-BxSM52wYFqXrbQQT5WUEzKUn6qpYV+2L4XZLfn3Gblz2kwZ09S+QxC33WNdVEQy2djenFL8SNkrjejEKlvI6+Q==
   dependencies:
+    queue-microtask "^1.1.2"
+    readable-stream "^4.0.0"
+
+n3@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-1.23.0.tgz#463d6da406ae03d2534d3404dae777c7773483f8"
+  integrity sha512-JEbhFlxFTNsHTHUAGykRoVNRG4Sqsu8Wn+SXq99l9pRQPgqJzvY4CwNp/yxRGwb4oni9BT5sH5kevnbVUIUvkQ==
+  dependencies:
+    buffer "^6.0.3"
     queue-microtask "^1.1.2"
     readable-stream "^4.0.0"
 

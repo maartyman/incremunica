@@ -50,6 +50,82 @@ describe('System test: QuerySparql (without polly)', () => {
       streamingStore = new StreamingStore<Quad>();
     });
 
+    it('simple query with GROUPBY', async() => {
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Reading'));
+      streamingStore.addQuad(quad('Bob', 'http://test/hasInterest', 'Sports'));
+
+      const bindingStream = await engine.queryBindings(`PREFIX test: <http://test/>
+          SELECT ?person (COUNT(?interest) AS ?interestCount)
+          WHERE {
+            ?person test:hasInterest ?interest.
+          }
+          GROUP BY ?person`, {
+        sources: [ streamingStore ],
+      });
+
+      const integerNamedNode = DF.namedNode('http://www.w3.org/2001/XMLSchema#integer');
+      await expect(partialArrayifyStream(bindingStream, 2)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('person'), DF.namedNode('Bob') ],
+          [ DF.variable('interestCount'), DF.literal('1', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('person'), DF.namedNode('Alice') ],
+          [ DF.variable('interestCount'), DF.literal('2', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.removeQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+
+      await expect(partialArrayifyStream(bindingStream, 2)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('person'), DF.namedNode('Alice') ],
+          [ DF.variable('interestCount'), DF.literal('2', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('person'), DF.namedNode('Alice') ],
+          [ DF.variable('interestCount'), DF.literal('1', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.end();
+    });
+
+    it('simple query with an EXTEND', async() => {
+      streamingStore.addQuad(quad('http://test/Alice', 'http://test/hasInterest', 1));
+      streamingStore.addQuad(quad('http://test/Alice', 'http://test/hasInterest', 2));
+      streamingStore.addQuad(quad('http://test/Alice', 'http://test/hasInterest', 3));
+
+      const bindingStream = await engine.queryBindings(`PREFIX test: <http://test/>
+          SELECT (max(?interest) AS ?interestCount)
+          WHERE {
+            test:Alice test:hasInterest ?interest.
+          }`, {
+        sources: [ streamingStore ],
+      });
+
+      const integerNamedNode = DF.namedNode('http://www.w3.org/2001/XMLSchema#integer');
+      await expect(partialArrayifyStream(bindingStream, 1)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('interestCount'), DF.literal('3', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.removeQuad(quad('http://test/Alice', 'http://test/hasInterest', 3));
+
+      await expect(partialArrayifyStream(bindingStream, 2)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('interestCount'), DF.literal('3', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('interestCount'), DF.literal('2', integerNamedNode) ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.end();
+    });
+
     it('simple query', async() => {
       streamingStore.addQuad(quad('s1', 'p1', 'o1'));
       streamingStore.addQuad(quad('s2', 'p2', 'o2'));

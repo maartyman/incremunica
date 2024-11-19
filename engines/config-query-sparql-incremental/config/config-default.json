@@ -4,8 +4,8 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
   ],
   "import": [
-    "ccqs:config/bindings-aggregator-factory/actors.json",
-    "ccqs:config/bindings-aggregator-factory/mediators.json",
+    "icqsi:config/bindings-aggregator-factory/actors.json",
+    "icqsi:config/bindings-aggregator-factory/mediators.json",
     "icqsi:config/context-preprocess/actors.json",
     "ccqs:config/context-preprocess/mediators.json",
     "ccqs:config/expression-evaluator-factory/actors.json",
