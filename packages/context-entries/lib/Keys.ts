@@ -16,7 +16,7 @@ export const KeysGuard = {
 };
 
 export const KeysStreamingSource = {
-  matchOptions: new ActionContextKey<({ stopMatch: () => void })[]>('@incremunica/streaming-source:matchOptions'),
+  matchOptions: new ActionContextKey<({ close: () => void })[]>('@incremunica/streaming-source:matchOptions'),
 };
 
 export const KeysBindings = {

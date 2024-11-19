@@ -162,7 +162,7 @@ export class StreamingStore<Q extends Quad>
     predicate?: RDF.Term | null,
     object?: RDF.Term | null,
     graph?: RDF.Term | null,
-    options?: { stopMatch: () => void },
+    options?: { close: () => void; delete: () => void },
   ): RDF.Stream<Q> {
     const unionStream = new PassThrough({ objectMode: true });
 
@@ -194,8 +194,21 @@ export class StreamingStore<Q extends Quad>
       // The new pendingStream remains open, until the store is ended.
       const pendingStream = new PassThrough({ objectMode: true });
       if (options) {
-        options.stopMatch = () => {
+        options.close = () => {
           this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
+          pendingStream.end();
+        };
+        options.delete = () => {
+          this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
+          for (const quad of this.store.getQuads(
+            <Term>subject,
+            <Term>predicate,
+            <Term>object,
+            <Term>graph,
+          )) {
+            (<Quad>quad).isAddition = false;
+            pendingStream.push(quad);
+          }
           pendingStream.end();
         };
       }

@@ -11,7 +11,9 @@ import { KeysBindings } from '@incremunica/context-entries';
 import { DevTools } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
+import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
+import { PassThrough } from 'readable-stream';
 import { QueryEngine, QueryEngineFactory } from '../lib';
 import { usePolly } from './util';
 
@@ -373,6 +375,60 @@ describe('System test: QuerySparql (without polly)', () => {
       ]).setContextEntry(KeysBindings.isAddition, true));
     });
 
+    it('simple query with a streaming source, addition and deletion', async() => {
+      fetchData.dataString = '<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .';
+      fetchData.etag = '0';
+      const streamingStore = new StreamingStore<Quad>();
+      streamingStore.addQuad(quad('http://localhost:8787/s2', 'http://localhost:8787/p2', 'http://localhost:8787/o2'));
+
+      const sourcesStream = new PassThrough({ objectMode: true });
+      sourcesStream.push({
+        value: 'http://localhost:8787',
+        isAddition: true,
+      });
+      sourcesStream.push({
+        value: streamingStore,
+        isAddition: true,
+      });
+
+      bindingStream = await engine.queryBindings(`SELECT * WHERE {
+    ?s ?p ?o.
+  }`, {
+        // @ts-expect-error
+        sources: [ sourcesStream ],
+        pollingFrequency: 1000,
+      });
+
+      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
+        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
+        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
+      ]).setContextEntry(KeysBindings.isAddition, true));
+
+      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+      ]).setContextEntry(KeysBindings.isAddition, true));
+
+      sourcesStream.push({
+        value: 'http://localhost:8787',
+        isAddition: false,
+      });
+
+      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
+        resolve(bindings);
+      }))).resolves.toEqualBindings(BF.bindings([
+        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+      ]).setContextEntry(KeysBindings.isAddition, false));
+    });
+
     it('simple addition update query', async() => {
       fetchData.dataString = '<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .';
       fetchData.etag = '0';
@@ -494,6 +550,23 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ 'https://www.rubensworks.net/' ],
+        pollingFrequency: 1000,
+      });
+
+      await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
+    });
+
+    it('simple query with a streaming source, addition', async() => {
+      bindingStream = await engine.queryBindings(`SELECT * WHERE {
+    ?s ?p ?o.
+  }`, {
+        // @ts-expect-error
+        sources: [ new ArrayIterator([
+          {
+            value: 'https://www.rubensworks.net/',
+            isAddition: true,
+          },
+        ]) ],
         pollingFrequency: 1000,
       });
 

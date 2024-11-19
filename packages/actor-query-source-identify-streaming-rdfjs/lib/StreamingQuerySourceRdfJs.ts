@@ -96,8 +96,11 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     }
 
     const matchOptions = {
-      stopMatch() {
-        throw new Error('stopMatch function has not been replaced in streaming store.');
+      close: () => {
+        throw new Error('close function has not been replaced in streaming store.');
+      },
+      delete: () => {
+        throw new Error('delete function has not been replaced in streaming store.');
       },
     };
 
@@ -111,7 +114,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     );
 
     if (context) {
-      const matchOptionsArray: ({ stopMatch: () => void })[] | undefined = context.get(
+      const matchOptionsArray: ({ close: () => void })[] | undefined = context.get(
         KeysStreamingSource.matchOptions,
       );
       if (matchOptionsArray !== undefined) {
@@ -141,7 +144,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
         .catch(error => quads.destroy(error));
     }
 
-    return StreamingQuerySourceRdfJs.quadsToBindings(
+    const it = StreamingQuerySourceRdfJs.quadsToBindings(
       quads,
       operation,
       this.dataFactory,
@@ -154,6 +157,11 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
         }
       },
     );
+
+    it.setProperty('delete', () => {
+      matchOptions.delete();
+    });
+    return it;
   }
 
   // TODO [2024-12-01]: implement setMetadata make a proper estimation for the cardinality

@@ -287,7 +287,7 @@ export class ActorRdfJoinInnerIncrementalComputationalBind extends ActorRdfJoin 
         sideData.remainingEntries.map(entry => entry.operation),
         async(operations: Algebra.Operation[], operationBindings: Bindings) => {
           // Send the materialized patterns to the mediator for recursive join evaluation.
-          const matchOptions: ({ stopMatch: () => void })[] = [];
+          const matchOptions: ({ close: () => void })[] = [];
           const currentSubContext = subContext
             .set(KeysQueryOperation.joinBindings, operationBindings)
             .set(KeysStreamingSource.matchOptions, matchOptions);
@@ -299,7 +299,7 @@ export class ActorRdfJoinInnerIncrementalComputationalBind extends ActorRdfJoin 
           ));
           const stopFunction = (): void => {
             for (const MatchOption of matchOptions) {
-              MatchOption.stopMatch();
+              MatchOption.close();
             }
           };
 

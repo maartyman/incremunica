@@ -21,7 +21,7 @@ import type * as RDF from '@rdfjs/types';
 /**
  * An incremunica Stream None Query Source Identify Hypermedia Actor.
  */
-export class ActorQuerySourceIdentifyHypermediaStreamNone extends ActorQuerySourceIdentifyHypermedia {
+export class ActorQuerySourceIdentifyHypermediaNone extends ActorQuerySourceIdentifyHypermedia {
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   public readonly mediatorGuard: MediatorGuard;
 
@@ -45,7 +45,7 @@ export class ActorQuerySourceIdentifyHypermediaStreamNone extends ActorQuerySour
       dataFactory,
       await BindingsFactory.create(this.mediatorMergeBindingsContext, action.context, dataFactory),
     );
-    source.toString = () => `ActorQuerySourceIdentifyHypermediaStreamNone(${action.url})`;
+    source.toString = () => `ActorQuerySourceIdentifyHypermediaNone(${action.url})`;
     source.referenceValue = action.url;
 
     const { guardEvents } = await this.mediatorGuard.mediate({

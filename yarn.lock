@@ -6707,6 +6707,11 @@ dargs@^7.0.0:
   resolved "https://registry.yarnpkg.com/dargs/-/dargs-7.0.0.tgz#04015c41de0bcb69ec84050f3d9be0caf8d6d5cc"
   integrity sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==
 
+data-structure-typed@^1.53.2:
+  version "1.53.2"
+  resolved "https://registry.yarnpkg.com/data-structure-typed/-/data-structure-typed-1.53.2.tgz#f86a2f3ec7f70b39f7572518570f5be98b3b3d21"
+  integrity sha512-TOPCOnFk3JPYiAdMJ+3VXRq4YR7MWtuZZzQJilV4lsBxlc1d50CA1kisic0YikKri3TT3YRmzRjaFfRAJh6big==
+
 data-view-buffer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/data-view-buffer/-/data-view-buffer-1.0.1.tgz#8ea6326efec17a2e42620696e671d7d5a8bc66b2"

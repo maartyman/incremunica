@@ -79,7 +79,7 @@ describe('StreamingQuerySourceRdfJs', () => {
       )).toThrow(`Attempted to pass non-pattern operation 'nop' to StreamingQuerySourceRdfJs`);
     });
 
-    it('should throw when the store doesn\'t replace the stopMatch', async() => {
+    it('should throw when the store doesn\'t replace the close', async() => {
       store = <any> {
         match: () => streamifyArray([]),
       };
@@ -89,8 +89,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         ctx,
       );
       await expect(data).toEqualBindingsStream([]);
-      expect(ctx.get(KeysStreamingSource.matchOptions)[0].stopMatch)
-        .toThrow(new Error('stopMatch function has not been replaced in streaming store.'));
+      expect(ctx.get(KeysStreamingSource.matchOptions)[0].close)
+        .toThrow(new Error('close function has not been replaced in streaming store.'));
     });
 
     it('should destroy stream if setMetadata function throws', async() => {

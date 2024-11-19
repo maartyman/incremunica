@@ -40,6 +40,6 @@ export interface IIncementalRdfJsSourceExtended extends RDF.Source {
     predicate?: (RDF.Term | null),
     object?: (RDF.Term | null),
     graph?: (RDF.Term | null),
-    options?: { stopMatch: () => void }
+    options?: { close: () => void; delete: () => void }
   ) => RDF.Stream<RDF.Quad>;
 }

@@ -13,7 +13,7 @@ import { DevTools } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
-import { ActorQuerySourceIdentifyHypermediaStreamNone } from '../lib';
+import { ActorQuerySourceIdentifyHypermediaNone } from '../lib';
 
 const DF = new DataFactory();
 const AF = new Factory();
@@ -31,7 +31,7 @@ function captureEvents(item: EventEmitter, ...events: string[]) {
   return item;
 }
 
-describe('ActorRdfResolveHypermediaStreamNone', () => {
+describe('ActorRdfResolveHypermediaNone', () => {
   let bus: any;
   let BF: BindingsFactory;
 
@@ -40,8 +40,8 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
     BF = await DevTools.createTestBindingsFactory(DF);
   });
 
-  describe('An ActorRdfResolveHypermediaStreamNone instance', () => {
-    let actor: ActorQuerySourceIdentifyHypermediaStreamNone;
+  describe('An ActorRdfResolveHypermediaNone instance', () => {
+    let actor: ActorQuerySourceIdentifyHypermediaNone;
     let context: IActionContext;
     let mediatorGuard: MediatorGuard;
     let mediatorMergeBindingsContext: any;
@@ -67,7 +67,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
           }).run(<any>{})).mergeHandlers;
         },
       };
-      actor = new ActorQuerySourceIdentifyHypermediaStreamNone({
+      actor = new ActorQuerySourceIdentifyHypermediaNone({
         name: 'actor',
         bus,
         mediatorGuard,
@@ -130,7 +130,7 @@ describe('ActorRdfResolveHypermediaStreamNone', () => {
         quads: streamifyArray([]),
       };
       const result = (await actor.run(action));
-      expect(result.source.toString()).toBe('ActorQuerySourceIdentifyHypermediaStreamNone(http://test.com)');
+      expect(result.source.toString()).toBe('ActorQuerySourceIdentifyHypermediaNone(http://test.com)');
     });
 
     it('should run and add a guard', async() => {

@@ -760,13 +760,16 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('stopMatch should stop match', async() => {
+  it('close should stop match', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
     ])));
 
-    const options = { stopMatch: () => {} };
+    const options = {
+      close: () => {},
+      delete: () => {},
+    };
 
     const matchStream = store.match(
       null,
@@ -776,7 +779,7 @@ describe('StreamStore', () => {
       options,
     );
 
-    options.stopMatch();
+    options.close();
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s3', 'p3', 'o3'),
@@ -798,12 +801,15 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('stopMatch should stop match with multiple match', async() => {
+  it('close should stop match with multiple match', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
     ])));
 
-    const options1 = { stopMatch: () => {} };
+    const options1 = {
+      close: () => {},
+      delete: () => {},
+    };
     const matchStream1 = store.match(
       null,
       null,
@@ -812,7 +818,10 @@ describe('StreamStore', () => {
       options1,
     );
 
-    const options2 = { stopMatch: () => {} };
+    const options2 = {
+      close: () => {},
+      delete: () => {},
+    };
     const matchStream2 = store.match(
       null,
       null,
@@ -821,13 +830,13 @@ describe('StreamStore', () => {
       options2,
     );
 
-    options1.stopMatch();
+    options1.close();
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s2', 'p2', 'o2'),
     ])));
 
-    options2.stopMatch();
+    options2.close();
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s3', 'p3', 'o3'),
@@ -851,7 +860,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('stopMatch after end', async() => {
+  it('close after end', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
@@ -859,7 +868,10 @@ describe('StreamStore', () => {
 
     store.end();
 
-    const options = { stopMatch: () => {} };
+    const options = {
+      close: () => {},
+      delete: () => {},
+    };
 
     const matchStream = store.match(
       null,
@@ -869,7 +881,7 @@ describe('StreamStore', () => {
       options,
     );
 
-    options.stopMatch(); // Does noting
+    options.close(); // Does noting
 
     await expect(arrayifyStream(matchStream)).resolves.toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1'),
@@ -877,13 +889,16 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle stopMatch with halt', async() => {
+  it('handle close with halt', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
     ])));
 
-    const options = { stopMatch: () => {} };
+    const options = {
+      close: () => {},
+      delete: () => {},
+    };
 
     const matchStream = store.match(
       null,
@@ -894,7 +909,7 @@ describe('StreamStore', () => {
     );
 
     store.halt();
-    options.stopMatch();
+    options.close();
 
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s3', 'p3', 'o3'),
@@ -916,13 +931,16 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle stopMatch with halt with deletions', async() => {
+  it('handle close with halt with deletions', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1'),
       quad('s2', 'p2', 'o2'),
     ])));
 
-    const options = { stopMatch: () => {} };
+    const options = {
+      close: () => {},
+      delete: () => {},
+    };
 
     const matchStream = store.match(
       null,
@@ -933,7 +951,7 @@ describe('StreamStore', () => {
     );
 
     store.halt();
-    options.stopMatch();
+    options.close();
 
     const quad1 = quad('s1', 'p1', 'o1');
     const quad2 = quad('s2', 'p2', 'o2');

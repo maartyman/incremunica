@@ -95,7 +95,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
         context: <any>{},
       } ]);
       mediatorQueryOperation = <any> {
-        mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
+        mediate: jest.fn(async(_arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
           return {
             bindingsStream: new ArrayIterator([
               BF.bindings([
@@ -1447,7 +1447,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
       it('should work if the active iterator ends first', async() => {
         let iterator: BindingsStream;
-        const stopMatchJest = jest.fn();
+        const closeJest = jest.fn();
         const streams: PassThrough[] = [];
         let num = 0;
 
@@ -1494,7 +1494,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
             const streamNum = num;
             num++;
-            const stopMatchfn = () => {
+            const closefn = () => {
               if (streamNum === 0) {
                 iterator.close();
                 iterator.on('end', () => {
@@ -1505,13 +1505,13 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
                   }
                 });
               }
-              stopMatchJest();
+              closeJest();
             };
             const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
             expect(matchOptions).toBeDefined();
             if (matchOptions !== undefined) {
-              (<({ stopMatch: () => void })[]>matchOptions).push({
-                stopMatch: stopMatchfn,
+              (<({ close: () => void })[]>matchOptions).push({
+                close: closefn,
               });
             }
             return {
@@ -1647,16 +1647,16 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
         expect(haltFn).toHaveBeenCalledTimes(1);
         expect(resumeFn).toHaveBeenCalledTimes(1);
-        expect(stopMatchJest).toHaveBeenCalledTimes(2);
+        expect(closeJest).toHaveBeenCalledTimes(2);
       });
 
       describe('with mock store', () => {
         let iterator: BindingsStream;
-        let stopMatchJest: () => void;
+        let closeJest: () => void;
         const streams: PassThrough[] = [];
 
         beforeEach(() => {
-          stopMatchJest = jest.fn();
+          closeJest = jest.fn();
 
           mediatorQueryOperation = <any> {
             mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
@@ -1699,15 +1699,15 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
               iterator = new WrappingIterator(unionStream);
 
-              const stopMatchfn = () => {
+              const closefn = () => {
                 stream.end();
-                stopMatchJest();
+                closeJest();
               };
               const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
 
               if (matchOptions !== undefined) {
-                (<({ stopMatch: () => void })[]> matchOptions).push({
-                  stopMatch: stopMatchfn,
+                (<({ close: () => void })[]> matchOptions).push({
+                  close: closefn,
                 });
               }
               return {
@@ -1845,7 +1845,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
           ]);
           expect(haltFn).toHaveBeenCalledTimes(0);
           expect(resumeFn).toHaveBeenCalledTimes(0);
-          expect(stopMatchJest).toHaveBeenCalledTimes(0);
+          expect(closeJest).toHaveBeenCalledTimes(0);
         });
 
         it('should handle entries with too many deletions', async() => {
@@ -1972,7 +1972,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
           expect(haltFn).toHaveBeenCalledTimes(1);
           expect(resumeFn).toHaveBeenCalledTimes(1);
-          expect(stopMatchJest).toHaveBeenCalledTimes(2);
+          expect(closeJest).toHaveBeenCalledTimes(2);
         });
       });
     });
