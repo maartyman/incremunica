@@ -1,1 +1,1 @@
-export * from './ActorQuerySourceIdentifyStreamingHypermedia';
+export * from './ActorQuerySourceIdentifyStream';

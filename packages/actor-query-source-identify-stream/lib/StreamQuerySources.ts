@@ -19,7 +19,7 @@ import { Queue } from 'data-structure-typed';
 import { type Algebra, Factory } from 'sparqlalgebrajs';
 import type { Operation } from 'sparqlalgebrajs/lib/algebra';
 
-export type IStreamingQuerySources = {
+export type IStreamQuerySource = {
   isAddition: boolean;
   value: string;
 };
@@ -34,7 +34,7 @@ type ISourceWrapperSafe = {
   deleteCallbacks: (() => void)[];
 };
 
-export class StreamingHypermediaQuerySources implements IQuerySource {
+export class StreamQuerySources implements IQuerySource {
   public referenceValue: string;
   public context?: IActionContext;
   private readonly sources: Map<string, ISourceWrapper> = new Map();
@@ -43,13 +43,13 @@ export class StreamingHypermediaQuerySources implements IQuerySource {
   private readonly dataFactory: ComunicaDataFactory;
 
   public constructor(
-    stream: AsyncIterator<IStreamingQuerySources>,
+    stream: AsyncIterator<IStreamQuerySource>,
     dataFactory: ComunicaDataFactory,
     mediatorQuerySourceIdentify: MediatorQuerySourceIdentify,
     context: IActionContext,
   ) {
     this.sourcesEventEmitter = new EventEmitter();
-    stream.on('data', (item: IStreamingQuerySources) => {
+    stream.on('data', (item: IStreamQuerySource) => {
       if (item.isAddition) {
         const chunk: ISourceWrapper = {
           deleteCallbacks: [],

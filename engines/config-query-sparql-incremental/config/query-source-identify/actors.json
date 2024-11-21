@@ -22,7 +22,7 @@
     },
     {
       "@id": "urn:comunica:default:query-source-identify/actors#stream",
-      "@type": "ActorQuerySourceIdentifyStreamingHypermedia",
+      "@type": "ActorQuerySourceIdentifyStream",
       "beforeActors": { "@id": "urn:comunica:default:query-source-identify/actors#hypermedia" }
     }
   ]

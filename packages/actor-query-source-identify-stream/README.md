@@ -23,7 +23,7 @@ After installing, this package can be added to your engine's configuration as fo
     ...
     {
       "@id": "urn:comunica:default:query-source-identify/actors#stream",
-      "@type": "ActorQuerySourceIdentifyStreamingHypermedia",
+      "@type": "ActorQuerySourceIdentifyStream",
       "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" }
     }
   ]

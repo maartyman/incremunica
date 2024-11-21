@@ -10,16 +10,16 @@ import { KeysInitQuery } from '@comunica/context-entries';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
-import { StreamingHypermediaQuerySources } from './StreamingHypermediaQuerySources';
+import { StreamQuerySources } from './StreamQuerySources';
 
 /**
- * An incremunica Streaming Sources Query Source Identify Actor.
+ * An incremunica Stream Sources Query Source Identify Actor.
  */
-export class ActorQuerySourceIdentifyStreamingHypermedia extends ActorQuerySourceIdentify {
+export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   public readonly mediatorQuerySourceIdentify: MediatorQuerySourceIdentify;
 
-  public constructor(args: IActorQuerySourceIdentifyStreamingSourcesArgs) {
+  public constructor(args: IActorQuerySourceIdentifyStreamSourcesArgs) {
     super(args);
   }
 
@@ -35,7 +35,7 @@ export class ActorQuerySourceIdentifyStreamingHypermedia extends ActorQuerySourc
     const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
     return {
       querySource: {
-        source: new StreamingHypermediaQuerySources(
+        source: new StreamQuerySources(
           <any>action.querySourceUnidentified.value,
           dataFactory,
           this.mediatorQuerySourceIdentify,
@@ -47,7 +47,7 @@ export class ActorQuerySourceIdentifyStreamingHypermedia extends ActorQuerySourc
   }
 }
 
-export interface IActorQuerySourceIdentifyStreamingSourcesArgs extends IActorQuerySourceIdentifyArgs {
+export interface IActorQuerySourceIdentifyStreamSourcesArgs extends IActorQuerySourceIdentifyArgs {
   /**
    * A mediator for creating binding context merge handlers
    */

@@ -9,7 +9,7 @@
   "actors": [
     {
       "@id": "urn:comunica:default:query-source-identify/actors#stream",
-      "@type": "ActorQuerySourceIdentifyStreamingHypermedia",
+      "@type": "ActorQuerySourceIdentifyStream",
       "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" },
       "mediatorQuerySourceIdentify": { "@id": "urn:comunica:default:query-source-identify/mediators#main" }
     }
