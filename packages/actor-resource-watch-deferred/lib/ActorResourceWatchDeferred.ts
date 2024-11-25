@@ -30,6 +30,7 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
   public async run(action: IActionResourceWatch): Promise<IActorResourceWatchOutput> {
     const eventsSource: IResourceWatchEventEmitter = action.context
       .getSafe(KeysResourceWatch.deferredEvaluationEventEmitter);
+    eventsSource.setMaxListeners(eventsSource.getMaxListeners() + 1);
     const outputEvents: IResourceWatchEventEmitter = new EventEmitter();
 
     const emitUpdate = (): void => {
