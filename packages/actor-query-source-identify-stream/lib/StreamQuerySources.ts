@@ -49,6 +49,7 @@ export class StreamQuerySources implements IQuerySource {
     context: IActionContext,
   ) {
     this.sourcesEventEmitter = new EventEmitter();
+    this.sourcesEventEmitter.setMaxListeners(Infinity);
     stream.on('data', (item: IStreamQuerySource) => {
       if (item.isAddition) {
         const chunk: ISourceWrapper = {
@@ -144,10 +145,15 @@ export class StreamQuerySources implements IQuerySource {
     };
     iterator.readable = true;
 
-    this.sourcesEventEmitter.on('data', (sourceWrapper: ISourceWrapperSafe) => {
+    const addSourceToBuffer = (sourceWrapper: ISourceWrapperSafe) => {
+      if (iterator.done) {
+        this.sourcesEventEmitter.removeListener('data', addSourceToBuffer);
+        return;
+      }
       buffer.push(sourceWrapper);
       iterator.readable = true;
-    });
+    }
+    this.sourcesEventEmitter.on('data', addSourceToBuffer);
 
     const unionIterator = new UnionIterator<Bindings>(iterator, { autoStart: false });
 
