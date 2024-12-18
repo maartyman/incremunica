@@ -11,12 +11,14 @@ import {
   ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
 import { KeysResourceWatch } from '@incremunica/context-entries';
+import type {MediatorHttp} from "@comunica/bus-http";
 
 /**
- * An incremunica Deffered Resource Watch Actor.
+ * An incremunica Deferred Resource Watch Actor.
  */
 export class ActorResourceWatchDeferred extends ActorResourceWatch {
-  public constructor(args: IActorResourceWatchArgs) {
+  public readonly mediatorHttp: MediatorHttp;
+  public constructor(args: IActorResourceWatchDeferredArgs) {
     super(args);
   }
 
@@ -33,24 +35,53 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
     eventsSource.setMaxListeners(eventsSource.getMaxListeners() + 1);
     const outputEvents: IResourceWatchEventEmitter = new EventEmitter();
 
-    const emitUpdate = (): void => {
-      outputEvents.emit('update');
-    };
+    let etag = action.metadata.etag;
+    const checkForChanges = (): void => {
+      // TODO [2024-12-19]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
+      this.mediatorHttp.mediate(
+        {
+          context: action.context,
+          input: action.url,
+          init: {
+            method: 'HEAD',
+          },
+        },
+      ).then((responseHead) => {
+        // TODO [2024-12-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
+        if (!responseHead.ok) {
+          outputEvents.emit('delete');
+        }
+        if (responseHead.headers.get('etag') !== etag) {
+          outputEvents.emit('update');
+          etag = responseHead.headers.get('etag');
+        }
+      }).catch(() => {
+        outputEvents.emit('delete');
+      });
+    }
+
     let running = false;
     return {
       events: outputEvents,
       start: () => {
         if (!running) {
           running = true;
-          eventsSource.on('update', emitUpdate);
+          eventsSource.on('update', checkForChanges);
         }
       },
       stop: () => {
         if (running) {
           running = false;
-          eventsSource.removeListener('update', emitUpdate);
+          eventsSource.removeListener('update', checkForChanges);
         }
       },
     };
   }
+}
+
+export interface IActorResourceWatchDeferredArgs extends IActorResourceWatchArgs {
+  /**
+   * The HTTP mediator
+   */
+  mediatorHttp: MediatorHttp;
 }

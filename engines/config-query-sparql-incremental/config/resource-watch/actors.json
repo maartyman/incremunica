@@ -25,6 +25,7 @@
     {
       "@id": "urn:comunica:default:resource-watch/actors#deferred",
       "@type": "ActorResourceWatchDeferred",
+      "mediatorHttp": { "@id": "urn:comunica:default:http/mediators#main" },
       "priority": 15
     }
   ]
