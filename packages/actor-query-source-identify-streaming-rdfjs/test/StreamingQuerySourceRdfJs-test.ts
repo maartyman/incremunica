@@ -4,8 +4,8 @@ import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
-import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import { quad, createTestContextWithDataFactory, createTestBindingsFactory } from '@incremunica/dev-tools';
+import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import { arrayifyStream } from 'arrayify-stream';
@@ -18,7 +18,6 @@ import '@incremunica/incremental-jest';
 import '@comunica/utils-jest';
 import 'jest-rdf';
 
-const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
@@ -31,10 +30,10 @@ describe('StreamingQuerySourceRdfJs', () => {
   let source: StreamingQuerySourceRdfJs;
   let BF: BindingsFactory;
   beforeEach(async() => {
-    ctx = DevTools.createTestContextWithDataFactory(DF);
+    ctx = createTestContextWithDataFactory(DF);
     ctx = ctx.set(KeysStreamingSource.matchOptions, []);
     store = new StreamingStore();
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
     source = new StreamingQuerySourceRdfJs(store, DF, BF);
   });
 
@@ -79,9 +78,10 @@ describe('StreamingQuerySourceRdfJs', () => {
       )).toThrow(`Attempted to pass non-pattern operation 'nop' to StreamingQuerySourceRdfJs`);
     });
 
-    it('should throw when the store doesn\'t replace the close', async() => {
+    it('should throw when the store doesn\'t replace the closeStream', async() => {
       store = <any> {
         match: () => streamifyArray([]),
+        countQuads: () => 1,
       };
       source = new StreamingQuerySourceRdfJs(store, DF, BF);
       const data = source.queryBindings(
@@ -89,8 +89,8 @@ describe('StreamingQuerySourceRdfJs', () => {
         ctx,
       );
       await expect(data).toEqualBindingsStream([]);
-      expect(ctx.get(KeysStreamingSource.matchOptions)[0].close)
-        .toThrow(new Error('close function has not been replaced in streaming store.'));
+      expect(ctx.get(KeysStreamingSource.matchOptions)[0].closeStream)
+        .toThrow(new Error('closeStream function has not been replaced in streaming store.'));
     });
 
     it('should destroy stream if setMetadata function throws', async() => {
@@ -832,10 +832,10 @@ describe('StreamingQuerySourceRdfJs', () => {
     it('converts triples', async() => {
       // Prepare data
       const quadStream = new ArrayIterator([
-        DevTools.quad(true, 's1', 'p1', 'o1'),
+        quad('s1', 'p1', 'o1', undefined, true),
         quad('s2', 'p2', 'o2'),
         quad('s3', 'p3', 'o3'),
-        DevTools.quad(false, 's1', 'p1', 'o1'),
+        quad('s1', 'p1', 'o1', undefined, false),
       ], { autoStart: false });
       quadStream.setProperty('metadata', {
         cardinality: { type: 'exact', value: 3 },
@@ -1036,9 +1036,9 @@ describe('StreamingQuerySourceRdfJs', () => {
       // Prepare data
       const quadStream = new ArrayIterator([
         quad('s1', 'p1', 'o1'),
-        DevTools.quad(true, 's2', 'p2', 'o2', 'g1'),
+        quad('s2', 'p2', 'o2', 'g1', true),
         quad('s3', 'p3', 'o3', 'g2'),
-        DevTools.quad(false, 's2', 'p2', 'o2', 'g1'),
+        quad('s2', 'p2', 'o2', 'g1', false),
       ], { autoStart: false });
       quadStream.setProperty('metadata', {
         cardinality: { type: 'exact', value: 3 },

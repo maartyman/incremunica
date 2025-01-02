@@ -157,20 +157,31 @@ export class StreamingStore<Q extends Quad>
     return this;
   }
 
+  /**
+   * Return a stream of quads matching the given pattern.
+   *
+   * @param subject   An optional subject.
+   * @param predicate An optional predicate.
+   * @param object    An optional object.
+   * @param graph     An optional graph.
+   * @param options   An optional object that will be populated with 2 functions that control the output stream:
+   *                    `closeStream` simply ends the stream.
+   *                    `deleteStream` first propagates the results as deletions and then ends the stream.
+   */
   public match(
-    subject?: RDF.Term | null,
-    predicate?: RDF.Term | null,
-    object?: RDF.Term | null,
-    graph?: RDF.Term | null,
-    options?: { close: () => void; delete: () => void },
+    subject: RDF.Term | null,
+    predicate: RDF.Term | null,
+    object: RDF.Term | null,
+    graph: RDF.Term | null,
+    options?: { closeStream?: () => void; deleteStream?: () => void },
   ): RDF.Stream<Q> {
     const unionStream = new PassThrough({ objectMode: true });
 
     const storedQuads = this.store.getQuads(
-      <Term>subject,
-      <Term>predicate,
-      <Term>object,
-      <Term>graph,
+      subject,
+      predicate,
+      object,
+      graph,
     );
     const storeResult = new Readable({
       objectMode: true,
@@ -194,11 +205,11 @@ export class StreamingStore<Q extends Quad>
       // The new pendingStream remains open, until the store is ended.
       const pendingStream = new PassThrough({ objectMode: true });
       if (options) {
-        options.close = () => {
+        options.closeStream = () => {
           this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
           pendingStream.end();
         };
-        options.delete = () => {
+        options.deleteStream = () => {
           this.pendingStreams.removeClosedPatternListener(subject, predicate, object, graph);
           for (const quad of this.store.getQuads(
             <Term>subject,
@@ -233,6 +244,23 @@ export class StreamingStore<Q extends Quad>
       });
     }
     return unionStream;
+  }
+
+  /**
+   * Return the number of quads matching the given pattern.
+   *
+   * @param subject   An optional subject.
+   * @param predicate An optional predicate.
+   * @param object    An optional object.
+   * @param graph     An optional graph.
+   */
+  public countQuads(
+    subject: RDF.Term | null,
+    predicate: RDF.Term | null,
+    object: RDF.Term | null,
+    graph: RDF.Term | null,
+  ): number {
+    return this.store.countQuads(subject, predicate, object, graph);
   }
 
   /**

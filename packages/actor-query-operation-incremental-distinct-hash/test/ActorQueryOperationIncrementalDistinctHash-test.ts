@@ -4,15 +4,13 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, getSafeQuads } from '@comunica/utils-query-operation';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestMediatorHashBindings, createTestBindingsFactory, quad } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import type { Quad } from 'rdf-data-factory';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorQueryOperationIncrementalDistinctHash } from '../lib';
 import '@comunica/utils-jest';
-
-const quad = require('rdf-quad');
 
 const DF = new DataFactory();
 
@@ -22,7 +20,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
   let BF: BindingsFactory;
 
   beforeEach(async() => {
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
     bus = new Bus({ name: 'bus' });
     mediatorQueryOperation = {
       mediate: (arg: any) => Promise.resolve({
@@ -54,7 +52,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     let mediatorHashQuads: MediatorHashQuads;
 
     beforeEach(() => {
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorHashBindings = createTestMediatorHashBindings();
       mediatorHashQuads = <any> {
         mediate: () => {
           return {
@@ -75,76 +73,76 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
 
     it('should create a filter that is a predicate', async() => {
       const filter = await actor.newHashFilterQuads(<any>{});
-      expect(filter(DevTools.quad(true, 's', 'p', 'o'))).toBe(true);
+      expect(filter(quad('s', 'p', 'o', undefined, true))).toBe(true);
     });
 
     it('should create a filter that only returns true once for equal objects', async() => {
       const filter = await actor.newHashFilterQuads(<any>{});
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
 
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
     });
 
     it('should create a filters that are independent', async() => {
       const filter1 = await actor.newHashFilterQuads(<any>{});
       const filter2 = await actor.newHashFilterQuads(<any>{});
       const filter3 = await actor.newHashFilterQuads(<any>{});
-      expect(filter1(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter1(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
+      expect(filter1(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter1(quad('a', 'p', 'b', undefined, true))).toBe(false);
 
-      expect(filter2(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter2(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
+      expect(filter2(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter2(quad('a', 'p', 'b', undefined, true))).toBe(false);
 
-      expect(filter3(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter3(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
+      expect(filter3(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter3(quad('a', 'p', 'b', undefined, true))).toBe(false);
     });
 
     it('should create a filter that returns true if everything is deleted', async() => {
       const filter = await actor.newHashFilterQuads(<any>{});
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
 
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
     });
 
     it('should create a filter that returns false if too much is deleted', async() => {
       const filter = await actor.newHashFilterQuads(<any>{});
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'a'))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
 
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(false);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'b'))).toBe(true);
-      expect(filter(DevTools.quad(false, 'a', 'p', 'a'))).toBe(false);
-      expect(filter(DevTools.quad(true, 'a', 'p', 'b'))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, false))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined, false))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
     });
   });
 
@@ -154,7 +152,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     let mediatorHashQuads: MediatorHashQuads;
 
     beforeEach(() => {
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorHashBindings = createTestMediatorHashBindings();
       mediatorHashQuads = <any> {
         mediate: () => {
           return {
@@ -348,7 +346,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     let mediatorHashQuads: MediatorHashQuads;
 
     beforeEach(() => {
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorHashBindings = createTestMediatorHashBindings();
       mediatorHashQuads = <any> {
         mediate: () => {
           return {
@@ -398,11 +396,11 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     it('should run with quads', async() => {
       mediatorQueryOperation.mediate = (arg: any) => Promise.resolve({
         quadStream: new ArrayIterator([
-          DevTools.quad(true, 's1', 'p1', 'o1'),
-          DevTools.quad(true, 's2', 'p2', 'o2'),
-          DevTools.quad(true, 's1', 'p1', 'o1'),
-          quad('s3', 'p3', 'o3'),
-          DevTools.quad(false, 's2', 'p2', 'o2'),
+          quad('s1', 'p1', 'o1', undefined, true),
+          quad('s2', 'p2', 'o2', undefined, true),
+          quad('s1', 'p1', 'o1', undefined, true),
+          quad('s3', 'p3', 'o3', undefined, true),
+          quad('s2', 'p2', 'o2', undefined, false),
         ]),
         metadata: () => Promise.resolve({
           cardinality: 5,
@@ -418,10 +416,10 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
       });
       expect(output.type).toBe('quads');
       await expect(arrayifyStream(output.quadStream)).resolves.toEqual([
-        DevTools.quad(true, 's1', 'p1', 'o1'),
-        DevTools.quad(true, 's2', 'p2', 'o2'),
-        DevTools.quad(true, 's3', 'p3', 'o3'),
-        DevTools.quad(false, 's2', 'p2', 'o2'),
+        quad('s1', 'p1', 'o1', undefined, true),
+        quad('s2', 'p2', 'o2', undefined, true),
+        quad('s3', 'p3', 'o3', undefined, true),
+        quad('s2', 'p2', 'o2', undefined, false),
       ]);
     });
   });

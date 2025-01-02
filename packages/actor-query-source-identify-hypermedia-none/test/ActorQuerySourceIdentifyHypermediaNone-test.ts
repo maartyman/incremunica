@@ -9,7 +9,7 @@ import {
 } from '@incremunica/actor-merge-bindings-context-is-addition';
 import type { IActionGuard, MediatorGuard } from '@incremunica/bus-guard';
 import { KeysBindings, KeysGuard } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory, createTestContextWithDataFactory } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
@@ -37,7 +37,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfResolveHypermediaNone instance', () => {
@@ -49,7 +49,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
     let mediatorFn: jest.Func;
 
     beforeEach(() => {
-      context = DevTools.createTestContextWithDataFactory(DF);
+      context = createTestContextWithDataFactory(DF);
       guardEvents = new EventEmitter();
       captureEvents(guardEvents, 'modified', 'up-to-date');
       mediatorFn = jest.fn();

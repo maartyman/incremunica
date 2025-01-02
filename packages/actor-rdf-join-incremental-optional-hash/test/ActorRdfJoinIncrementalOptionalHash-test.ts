@@ -9,7 +9,7 @@ import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@c
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory, createTestContextWithDataFactory, createTestMediatorHashBindings } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
@@ -26,8 +26,8 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    context = DevTools.createTestContextWithDataFactory(DF);
-    BF = await DevTools.createTestBindingsFactory(DF);
+    context = createTestContextWithDataFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('The ActorRdfJoinIncrementalOptionalHash module', () => {
@@ -66,7 +66,7 @@ IActorRdfJoinSelectivityOutput
       mediatorJoinSelectivity = <any> {
         mediate: async() => ({ selectivity: 1 }),
       };
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorHashBindings = createTestMediatorHashBindings();
       actor = new ActorRdfJoinIncrementalOptionalHash({
         name: 'actor',
         bus,

@@ -1,6 +1,6 @@
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
 import { ActionContext, Bus } from '@comunica/core';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestContextWithDataFactory } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import { ActorQuerySourceIdentifyStreamingRdfJs, StreamingQuerySourceRdfJs } from '..';
 import 'jest-rdf';
@@ -79,7 +79,7 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
 
     describe('run', () => {
       it('should get the source', async() => {
-        const contextIn = DevTools.createTestContextWithDataFactory();
+        const contextIn = createTestContextWithDataFactory();
         const ret = await actor.run({
           querySourceUnidentified: { type: 'rdfjs', value: source },
           context: contextIn,
@@ -89,7 +89,7 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
       });
 
       it('should get the source with context', async() => {
-        const contextIn = DevTools.createTestContextWithDataFactory();
+        const contextIn = createTestContextWithDataFactory();
         const contextSource = new ActionContext();
         const ret = await actor.run({
           querySourceUnidentified: { type: 'rdfjs', value: source, context: contextSource },

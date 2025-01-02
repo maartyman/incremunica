@@ -13,7 +13,7 @@
     "packages/incremental-inner-join",
     "packages/packager",
     "packages/runner-cli",
-    "packages/incremental-rdf-streaming-store",
+    "packages/streaming-store",
     "packages/incremental-types"
   ],
   "ignoreComponents": [

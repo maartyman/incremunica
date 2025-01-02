@@ -1,6 +1,6 @@
-# Incremental RDF Streaming Store
+# Incremunica Streaming Store
 
-[![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-rdf-streaming-store.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-rdf-streaming-store)
+[![npm version](https://badge.fury.io/js/@incremunica%2Fstreaming-store.svg)](https://badge.fury.io/js/@incremunica%2Fstreaming-store)
 
 A read-only [RDF/JS store](https://rdf.js.org/stream-spec/#store-interface) that allows parallel data lookup and insertion.
 It works in both JavaScript and TypeScript.
@@ -17,11 +17,11 @@ If using TypeScript, it is recommended to use this in conjunction with [`@rdfjs/
 ## Installation
 
 ```bash
-$ npm install @comunica/incremental-rdf-streaming-store
+$ npm install @comunica/streaming-store
 ```
 or
 ```bash
-$ yarn add @comunica/incremental-rdf-streaming-store
+$ yarn add @comunica/streaming-store
 ```
 
 This package also works out-of-the-box in browsers via tools such as [webpack](https://webpack.js.org/) and [browserify](http://browserify.org/).
@@ -31,7 +31,7 @@ This package also works out-of-the-box in browsers via tools such as [webpack](h
 A new `StreamingStore` can be created as follows:
 
 ```typescript
-import { StreamingStore } from '@comunica/incremental-rdf-streaming-store';
+import { StreamingStore } from '@comunica/streaming-store';
 
 const store = new StreamingStore();
 ```

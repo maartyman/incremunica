@@ -2,7 +2,7 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorMergeBindingsContextIsAddition } from '../lib';
 import '@incremunica/incremental-jest';
@@ -72,7 +72,7 @@ describe('ActorMergeBindingsContextIsAddition', () => {
     let BF: BindingsFactory;
 
     beforeEach(async() => {
-      BF = await DevTools.createTestBindingsFactory(DF);
+      BF = await createTestBindingsFactory(DF);
     });
 
     it('should work with addition bindings', async() => {

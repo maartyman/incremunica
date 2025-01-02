@@ -1,4 +1,4 @@
-import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import type * as RDF from '@rdfjs/types';
 
@@ -34,12 +34,22 @@ export interface IIncementalRdfJsSourceExtended extends RDF.Source {
     object?: RDF.Term,
     graph?: RDF.Term
   ) => Promise<number> | number;
-
+  /**
+   * Return a stream of quads matching the given pattern.
+   *
+   * @param subject   An optional subject.
+   * @param predicate An optional predicate.
+   * @param object    An optional object.
+   * @param graph     An optional graph.
+   * @param options   An optional object that will be populated with 2 functions that control the output stream:
+   *                    `closeStream` simply ends the stream.
+   *                    `deleteStream` first propagates the results as deletions and then ends the stream.
+   */
   match: (
     subject?: (RDF.Term | null),
     predicate?: (RDF.Term | null),
     object?: (RDF.Term | null),
     graph?: (RDF.Term | null),
-    options?: { close: () => void; delete: () => void }
+    options?: { closeStream: () => void; deleteStream: () => void }
   ) => RDF.Stream<RDF.Quad>;
 }

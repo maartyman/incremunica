@@ -6,7 +6,7 @@ import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinIncrementalMinusHash } from '../lib/ActorRdfJoinIncrementalMinusHash';
@@ -22,7 +22,7 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
     context = new ActionContext();
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinIncrementalMinusHash instance', () => {
@@ -39,7 +39,7 @@ IActorRdfJoinSelectivityOutput
       mediatorJoinSelectivity = <any>{
         mediate: async() => ({ selectivity: 1 }),
       };
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorHashBindings = createTestMediatorHashBindings();
       actor = new ActorRdfJoinIncrementalMinusHash({
         name: 'actor',
         bus,

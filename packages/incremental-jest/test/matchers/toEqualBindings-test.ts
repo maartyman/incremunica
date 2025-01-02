@@ -1,7 +1,7 @@
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import '../../lib';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 
 const DF = new DataFactory();
@@ -11,7 +11,7 @@ describe('toEqualBindings', () => {
   let BF: BindingsFactory;
 
   beforeEach(async() => {
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   it('should succeed for equal empty bindings', () => {

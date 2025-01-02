@@ -8,8 +8,8 @@ import * as http from 'node:http';
 import type { Bindings, BindingsStream, QueryStringContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
-import { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import { createTestBindingsFactory } from '@incremunica/dev-tools';
+import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
@@ -42,7 +42,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
   beforeEach(async() => {
     engine = new QueryEngine();
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('using Streaming Store', () => {

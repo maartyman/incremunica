@@ -13,7 +13,7 @@ import type { BindingsStream, IActionContext, IQueryOperationResultBindings } fr
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory, createTestMediatorMergeBindingsContext, createTestMediatorHashBindings, createTestContextWithDataFactory } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator, WrappingIterator } from 'asynciterator';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
@@ -49,7 +49,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinIncrementalComputationalBind instance', () => {
@@ -86,7 +86,7 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
       };
       haltFn = jest.fn();
       resumeFn = jest.fn();
-      context = DevTools.createTestContextWithDataFactory(DF);
+      context = createTestContextWithDataFactory(DF);
       context = context.set(KeysQueryOperation.querySources, [ <any>{
         source: {
           resume: resumeFn,
@@ -120,8 +120,8 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
           };
         }),
       };
-      mediatorMergeBindingsContext = DevTools.createTestMediatorMergeBindingsContext();
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorMergeBindingsContext = createTestMediatorMergeBindingsContext();
+      mediatorHashBindings = createTestMediatorHashBindings();
       actor = new ActorRdfJoinInnerIncrementalComputationalBind({
         name: 'actor',
         bus,
@@ -1510,8 +1510,8 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
             const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
             expect(matchOptions).toBeDefined();
             if (matchOptions !== undefined) {
-              (<({ close: () => void })[]>matchOptions).push({
-                close: closefn,
+              (<({ closeStream: () => void })[]>matchOptions).push({
+                closeStream: closefn,
               });
             }
             return {
@@ -1706,8 +1706,8 @@ describe('ActorRdfJoinIncrementalComputationalBind', () => {
               const matchOptions = arg.context.get(KeysStreamingSource.matchOptions);
 
               if (matchOptions !== undefined) {
-                (<({ close: () => void })[]> matchOptions).push({
-                  close: closefn,
+                (<({ closeStream: () => void })[]> matchOptions).push({
+                  closeStream: closefn,
                 });
               }
               return {

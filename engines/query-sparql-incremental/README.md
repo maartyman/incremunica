@@ -72,7 +72,7 @@ You can also use an [incremental triple store](https://www.npmjs.com/package/@in
 This store allows you to change the dataset (additions and deletions) and show you the changes in the query results.
 ```javascript
 const QueryEngine = require('@incremunica/query-sparql-incremental').QueryEngine;
-const StreamingStore = require("@incremunica/incremental-rdf-streaming-store").StreamingStore;
+const StreamingStore = require("@incremunica/streaming-store").StreamingStore;
 const myEngine = new QueryEngine();
 const streamingStore = new StreamingStore();
 

@@ -45,6 +45,6 @@
     "@incremunica/actor-query-source-identify-streaming-rdfjs": "^1.3.0",
     "@incremunica/bus-guard": "^1.3.0",
     "@incremunica/context-entries": "^1.3.0",
-    "@incremunica/incremental-rdf-streaming-store": "^1.3.0"
+    "@incremunica/streaming-store": "^1.3.0"
   }
 }

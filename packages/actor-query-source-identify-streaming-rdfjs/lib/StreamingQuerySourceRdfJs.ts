@@ -16,7 +16,7 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { ClosableIterator } from '@comunica/utils-iterator';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
-import type { StreamingStore } from '@incremunica/incremental-rdf-streaming-store';
+import type { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { StreamingQuerySource, StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import type * as RDF from '@rdfjs/types';
@@ -97,11 +97,11 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     }
 
     const matchOptions = {
-      close: () => {
-        throw new Error('close function has not been replaced in streaming store.');
+      closeStream: () => {
+        throw new Error('closeStream function has not been replaced in streaming store.');
       },
-      delete: () => {
-        throw new Error('delete function has not been replaced in streaming store.');
+      deleteStream: () => {
+        throw new Error('deleteStream function has not been replaced in streaming store.');
       },
     };
 
@@ -115,7 +115,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     );
 
     if (context) {
-      const matchOptionsArray: ({ close: () => void })[] | undefined = context.get(
+      const matchOptionsArray: ({ closeStream: () => void })[] | undefined = context.get(
         KeysStreamingSource.matchOptions,
       );
       if (matchOptionsArray !== undefined) {
@@ -160,7 +160,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     );
 
     it.setProperty('delete', () => {
-      matchOptions.delete();
+      matchOptions.deleteStream();
     });
     return it;
   }

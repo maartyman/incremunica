@@ -12,7 +12,7 @@ import type { IActionContext, IQueryOperationResultBindings } from '@comunica/ty
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
-import { DevTools } from '@incremunica/dev-tools';
+import { createTestBindingsFactory, createTestContextWithDataFactory, createTestMediatorMergeBindingsContext, createTestMediatorHashBindings } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
@@ -30,7 +30,7 @@ describe('ActorRdfJoinIncrementalMemoryBind', () => {
 
   beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    BF = await DevTools.createTestBindingsFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinIncrementalMemoryBind instance', () => {
@@ -63,7 +63,7 @@ describe('ActorRdfJoinIncrementalMemoryBind', () => {
           return { entries };
         },
       };
-      context = DevTools.createTestContextWithDataFactory(DF);
+      context = createTestContextWithDataFactory(DF);
       mediatorQueryOperation = <any> {
         mediate: jest.fn(async(arg: IActionQueryOperation): Promise<IQueryOperationResultBindings> => {
           return {
@@ -90,8 +90,8 @@ describe('ActorRdfJoinIncrementalMemoryBind', () => {
           };
         }),
       };
-      mediatorMergeBindingsContext = DevTools.createTestMediatorMergeBindingsContext();
-      mediatorHashBindings = DevTools.createTestMediatorHashBindings();
+      mediatorMergeBindingsContext = createTestMediatorMergeBindingsContext();
+      mediatorHashBindings = createTestMediatorHashBindings();
       actor = new ActorRdfJoinInnerIncrementalMemoryBind({
         name: 'actor',
         bus,
