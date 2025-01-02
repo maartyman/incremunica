@@ -1,5 +1,5 @@
-import type { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
+import type { StreamingStore } from '@incremunica/streaming-store';
 import type * as RDF from '@rdfjs/types';
 
 export interface IIncementalRdfJsSourceExtended extends RDF.Source {

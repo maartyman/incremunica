@@ -5,9 +5,9 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { quad, createTestContextWithDataFactory, createTestBindingsFactory } from '@incremunica/dev-tools';
-import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/incremental-types';
 import { StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
+import { StreamingStore } from '@incremunica/streaming-store';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
@@ -1248,7 +1248,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         }, {
           canBeUndef: false,
           variable: DF.variable('p'),
-        },],
+        }],
       });
     });
   });
