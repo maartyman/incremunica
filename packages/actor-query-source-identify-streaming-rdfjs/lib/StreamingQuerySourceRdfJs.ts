@@ -34,6 +34,7 @@ import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
 
 export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
+  // TODO []: generalize store type
   public store: StreamingStore<Quad>;
   private registeredQueries: number;
   protected readonly selectorShape: FragmentSelectorShape;
@@ -74,10 +75,10 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     this.store.resume();
   }
 
-  public static nullifyVariables(term: RDF.Term | undefined, quotedTripleFiltering: boolean): RDF.Term | undefined {
+  public static nullifyVariables(term: RDF.Term | undefined, quotedTripleFiltering: boolean): RDF.Term | null {
     return !term || term.termType === 'Variable' || (!quotedTripleFiltering &&
       term.termType === 'Quad' && someTermsNested(term, value => value.termType === 'Variable')) ?
-      undefined :
+      null :
       term;
   }
 
@@ -164,12 +165,39 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     return it;
   }
 
-  // TODO [2024-12-01]: implement setMetadata make a proper estimation for the cardinality
   protected async setMetadata(
     it: AsyncIterator<RDF.Quad>,
-    _operation: Algebra.Pattern,
+    operation: Algebra.Pattern,
   ): Promise<void> {
-    const cardinality = 1;
+    // TODO []:Check if the source supports quoted triple filtering
+    // const quotedTripleFiltering = Boolean(this.store.features?.quotedTripleFiltering);
+    const quotedTripleFiltering = false;
+    let cardinality: number;
+    if (this.store.countQuads) {
+      // If the source provides a dedicated method for determining cardinality, use that.
+      cardinality = this.store.countQuads(
+        StreamingQuerySourceRdfJs.nullifyVariables(operation.subject, quotedTripleFiltering),
+        StreamingQuerySourceRdfJs.nullifyVariables(operation.predicate, quotedTripleFiltering),
+        StreamingQuerySourceRdfJs.nullifyVariables(operation.object, quotedTripleFiltering),
+        StreamingQuerySourceRdfJs.nullifyVariables(operation.graph, quotedTripleFiltering),
+      );
+    } else {
+      // Otherwise, fallback to a sub-optimal alternative where we just call match again to count the quads.
+      // WARNING: we can NOT reuse the original data stream here,
+      // because we may lose data elements due to things happening async.
+      let i = 0;
+      cardinality = await new Promise((resolve, reject) => {
+        const matches = this.store.match(
+          StreamingQuerySourceRdfJs.nullifyVariables(operation.subject, quotedTripleFiltering),
+          StreamingQuerySourceRdfJs.nullifyVariables(operation.predicate, quotedTripleFiltering),
+          StreamingQuerySourceRdfJs.nullifyVariables(operation.object, quotedTripleFiltering),
+          StreamingQuerySourceRdfJs.nullifyVariables(operation.graph, quotedTripleFiltering),
+        );
+        matches.on('error', reject);
+        matches.on('end', () => resolve(i));
+        matches.on('data', () => i++);
+      });
+    }
 
     it.setProperty('metadata', {
       state: new MetadataValidationState(),

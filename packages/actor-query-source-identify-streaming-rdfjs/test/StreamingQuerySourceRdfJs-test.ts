@@ -1161,6 +1161,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         quad('s3', 's1', 'o3'),
       ], { autoStart: false });
       quadStream.setProperty('metadata', {
+        state: new MetadataValidationState(),
         cardinality: { type: 'exact', value: 3 },
         order: [
           { term: 'subject', direction: 'asc' },
@@ -1187,6 +1188,7 @@ describe('StreamingQuerySourceRdfJs', () => {
       // Check metadata
       const metadata = await new Promise(resolve => bindingsStream.getProperty('metadata', resolve));
       expect(metadata).toEqual({
+        state: expect.any(MetadataValidationState),
         cardinality: { type: 'estimate', value: 3 },
         order: [
           { term: DF.variable('x'), direction: 'asc' },
@@ -1201,17 +1203,18 @@ describe('StreamingQuerySourceRdfJs', () => {
     it('converts quoted triples with duplicate variables', async() => {
       // Prepare data
       const quadStream = new ArrayIterator([
-        quad('s1', 'p1', '<<<o1s> <o1p> <o1o>>>'),
-        quad('s2', 'p2', '<<<o2s> <o2p> <s2>>>'),
-        quad('s3', 'p3', '<<<o3s> <o3p> <o3o>>>'),
+        quad('s1', 'p1', 's1'),
+        quad('s2', 'p2', 's2'),
+        quad('s3', 'p3', 's3'),
       ], { autoStart: false });
       quadStream.setProperty('metadata', {
+        state: new MetadataValidationState(),
         cardinality: { type: 'exact', value: 3 },
       });
       const pattern = AF.createPattern(
         DF.variable('x'),
         DF.variable('p'),
-        DF.quad(DF.variable('os'), DF.variable('op'), DF.variable('x')),
+        DF.variable('x'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
         .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
@@ -1219,30 +1222,33 @@ describe('StreamingQuerySourceRdfJs', () => {
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
+          x: DF.namedNode('s1'),
+          p: DF.namedNode('p1'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
           x: DF.namedNode('s2'),
           p: DF.namedNode('p2'),
-          os: DF.namedNode('o2s'),
-          op: DF.namedNode('o2p'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          x: DF.namedNode('s3'),
+          p: DF.namedNode('p3'),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
       // Check metadata
       const metadata = await new Promise(resolve => bindingsStream.getProperty('metadata', resolve));
       expect(metadata).toEqual({
+        state: expect.any(MetadataValidationState),
         cardinality: { type: 'estimate', value: 3 },
+        availableOrders: undefined,
+        order: undefined,
         variables: [{
           canBeUndef: false,
           variable: DF.variable('x'),
         }, {
           canBeUndef: false,
           variable: DF.variable('p'),
-        }, {
-          canBeUndef: false,
-          variable: DF.variable('os'),
-        }, {
-          canBeUndef: false,
-          variable: DF.variable('op'),
-        }],
+        },],
       });
     });
   });
