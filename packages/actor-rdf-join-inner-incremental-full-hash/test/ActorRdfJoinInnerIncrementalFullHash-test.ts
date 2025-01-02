@@ -124,7 +124,7 @@ IActorRdfJoinSelectivityOutput
           .toFailTest('actor requires 2 join entries at most. The input contained 3.');
       });
 
-      it('should fail on undefs in left stream', async() => {
+      it('should pass on undefs in left stream', async() => {
         action.entries[0].output.metadata = () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
@@ -136,7 +136,7 @@ IActorRdfJoinSelectivityOutput
           variables: [{ variable: DF.variable('a'), canBeUndef: false }],
         });
         await expect(actor.test(action)).resolves
-          .toFailTest('Actor actor can not join streams containing undefs');
+          .toPassTest({ iterations: 0, persistedItems: 0, blockingItems: 0, requestTime: 0 });
       });
 
       it('should fail on undefs in right stream', async() => {

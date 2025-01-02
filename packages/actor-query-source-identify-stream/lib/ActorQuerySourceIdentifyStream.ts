@@ -1,4 +1,3 @@
-import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type {
   IActionQuerySourceIdentify,
   IActorQuerySourceIdentifyOutput,
@@ -6,6 +5,7 @@ import type {
   MediatorQuerySourceIdentify,
 } from '@comunica/bus-query-source-identify';
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
+import type { MediatorRdfMetadataAccumulate } from '@comunica/bus-rdf-metadata-accumulate';
 import { KeysInitQuery } from '@comunica/context-entries';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
@@ -16,8 +16,8 @@ import { StreamQuerySources } from './StreamQuerySources';
  * An incremunica Stream Sources Query Source Identify Actor.
  */
 export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
-  public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   public readonly mediatorQuerySourceIdentify: MediatorQuerySourceIdentify;
+  public readonly mediatorRdfMetadataAccumulate: MediatorRdfMetadataAccumulate;
 
   public constructor(args: IActorQuerySourceIdentifyStreamSourcesArgs) {
     super(args);
@@ -39,6 +39,7 @@ export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
           <any>action.querySourceUnidentified.value,
           dataFactory,
           this.mediatorQuerySourceIdentify,
+          this.mediatorRdfMetadataAccumulate,
           action.context,
         ),
         context: action.querySourceUnidentified.context ?? new ActionContext(),
@@ -49,11 +50,11 @@ export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
 
 export interface IActorQuerySourceIdentifyStreamSourcesArgs extends IActorQuerySourceIdentifyArgs {
   /**
-   * A mediator for creating binding context merge handlers
-   */
-  mediatorMergeBindingsContext: MediatorMergeBindingsContext;
-  /**
    * A mediator for identifying query sources.
    */
   mediatorQuerySourceIdentify: MediatorQuerySourceIdentify;
+  /**
+   * A mediator for identifying query sources.
+   */
+  mediatorRdfMetadataAccumulate: MediatorQuerySourceIdentify;
 }

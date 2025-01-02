@@ -2,7 +2,14 @@ import { EventEmitter } from 'events';
 import {
   LinkedRdfSourcesAsyncRdfIterator,
 } from '@comunica/actor-query-source-identify-hypermedia/lib/LinkedRdfSourcesAsyncRdfIterator';
-import type { IActorQuerySourceIdentifyOutput, MediatorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
+import type {
+  IActorQuerySourceIdentifyOutput,
+  MediatorQuerySourceIdentify,
+} from '@comunica/bus-query-source-identify';
+import {
+  getVariables,
+} from '@comunica/bus-query-source-identify';
+import type { MediatorRdfMetadataAccumulate } from '@comunica/bus-rdf-metadata-accumulate';
 import type {
   Bindings,
   BindingsStream,
@@ -11,6 +18,7 @@ import type {
   IActionContext,
   IQueryBindingsOptions,
   IQuerySource,
+  MetadataBindings,
 } from '@comunica/types';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import type * as RDF from '@rdfjs/types';
@@ -36,21 +44,27 @@ type ISourceWrapperSafe = {
 
 export class StreamQuerySources implements IQuerySource {
   public referenceValue: string;
-  public context?: IActionContext;
+  public context: IActionContext;
   private readonly sources: Map<string, ISourceWrapper> = new Map();
   private readonly sourcesEventEmitter: EventEmitter;
   protected readonly selectorShape: FragmentSelectorShape;
   private readonly dataFactory: ComunicaDataFactory;
+  private readonly mediatorRdfMetadataAccumulate: MediatorRdfMetadataAccumulate;
 
   public constructor(
     stream: AsyncIterator<IStreamQuerySource>,
     dataFactory: ComunicaDataFactory,
     mediatorQuerySourceIdentify: MediatorQuerySourceIdentify,
+    mediatorRdfMetadataAccumulate: MediatorRdfMetadataAccumulate,
     context: IActionContext,
   ) {
+    this.mediatorRdfMetadataAccumulate = mediatorRdfMetadataAccumulate;
     this.sourcesEventEmitter = new EventEmitter();
     this.sourcesEventEmitter.setMaxListeners(Number.POSITIVE_INFINITY);
     stream.on('data', (item: IStreamQuerySource) => {
+      // TODO: properly canonicalize the url, if it is a URL
+      // TODO: what if the URL occurs twice once here and once in another source identify?
+      // TODO: what if a source occurs twice here
       if (item.isAddition) {
         const chunk: ISourceWrapper = {
           deleteCallbacks: [],
@@ -115,6 +129,16 @@ export class StreamQuerySources implements IQuerySource {
       buffer.push(<ISourceWrapperSafe>sourceWrapper);
     }
 
+    const variables = getVariables(<Algebra.Pattern>operation);
+    // TODO how to handle metadata correctly
+    let accumulatedMetadata: MetadataBindings = {
+      state: new MetadataValidationState(),
+      cardinality: { type: 'estimate', value: 1 },
+      variables: variables.map(variable =>
+        // TODO make sure canBeUndef is set correctly
+        ({ variable, canBeUndef: false })),
+    };
+    let first = true;
     const iterator = new AsyncIterator<BindingsStream>();
     iterator.read = (): BindingsStream | null => {
       const sourceWrapper = buffer.shift();
@@ -123,9 +147,28 @@ export class StreamQuerySources implements IQuerySource {
         return null;
       }
       const bindingsStream = sourceWrapper.source.queryBindings(operation, context, options);
+      bindingsStream.getProperty('metadata', (metadata: MetadataBindings) => {
+        if (first) {
+          accumulatedMetadata.state.invalidate();
+          accumulatedMetadata = metadata;
+          first = false;
+        }
+        this.mediatorRdfMetadataAccumulate.mediate({
+          mode: 'append',
+          accumulatedMetadata,
+          appendingMetadata: metadata,
+          context: this.context,
+        }).then((result) => {
+          const resultMetadata = result.metadata;
+          resultMetadata.state = new MetadataValidationState();
+          accumulatedMetadata?.state.invalidate();
+          accumulatedMetadata = <MetadataBindings>resultMetadata;
+        });
+      });
       let stopStreamFn = bindingsStream.getProperty<() => void>('delete');
       if (!stopStreamFn) {
         if (bindingsStream instanceof LinkedRdfSourcesAsyncRdfIterator) {
+          // TODO: make sure LinkedRdfSourcesAsyncRdfIterator is also destroyed
           stopStreamFn = () => {
             for (const currentIterator of (<any>bindingsStream).currentIterators) {
               const fn = (<BindingsStream>currentIterator).getProperty<() => void>('delete');
@@ -137,7 +180,9 @@ export class StreamQuerySources implements IQuerySource {
             }
           };
         } else {
-          throw new TypeError('No delete function found');
+          stopStreamFn = () => {
+            throw new Error('No delete function found');
+          };
         }
       }
       sourceWrapper.deleteCallbacks.push(stopStreamFn);
@@ -157,24 +202,7 @@ export class StreamQuerySources implements IQuerySource {
 
     const unionIterator = new UnionIterator<Bindings>(iterator, { autoStart: false });
 
-    unionIterator.setProperty('metadata', {
-      state: new MetadataValidationState(),
-      cardinality: { type: 'exact', value: 1 },
-      variables: [
-        {
-          variable: this.dataFactory.variable('s'),
-          canBeUndef: false,
-        },
-        {
-          variable: this.dataFactory.variable('p'),
-          canBeUndef: false,
-        },
-        {
-          variable: this.dataFactory.variable('o'),
-          canBeUndef: false,
-        },
-      ],
-    });
+    unionIterator.setProperty('metadata', accumulatedMetadata);
 
     return unionIterator;
   }
