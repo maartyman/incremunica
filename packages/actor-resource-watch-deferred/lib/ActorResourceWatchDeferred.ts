@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import type { MediatorHttp } from '@comunica/bus-http';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTest } from '@comunica/core';
 import type {
@@ -11,7 +12,6 @@ import {
   ActorResourceWatch,
 } from '@incremunica/bus-resource-watch';
 import { KeysResourceWatch } from '@incremunica/context-entries';
-import type {MediatorHttp} from "@comunica/bus-http";
 
 /**
  * An incremunica Deferred Resource Watch Actor.
@@ -26,6 +26,21 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
     if (!action.context.has(KeysResourceWatch.deferredEvaluationEventEmitter)) {
       return failTest('Context does not have \'deferredEvaluationEventEmitter\'');
     }
+    const responseHead = await this.mediatorHttp.mediate(
+      {
+        context: action.context,
+        input: action.url,
+        init: {
+          method: 'HEAD',
+        },
+      },
+    );
+    if (!responseHead.ok) {
+      return failTest('Source does not support HEAD requests');
+    }
+    if (!responseHead.headers.get('etag')) {
+      return failTest('Source does not support etag headers');
+    }
     return passTest({ priority: this.priority });
   }
 
@@ -37,7 +52,6 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
 
     let etag = action.metadata.etag;
     const checkForChanges = (): void => {
-      // TODO [2024-12-19]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
       this.mediatorHttp.mediate(
         {
           context: action.context,
@@ -47,7 +61,7 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
           },
         },
       ).then((responseHead) => {
-        // TODO [2024-12-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
+        // TODO [2025-08-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
         if (!responseHead.ok) {
           outputEvents.emit('delete');
         }
@@ -58,7 +72,7 @@ export class ActorResourceWatchDeferred extends ActorResourceWatch {
       }).catch(() => {
         outputEvents.emit('delete');
       });
-    }
+    };
 
     let running = false;
     return {
