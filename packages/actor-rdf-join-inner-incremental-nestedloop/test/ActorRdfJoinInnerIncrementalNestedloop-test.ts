@@ -909,5 +909,99 @@ IActorRdfJoinSelectivityOutput
         expected,
       );
     });
+
+    it('should handle multiple bindings with undefs', async() => {
+      // Clean up the old bindings
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
+
+      action.entries[0].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        null,
+        null,
+        null,
+        null,
+        null,
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: true },
+      ];
+
+      action.entries[1].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: true },
+      ];
+
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: true },
+      ]);
+      await expect(output.bindingsStream).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+    });
   });
 });

@@ -124,7 +124,7 @@ IActorRdfJoinSelectivityOutput
           .resolves.toFailTest('actor requires 2 join entries at most. The input contained 3.');
       });
 
-      it('should fail on undefs in left stream', async() => {
+      it('should pass on undefs in left stream', async() => {
         action.entries[0].output.metadata = () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
@@ -135,10 +135,10 @@ IActorRdfJoinSelectivityOutput
           cardinality: { type: 'estimate', value: 4 },
           variables: [{ variable: DF.variable('a'), canBeUndef: false }],
         });
-        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
+        expect((await actor.test(action)).isPassed).toBeTruthy();
       });
 
-      it('should fail on undefs in right stream', async() => {
+      it('should pass on undefs in right stream', async() => {
         action.entries[0].output.metadata = () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
@@ -149,10 +149,10 @@ IActorRdfJoinSelectivityOutput
           cardinality: { type: 'estimate', value: 4 },
           variables: [{ variable: DF.variable('a'), canBeUndef: true }],
         });
-        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
+        expect((await actor.test(action)).isPassed).toBeTruthy();
       });
 
-      it('should fail on undefs in left and right stream', async() => {
+      it('should pass on undefs in left and right stream', async() => {
         action.entries[0].output.metadata = () => Promise.resolve({
           state: new MetadataValidationState(),
           cardinality: { type: 'estimate', value: 4 },
@@ -163,7 +163,7 @@ IActorRdfJoinSelectivityOutput
           cardinality: { type: 'estimate', value: 4 },
           variables: [{ variable: DF.variable('a'), canBeUndef: true }],
         });
-        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
+        expect((await actor.test(action)).isPassed).toBeTruthy();
       });
 
       it('should generate correct test metadata', async() => {
@@ -843,6 +843,100 @@ IActorRdfJoinSelectivityOutput
           expected,
         );
       });
+    });
+
+    it('should handle multiple bindings with undefs', async() => {
+      // Clean up the old bindings
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
+
+      action.entries[0].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        null,
+        null,
+        null,
+        null,
+        null,
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: true },
+      ];
+
+      action.entries[1].output.bindingsStream = new ArrayIterator([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: true },
+      ];
+
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: true },
+      ]);
+      await expect(output.bindingsStream).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
     });
   });
 });

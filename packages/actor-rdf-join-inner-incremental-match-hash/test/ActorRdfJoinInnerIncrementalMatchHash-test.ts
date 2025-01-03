@@ -177,10 +177,7 @@ IActorRdfJoinSelectivityOutput
                 },
                 pageSize: 100,
                 requestTime: 10,
-                state: {
-                  invalidateListeners: [],
-                  valid: true,
-                },
+                state: expect.any(MetadataValidationState),
                 variables: [],
               },
               {
@@ -190,19 +187,16 @@ IActorRdfJoinSelectivityOutput
                 },
                 pageSize: 100,
                 requestTime: 20,
-                state: {
-                  invalidateListeners: [],
-                  valid: true,
-                },
+                state: expect.any(MetadataValidationState),
                 variables: [],
               },
             ],
           },
           value: {
             blockingItems: 0,
-            iterations: 0,
-            persistedItems: 0,
-            requestTime: 0,
+            iterations: 9,
+            persistedItems: 9,
+            requestTime: 1.4,
           },
         });
       });

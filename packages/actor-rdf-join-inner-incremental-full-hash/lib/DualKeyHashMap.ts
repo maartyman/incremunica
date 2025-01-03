@@ -14,6 +14,7 @@ export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
         if (value.equals(mapObject.value)) {
           mapObject.count++;
         } else {
+          // TODO []: this can happen when using clashing hash functions
           throw new Error(`Current value: ${JSON.stringify(mapObject.value)} and given value: ${JSON.stringify(value)} are different. With hash functions mainKey: ${mainKey}, secondary key: ${secondaryKey}!`);
         }
       } else {

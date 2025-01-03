@@ -27,7 +27,7 @@ export class ActorRdfJoinInnerIncrementalDeleteHash extends ActorRdfJoin {
       logicalType: 'inner',
       physicalName: 'delete-hash',
       limitEntries: 2,
-      canHandleUndefs: false,
+      canHandleUndefs: true,
     });
   }
 

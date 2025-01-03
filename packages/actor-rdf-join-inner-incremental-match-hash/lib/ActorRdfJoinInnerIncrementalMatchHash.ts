@@ -58,11 +58,15 @@ export class ActorRdfJoinInnerIncrementalMatchHash extends ActorRdfJoin {
     _action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
   ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+    const { metadatas } = sideData;
+    const requestInitialTimes = ActorRdfJoin.getRequestInitialTimes(metadatas);
+    const requestItemTimes = ActorRdfJoin.getRequestItemTimes(metadatas);
     return passTestWithSideData({
-      iterations: 0,
-      persistedItems: 0,
+      iterations: metadatas[0].cardinality.value + metadatas[1].cardinality.value,
+      persistedItems: metadatas[0].cardinality.value + metadatas[1].cardinality.value,
       blockingItems: 0,
-      requestTime: 0,
+      requestTime: requestInitialTimes[0] + metadatas[0].cardinality.value * requestItemTimes[0] +
+        requestInitialTimes[1] + metadatas[1].cardinality.value * requestItemTimes[1],
     }, sideData);
   }
 }

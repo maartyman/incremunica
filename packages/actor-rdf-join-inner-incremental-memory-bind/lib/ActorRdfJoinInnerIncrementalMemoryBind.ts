@@ -31,8 +31,7 @@ import {
 } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
 import type * as RDF from 'rdf-js';
-import type { Algebra } from 'sparqlalgebrajs';
-import { Factory } from 'sparqlalgebrajs';
+import { Factory, Algebra, Util } from 'sparqlalgebrajs';
 
 /**
  * A comunica Multi-way Bind RDF Join Actor.
@@ -352,11 +351,27 @@ export class ActorRdfJoinInnerIncrementalMemoryBind extends ActorRdfJoin {
     };
   }
 
+  public canBindWithOperation(operation: Algebra.Operation): boolean {
+    let valid = true;
+    Util.recurseOperation(operation, {
+      [Algebra.types.EXTEND](): boolean {
+        valid = false;
+        return false;
+      },
+      [Algebra.types.GROUP](): boolean {
+        valid = false;
+        return false;
+      },
+    });
+
+    return valid;
+  }
+
   public async getJoinCoefficients(
     action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
   ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinIncrementalMemoryMultiBindTestSideData>> {
-    const { metadatas } = sideData;
+    let { metadatas } = sideData;
     // Order the entries so we can pick the first one (usually the one with the lowest cardinality)
     const entriesUnsorted = action.entries
       .map((entry, i) => ({ ...entry, metadata: metadatas[i] }));
@@ -365,11 +380,66 @@ export class ActorRdfJoinInnerIncrementalMemoryBind extends ActorRdfJoin {
       return entriesTest;
     }
     const entriesSorted = entriesTest.get();
+    metadatas = entriesSorted.map(entry => entry.metadata);
+
+    const requestInitialTimes = ActorRdfJoin.getRequestInitialTimes(metadatas);
+    const requestItemTimes = ActorRdfJoin.getRequestItemTimes(metadatas);
+
+    // Determine first stream and remaining ones
+    const remainingEntries = [ ...entriesSorted ];
+    const remainingRequestInitialTimes = [ ...requestInitialTimes ];
+    const remainingRequestItemTimes = [ ...requestItemTimes ];
+    remainingEntries.splice(0, 1);
+    remainingRequestInitialTimes.splice(0, 1);
+    remainingRequestItemTimes.splice(0, 1);
+
+    // Reject binding on some operation types
+    if (remainingEntries
+      .some(entry => !this.canBindWithOperation(entry.operation))) {
+      return failTest(`Actor ${this.name} can not bind on Extend and Group operations`);
+    }
+
+    // Reject binding on modified operations, since using the output directly would be significantly more efficient.
+    if (remainingEntries.some(entry => entry.operationModified)) {
+      return failTest(`Actor ${this.name} can not be used over remaining entries with modified operations`);
+    }
+
+    // Only run this actor if the smallest stream is significantly smaller than the largest stream.
+    // We must use Math.max, because the last metadata is not necessarily the biggest, but it's the least preferred.
+    // If join entries are produced locally, we increase the possibility of doing this bind join, as it's cheap.
+    const isRemoteAccess = requestItemTimes.some(time => time > 0);
+    if (metadatas[0].cardinality.value * 60 / (isRemoteAccess ? 1 : 3) >
+      Math.max(...metadatas.map(metadata => metadata.cardinality.value))) {
+      return failTest(`Actor ${this.name} can only run if the smallest stream is much smaller than largest stream`);
+    }
+
+    // Determine selectivities of smallest entry with all other entries
+    const selectivities = await Promise.all(remainingEntries
+      .map(async entry => (await this.mediatorJoinSelectivity.mediate({
+        entries: [ entriesSorted[0], entry ],
+        context: action.context,
+      })).selectivity * this.selectivityModifier));
+
+    // Determine coefficients for remaining entries
+    const cardinalityRemaining = remainingEntries
+      .map((entry, i) => entry.metadata.cardinality.value * selectivities[i])
+      .reduce((sum, element) => sum + element, 0);
+    const receiveInitialCostRemaining = remainingRequestInitialTimes
+      .reduce((sum, element) => sum + element, 0);
+    const receiveItemCostRemaining = remainingRequestItemTimes
+      .reduce((sum, element) => sum + element, 0);
+
+    // TODO []: persistedItems is not yet implemented
     return passTestWithSideData({
-      iterations: 0,
+      iterations: metadatas[0].cardinality.value * cardinalityRemaining,
       persistedItems: 0,
       blockingItems: 0,
-      requestTime: 0,
+      requestTime: requestInitialTimes[0] +
+        metadatas[0].cardinality.value * (
+          requestItemTimes[0] +
+          receiveInitialCostRemaining +
+          cardinalityRemaining * receiveItemCostRemaining
+        ),
     }, { ...sideData, entriesUnsorted, entriesSorted });
   }
 }

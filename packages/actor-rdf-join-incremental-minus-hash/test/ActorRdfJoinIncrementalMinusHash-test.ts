@@ -5,12 +5,14 @@ import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
 import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinIncrementalMinusHash } from '../lib/ActorRdfJoinIncrementalMinusHash';
 import '@comunica/utils-jest';
+import type * as RDF from '@rdfjs/types';
 
 const DF = new DataFactory();
 
@@ -34,6 +36,9 @@ IActorRdfJoinSelectivityOutput
 >;
     let actor: ActorRdfJoinIncrementalMinusHash;
     let mediatorHashBindings: MediatorHashBindings;
+    let action: IActionRdfJoin;
+    let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any>{
@@ -46,6 +51,42 @@ IActorRdfJoinSelectivityOutput
         mediatorJoinSelectivity,
         mediatorHashBindings,
       });
+      variables0 = [];
+      variables1 = [];
+      action = {
+        type: 'minus',
+        entries: [
+          {
+            output: {
+              bindingsStream: new ArrayIterator([], { autoStart: false }),
+              metadata: async() => ({
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: variables0,
+              }),
+              type: 'bindings',
+            },
+            operation: <any> {},
+          },
+          {
+            output: {
+              bindingsStream: new ArrayIterator([], { autoStart: false }),
+              metadata: async() => ({
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: variables1,
+              }),
+              type: 'bindings',
+            },
+            operation: <any> {},
+          },
+        ],
+        context,
+      };
     });
 
     describe('test', () => {
@@ -81,50 +122,22 @@ IActorRdfJoinSelectivityOutput
         })).resolves.toFailTest(`actor can only handle logical joins of type 'minus', while 'inner' was given.`);
       });
 
-      it('should test on two entries with undefs', async() => {
-        await expect(actor.test({
-          type: 'minus',
-          entries: <any>[
-            {
-              output: {
-                type: 'bindings',
-                metadata: () => Promise.resolve(
-                  { cardinality: 4, pageSize: 100, requestTime: 10 },
-                ),
-              },
-            },
-            {
-              output: {
-                type: 'bindings',
-                metadata: () => Promise.resolve(
-                  { cardinality: 4, pageSize: 100, requestTime: 10 },
-                ),
-              },
-            },
-          ],
-          context,
-        })).resolves.toEqual({
-          sideData: {
-            metadatas: [
-              {
-                cardinality: 4,
-                pageSize: 100,
-                requestTime: 10,
-              },
-              {
-                cardinality: 4,
-                pageSize: 100,
-                requestTime: 10,
-              },
-            ],
-          },
-          value: {
-            blockingItems: 0,
-            iterations: 0,
-            persistedItems: 0,
-            requestTime: 0,
-          },
-        });
+      it('should pass on undefs on overlapping vars in left stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
+      });
+
+      it('should pass on undefs on overlapping vars in right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
+      });
+
+      it('should pass on undefs in left and right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
       });
 
       it('should test on two entries', async() => {
@@ -939,14 +952,96 @@ IActorRdfJoinSelectivityOutput
         // Validate output
         expect(result.type).toBe('bindings');
         await expect(result.metadata()).resolves
-          .toEqual({ cardinality: 3, variables: [{
-            canBeUndef: false,
-            variable: DF.variable('a'),
-          }]});
+          .toEqual({
+            cardinality: 3,
+            variables: [{
+              canBeUndef: false,
+              variable: DF.variable('a'),
+            }],
+          });
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        ]);
+      });
+
+      it('should handle multiple bindings with undefs', async() => {
+        const action: IActionRdfJoin = {
+          type: 'minus',
+          entries: [
+            {
+              output: <any>{
+                bindingsStream: new ArrayIterator([
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+                ], { autoStart: false }),
+                metadata: () => Promise.resolve({
+                  cardinality: 4,
+                  variables: [{
+                    canBeUndef: true,
+                    variable: DF.variable('a'),
+                  }],
+                }),
+                type: 'bindings',
+              },
+              operation: <any>{},
+            },
+            {
+              output: <any>{
+                bindingsStream: new ArrayIterator([
+                  null,
+                  null,
+                  null,
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+                ], { autoStart: false }),
+                metadata: () => Promise.resolve({
+                  cardinality: 4,
+                  variables: [{
+                    canBeUndef: true,
+                    variable: DF.variable('a'),
+                  }],
+                }),
+                type: 'bindings',
+              },
+              operation: <any>{},
+            },
+          ],
+          context,
+        };
+        const { result } = await actor.getOutput(action);
+
+        // Validate output
+        expect(result.type).toBe('bindings');
+        await expect(result.metadata()).resolves
+          .toEqual({
+            cardinality: 4,
+            variables: [{
+              canBeUndef: true,
+              variable: DF.variable('a'),
+            }],
+          });
+        await expect(result.bindingsStream).toEqualBindingsStream([
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
     });
