@@ -16,7 +16,7 @@ import type * as RDF from 'rdf-js';
 
 const DF = new DataFactory();
 
-export function bindingsToString(bindings: Bindings) {
+export function bindingsToString(bindings: Bindings): string {
   let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
   for (const [ key, value ] of bindings) {
     string += `\n\t${key.value}: ${value.value}`;
@@ -24,7 +24,7 @@ export function bindingsToString(bindings: Bindings) {
   return string;
 }
 
-export function printBindings(bindings: Bindings) {
+export function printBindings(bindings: Bindings): void {
   let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
   for (const [ key, value ] of bindings) {
     string += `\n\t${key.value}: ${value.value}`;
@@ -33,7 +33,7 @@ export function printBindings(bindings: Bindings) {
   console.log(string);
 }
 
-export function printBindingsStream(bindingsStream: BindingsStream) {
+export function printBindingsStream(bindingsStream: BindingsStream): BindingsStream {
   return bindingsStream.map((bindings) => {
     if (bindings) {
       printBindings(<Bindings>bindings);

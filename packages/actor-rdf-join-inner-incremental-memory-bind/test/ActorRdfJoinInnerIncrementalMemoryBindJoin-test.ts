@@ -12,7 +12,12 @@ import type { IActionContext, IQueryOperationResultBindings } from '@comunica/ty
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
-import { createTestBindingsFactory, createTestContextWithDataFactory, createTestMediatorMergeBindingsContext, createTestMediatorHashBindings } from '@incremunica/dev-tools';
+import {
+  createTestBindingsFactory,
+  createTestContextWithDataFactory,
+  createTestMediatorMergeBindingsContext,
+  createTestMediatorHashBindings,
+} from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';

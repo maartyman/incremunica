@@ -62,9 +62,9 @@ export class StreamQuerySources implements IQuerySource {
     this.sourcesEventEmitter = new EventEmitter();
     this.sourcesEventEmitter.setMaxListeners(Number.POSITIVE_INFINITY);
     stream.on('data', (item: IStreamQuerySource) => {
-      // TODO: properly canonicalize the url, if it is a URL
-      // TODO: what if the URL occurs twice once here and once in another source identify?
-      // TODO: what if a source occurs twice here
+      // TODO [2025-01-01]: properly canonicalize the url, if it is a URL
+      // TODO [2025-01-01]: what if the URL occurs twice once here and once in another source identify?
+      // TODO [2025-01-01]: what if a source occurs twice here
       if (item.isAddition) {
         const chunk: ISourceWrapper = {
           deleteCallbacks: [],
@@ -130,12 +130,12 @@ export class StreamQuerySources implements IQuerySource {
     }
 
     const variables = getVariables(<Algebra.Pattern>operation);
-    // TODO how to handle metadata correctly
+    // TODO [2025-01-01]: how to handle metadata correctly
     let accumulatedMetadata: MetadataBindings = {
       state: new MetadataValidationState(),
       cardinality: { type: 'estimate', value: 1 },
       variables: variables.map(variable =>
-        // TODO make sure canBeUndef is set correctly
+        // TODO [2025-01-01]: make sure canBeUndef is set correctly
         ({ variable, canBeUndef: false })),
     };
     let first = true;
@@ -163,12 +163,15 @@ export class StreamQuerySources implements IQuerySource {
           resultMetadata.state = new MetadataValidationState();
           accumulatedMetadata?.state.invalidate();
           accumulatedMetadata = <MetadataBindings>resultMetadata;
+        }).catch((error: Error) => {
+          throw error;
+          // TODO [2025-01-01]: handle error and write test
         });
       });
       let stopStreamFn = bindingsStream.getProperty<() => void>('delete');
       if (!stopStreamFn) {
         if (bindingsStream instanceof LinkedRdfSourcesAsyncRdfIterator) {
-          // TODO: make sure LinkedRdfSourcesAsyncRdfIterator is also destroyed
+          // TODO [2025-01-01]: make sure LinkedRdfSourcesAsyncRdfIterator is also destroyed
           stopStreamFn = () => {
             for (const currentIterator of (<any>bindingsStream).currentIterators) {
               const fn = (<BindingsStream>currentIterator).getProperty<() => void>('delete');

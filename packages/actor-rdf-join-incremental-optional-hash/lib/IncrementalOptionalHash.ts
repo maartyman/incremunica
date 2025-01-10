@@ -50,7 +50,7 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
       return false;
     }
 
-    if (array.length == 1 && array[0].equals(item)) {
+    if (array.length === 1 && array[0].equals(item)) {
       memory.delete(hash);
       return true;
     }

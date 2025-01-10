@@ -34,7 +34,7 @@ import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
 
 export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
-  // TODO []: generalize store type
+  // TODO [2025-01-01]: generalize store type
   public store: StreamingStore<Quad>;
   private registeredQueries: number;
   protected readonly selectorShape: FragmentSelectorShape;
@@ -169,7 +169,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     it: AsyncIterator<RDF.Quad>,
     operation: Algebra.Pattern,
   ): Promise<void> {
-    // TODO []:Check if the source supports quoted triple filtering
+    // TODO [2025-01-01]:Check if the source supports quoted triple filtering
     // const quotedTripleFiltering = Boolean(this.store.features?.quotedTripleFiltering);
     const quotedTripleFiltering = false;
     let cardinality: number;

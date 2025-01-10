@@ -9,7 +9,11 @@ import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@c
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
-import { createTestBindingsFactory, createTestContextWithDataFactory, createTestMediatorHashBindings } from '@incremunica/dev-tools';
+import {
+  createTestBindingsFactory,
+  createTestContextWithDataFactory,
+  createTestMediatorHashBindings,
+} from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';

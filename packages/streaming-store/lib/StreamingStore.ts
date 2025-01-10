@@ -160,13 +160,13 @@ export class StreamingStore<Q extends Quad>
   /**
    * Return a stream of quads matching the given pattern.
    *
-   * @param subject   An optional subject.
-   * @param predicate An optional predicate.
-   * @param object    An optional object.
-   * @param graph     An optional graph.
-   * @param options   An optional object that will be populated with 2 functions that control the output stream:
-   *                    `closeStream` simply ends the stream.
-   *                    `deleteStream` first propagates the results as deletions and then ends the stream.
+   * @param subject               An optional subject.
+   * @param predicate             An optional predicate.
+   * @param object                An optional object.
+   * @param graph                 An optional graph.
+   * @param options               An optional object that will override 2 functions that control the output stream.
+   * @param options.closeStream   A function that ends the stream.
+   * @param options.deleteStream  A function that first propagates the results as deletions and then end the stream.
    */
   public match(
     subject: RDF.Term | null,

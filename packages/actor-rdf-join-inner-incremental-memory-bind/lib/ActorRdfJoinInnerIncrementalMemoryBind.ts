@@ -429,7 +429,7 @@ export class ActorRdfJoinInnerIncrementalMemoryBind extends ActorRdfJoin {
     const receiveItemCostRemaining = remainingRequestItemTimes
       .reduce((sum, element) => sum + element, 0);
 
-    // TODO []: persistedItems is not yet implemented
+    // TODO [2025-01-01]: persistedItems is not yet implemented
     return passTestWithSideData({
       iterations: metadatas[0].cardinality.value * cardinalityRemaining,
       persistedItems: 0,

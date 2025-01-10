@@ -799,7 +799,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('closeStream should stop match with multiple match', async() => {
+  it('closeStream should stop match with multiple match 1', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
     ])));
@@ -856,7 +856,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('closeStream after end', async() => {
+  it('closeStream after end 2', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
@@ -884,7 +884,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle closeStream with halt', async() => {
+  it('handle closeStream with halt 1', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
@@ -925,7 +925,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle closeStream with halt with deletions', async() => {
+  it('handle closeStream with halt with deletions 1', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
@@ -1010,7 +1010,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('closeStream should stop match with multiple match', async() => {
+  it('closeStream should stop match with multiple match 2', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
     ])));
@@ -1070,7 +1070,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('closeStream after end', async() => {
+  it('closeStream after end 1', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
@@ -1098,7 +1098,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle closeStream with halt', async() => {
+  it('handle closeStream with halt 2', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
@@ -1142,7 +1142,7 @@ describe('StreamStore', () => {
     ]);
   });
 
-  it('handle closeStream with halt with deletions', async() => {
+  it('handle closeStream with halt with deletions 2', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),

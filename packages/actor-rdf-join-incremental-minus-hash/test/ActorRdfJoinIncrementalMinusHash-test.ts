@@ -8,11 +8,11 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
 import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incremunica/dev-tools';
+import type * as RDF from '@rdfjs/types';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinIncrementalMinusHash } from '../lib/ActorRdfJoinIncrementalMinusHash';
 import '@comunica/utils-jest';
-import type * as RDF from '@rdfjs/types';
 
 const DF = new DataFactory();
 

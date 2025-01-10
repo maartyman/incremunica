@@ -13,7 +13,12 @@ import type { BindingsStream, IActionContext, IQueryOperationResultBindings } fr
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
-import { createTestBindingsFactory, createTestMediatorMergeBindingsContext, createTestMediatorHashBindings, createTestContextWithDataFactory } from '@incremunica/dev-tools';
+import {
+  createTestBindingsFactory,
+  createTestMediatorMergeBindingsContext,
+  createTestMediatorHashBindings,
+  createTestContextWithDataFactory,
+} from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator, WrappingIterator } from 'asynciterator';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
