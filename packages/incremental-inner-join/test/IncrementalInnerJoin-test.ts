@@ -1,24 +1,26 @@
-import {ArrayIterator, AsyncIterator} from 'asynciterator';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { AsyncIterator } from 'asynciterator';
+import { ArrayIterator } from 'asynciterator';
 import '@incremunica/incremental-jest';
-import {IncrementalInnerJoin} from "../lib";
-import { Bindings } from '@incremunica/incremental-types';
+import { IncrementalInnerJoin } from '../lib';
 
-let cleanupMock = jest.fn();
-let hasResultMock = jest.fn();
-let readMock = jest.fn();
+const cleanupMock = jest.fn();
+const hasResultMock = jest.fn();
+const readMock = jest.fn();
 
 let results = false;
 
 class ExtendedClass extends IncrementalInnerJoin {
-  read(): Bindings | null {
+  public read(): Bindings | null {
     readMock();
     return null;
   }
-  _cleanup(): void {
+
+  public _cleanup(): void {
     cleanupMock();
   }
 
-  hasResults(): boolean {
+  public hasResults(): boolean {
     hasResultMock();
     return results;
   }
@@ -28,23 +30,23 @@ describe('IncrementalInnerJoin', () => {
   describe('The HashBindings module', () => {
     let leftIterator: AsyncIterator<Bindings>;
     let rightIterator: AsyncIterator<Bindings>;
-    let funJoin = () => null;
+    const funJoin = () => null;
 
     beforeEach(() => {
-      leftIterator = new ArrayIterator([<any>{}], {autoStart: false});
-      rightIterator = new ArrayIterator([<any>{}], {autoStart: false});
+      leftIterator = new ArrayIterator([ <any>{} ], { autoStart: false });
+      rightIterator = new ArrayIterator([ <any>{} ], { autoStart: false });
     });
 
     it('should be a HashBindings constructor', () => {
       expect(new (<any> ExtendedClass)(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       )).toBeInstanceOf(IncrementalInnerJoin);
       expect(new (<any> ExtendedClass)(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       )).toBeInstanceOf(ExtendedClass);
     });
   });
@@ -52,18 +54,18 @@ describe('IncrementalInnerJoin', () => {
   describe('An HashBindings instance', () => {
     let leftIterator: AsyncIterator<Bindings>;
     let rightIterator: AsyncIterator<Bindings>;
-    let funJoin = () => null;
+    const funJoin = () => null;
 
     beforeEach(() => {
-      leftIterator = new ArrayIterator([<any>{}], {autoStart: false});
-      rightIterator = new ArrayIterator([<any>{}], {autoStart: false});
+      leftIterator = new ArrayIterator([ <any>{} ], { autoStart: false });
+      rightIterator = new ArrayIterator([ <any>{} ], { autoStart: false });
     });
 
     it('should be readable if one of the iterators is readable', () => {
-      let extendedClass = new ExtendedClass(
-        new ArrayIterator([<any>{}], {autoStart: false}),
-        new ArrayIterator([], {autoStart: false}),
-        funJoin
+      const extendedClass = new ExtendedClass(
+        new ArrayIterator([ <any>{} ], { autoStart: false }),
+        new ArrayIterator([], { autoStart: false }),
+        funJoin,
       );
       expect(extendedClass.readable).toBeTruthy();
     });
@@ -72,50 +74,50 @@ describe('IncrementalInnerJoin', () => {
       leftIterator.readable = false;
       rightIterator.readable = false;
 
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
       expect(extendedClass.readable).toBeFalsy();
     });
 
-    it('should be destroyed if the left iterator throws an error', async () => {
-      let extendedClass = new ExtendedClass(
+    it('should be destroyed if the left iterator throws an error', async() => {
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      let error = new Promise<string>((resolve) => {
-        extendedClass.once("error", (error) => {
+      const error = new Promise<string>((resolve) => {
+        extendedClass.once('error', (error) => {
           resolve(error);
         });
       });
 
-      leftIterator.emit("error", "test error");
+      leftIterator.emit('error', 'test error');
 
-      expect(await error).toEqual("test error");
+      await expect(error).resolves.toBe('test error');
       expect(extendedClass.ended).toBeTruthy();
     });
 
-    it('should be destroyed if the right iterator throws an error', async () => {
-      let extendedClass = new ExtendedClass(
+    it('should be destroyed if the right iterator throws an error', async() => {
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      let error = new Promise<string>((resolve) => {
-        extendedClass.once("error", (error) => {
+      const error = new Promise<string>((resolve) => {
+        extendedClass.once('error', (error) => {
           resolve(error);
         });
       });
 
-      rightIterator.emit("error", "test error");
+      rightIterator.emit('error', 'test error');
 
-      expect(await error).toEqual("test error");
+      await expect(error).resolves.toBe('test error');
       expect(extendedClass.ended).toBeTruthy();
     });
 
@@ -123,89 +125,87 @@ describe('IncrementalInnerJoin', () => {
       leftIterator.readable = false;
       rightIterator.readable = false;
 
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
       expect(extendedClass.readable).toBeFalsy();
 
-      leftIterator.emit("readable")
-
+      leftIterator.emit('readable');
 
       expect(extendedClass.readable).toBeTruthy();
     });
 
-    it('should destroy left and right iterator if no results and end left', async () => {
-      let extendedClass = new ExtendedClass(
+    it('should destroy left and right iterator if no results and end left', async() => {
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      leftIterator.emit("end")
+      leftIterator.emit('end');
 
-      expect(leftIterator.done).toBeTruthy()
-      expect(rightIterator.done).toBeTruthy()
+      expect(leftIterator.done).toBeTruthy();
+      expect(rightIterator.done).toBeTruthy();
     });
 
     it('should destroy left and right iterator if no results and end right', () => {
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      rightIterator.emit("end")
+      rightIterator.emit('end');
 
-      expect(leftIterator.done).toBeTruthy()
-      expect(rightIterator.done).toBeTruthy()
+      expect(leftIterator.done).toBeTruthy();
+      expect(rightIterator.done).toBeTruthy();
     });
 
     it('should not end if results', () => {
-      results = true
+      results = true;
 
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      leftIterator.close()
+      leftIterator.close();
 
       expect(extendedClass.ended).toBeFalsy();
     });
 
     it('should destroy iterators if end', () => {
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
-      extendedClass._end()
+      extendedClass._end();
 
       expect(leftIterator.destroyed).toBeTruthy();
       expect(rightIterator.destroyed).toBeTruthy();
     });
 
     it('should have all abstract functions', () => {
-      let extendedClass = new ExtendedClass(
+      const extendedClass = new ExtendedClass(
         leftIterator,
         rightIterator,
-        funJoin
+        funJoin,
       );
 
       extendedClass._cleanup();
-      expect(cleanupMock).toBeCalled();
+      expect(cleanupMock).toHaveBeenCalledWith();
 
       extendedClass.hasResults();
-      expect(hasResultMock).toBeCalled();
+      expect(hasResultMock).toHaveBeenCalledWith();
 
       extendedClass.read();
-      expect(readMock).toBeCalled();
+      expect(readMock).toHaveBeenCalledWith();
     });
-
   });
 });

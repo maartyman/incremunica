@@ -1,24 +1,24 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
-import type { RdfJsQuadStreamingSource } from '@incremunica/actor-rdf-resolve-quad-pattern-rdfjs-streaming-source';
 import type { IGuardEvents } from '@incremunica/incremental-types/lib/GuardEvents';
+import type { StreamingQuerySource } from '@incremunica/streaming-query-source';
 
 /**
  * A comunica actor for guard events.
  *
  * Actor Guard:
- * * Input:  IActionGuard:      TODO: fill in.
+ * * Input:  IActionGuard:      // TODO [2024-12-01]: fill in.
  * * Test:   <none>
- * * Output: IActorGuardOutput: TODO: fill in.
+ * * Output: IActorGuardOutput: // TODO [2024-12-01]: fill in.
  *
  * @see IActionGuard
  * @see IActorGuardOutput
  */
-export abstract class ActorGuard extends Actor<IActionGuard, IActorTest, IActorGuardOutput> {
+export abstract class ActorGuard<TS = undefined> extends Actor<IActionGuard, IActorTest, IActorGuardOutput, TS> {
   /**
    * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
    */
-  public constructor(args: IActorGuardArgs) {
+  public constructor(args: IActorGuardArgs<TS>) {
     super(args);
   }
 }
@@ -27,7 +27,7 @@ export interface IActionGuard extends IAction {
   /**
    * The source element of the data.
    */
-  streamingSource: RdfJsQuadStreamingSource;
+  streamingQuerySource: StreamingQuerySource;
   /**
    * The URL of the source that was fetched.
    */
@@ -45,9 +45,14 @@ export interface IActorGuardOutput extends IActorOutput {
   guardEvents: IGuardEvents;
 }
 
-export type IActorGuardArgs = IActorArgs<
-IActionGuard, IActorTest, IActorGuardOutput>;
+export type IActorGuardArgs<TS = undefined> = IActorArgs<
+IActionGuard,
+IActorTest,
+IActorGuardOutput,
+TS
+>;
 
 export type MediatorGuard = Mediate<
-IActionGuard, IActorGuardOutput>;
-
+IActionGuard,
+IActorGuardOutput
+>;

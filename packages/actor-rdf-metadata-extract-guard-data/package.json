@@ -3,41 +3,41 @@
   "version": "1.3.0",
   "description": "A guard-data rdf-metadata-extract actor",
   "lsd:module": true,
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/actor-rdf-metadata-extract-guard-data"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "sideEffects": false,
   "keywords": [
     "comunica",
     "actor",
     "rdf-metadata-extract",
     "guard-data"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
   },
-  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
     "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
     "lib/**/*.js.map"
   ],
-  "dependencies": {
-    "@comunica/bus-rdf-metadata-extract": "^2.10.0",
-    "@comunica/core": "^2.10.0"
-  },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
     "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/bus-rdf-metadata-extract": "^4.0.1",
+    "@comunica/core": "^4.0.2"
   }
 }

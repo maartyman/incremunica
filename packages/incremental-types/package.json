@@ -3,43 +3,37 @@
   "version": "1.3.0",
   "description": "Types module for incremental Comunica",
   "lsd:module": true,
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
     "directory": "packages/incremental-types"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
   },
-  "sideEffects": false,
   "keywords": [
     "comunica",
     "types"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/maartyman/incremunica/issues"
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
   },
-  "homepage": "https://maartyman.github.io/incremunica/",
   "files": [
-    "components",
     "lib/**/*.d.ts",
     "lib/**/*.js",
-    "lib/**/*.js.map",
-    "bin/**/*.d.ts",
-    "bin/**/*.js",
-    "bin/**/*.js.map"
+    "lib/**/*.js.map"
   ],
-  "dependencies": {
-    "@rdfjs/types": "*",
-    "asynciterator": "^3.8.1",
-    "n3": "^1.16.3"
-  },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",
     "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
     "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "n3": "^1.16.3"
   }
 }

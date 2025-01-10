@@ -1,6 +1,6 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
 
     "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-incremental-optional-hash/^1.0.0/components/context.jsonld"
   ],
@@ -10,7 +10,8 @@
     {
       "@id": "urn:comunica:default:rdf-join/actors#incremental-optional-hash",
       "@type": "ActorRdfJoinIncrementalOptionalHash",
-      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
+      "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" },
+      "mediatorHashBindings": { "@id": "urn:comunica:default:hash-bindings/mediators#main" }
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/@incremunica%2Fbus-guard.svg)](https://badge.fury.io/js/@incremunica%2Fbus-guard)
 
-A comunica bus for guard events. 
+A comunica bus for guard events.
 
 ## Install
 

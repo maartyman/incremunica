@@ -6,19 +6,24 @@ import { Actor } from '@comunica/core';
  * An incremunica actor for resource-watch events.
  *
  * Actor types:
- * * Input:  IActionResourceWatch:      TODO: fill in.
+ * * Input:  IActionResourceWatch:      // TODO: fill in.
  * * Test:   <none>
- * * Output: IActorResourceWatchOutput: TODO: fill in.
+ * * Output: IActorResourceWatchOutput: // TODO: fill in.
  *
  * @see IActionResourceWatch
  * @see IActorResourceWatchOutput
  */
-export abstract class ActorResourceWatch extends Actor<IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+export abstract class ActorResourceWatch<TS = undefined> extends Actor<
+  IActionResourceWatch,
+  IActorTest,
+  IActorResourceWatchOutput,
+  TS
+> {
   public readonly priority: number;
   /**
-  * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
-  */
-  public constructor(args: IActorResourceWatchArgs) {
+   * @param args - @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
+   */
+  public constructor(args: IActorResourceWatchArgs<TS>) {
     super(args);
   }
 }
@@ -47,11 +52,19 @@ export interface IActorResourceWatchOutput extends IActorOutput {
   /**
    * A function to stop watching the resource.
    */
-  stopFunction: () => void;
+  stop: () => void;
+  /**
+   * A function to start watching the resource.
+   */
+  start: () => void;
 }
 
-export interface IActorResourceWatchArgs extends IActorArgs<
-IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
+export interface IActorResourceWatchArgs<TS = undefined> extends IActorArgs<
+IActionResourceWatch,
+IActorTest,
+IActorResourceWatchOutput,
+TS
+> {
   /**
    * The priority of the actor.
    */
@@ -59,4 +72,6 @@ IActionResourceWatch, IActorTest, IActorResourceWatchOutput> {
 }
 
 export type MediatorResourceWatch = Mediate<
-IActionResourceWatch, IActorResourceWatchOutput>;
+IActionResourceWatch,
+IActorResourceWatchOutput
+>;

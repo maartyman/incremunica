@@ -1,5 +1,6 @@
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin, Side } from '@incremunica/incremental-inner-join';
-import type { Bindings } from '@incremunica/incremental-types';
 
 export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   private readonly rightMemory: Bindings[] = [];
@@ -19,13 +20,13 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
   }
 
   private addOrDeleteFromMemory(item: Bindings, memory: Bindings[]): boolean {
-    if (item.diff) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       memory.push(item);
       return true;
     }
     const index = memory.findIndex((bindings: Bindings) => item.equals(bindings));
     if (index !== -1) {
-      memory[index] = memory[memory.length - 1];
+      memory[index] = memory.at(-1)!;
       memory.pop();
       return true;
     }
@@ -39,7 +40,7 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
     } else {
       otherArray = this.rightMemory;
     }
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       if (this.ended) {
         return null;
@@ -53,9 +54,9 @@ export class IncrementalNestedLoopJoin extends IncrementalInnerJoin {
           continue;
         }
 
-        const resultingBindings = this.activeSide === Side.right ?
+        const resultingBindings = (this.activeSide === Side.right ?
           this.funJoin(otherArray[this.index], this.activeElement) :
-          this.funJoin(this.activeElement, otherArray[this.index]);
+          this.funJoin(this.activeElement, otherArray[this.index]));
 
         this.index++;
 

@@ -1,28 +1,37 @@
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
+import '@comunica/utils-jest';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
-import { ActionContext, Bus } from '@comunica/core';
+import { Bus } from '@comunica/core';
 import type { IQueryOperationResultBindings, Bindings, IActionContext } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
+import { KeysBindings } from '@incremunica/context-entries';
+import {
+  createTestBindingsFactory,
+  createTestContextWithDataFactory,
+  createTestMediatorHashBindings,
+} from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
-import arrayifyStream from 'arrayify-stream';
-import {ArrayIterator} from 'asynciterator';
+import { arrayifyStream } from 'arrayify-stream';
+import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import '@incremunica/incremental-jest';
-import { MetadataValidationState } from '@comunica/metadata';
-import {ActorRdfJoinIncrementalOptionalHash} from "../lib/ActorRdfJoinIncrementalOptionalHash";
+import { ActorRdfJoinIncrementalOptionalHash } from '../lib/ActorRdfJoinIncrementalOptionalHash';
 
 const DF = new DataFactory();
-const BF = new BindingsFactory();
 
 describe('ActorRdfJoinIncrementalOptionalHash', () => {
   let bus: any;
   let context: IActionContext;
+  let BF: BindingsFactory;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
-    context = new ActionContext();
+    context = createTestContextWithDataFactory(DF);
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('The ActorRdfJoinIncrementalOptionalHash module', () => {
@@ -31,29 +40,43 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
     });
 
     it('should be a ActorRdfJoinIncrementalOptionalHash constructor', () => {
-      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoinIncrementalOptionalHash);
-      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus })).toBeInstanceOf(ActorRdfJoin);
+      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus }))
+        .toBeInstanceOf(ActorRdfJoinIncrementalOptionalHash);
+      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus }))
+        .toBeInstanceOf(ActorRdfJoin);
     });
 
     it('should not be able to create new ActorRdfJoinIncrementalOptionalHash objects without \'new\'', () => {
-      expect(() => { (<any> ActorRdfJoinIncrementalOptionalHash)(); }).toThrow();
+      expect(() => {
+        (<any> ActorRdfJoinIncrementalOptionalHash)();
+      }).toThrow('Class constructor ActorRdfJoinIncrementalOptionalHash cannot be invoked without \'new\'');
     });
   });
 
   describe('An ActorRdfJoinIncrementalOptionalHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
-      IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>;
+      IActionRdfJoinSelectivity,
+IActorTest,
+IActorRdfJoinSelectivityOutput
+>;
     let actor: ActorRdfJoinIncrementalOptionalHash;
     let action: IActionRdfJoin;
-    let variables0: RDF.Variable[];
-    let variables1: RDF.Variable[];
+    let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let mediatorHashBindings: MediatorHashBindings;
 
     beforeEach(() => {
       mediatorJoinSelectivity = <any> {
         mediate: async() => ({ selectivity: 1 }),
       };
-      actor = new ActorRdfJoinIncrementalOptionalHash({ name: 'actor', bus, mediatorJoinSelectivity });
+      mediatorHashBindings = createTestMediatorHashBindings();
+      actor = new ActorRdfJoinIncrementalOptionalHash({
+        name: 'actor',
+        bus,
+        mediatorJoinSelectivity,
+        mediatorHashBindings,
+      });
       variables0 = [];
       variables1 = [];
       action = {
@@ -67,7 +90,6 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
                 cardinality: { type: 'estimate', value: 4 },
                 pageSize: 100,
                 requestTime: 10,
-                canContainUndefs: false,
                 variables: variables0,
               }),
               type: 'bindings',
@@ -82,7 +104,6 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
                 cardinality: { type: 'estimate', value: 5 },
                 pageSize: 100,
                 requestTime: 20,
-                canContainUndefs: false,
                 variables: variables1,
               }),
               type: 'bindings',
@@ -96,401 +117,477 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
 
     describe('should test', () => {
       afterEach(() => {
-        action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+        for (const output of action.entries) {
+          output.output?.bindingsStream?.destroy();
+        }
       });
 
-      it('should only handle 2 streams', () => {
-        action.entries.push(<any> {});
-        return expect(actor.test(action)).rejects.toBeTruthy();
+      it('should only handle 2 streams', async() => {
+        action.entries.push(<any>{});
+        await expect(actor.test(action))
+          .resolves.toFailTest('actor requires 2 join entries at most. The input contained 3.');
       });
 
-      it('should fail on undefs in left stream', () => {
-        action.entries[0].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        return expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+      it('should fail on undefs on overlapping vars in left stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
-      it('should fail on undefs in right stream', () => {
-        action.entries[1].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        return expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+      it('should fail on undefs on overlapping vars in right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
-      it('should fail on undefs in left and right stream', () => {
-        action.entries[0].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        action.entries[1].output.metadata = () => Promise.resolve({
-          state: new MetadataValidationState(),
-          cardinality: { type: 'estimate', value: 4 },
-          canContainUndefs: true,
-          variables: [],
-        });
-        return expect(actor.test(action)).rejects
-          .toThrow(new Error('Actor actor can not join streams containing undefs'));
+      it('should fail on undefs in left and right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        await expect(actor.test(action)).resolves.toFailTest('Actor actor can not join streams containing undefs');
       });
 
       it('should generate correct test metadata', async() => {
-        await expect(actor.test(action)).resolves.toHaveProperty('iterations', 0);
+        await expect(actor.test(action)).resolves.toEqual({
+          sideData: {
+            metadatas: [
+              {
+                cardinality: {
+                  type: 'estimate',
+                  value: 4,
+                },
+                pageSize: 100,
+                requestTime: 10,
+                state: {
+                  invalidateListeners: [],
+                  valid: true,
+                },
+                variables: [],
+              },
+              {
+                cardinality: {
+                  type: 'estimate',
+                  value: 5,
+                },
+                pageSize: 100,
+                requestTime: 20,
+                state: {
+                  invalidateListeners: [],
+                  valid: true,
+                },
+                variables: [],
+              },
+            ],
+          },
+          value: {
+            blockingItems: 0,
+            iterations: 0,
+            persistedItems: 0,
+            requestTime: 0,
+          },
+        });
       });
     });
 
     it('should generate correct metadata', async() => {
-      await actor.run(action).then(async(result: IQueryOperationResultBindings) => {
-        await expect((<any> result).metadata()).resolves.toHaveProperty('cardinality',
-          { type: 'estimate',
+      await actor.run(action, undefined).then(async(result: IQueryOperationResultBindings) => {
+        await expect((<any> result).metadata()).resolves.toHaveProperty(
+          'cardinality',
+          {
+            type: 'estimate',
             value: (await (<any> action.entries[0].output).metadata()).cardinality.value *
-              (await (<any> action.entries[1].output).metadata()).cardinality.value });
+              (await (<any> action.entries[1].output).metadata()).cardinality.value,
+          },
+        );
 
         await expect(result.bindingsStream).toEqualBindingsStream([]);
       });
     });
 
-    it('should return an empty stream for empty input', () => {
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        expect((await output.metadata()).variables).toEqual([]);
-        await expect(output.bindingsStream).toEqualBindingsStream([]);
-      });
+    it('should return an empty stream for empty input', async() => {
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([]);
+      await expect(output.bindingsStream).toEqualBindingsStream([]);
     });
 
-    it('should return null on read if join has ended', () => {
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        expect((await output.metadata()).variables).toEqual([]);
-        await expect(output.bindingsStream).toEqualBindingsStream([]);
-        expect(output.bindingsStream.ended).toBeTruthy();
-        expect(output.bindingsStream.read()).toBeNull();
-      });
+    it('should return null on read if join has ended', async() => {
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([]);
+      await expect(output.bindingsStream).toEqualBindingsStream([]);
+      expect(output.bindingsStream.ended).toBeTruthy();
+      expect(output.bindingsStream.read()).toBeNull();
     });
 
-    it('should end after both streams are ended and no new elements can be generated', () => {
+    it('should end after both streams are ended and no new elements can be generated', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('3') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        output.bindingsStream.read()
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
-        expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
-        expect(action.entries[1].output.bindingsStream.ended).toBeTruthy();
-        expect(output.bindingsStream.ended).toBeFalsy();
-        await arrayifyStream(output.bindingsStream)
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
-        expect(output.bindingsStream.ended).toBeTruthy();
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      output.bindingsStream.read();
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 100));
+      expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
+      expect(action.entries[1].output.bindingsStream.ended).toBeTruthy();
+      expect(output.bindingsStream.ended).toBeFalsy();
+      await arrayifyStream(output.bindingsStream);
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 100));
+      expect(output.bindingsStream.ended).toBeTruthy();
     });
 
-    it('should join bindings with matching values', () => {
+    it('should join bindings with matching values', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        await expect(output.bindingsStream).toEqualBindingsStream([
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('a') ],
-            [ DF.variable('b'), DF.literal('b') ],
-            [ DF.variable('c'), DF.literal('c') ],
-          ]),
-        ]);
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      await expect(output.bindingsStream).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('a') ],
+          [ DF.variable('b'), DF.literal('b') ],
+          [ DF.variable('c'), DF.literal('c') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
     });
 
-    it('should return bindings from input 1 if incompatible values', () => {
+    it('should return bindings from input 1 if incompatible values', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('d') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        await expect(output.bindingsStream).toEqualBindingsStream([
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('a') ],
-            [ DF.variable('b'), DF.literal('b') ],
-          ]),
-        ]);
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      await expect(output.bindingsStream).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('a') ],
+          [ DF.variable('b'), DF.literal('b') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
     });
 
-    it('should join multiple bindings', () => {
+    it('should join multiple bindings', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('5') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('0') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('0') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('c'), DF.literal('7') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('5') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('3') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('3') ],
-            [ DF.variable('c'), DF.literal('5') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('3') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('3') ],
-            [ DF.variable('c'), DF.literal('7') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('4') ],
-            [ DF.variable('c'), DF.literal('7') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('5') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('3') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('3') ],
+          [ DF.variable('c'), DF.literal('5') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('3') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('3') ],
+          [ DF.variable('c'), DF.literal('7') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('4') ],
+          [ DF.variable('c'), DF.literal('7') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings (left) right first', () => {
+    it('should join multiple bindings with negative bindings (left) right first', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings (left) left first', () => {
+    it('should join multiple bindings with negative bindings (left) left first', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = <any> new ArrayIterator([
         null,
         null,
@@ -500,142 +597,164 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('3') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings (right) right first', () => {
+    it('should join multiple bindings with negative bindings (right) right first', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings (right) left first', () => {
+    it('should join multiple bindings with negative bindings (right) left first', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = <any> new ArrayIterator([
         null,
         null,
@@ -643,274 +762,307 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ], false),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings that are not in the result set (left)', () => {
+    it('should join multiple bindings with negative bindings that are not in the result set (left)', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should join multiple bindings with negative bindings that are not in the result set (right)', () => {
+    it('should join multiple bindings with negative bindings that are not in the result set (right)', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ], false),
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('b') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('6') ],
-          ]),
-        ];
-        expect((await output.metadata()).variables).toEqual([ DF.variable('a'), DF.variable('b'), DF.variable('c') ]);
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        expect(await arrayifyStream(output.bindingsStream)).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('b') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('2') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect((await output.metadata()).variables).toEqual([
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ]);
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
 
-    it('should be symmetric', () => {
+    it('should be symmetric', async() => {
       // Clean up the old bindings
-      action.entries.forEach(output => output.output?.bindingsStream?.destroy());
+      for (const output of action.entries) {
+        output.output?.bindingsStream?.destroy();
+      }
 
       action.entries[0].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]).transform({
         transform: (item: Bindings, done: () => void, push: (i: RDF.Bindings) => void) => {
           push(item);
           setTimeout(() => {
             push(item);
             done();
-          }, 100)
-        }
+          }, 100);
+        },
       });
-      variables0 = [ DF.variable('a'), DF.variable('b') ];
+      variables0 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('b'), canBeUndef: false },
+      ];
       action.entries[1].output.bindingsStream = new ArrayIterator([
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]),
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
-      variables1 = [ DF.variable('a'), DF.variable('c') ];
-      return actor.run(action).then(async(output: IQueryOperationResultBindings) => {
-        const expected = [
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-          BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ],
-            [ DF.variable('c'), DF.literal('4') ],
-          ]),
-        ];
-        // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-        expect((await arrayifyStream(output.bindingsStream))).toBeIsomorphicBindingsArray(
-          expected
-        );
-      });
+      variables1 = [
+        { variable: DF.variable('a'), canBeUndef: false },
+        { variable: DF.variable('c'), canBeUndef: false },
+      ];
+      const output = await actor.run(action, undefined);
+      const expected = [
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('2') ],
+          [ DF.variable('c'), DF.literal('4') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
+      await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(
+        expected,
+      );
     });
-
   });
 });

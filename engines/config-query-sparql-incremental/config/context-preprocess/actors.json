@@ -1,0 +1,78 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-context-preprocess-convert-shortcuts/^4.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-context-preprocess-set-defaults/^4.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-context-preprocess-source-to-destination/^4.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-context-preprocess-query-source-identify/^4.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-context-preprocess-query-source-skolemize/^4.0.0/components/context.jsonld",
+
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-context-preprocess-query-source-convert-streams/^1.0.0/components/context.jsonld"
+  ],
+  "@id": "urn:comunica:default:Runner",
+  "@type": "Runner",
+  "actors": [
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#convert-shortcuts",
+      "@type": "ActorContextPreprocessConvertShortcuts",
+      "contextKeyShortcuts": {
+        "sources": "@comunica/actor-init-query:querySourcesUnidentified",
+        "destination": "@comunica/bus-rdf-update-quads:destination",
+        "initialBindings": "@comunica/actor-init-query:initialBindings",
+        "queryFormat": "@comunica/actor-init-query:queryFormat",
+        "baseIRI": "@comunica/actor-init-query:baseIRI",
+        "log": "@comunica/core:log",
+        "datetime": "@comunica/actor-http-memento:datetime",
+        "queryTimestamp": "@comunica/actor-init-query:queryTimestamp",
+        "queryTimestampHighResolution": "@comunica/actor-init-query:queryTimestampHighResolution",
+        "httpProxyHandler": "@comunica/actor-http-proxy:httpProxyHandler",
+        "lenient": "@comunica/actor-init-query:lenient",
+        "httpIncludeCredentials": "@comunica/bus-http:include-credentials",
+        "httpAuth": "@comunica/bus-http:auth",
+        "httpTimeout": "@comunica/bus-http:http-timeout",
+        "httpBodyTimeout": "@comunica/bus-http:http-body-timeout",
+        "httpRetryCount": "@comunica/bus-http:http-retry-count",
+        "httpRetryDelayFallback": "@comunica/bus-http:http-retry-delay-fallback",
+        "httpRetryDelayLimit": "@comunica/bus-http:http-retry-delay-limit",
+        "fetch": "@comunica/bus-http:fetch",
+        "recoverBrokenLinks": "@comunica/bus-http-wayback:recover-broken-links",
+        "readOnly": "@comunica/bus-query-operation:readOnly",
+        "extensionFunctions": "@comunica/actor-init-query:extensionFunctions",
+        "extensionFunctionCreator": "@comunica/actor-init-query:extensionFunctionCreator",
+        "functionArgumentsCache": "@comunica/actor-init-query:functionArgumentsCache",
+        "explain": "@comunica/actor-init-query:explain",
+        "unionDefaultGraph": "@comunica/bus-query-operation:unionDefaultGraph",
+        "traverse": "@comunica/bus-query-source-identify:traverse",
+        "invalidateCache": "@comunica/actor-init-query:invalidateCache",
+        "dataFactory": "@comunica/actor-init-query:dataFactory",
+        "distinctConstruct": "@comunica/actor-init-query:distinctConstruct",
+        "pollingFrequency": "@incremunica/resource-watch:pollingFrequency",
+        "deferredEvaluationEventEmitter": "@incremunica/resource-watch:deferredEvaluationEventEmitter"
+      }
+    },
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#set-defaults",
+      "@type": "ActorContextPreprocessSetDefaults"
+    },
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#source-to-destination",
+      "@type": "ActorContextPreprocessSourceToDestination"
+    },
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#query-source-identify",
+      "@type": "ActorContextPreprocessQuerySourceIdentify",
+      "mediatorQuerySourceIdentify": { "@id": "urn:comunica:default:query-source-identify/mediators#main" },
+      "mediatorContextPreprocess": { "@id": "urn:comunica:default:context-preprocess/mediators#main" },
+      "beforeActors": { "@id": "urn:comunica:default:context-preprocess/actors#query-source-skolemize" }
+    },
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#query-source-convert-streams",
+      "@type": "ActorContextPreprocessQuerySourceConvertStreams",
+      "beforeActors": { "@id": "urn:comunica:default:context-preprocess/actors#query-source-identify" }
+    },
+    {
+      "@id": "urn:comunica:default:context-preprocess/actors#query-source-skolemize",
+      "@type": "ActorContextPreprocessQuerySourceSkolemize"
+    }
+  ]
+}

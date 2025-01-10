@@ -1,4 +1,5 @@
 import { ActionContextKey } from '@comunica/core';
+import type { IResourceWatchEventEmitter } from '@incremunica/bus-resource-watch';
 import type { IGuardEvents } from '@incremunica/incremental-types';
 
 /**
@@ -15,9 +16,15 @@ export const KeysGuard = {
 };
 
 export const KeysStreamingSource = {
-  matchOptions: new ActionContextKey<({ stopMatch: () => void })[]>('@incremunica/streaming-source:matchOptions'),
+  matchOptions: new ActionContextKey<({ closeStream: () => void })[]>('@incremunica/streaming-source:matchOptions'),
 };
 
-export const KeysDeltaQueryJoin = {
-  fromDeltaQuery: new ActionContextKey('@incremunica/delta-query-join:fromDeltaQuery'),
+export const KeysBindings = {
+  isAddition: new ActionContextKey<boolean>('@incremunica/bindings:isAddition'),
+};
+
+export const KeysResourceWatch = {
+  pollingFrequency: new ActionContextKey<number>('@incremunica/resource-watch:pollingFrequency'),
+  deferredEvaluationEventEmitter:
+    new ActionContextKey<IResourceWatchEventEmitter>('@incremunica/resource-watch:deferredEvaluationEventEmitter'),
 };

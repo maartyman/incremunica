@@ -1,27 +1,26 @@
-import type { Bindings as BindingsFactoryBindings } from '@incremunica/incremental-bindings-factory';
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { AsyncIterator } from 'asynciterator';
 
 export class IncrementalOptionalHash extends IncrementalInnerJoin {
-  private readonly rightMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
-  private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
+  private readonly rightMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
+  private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
   private activeElement: Bindings | null = null;
   private otherArray: Bindings[] = [];
   private index = 0;
-  private readonly funHash: (entry: Bindings) => string;
+  private readonly joinHash: (entry: Bindings) => number;
   private prependArray: boolean;
   private appendArray: boolean;
-  private readonly bindingsFactory = new BindingsFactory();
 
   public constructor(
-    left: BindingsStream,
-    right: BindingsStream,
-    funHash: (entry: Bindings) => string,
+    left: AsyncIterator<Bindings>,
+    right: AsyncIterator<Bindings>,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
+    joinHash: (entry: Bindings) => number,
   ) {
     super(left, right, funJoin);
-    this.funHash = funHash;
+    this.joinHash = joinHash;
   }
 
   protected _cleanup(): void {
@@ -36,9 +35,9 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
       this.activeElement !== null;
   }
 
-  private addOrDeleteFromMemory(item: Bindings, hash: string, memory: Map<string, Bindings[]>): boolean {
+  private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.diff) {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);
@@ -51,14 +50,14 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
       return false;
     }
 
-    if (array.length < 2 && array[0].equals(item)) {
+    if (array.length === 1 && array[0].equals(item)) {
       memory.delete(hash);
       return true;
     }
 
     const index = array.findIndex((bindings: Bindings) => item.equals(bindings));
     if (index !== -1) {
-      array[index] = array[array.length - 1];
+      array[index] = array.at(-1)!;
       array.pop();
       return true;
     }
@@ -66,7 +65,6 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
   }
 
   public read(): Bindings | null {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.ended) {
         return null;
@@ -91,16 +89,16 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
           continue;
         }
 
-        let resultingBindings = null;
+        let resultingBindings: null | Bindings = null;
         if (this.prependArray) {
           // We need to delete the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(<BindingsFactoryBindings> this.otherArray[this.index]);
-          resultingBindings.diff = false;
+          resultingBindings = this.otherArray[this.index];
+          resultingBindings = resultingBindings.setContextEntry(KeysBindings.isAddition, false);
         } else if (this.activeElement === null) {
           // If this.activeElement is null, then appendArray is true
           // we need to add the bindings with no optional bindings
-          resultingBindings = this.bindingsFactory.fromBindings(<BindingsFactoryBindings> this.otherArray[this.index]);
-          resultingBindings.diff = true;
+          resultingBindings = this.otherArray[this.index];
+          resultingBindings = resultingBindings.setContextEntry(KeysBindings.isAddition, true);
         } else {
           // Otherwise merge bindings
           resultingBindings = this.funJoin(this.activeElement, this.otherArray[this.index]);
@@ -120,15 +118,17 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
       let item = this.rightIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
+        const hash = this.joinHash(item);
         const rightMemEl = this.rightMemory.get(hash);
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
           const otherArray = this.leftMemory.get(hash);
           if (otherArray !== undefined) {
-            if (item.diff && (rightMemEl === undefined || rightMemEl.length === 0)) {
+            if (
+              item.getContextEntry(KeysBindings.isAddition) &&
+              (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
-            if (!item.diff && this.rightMemory.get(hash)?.length === 1) {
+            if (!item.getContextEntry(KeysBindings.isAddition) && this.rightMemory.get(hash)?.length === 1) {
               this.appendArray = true;
             }
             this.activeElement = item;
@@ -140,15 +140,14 @@ export class IncrementalOptionalHash extends IncrementalInnerJoin {
 
       item = this.leftIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
+        const hash = this.joinHash(item);
         if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
           const otherArray = this.rightMemory.get(hash);
-          if (otherArray !== undefined) {
-            this.activeElement = item;
-            this.otherArray = otherArray;
-          } else {
+          if (otherArray === undefined) {
             return item;
           }
+          this.activeElement = item;
+          this.otherArray = otherArray;
         }
         continue;
       }

@@ -1,15 +1,26 @@
-import type { IActionRdfJoin, IActorRdfJoinArgs, IActorRdfJoinOutputInner } from '@comunica/bus-rdf-join';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
+import type {
+  IActionRdfJoin,
+  IActorRdfJoinArgs,
+  IActorRdfJoinOutputInner,
+  IActorRdfJoinTestSideData,
+} from '@comunica/bus-rdf-join';
 import { ActorRdfJoin } from '@comunica/bus-rdf-join';
+import type { TestResult } from '@comunica/core';
+import { passTestWithSideData } from '@comunica/core';
 import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-coefficients';
-import type { MetadataBindings } from '@comunica/types';
-import type { BindingsStream } from '@incremunica/incremental-types';
+import type { BindingsStream } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { AsyncIterator } from 'asynciterator';
 import { IncrementalOptionalHash } from './IncrementalOptionalHash';
 
 /**
  * An Incremunica Optional Hash RDF Join Actor.
  */
 export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
-  public constructor(args: IActorRdfJoinArgs) {
+  public readonly mediatorHashBindings: MediatorHashBindings;
+
+  public constructor(args: IActorRdfJoinIncrementalOptionalHashArgs) {
     super(args, {
       logicalType: 'optional',
       physicalName: 'hash',
@@ -18,19 +29,23 @@ export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
     });
   }
 
-  protected async getOutput(action: IActionRdfJoin): Promise<IActorRdfJoinOutputInner> {
+  protected async getOutput(
+    action: IActionRdfJoin,
+    _sideData: IActorRdfJoinTestSideData,
+  ): Promise<IActorRdfJoinOutputInner> {
     const metadatas = await ActorRdfJoin.getMetadatas(action.entries);
-    const variables = ActorRdfJoin.overlappingVariables(metadatas);
-    const join = new IncrementalOptionalHash(
-      <BindingsStream><any>action.entries[0].output.bindingsStream,
-      <BindingsStream><any>action.entries[1].output.bindingsStream,
-      entry => ActorRdfJoinIncrementalOptionalHash.hash(entry, variables),
-      <any> ActorRdfJoin.joinBindings,
+    const commonVariables = ActorRdfJoin.overlappingVariables(metadatas).map(v => v.variable);
+    const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
+    const bindingsStream = <BindingsStream><unknown> new IncrementalOptionalHash(
+      <AsyncIterator<Bindings>><unknown>action.entries[0].output.bindingsStream,
+      <AsyncIterator<Bindings>><unknown>action.entries[1].output.bindingsStream,
+      <(...bindings: Bindings[]) => Bindings | null>ActorRdfJoin.joinBindings,
+      entry => hashFunction(entry, commonVariables),
     );
     return {
       result: {
         type: 'bindings',
-        bindingsStream: join,
+        bindingsStream,
         metadata: async() => await this.constructResultMetadata(
           action.entries,
           await ActorRdfJoin.getMetadatas(action.entries),
@@ -40,15 +55,19 @@ export class ActorRdfJoinIncrementalOptionalHash extends ActorRdfJoin {
     };
   }
 
-  protected async getJoinCoefficients(
-    action: IActionRdfJoin,
-    metadatas: MetadataBindings[],
-  ): Promise<IMediatorTypeJoinCoefficients> {
-    return {
+  public async getJoinCoefficients(
+    _action: IActionRdfJoin,
+    sideData: IActorRdfJoinTestSideData,
+  ): Promise<TestResult<IMediatorTypeJoinCoefficients, IActorRdfJoinTestSideData>> {
+    return passTestWithSideData({
       iterations: 0,
       persistedItems: 0,
       blockingItems: 0,
       requestTime: 0,
-    };
+    }, sideData);
   }
+}
+
+export interface IActorRdfJoinIncrementalOptionalHashArgs extends IActorRdfJoinArgs {
+  mediatorHashBindings: MediatorHashBindings;
 }

@@ -1,38 +1,92 @@
-import { BindingsFactory } from '@incremunica/incremental-bindings-factory';
+import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
-import {ArrayIterator, WrappingIterator} from 'asynciterator';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { MetadataValidationState } from '@comunica/utils-metadata';
+import { KeysBindings } from '@incremunica/context-entries';
+import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incremunica/dev-tools';
+import type * as RDF from '@rdfjs/types';
+import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinIncrementalMinusHash } from '../lib/ActorRdfJoinIncrementalMinusHash';
-import '@comunica/jest';
-import {BindingsStream} from "@incremunica/incremental-types";
+import '@comunica/utils-jest';
 
 const DF = new DataFactory();
-const BF = new BindingsFactory();
 
 describe('ActorRdfJoinIncrementalMinusHash', () => {
   let bus: any;
   let context: IActionContext;
+  let BF: BindingsFactory;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     bus = new Bus({ name: 'bus' });
     context = new ActionContext();
+    BF = await createTestBindingsFactory(DF);
   });
 
   describe('An ActorRdfJoinIncrementalMinusHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
-      IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>;
+      IActionRdfJoinSelectivity,
+IActorTest,
+IActorRdfJoinSelectivityOutput
+>;
     let actor: ActorRdfJoinIncrementalMinusHash;
+    let mediatorHashBindings: MediatorHashBindings;
+    let action: IActionRdfJoin;
+    let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
+    let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
 
     beforeEach(() => {
-      mediatorJoinSelectivity = <any> {
+      mediatorJoinSelectivity = <any>{
         mediate: async() => ({ selectivity: 1 }),
       };
-      actor = new ActorRdfJoinIncrementalMinusHash({ name: 'actor', bus, mediatorJoinSelectivity });
+      mediatorHashBindings = createTestMediatorHashBindings();
+      actor = new ActorRdfJoinIncrementalMinusHash({
+        name: 'actor',
+        bus,
+        mediatorJoinSelectivity,
+        mediatorHashBindings,
+      });
+      variables0 = [];
+      variables1 = [];
+      action = {
+        type: 'minus',
+        entries: [
+          {
+            output: {
+              bindingsStream: new ArrayIterator([], { autoStart: false }),
+              metadata: async() => ({
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: variables0,
+              }),
+              type: 'bindings',
+            },
+            operation: <any> {},
+          },
+          {
+            output: {
+              bindingsStream: new ArrayIterator([], { autoStart: false }),
+              metadata: async() => ({
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: variables1,
+              }),
+              type: 'bindings',
+            },
+            operation: <any> {},
+          },
+        ],
+        context,
+      };
     });
 
     describe('test', () => {
@@ -41,67 +95,55 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [],
           context,
-        })).rejects.toThrow('actor requires at least two join entries.');
+        })).resolves.toFailTest('actor requires at least two join entries.');
       });
 
       it('should not test on one entry', async() => {
         await expect(actor.test({
           type: 'minus',
-          entries: <any> [{}],
+          entries: <any>[{}],
           context,
-        })).rejects.toThrow('actor requires at least two join entries.');
+        })).resolves.toFailTest('actor requires at least two join entries.');
       });
 
       it('should not test on three entries', async() => {
         await expect(actor.test({
           type: 'minus',
-          entries: <any> [{}, {}, {}],
+          entries: <any>[{}, {}, {}],
           context,
-        })).rejects.toThrow('actor requires 2 join entries at most. The input contained 3.');
+        })).resolves.toFailTest('actor requires 2 join entries at most. The input contained 3.');
       });
 
       it('should not test on a non-minus operation', async() => {
         await expect(actor.test({
           type: 'inner',
-          entries: <any> [{}, {}],
+          entries: <any>[{}, {}],
           context,
-        })).rejects.toThrow(`actor can only handle logical joins of type 'minus', while 'inner' was given.`);
+        })).resolves.toFailTest(`actor can only handle logical joins of type 'minus', while 'inner' was given.`);
       });
 
-      it('should test on two entries with undefs', async() => {
-        expect(await actor.test({
-          type: 'minus',
-          entries: <any> [
-            {
-              output: {
-                type: 'bindings',
-                metadata: () => Promise.resolve(
-                  { cardinality: 4, pageSize: 100, requestTime: 10, canContainUndefs: true },
-                ),
-              },
-            },
-            {
-              output: {
-                type: 'bindings',
-                metadata: () => Promise.resolve(
-                  { cardinality: 4, pageSize: 100, requestTime: 10, canContainUndefs: true },
-                ),
-              },
-            },
-          ],
-          context,
-        })).toEqual({
-          iterations: 0,
-          blockingItems: 0,
-          persistedItems: 0,
-          requestTime: 0,
-        });
+      it('should pass on undefs on overlapping vars in left stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
+      });
+
+      it('should pass on undefs on overlapping vars in right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: false }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
+      });
+
+      it('should pass on undefs in left and right stream', async() => {
+        variables0 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        variables1 = [{ variable: DF.variable('a'), canBeUndef: true }];
+        expect((await actor.test(action)).isPassed).toBeTruthy();
       });
 
       it('should test on two entries', async() => {
-        expect(await actor.test({
+        await expect(actor.test({
           type: 'minus',
-          entries: <any> [
+          entries: <any>[
             {
               output: {
                 type: 'bindings',
@@ -126,11 +168,35 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
             },
           ],
           context,
-        })).toEqual({
-          iterations: 0,
-          blockingItems: 0,
-          persistedItems: 0,
-          requestTime: 0,
+        })).resolves.toEqual({
+          sideData: {
+            metadatas: [
+              {
+                canContainUndefs: false,
+                cardinality: {
+                  type: 'estimate',
+                  value: 4,
+                },
+                pageSize: 100,
+                requestTime: 10,
+              },
+              {
+                canContainUndefs: false,
+                cardinality: {
+                  type: 'estimate',
+                  value: 4,
+                },
+                pageSize: 100,
+                requestTime: 10,
+              },
+            ],
+          },
+          value: {
+            iterations: 0,
+            blockingItems: 0,
+            persistedItems: 0,
+            requestTime: 0,
+          },
         });
       });
     });
@@ -141,35 +207,53 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [
+                    {
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [
+                    {
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -177,11 +261,19 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
-        expect(await result.metadata())
-          .toEqual({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});
+        expect(result.type).toBe('bindings');
+        await expect(result.metadata()).resolves
+          .toEqual({
+            cardinality: 3,
+            variables: [{
+              canBeUndef: false,
+              variable: DF.variable('a'),
+            }],
+          });
         await expect(result.bindingsStream).toEqualBindingsStream([
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+          BF.bindings([
+            [ DF.variable('a'), DF.literal('3') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
@@ -190,41 +282,61 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
                   null,
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                   null,
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
-                  BF.bindings([[ DF.variable('a'), DF.literal('0') ]], false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('0') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -232,23 +344,23 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
+        expect(result.type).toBe('bindings');
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ]
-          ]),
+            [ DF.variable('a'), DF.literal('2') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ]
-          ], false),
+            [ DF.variable('a'), DF.literal('2') ],
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
-            [ DF.variable('a'), DF.literal('1') ]
-          ]),
+            [ DF.variable('a'), DF.literal('1') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ]
-          ]),
+            [ DF.variable('a'), DF.literal('3') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
-            [ DF.variable('a'), DF.literal('2') ]
-          ]),
+            [ DF.variable('a'), DF.literal('2') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
@@ -257,40 +369,62 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('0') ]], false),
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
-                  BF.bindings([[ DF.variable('a'), DF.literal('3') ]], false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('0') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -298,14 +432,14 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
+        expect(result.type).toBe('bindings');
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ]
-          ]),
+            [ DF.variable('a'), DF.literal('3') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
-            [ DF.variable('a'), DF.literal('3') ]
-          ], false),
+            [ DF.variable('a'), DF.literal('3') ],
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -314,49 +448,67 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                    [ DF.variable('b'), DF.literal('1') ]
-                  ]),
+                    [ DF.variable('b'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                    [ DF.variable('b'), DF.literal('2') ]
-                  ]),
+                    [ DF.variable('b'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.literal('1') ],
-                    [ DF.variable('b'), DF.literal('1') ]
-                  ], false),
+                    [ DF.variable('b'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a'), DF.variable('b') ],
+                  variables: [
+                    {
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    },
+                    {
+                      canBeUndef: false,
+                      variable: DF.variable('b'),
+                    },
+                  ],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
                   null,
                   null,
                   null,
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]], false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -364,24 +516,24 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
+        expect(result.type).toBe('bindings');
         await expect(result.bindingsStream).toEqualBindingsStream([
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('1') ]
-          ]),
+            [ DF.variable('b'), DF.literal('1') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ]
-          ]),
+            [ DF.variable('b'), DF.literal('2') ],
+          ]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('1') ]
-          ], false),
+            [ DF.variable('b'), DF.literal('1') ],
+          ]).setContextEntry(KeysBindings.isAddition, false),
           BF.bindings([
             [ DF.variable('a'), DF.literal('1') ],
-            [ DF.variable('b'), DF.literal('2') ]
-          ], false),
+            [ DF.variable('b'), DF.literal('2') ],
+          ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
 
@@ -390,32 +542,40 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -423,9 +583,9 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
+        expect(result.type).toBe('bindings');
         await expect(result.bindingsStream).toEqualBindingsStream([]);
-        await expect(result.bindingsStream.read()).toEqual(null);
+        expect(result.bindingsStream.read()).toBeNull();
       });
 
       it('should be able to end when buffer is full', async() => {
@@ -433,36 +593,48 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   null,
                   null,
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]], false),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, false),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -470,21 +642,24 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(action.entries[0].output.bindingsStream.readable = false);
-        expect(action.entries[1].output.bindingsStream.readable = false);
+        expect(action.entries[0].output.bindingsStream.readable).toBeTruthy();
+        expect(action.entries[1].output.bindingsStream.readable).toBeTruthy();
         await new Promise<void>(resolve => setTimeout(resolve, 0));
-        expect(action.entries[0].output.bindingsStream.readable = true);
-        expect(action.entries[1].output.bindingsStream.readable = true);
-        await new Promise<void>(resolve => setTimeout(resolve, 0));
-        expect(result.bindingsStream.read()).toEqual(BF.bindings([[ DF.variable('a'), DF.literal('1') ]]));
+        expect(result.bindingsStream.read())
+          .toEqualBindings(BF.bindings([
+            [ DF.variable('a'), DF.literal('1') ],
+          ]).setContextEntry(KeysBindings.isAddition, true));
         action.entries[0].output.bindingsStream.close();
         action.entries[1].output.bindingsStream.close();
         await new Promise<void>(resolve => setTimeout(resolve, 0));
         expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
         expect(action.entries[1].output.bindingsStream.ended).toBeTruthy();
         expect(result.bindingsStream.ended).toBeFalsy();
-        expect(result.bindingsStream.read()).toEqual(BF.bindings([[ DF.variable('a'), DF.literal('1') ]]));
-        expect(result.bindingsStream.read()).toEqual(null);
+        expect(result.bindingsStream.read())
+          .toEqualBindings(BF.bindings([
+            [ DF.variable('a'), DF.literal('1') ],
+          ]).setContextEntry(KeysBindings.isAddition, true));
+        expect(result.bindingsStream.read()).toBeNull();
         expect(action.entries[0].output.bindingsStream.ended).toBeTruthy();
         expect(action.entries[1].output.bindingsStream.ended).toBeTruthy();
         expect(result.bindingsStream.ended).toBeTruthy();
@@ -495,28 +670,32 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -533,35 +712,47 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
-                bindingsStream: new ArrayIterator([], { autoStart: false }),
+              output: <any>{
+                bindingsStream: new ArrayIterator([ BF.bindings([[
+                  DF.variable('a'),
+                  DF.literal('1'),
+                ]]) ], { autoStart: false }),
                 metadata: () => Promise.resolve({
-                  cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  cardinality: 1,
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
-                bindingsStream: new ArrayIterator([], { autoStart: false }),
+              output: <any>{
+                bindingsStream: new ArrayIterator([ BF.bindings([[
+                  DF.variable('a'),
+                  DF.literal('1'),
+                ]]) ], { autoStart: false }),
                 metadata: () => Promise.resolve({
-                  cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  cardinality: 1,
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
         };
-        action.entries[0].output.bindingsStream.readable = true;
+        action.entries[0].output.bindingsStream.readable = false;
         action.entries[1].output.bindingsStream.readable = false;
         const { result } = await actor.getOutput(action);
+        expect(result.bindingsStream.readable).toBeFalsy();
+        action.entries[0].output.bindingsStream.readable = true;
         await new Promise<void>(resolve => setTimeout(resolve, 0));
         expect(result.bindingsStream.readable).toBeTruthy();
       });
@@ -571,35 +762,47 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
-                bindingsStream: new ArrayIterator([], { autoStart: false }),
+              output: <any>{
+                bindingsStream: new ArrayIterator([ BF.bindings([[
+                  DF.variable('a'),
+                  DF.literal('1'),
+                ]]) ], { autoStart: false }),
                 metadata: () => Promise.resolve({
-                  cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  cardinality: 1,
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
-                bindingsStream: new ArrayIterator([], { autoStart: false }),
+              output: <any>{
+                bindingsStream: new ArrayIterator([ BF.bindings([[
+                  DF.variable('a'),
+                  DF.literal('1'),
+                ]]) ], { autoStart: false }),
                 metadata: () => Promise.resolve({
-                  cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  cardinality: 1,
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
         };
         action.entries[0].output.bindingsStream.readable = false;
-        action.entries[1].output.bindingsStream.readable = true;
+        action.entries[1].output.bindingsStream.readable = false;
         const { result } = await actor.getOutput(action);
+        expect(result.bindingsStream.readable).toBeFalsy();
+        action.entries[1].output.bindingsStream.readable = true;
         await new Promise<void>(resolve => setTimeout(resolve, 0));
         expect(result.bindingsStream.readable).toBeTruthy();
       });
@@ -609,38 +812,42 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
         };
         const { result } = await actor.getOutput(action);
-        let promise = new Promise<void>(resolve => result.bindingsStream.on("error", (e) => {
-          expect(e.message).toEqual("Test error");
+        const promise = new Promise<void>(resolve => result.bindingsStream.on('error', (e) => {
+          expect(e.message).toBe('Test error');
           resolve();
         }));
-        action.entries[0].output.bindingsStream.destroy(new Error("Test error"));
+        action.entries[0].output.bindingsStream.destroy(new Error('Test error'));
         await promise;
       });
 
@@ -649,38 +856,42 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
         };
         const { result } = await actor.getOutput(action);
-        let promise = new Promise<void>(resolve => result.bindingsStream.on("error", (e) => {
-          expect(e.message).toEqual("Test error");
+        const promise = new Promise<void>(resolve => result.bindingsStream.on('error', (e) => {
+          expect(e.message).toBe('Test error');
           resolve();
         }));
-        action.entries[1].output.bindingsStream.destroy(new Error("Test error"));
+        action.entries[1].output.bindingsStream.destroy(new Error('Test error'));
         await promise;
       });
 
@@ -689,35 +900,49 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
           type: 'minus',
           entries: [
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-                  BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 3,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('a') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
             {
-              output: <any> {
+              output: <any>{
                 bindingsStream: new ArrayIterator([
-                  BF.bindings([[ DF.variable('b'), DF.literal('1') ]]),
-                  BF.bindings([[ DF.variable('b'), DF.literal('2') ]]),
+                  BF.bindings([
+                    [ DF.variable('b'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('b'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   cardinality: 2,
-                  canContainUndefs: false,
-                  variables: [ DF.variable('b') ],
+                  variables: [{
+                    canBeUndef: false,
+                    variable: DF.variable('b'),
+                  }],
                 }),
                 type: 'bindings',
               },
-              operation: <any> {},
+              operation: <any>{},
             },
           ],
           context,
@@ -725,18 +950,100 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
         const { result } = await actor.getOutput(action);
 
         // Validate output
-        expect(result.type).toEqual('bindings');
-        expect(await result.metadata())
-          .toEqual({ cardinality: 3, canContainUndefs: false, variables: [ DF.variable('a') ]});
+        expect(result.type).toBe('bindings');
+        await expect(result.metadata()).resolves
+          .toEqual({
+            cardinality: 3,
+            variables: [{
+              canBeUndef: false,
+              variable: DF.variable('a'),
+            }],
+          });
         await expect(result.bindingsStream).toEqualBindingsStream([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
-          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
         ]);
       });
 
+      it('should handle multiple bindings with undefs', async() => {
+        const action: IActionRdfJoin = {
+          type: 'minus',
+          entries: [
+            {
+              output: <any>{
+                bindingsStream: new ArrayIterator([
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('3') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+                ], { autoStart: false }),
+                metadata: () => Promise.resolve({
+                  cardinality: 4,
+                  variables: [{
+                    canBeUndef: true,
+                    variable: DF.variable('a'),
+                  }],
+                }),
+                type: 'bindings',
+              },
+              operation: <any>{},
+            },
+            {
+              output: <any>{
+                bindingsStream: new ArrayIterator([
+                  null,
+                  null,
+                  null,
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('1') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([
+                    [ DF.variable('a'), DF.literal('2') ],
+                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+                ], { autoStart: false }),
+                metadata: () => Promise.resolve({
+                  cardinality: 4,
+                  variables: [{
+                    canBeUndef: true,
+                    variable: DF.variable('a'),
+                  }],
+                }),
+                type: 'bindings',
+              },
+              operation: <any>{},
+            },
+          ],
+          context,
+        };
+        const { result } = await actor.getOutput(action);
 
-
+        // Validate output
+        expect(result.type).toBe('bindings');
+        await expect(result.metadata()).resolves
+          .toEqual({
+            cardinality: 4,
+            variables: [{
+              canBeUndef: true,
+              variable: DF.variable('a'),
+            }],
+          });
+        await expect(result.bindingsStream).toEqualBindingsStream([
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+        ]);
+      });
     });
   });
 });

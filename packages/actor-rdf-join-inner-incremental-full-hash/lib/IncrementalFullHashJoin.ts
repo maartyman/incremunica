@@ -1,6 +1,7 @@
-import { HashBindings } from '@incremunica/hash-bindings';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
-import type { Bindings, BindingsStream } from '@incremunica/incremental-types';
+import type { AsyncIterator } from 'asynciterator';
 import type { IMapObject } from './DualKeyHashMap';
 import { DualKeyHashMap } from './DualKeyHashMap';
 
@@ -11,17 +12,22 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
   private otherArray: IterableIterator<IMapObject<Bindings>> = [][Symbol.iterator]();
   private otherElement: IMapObject<Bindings> | null = null;
   private count = 0;
-  private readonly funHash: (entry: Bindings) => string;
-  private readonly hashBindings = new HashBindings();
+  private readonly joinHash: (entry: Bindings) => number;
+  private readonly leftHash: (entry: Bindings) => number;
+  private readonly rightHash: (entry: Bindings) => number;
 
   public constructor(
-    left: BindingsStream,
-    right: BindingsStream,
-    funHash: (entry: Bindings) => string,
+    left: AsyncIterator<Bindings>,
+    right: AsyncIterator<Bindings>,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
+    joinHash: (entry: Bindings) => number,
+    leftHash: (entry: Bindings) => number,
+    rightHash: (entry: Bindings) => number,
   ) {
     super(left, right, funJoin);
-    this.funHash = funHash;
+    this.joinHash = joinHash;
+    this.leftHash = leftHash;
+    this.rightHash = rightHash;
   }
 
   protected _cleanup(): void {
@@ -36,16 +42,20 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
       this.activeElement !== null;
   }
 
-  private addOrDeleteFromMemory(item: Bindings, joinHash: string, memory: DualKeyHashMap<Bindings>): boolean {
-    if (item.diff) {
-      memory.set(this.hashBindings.hash(item), joinHash, item);
+  private addOrDeleteFromMemory(
+    item: Bindings,
+    joinHash: number,
+    memory: DualKeyHashMap<Bindings>,
+    hash: number,
+  ): boolean {
+    if (item.getContextEntry(KeysBindings.isAddition)) {
+      memory.set(hash, joinHash, item);
       return true;
     }
-    return memory.delete(this.hashBindings.hash(item), joinHash);
+    return memory.delete(hash, joinHash);
   }
 
   public read(): Bindings | null {
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.ended) {
         return null;
@@ -83,8 +93,8 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
 
       let item = this.leftIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
-        if (this.addOrDeleteFromMemory(item, hash, this.leftMemory)) {
+        const hash = this.joinHash(item);
+        if (this.addOrDeleteFromMemory(item, hash, this.leftMemory, this.leftHash(item))) {
           const otherArray = this.rightMemory.getAll(hash);
           if (otherArray !== undefined) {
             this.activeElement = item;
@@ -96,8 +106,8 @@ export class IncrementalFullHashJoin extends IncrementalInnerJoin {
 
       item = this.rightIterator.read();
       if (item !== null) {
-        const hash = this.funHash(item);
-        if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
+        const hash = this.joinHash(item);
+        if (this.addOrDeleteFromMemory(item, hash, this.rightMemory, this.rightHash(item))) {
           const otherArray = this.leftMemory.getAll(hash);
           if (otherArray !== undefined) {
             this.activeElement = item;
