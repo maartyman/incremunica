@@ -9,12 +9,12 @@ import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import type { Quad } from 'rdf-data-factory';
 import { DataFactory } from 'rdf-data-factory';
-import { ActorQueryOperationIncrementalDistinctHash } from '../lib';
+import { ActorQueryOperationDistinctHash } from '../lib';
 import '@comunica/utils-jest';
 
 const DF = new DataFactory();
 
-describe('ActorQueryOperationIncrementalDistinctHash', () => {
+describe('ActorQueryOperationDistinctHash', () => {
   let bus: any;
   let mediatorQueryOperation: any;
   let BF: BindingsFactory;
@@ -47,7 +47,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
   });
 
   describe('newHashFilterQuads', () => {
-    let actor: ActorQueryOperationIncrementalDistinctHash;
+    let actor: ActorQueryOperationDistinctHash;
     let mediatorHashBindings: MediatorHashBindings;
     let mediatorHashQuads: MediatorHashQuads;
 
@@ -62,7 +62,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
           };
         },
       };
-      actor = new ActorQueryOperationIncrementalDistinctHash(
+      actor = new ActorQueryOperationDistinctHash(
         { name: 'actor', bus, mediatorQueryOperation, mediatorHashBindings, mediatorHashQuads },
       );
     });
@@ -147,7 +147,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
   });
 
   describe('newHashFilterBindings', () => {
-    let actor: ActorQueryOperationIncrementalDistinctHash;
+    let actor: ActorQueryOperationDistinctHash;
     let mediatorHashBindings: MediatorHashBindings;
     let mediatorHashQuads: MediatorHashQuads;
 
@@ -162,7 +162,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
           };
         },
       };
-      actor = new ActorQueryOperationIncrementalDistinctHash(
+      actor = new ActorQueryOperationDistinctHash(
         { name: 'actor', bus, mediatorQueryOperation, mediatorHashBindings, mediatorHashQuads },
       );
     });
@@ -340,8 +340,8 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
     });
   });
 
-  describe('An ActorQueryOperationIncrementalDistinctHash instance', () => {
-    let actor: ActorQueryOperationIncrementalDistinctHash;
+  describe('An ActorQueryOperationDistinctHash instance', () => {
+    let actor: ActorQueryOperationDistinctHash;
     let mediatorHashBindings: MediatorHashBindings;
     let mediatorHashQuads: MediatorHashQuads;
 
@@ -356,7 +356,7 @@ describe('ActorQueryOperationIncrementalDistinctHash', () => {
           };
         },
       };
-      actor = new ActorQueryOperationIncrementalDistinctHash(
+      actor = new ActorQueryOperationDistinctHash(
         { name: 'actor', bus, mediatorQueryOperation, mediatorHashBindings, mediatorHashQuads },
       );
     });

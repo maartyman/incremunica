@@ -1,6 +1,6 @@
-# Incremunica Incremental Distinct Hash Query Operation Actor
+# Incremunica Distinct Hash Query Operation Actor
 
-[![npm version](https://badge.fury.io/js/%40Incremunica%2Factor-query-operation-incremental-distinct-hash.svg)](https://www.npmjs.com/package/@Incremunica/actor-query-operation-incremental-distinct-hash)
+[![npm version](https://badge.fury.io/js/%40Incremunica%2Factor-query-operation-distinct-hash.svg)](https://www.npmjs.com/package/@Incremunica/actor-query-operation-distinct-hash)
 
 A [Query Operation](https://github.com/Incremunica/Incremunica/tree/master/packages/bus-query-operation) actor that handles [SPARQL `DISTINCT`](https://www.w3.org/TR/sparql11-query/#sparqlDistinct) operations
 by maintaining a hash-based cache of infinite size.
@@ -13,7 +13,7 @@ and should only be used by [developers that want to build their own query engine
 ## Install
 
 ```bash
-$ yarn add @Incremunica/actor-query-operation-incremental-distinct-hash
+$ yarn add @Incremunica/actor-query-operation-distinct-hash
 ```
 
 ## Configure
@@ -23,13 +23,13 @@ After installing, this package can be added to your engine's configuration as fo
 {
   "@context": [
     ...
-    "https://linkedsoftwaredependencies.org/bundles/npm/@Incremunica/actor-query-operation-incremental-distinct-hash/^2.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@Incremunica/actor-query-operation-distinct-hash/^2.0.0/components/context.jsonld"
   ],
   "actors": [
     ...
     {
       "@id": "urn:comunica:default:query-operation/actors#distinct",
-      "@type": "ActorQueryOperationIncrementalDistinctHash",
+      "@type": "ActorQueryOperationDistinctHash",
       "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" },
       "mediatorHashBindings": { "@id": "urn:comunica:default:hash-bindings/mediators#main" }
     }

@@ -24,11 +24,11 @@ import type { Algebra } from 'sparqlalgebrajs';
 /**
  * An Incremunica Distinct Hash Query Operation Actor.
  */
-export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperationTypedMediated<Algebra.Distinct> {
+export class ActorQueryOperationDistinctHash extends ActorQueryOperationTypedMediated<Algebra.Distinct> {
   public readonly mediatorHashBindings: MediatorHashBindings;
   public readonly mediatorHashQuads: MediatorHashQuads;
 
-  public constructor(args: IActorQueryOperationIncrementalDistinctHashArgs) {
+  public constructor(args: IActorQueryOperationDistinctHashArgs) {
     super(args, 'distinct');
   }
 
@@ -140,7 +140,7 @@ export class ActorQueryOperationIncrementalDistinctHash extends ActorQueryOperat
   }
 }
 
-export interface IActorQueryOperationIncrementalDistinctHashArgs extends IActorQueryOperationTypedMediatedArgs {
+export interface IActorQueryOperationDistinctHashArgs extends IActorQueryOperationTypedMediatedArgs {
   mediatorHashBindings: MediatorHashBindings;
   mediatorHashQuads: MediatorHashQuads;
 }
