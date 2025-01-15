@@ -7,5 +7,5 @@ A base class for streaming query sources
 ## Install
 
 ```bash
-$ yarn add @comunica/incremental-inner-join
+$ yarn add @incremunica/streaming-query-source
 ```

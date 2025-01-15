@@ -1610,21 +1610,6 @@
     "@comunica/utils-query-operation" "^4.0.2"
     sparqlalgebrajs "^4.3.8"
 
-"@comunica/actor-query-operation-path-one-or-more@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-path-one-or-more/-/actor-query-operation-path-one-or-more-4.0.2.tgz#57b4590fcb3c143930fb7168e57d5b6a503f1abf"
-  integrity sha512-njgpodJzQeKEjmkuOrnWaVFHw7qwGF3sC3ZEB5kUexf0ZzgYfBzfJEQIOBYNl5ZMFSKzQ9Su0FJdUiqjeKWXjA==
-  dependencies:
-    "@comunica/actor-abstract-path" "^4.0.2"
-    "@comunica/bus-merge-bindings-context" "^4.0.2"
-    "@comunica/bus-query-operation" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-bindings-factory" "^4.0.2"
-    "@comunica/utils-query-operation" "^4.0.2"
-    asynciterator "^3.9.0"
-    sparqlalgebrajs "^4.3.8"
-
 "@comunica/actor-query-operation-path-seq@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-path-seq/-/actor-query-operation-path-seq-4.0.2.tgz#7ccd46e4e9befd74e62e52ecd8d4f672ba0a099a"
@@ -1636,22 +1621,6 @@
     "@comunica/context-entries" "^4.0.2"
     "@comunica/types" "^4.0.2"
     "@comunica/utils-query-operation" "^4.0.2"
-    sparqlalgebrajs "^4.3.8"
-
-"@comunica/actor-query-operation-path-zero-or-more@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-path-zero-or-more/-/actor-query-operation-path-zero-or-more-4.0.2.tgz#aa29170af3395f1c8ad4228382579f8b75d6bb38"
-  integrity sha512-J8gL+R8y4IzHdh57jOmR8NU5ynbvjpstm7W+6yrDUqsT0KAO0f7l+ybwmXImgks2Z/dY/CGHxMYm8NunNhx88g==
-  dependencies:
-    "@comunica/actor-abstract-path" "^4.0.2"
-    "@comunica/bus-merge-bindings-context" "^4.0.2"
-    "@comunica/bus-query-operation" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-bindings-factory" "^4.0.2"
-    "@comunica/utils-query-operation" "^4.0.2"
-    asynciterator "^3.9.0"
-    rdf-string "^1.6.1"
     sparqlalgebrajs "^4.3.8"
 
 "@comunica/actor-query-operation-path-zero-or-one@^4.0.2":
@@ -1974,20 +1943,6 @@
   dependencies:
     "@comunica/bus-rdf-join-entries-sort" "^4.0.2"
     "@comunica/core" "^4.0.2"
-
-"@comunica/actor-rdf-join-inner-multi-empty@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-rdf-join-inner-multi-empty/-/actor-rdf-join-inner-multi-empty-4.0.2.tgz#03c5467b4eb2042b6b263589da1693ae519a01d5"
-  integrity sha512-lKBgcps21duI41XnrA+85dcoV9F83RO+0/lS1721jQv+IhOnfVHh50VoZRFUkWb9ng+CRqpKI+RXfkoSAs9DcA==
-  dependencies:
-    "@comunica/bus-rdf-join" "^4.0.2"
-    "@comunica/context-entries" "^4.0.2"
-    "@comunica/core" "^4.0.2"
-    "@comunica/mediatortype-join-coefficients" "^4.0.2"
-    "@comunica/types" "^4.0.2"
-    "@comunica/utils-metadata" "^4.0.2"
-    "@rdfjs/types" "*"
-    asynciterator "^3.9.0"
 
 "@comunica/actor-rdf-join-inner-multi-smallest@^4.0.2":
   version "4.0.2"
