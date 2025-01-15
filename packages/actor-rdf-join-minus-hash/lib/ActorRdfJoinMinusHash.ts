@@ -12,15 +12,15 @@ import type { IMediatorTypeJoinCoefficients } from '@comunica/mediatortype-join-
 import type { BindingsStream } from '@comunica/types';
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
-import { IncrementalMinusHash } from './IncrementalMinusHash';
+import { MinusHash } from './MinusHash';
 
 /**
  * An Incremunica Minus Hash RDF Join Actor.
  */
-export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
+export class ActorRdfJoinMinusHash extends ActorRdfJoin {
   public readonly mediatorHashBindings: MediatorHashBindings;
 
-  public constructor(args: IActorRdfJoinIncrementalMinusHashArgs) {
+  public constructor(args: IActorRdfJoinMinusHashArgs) {
     super(args, {
       logicalType: 'minus',
       physicalName: 'hash',
@@ -43,7 +43,7 @@ export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
       return { result: output };
     }
     const { hashFunction } = await this.mediatorHashBindings.mediate({ context: action.context });
-    const bindingsStream = <BindingsStream><unknown> new IncrementalMinusHash(
+    const bindingsStream = <BindingsStream><unknown> new MinusHash(
         <AsyncIterator<Bindings>><unknown>output.bindingsStream,
         <AsyncIterator<Bindings>><unknown>buffer.bindingsStream,
         entry => hashFunction(entry, commonVariables),
@@ -70,6 +70,6 @@ export class ActorRdfJoinIncrementalMinusHash extends ActorRdfJoin {
   }
 }
 
-export interface IActorRdfJoinIncrementalMinusHashArgs extends IActorRdfJoinArgs {
+export interface IActorRdfJoinMinusHashArgs extends IActorRdfJoinArgs {
   mediatorHashBindings: MediatorHashBindings;
 }

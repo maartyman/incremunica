@@ -1,14 +1,14 @@
 {
-  "name": "@incremunica/actor-rdf-join-incremental-minus-hash",
+  "name": "@incremunica/actor-rdf-join-minus-hash",
   "version": "1.3.0",
-  "description": "An incremental-minus-hash rdf-join actor",
+  "description": "An minus-hash rdf-join actor",
   "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/actor-rdf-join-incremental-minus-hash"
+    "directory": "packages/actor-rdf-join-minus-hash"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
@@ -17,7 +17,7 @@
     "comunica",
     "actor",
     "rdf-join",
-    "incremental-minus-hash"
+    "minus-hash"
   ],
   "sideEffects": false,
   "main": "lib/index.js",

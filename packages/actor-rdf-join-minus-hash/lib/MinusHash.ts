@@ -2,7 +2,7 @@ import type { Bindings } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
 import { AsyncIterator } from 'asynciterator';
 
-export class IncrementalMinusHash extends AsyncIterator<Bindings> {
+export class MinusHash extends AsyncIterator<Bindings> {
   private readonly leftIterator: AsyncIterator<Bindings>;
   private readonly rightIterator: AsyncIterator<Bindings>;
   private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();

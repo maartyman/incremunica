@@ -11,12 +11,12 @@ import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incr
 import type * as RDF from '@rdfjs/types';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { ActorRdfJoinIncrementalMinusHash } from '../lib/ActorRdfJoinIncrementalMinusHash';
+import { ActorRdfJoinMinusHash } from '../lib';
 import '@comunica/utils-jest';
 
 const DF = new DataFactory();
 
-describe('ActorRdfJoinIncrementalMinusHash', () => {
+describe('ActorRdfJoinMinusHash', () => {
   let bus: any;
   let context: IActionContext;
   let BF: BindingsFactory;
@@ -27,14 +27,14 @@ describe('ActorRdfJoinIncrementalMinusHash', () => {
     BF = await createTestBindingsFactory(DF);
   });
 
-  describe('An ActorRdfJoinIncrementalMinusHash instance', () => {
+  describe('An ActorRdfJoinMinusHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity,
 IActorTest,
 IActorRdfJoinSelectivityOutput
 >;
-    let actor: ActorRdfJoinIncrementalMinusHash;
+    let actor: ActorRdfJoinMinusHash;
     let mediatorHashBindings: MediatorHashBindings;
     let action: IActionRdfJoin;
     let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
@@ -45,7 +45,7 @@ IActorRdfJoinSelectivityOutput
         mediate: async() => ({ selectivity: 1 }),
       };
       mediatorHashBindings = createTestMediatorHashBindings();
-      actor = new ActorRdfJoinIncrementalMinusHash({
+      actor = new ActorRdfJoinMinusHash({
         name: 'actor',
         bus,
         mediatorJoinSelectivity,
