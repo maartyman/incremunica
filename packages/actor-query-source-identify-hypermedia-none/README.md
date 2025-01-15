@@ -24,7 +24,7 @@ After installing, this package can be added to your engine's configuration as fo
     {
       "@id": "urn:comunica:default:query-source-identify-hypermedia/actors#none",
       "@type": "ActorQuerySourceIdentifyHypermediaNone",
-      "mediatorGuard": { "@id": "urn:comunica:default:guard/mediators#main"  },
+      "mediatorGuard": { "@id": "urn:comunica:default:determine-changes/mediators#main"  },
       "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" }
     }
   ]

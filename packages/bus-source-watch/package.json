@@ -1,14 +1,14 @@
 {
-  "name": "@incremunica/bus-bindings-aggregator-factory",
+  "name": "@incremunica/bus-source-watch",
   "version": "1.3.0",
-  "description": "An Incremunica bus for bindings aggregator factories.",
+  "description": "An incremunica bus for source-watch events.",
   "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/bus-bindings-aggregator-factory"
+    "directory": "packages/bus-source-watch"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
@@ -16,7 +16,7 @@
   "keywords": [
     "incremunica",
     "bus",
-    "aggregator-factory"
+    "source-watch"
   ],
   "sideEffects": false,
   "main": "lib/index.js",
@@ -36,14 +36,6 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/bus-expression-evaluator-factory": "^4.0.2",
-    "@comunica/context-entries": "^4.0.2",
-    "@comunica/core": "^4.0.1",
-    "@comunica/types": "^4.0.2",
-    "@comunica/utils-bindings-factory": "^4.0.2",
-    "@comunica/utils-expression-evaluator": "^4.0.2",
-    "@incremunica/context-entries": "^1.3.0",
-    "@rdfjs/types": "*",
-    "sparqlalgebrajs": "^4.3.8"
+    "@comunica/core": "^4.0.2"
   }
 }

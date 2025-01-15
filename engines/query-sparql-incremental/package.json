@@ -267,7 +267,7 @@
     "@incremunica/actor-bindings-aggregator-factory-sum": "^1.3.0",
     "@incremunica/actor-bindings-aggregator-factory-wildcard-count": "^1.3.0",
     "@incremunica/actor-context-preprocess-query-source-convert-streams": "^1.3.0",
-    "@incremunica/actor-guard-naive": "^1.3.0",
+    "@incremunica/actor-determine-changes-naive": "^1.3.0",
     "@incremunica/actor-merge-bindings-context-is-addition": "^1.3.0",
     "@incremunica/actor-query-operation-group": "^1.3.0",
     "@incremunica/actor-query-operation-incremental-distinct-hash": "^1.3.0",
@@ -277,10 +277,10 @@
     "@incremunica/actor-rdf-join-incremental-minus-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-incremental-optional-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-inner-incremental-full-hash": "^1.3.0",
-    "@incremunica/actor-rdf-metadata-extract-guard-data": "^1.3.0",
-    "@incremunica/actor-resource-watch-deferred": "^1.3.0",
-    "@incremunica/actor-resource-watch-polling": "^1.3.0",
-    "@incremunica/actor-resource-watch-solid-notification-websockets": "^1.3.0",
+    "@incremunica/actor-rdf-metadata-extract-determine-changes-data": "^1.3.0",
+    "@incremunica/actor-source-watch-deferred": "^1.3.0",
+    "@incremunica/actor-source-watch-polling": "^1.3.0",
+    "@incremunica/actor-source-watch-solid-notification-websockets": "^1.3.0",
     "@incremunica/config-query-sparql-incremental": "^1.3.0"
   },
   "browser": {

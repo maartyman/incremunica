@@ -7,8 +7,8 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import {
   ActorMergeBindingsContextIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';
-import type { IActionGuard, MediatorGuard } from '@incremunica/bus-guard';
-import { KeysBindings, KeysGuard } from '@incremunica/context-entries';
+import type { IActionDetermineChanges, MediatorDetermineChanges } from '@incremunica/bus-determine-changes';
+import { KeysBindings, KeysDetermineChanges } from '@incremunica/context-entries';
 import { createTestBindingsFactory, createTestContextWithDataFactory } from '@incremunica/dev-tools';
 import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
@@ -43,20 +43,20 @@ describe('ActorRdfResolveHypermediaNone', () => {
   describe('An ActorRdfResolveHypermediaNone instance', () => {
     let actor: ActorQuerySourceIdentifyHypermediaNone;
     let context: IActionContext;
-    let mediatorGuard: MediatorGuard;
+    let mediatorDetermineChanges: MediatorDetermineChanges;
     let mediatorMergeBindingsContext: any;
-    let guardEvents: EventEmitter;
+    let determineChangesEvents: EventEmitter;
     let mediatorFn: jest.Func;
 
     beforeEach(() => {
       context = createTestContextWithDataFactory(DF);
-      guardEvents = new EventEmitter();
-      captureEvents(guardEvents, 'modified', 'up-to-date');
+      determineChangesEvents = new EventEmitter();
+      captureEvents(determineChangesEvents, 'modified', 'up-to-date');
       mediatorFn = jest.fn();
-      mediatorGuard = <any> {
-        mediate: (action: IActionGuard) => {
+      mediatorDetermineChanges = <any> {
+        mediate: (action: IActionDetermineChanges) => {
           mediatorFn(action);
-          return { guardEvents };
+          return { determineChangesEvents };
         },
       };
       mediatorMergeBindingsContext = <any> {
@@ -70,7 +70,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
       actor = new ActorQuerySourceIdentifyHypermediaNone({
         name: 'actor',
         bus,
-        mediatorGuard,
+        mediatorDetermineChanges,
         mediatorMergeBindingsContext,
       });
     });
@@ -133,7 +133,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
       expect(result.source.toString()).toBe('ActorQuerySourceIdentifyHypermediaNone(http://test.com)');
     });
 
-    it('should run and add a guard', async() => {
+    it('should run and add a determine-changes', async() => {
       const action = <any> {
         context,
         url: 'http://test.com',
@@ -143,13 +143,13 @@ describe('ActorRdfResolveHypermediaNone', () => {
       expect(mediatorFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should add the guard events to the source', async() => {
+    it('should add the determine-changes events to the source', async() => {
       class ActionContextKeyTest implements IActionContextKey<boolean> {
         public readonly name = 'test';
         public readonly dummy: boolean | undefined;
       }
 
-      mediatorFn = jest.fn((action: IActionGuard) => {
+      mediatorFn = jest.fn((action: IActionDetermineChanges) => {
         action.streamingQuerySource.context = (new ActionContext()).set(new ActionContextKeyTest(), true);
       });
       const action = <any> {
@@ -159,12 +159,12 @@ describe('ActorRdfResolveHypermediaNone', () => {
       };
       const result = await actor.run(action);
       expect(mediatorFn).toHaveBeenCalledTimes(1);
-      expect((<any> result.source).context.get(KeysGuard.events)).toEqual(guardEvents);
+      expect((<any> result.source).context.get(KeysDetermineChanges.events)).toEqual(determineChangesEvents);
       expect((<any> result.source).context.get(new ActionContextKeyTest())).toBe(true);
     });
 
-    it('should add the guard events to the source even if the source has no context', async() => {
-      mediatorFn = jest.fn((action: IActionGuard) => {
+    it('should add the determine changes events to the source even if the source has no context', async() => {
+      mediatorFn = jest.fn((action: IActionDetermineChanges) => {
         action.streamingQuerySource.context = undefined;
       });
       const action = <any> {
@@ -174,7 +174,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
       };
       const result = await actor.run(action);
       expect(mediatorFn).toHaveBeenCalledTimes(1);
-      expect((<any> result.source).context.get(KeysGuard.events)).toEqual(guardEvents);
+      expect((<any> result.source).context.get(KeysDetermineChanges.events)).toEqual(determineChangesEvents);
     });
   });
 });

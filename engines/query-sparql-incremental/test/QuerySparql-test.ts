@@ -321,7 +321,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -344,7 +344,7 @@ describe('System test: QuerySparql (without polly)', () => {
         sources: [
           'http://localhost:8787',
         ],
-        pollingFrequency: 100,
+        pollingPeriod: 100,
         deferredEvaluationEventEmitter: deferredEventEmitter,
       });
 
@@ -396,7 +396,7 @@ describe('System test: QuerySparql (without polly)', () => {
   }`, {
         // @ts-expect-error
         sources: [ sourcesStream ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -467,7 +467,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -498,7 +498,7 @@ describe('System test: QuerySparql (without polly)', () => {
            OPTIONAL { ?s2 <http://localhost:8787/p2> ?o2 . }
            }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -550,7 +550,7 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
@@ -567,7 +567,7 @@ describe('System test: QuerySparql (with polly)', () => {
             isAddition: true,
           },
         ]) ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       });
 
       await expect((partialArrayifyStream(bindingStream, 100))).resolves.toHaveLength(100);
@@ -578,7 +578,7 @@ describe('System test: QuerySparql (with polly)', () => {
      ?s ?p ?o.
      }`;
       const context: QueryStringContext = {
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
         sources: [ 'https://www.rubensworks.net/' ],
       };
 
@@ -595,7 +595,7 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingFrequency: 1000,
+        pollingPeriod: 1000,
       };
 
       bindingStream = await engine.queryBindings(query, context);
@@ -615,7 +615,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingFrequency: 1000,
+          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyStream(bindingStream, 1))).resolves.toHaveLength(1);
@@ -629,7 +629,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingFrequency: 1000,
+          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyStream(bindingStream, 20))).resolves.toHaveLength(20);
@@ -641,7 +641,7 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingFrequency: 1000,
+          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyStream(bindingStream, 20))).resolves.toHaveLength(20);
@@ -656,7 +656,7 @@ describe('System test: QuerySparql (with polly)', () => {
               'https://raw.githubusercontent.com/w3c/data-shapes/gh-pages/shacl-compact-syntax/' +
               'tests/valid/basic-shape-iri.shaclc',
             ],
-            pollingFrequency: 1000,
+            pollingPeriod: 1000,
           });
 
           await expect((partialArrayifyStream(bindingStream, 1))).resolves.toHaveLength(1);

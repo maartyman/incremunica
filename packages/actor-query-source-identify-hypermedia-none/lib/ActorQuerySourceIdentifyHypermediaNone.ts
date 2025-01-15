@@ -12,8 +12,8 @@ import { ActionContext, passTest } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
-import type { MediatorGuard } from '@incremunica/bus-guard';
-import { KeysGuard } from '@incremunica/context-entries';
+import type { MediatorDetermineChanges } from '@incremunica/bus-determine-changes';
+import { KeysDetermineChanges } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/incremental-types';
 import { StreamingStore } from '@incremunica/streaming-store';
 import type * as RDF from '@rdfjs/types';
@@ -23,7 +23,7 @@ import type * as RDF from '@rdfjs/types';
  */
 export class ActorQuerySourceIdentifyHypermediaNone extends ActorQuerySourceIdentifyHypermedia {
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
-  public readonly mediatorGuard: MediatorGuard;
+  public readonly mediatorDetermineChanges: MediatorDetermineChanges;
 
   public constructor(args: IActorQuerySourceIdentifyHypermediaNoneArgs) {
     super(args, 'file');
@@ -48,7 +48,7 @@ export class ActorQuerySourceIdentifyHypermediaNone extends ActorQuerySourceIden
     source.toString = () => `ActorQuerySourceIdentifyHypermediaNone(${action.url})`;
     source.referenceValue = action.url;
 
-    const { guardEvents } = await this.mediatorGuard.mediate({
+    const { determineChangesEvents } = await this.mediatorDetermineChanges.mediate({
       context: action.context,
       url: action.url,
       metadata: action.metadata,
@@ -56,9 +56,9 @@ export class ActorQuerySourceIdentifyHypermediaNone extends ActorQuerySourceIden
     });
 
     if (source.context) {
-      source.context = source.context.set(KeysGuard.events, guardEvents);
+      source.context = source.context.set(KeysDetermineChanges.events, determineChangesEvents);
     } else {
-      source.context = new ActionContext().set(KeysGuard.events, guardEvents);
+      source.context = new ActionContext().set(KeysDetermineChanges.events, determineChangesEvents);
     }
 
     return { source };
@@ -67,9 +67,9 @@ export class ActorQuerySourceIdentifyHypermediaNone extends ActorQuerySourceIden
 
 export interface IActorQuerySourceIdentifyHypermediaNoneArgs extends IActorQuerySourceIdentifyHypermediaArgs {
   /**
-   * The Guard mediator
+   * The Determine Changes mediator
    */
-  mediatorGuard: MediatorGuard;
+  mediatorDetermineChanges: MediatorDetermineChanges;
   /**
    * A mediator for creating binding context merge handlers
    */

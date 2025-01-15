@@ -1,22 +1,23 @@
 {
-  "name": "@incremunica/bus-bindings-aggregator-factory",
+  "name": "@incremunica/actor-determine-changes-naive",
   "version": "1.3.0",
-  "description": "An Incremunica bus for bindings aggregator factories.",
+  "description": "A naive determine-changes actor",
   "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/bus-bindings-aggregator-factory"
+    "directory": "packages/actor-determine-changes-naive"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
   },
   "keywords": [
-    "incremunica",
-    "bus",
-    "aggregator-factory"
+    "comunica",
+    "actor",
+    "determine-changes",
+    "naive"
   ],
   "sideEffects": false,
   "main": "lib/index.js",
@@ -36,14 +37,11 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/bus-expression-evaluator-factory": "^4.0.2",
-    "@comunica/context-entries": "^4.0.2",
+    "@comunica/bus-dereference-rdf": "^4.0.1",
     "@comunica/core": "^4.0.1",
-    "@comunica/types": "^4.0.2",
-    "@comunica/utils-bindings-factory": "^4.0.2",
-    "@comunica/utils-expression-evaluator": "^4.0.2",
-    "@incremunica/context-entries": "^1.3.0",
-    "@rdfjs/types": "*",
-    "sparqlalgebrajs": "^4.3.8"
+    "@incremunica/actor-query-source-identify-streaming-rdfjs": "^1.3.0",
+    "@incremunica/bus-determine-changes": "^1.3.0",
+    "@incremunica/bus-source-watch": "^1.3.0",
+    "@incremunica/streaming-query-source": "^1.3.0"
   }
 }

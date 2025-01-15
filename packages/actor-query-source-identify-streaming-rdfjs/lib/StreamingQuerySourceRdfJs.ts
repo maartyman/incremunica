@@ -128,12 +128,12 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     // Set up-to-date property
     // quads.setProperty('up-to-date', true);
     // if (context) {
-    //  const guardEvents = context.get<IGuardEvents>(KeysGuard.events);
-    //  if (guardEvents) {
-    //    guardEvents.on('modified', () => {
+    //  const determineChangesEvents = context.get<IDetermineChangesEvents>(KeysDetermineChanges.events);
+    //  if (determineChangesEvents) {
+    //    determineChangesEvents.on('modified', () => {
     //      quads.setProperty('up-to-date', false);
     //    });
-    //   guardEvents.on('up-to-date', () => {
+    //   determineChangesEvents.on('up-to-date', () => {
     //      quads.setProperty('up-to-date', true);
     //    });
     //  }
