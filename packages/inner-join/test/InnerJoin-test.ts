@@ -1,7 +1,7 @@
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import type { AsyncIterator } from 'asynciterator';
 import { ArrayIterator } from 'asynciterator';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import { InnerJoin } from '../lib';
 
 const cleanupMock = jest.fn();

@@ -2,7 +2,7 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import { EventEmitter } from 'events';
 import * as http from 'node:http';
 import type { Bindings, BindingsStream, QueryStringContext } from '@comunica/types';

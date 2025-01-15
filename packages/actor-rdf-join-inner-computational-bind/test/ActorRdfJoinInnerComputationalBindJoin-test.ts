@@ -30,7 +30,7 @@ import {
   ActorRdfJoinInnerComputationalBind,
 } from '../lib';
 import '@comunica/utils-jest';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 
 const streamifyArray = require('streamify-array');
 

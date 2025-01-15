@@ -14,7 +14,7 @@ import { DataFactory } from 'rdf-data-factory';
 import { PassThrough } from 'readable-stream';
 import { Factory } from 'sparqlalgebrajs';
 import { StreamingQuerySourceRdfJs } from '../lib';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import '@comunica/utils-jest';
 import 'jest-rdf';
 

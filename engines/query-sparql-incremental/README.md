@@ -68,7 +68,7 @@ async function main() {
 main();
 ```
 
-You can also use an [incremental triple store](https://www.npmjs.com/package/@incremunica/incremental-rdf-streaming-store).
+You can also use an [incremental triple store](https://www.npmjs.com/package/@incremunica/streaming-store).
 This store allows you to change the dataset (additions and deletions) and show you the changes in the query results.
 ```javascript
 const QueryEngine = require('@incremunica/query-sparql-incremental').QueryEngine;

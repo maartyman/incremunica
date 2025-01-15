@@ -1,5 +1,5 @@
 import 'jest-rdf';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import { EventEmitter } from 'node:events';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext, IActionContextKey } from '@comunica/types';

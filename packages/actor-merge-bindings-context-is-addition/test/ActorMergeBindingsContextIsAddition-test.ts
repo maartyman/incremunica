@@ -5,7 +5,7 @@ import { KeysBindings } from '@incremunica/context-entries';
 import { createTestBindingsFactory } from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorMergeBindingsContextIsAddition } from '../lib';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 
 const DF = new DataFactory();
 

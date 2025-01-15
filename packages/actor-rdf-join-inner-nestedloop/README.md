@@ -1,13 +1,13 @@
-# Incremunica Inner Incremental Nestedloop RDF Join Actor
+# Incremunica Inner Nestedloop RDF Join Actor
 
-[![npm version](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-incremental-nestedloop.svg)](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-incremental-nestedloop)
+[![npm version](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-nestedloop.svg)](https://badge.fury.io/js/@incremunica%2Factor-rdf-join-inner-nestedloop)
 
-A comunica Inner Incremental Nestedloop RDF Join Actor.
+A comunica Inner Nestedloop RDF Join Actor.
 
 ## Install
 
 ```bash
-$ yarn add @comunica/actor-rdf-join-inner-incremental-nestedloop
+$ yarn add @comunica/actor-rdf-join-inner-nestedloop
 ```
 
 ## Configure
@@ -17,13 +17,13 @@ After installing, this package can be added to your engine's configuration as fo
 {
   "@context": [
     ...
-    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-incremental-nestedloop/^1.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-nestedloop/^1.0.0/components/context.jsonld"
   ],
   "actors": [
     ...
     {
-      "@id": "urn:comunica:default:rdf-join/actors#inner-incremental-nestedloop",
-      "@type": "ActorRdfJoinInnerIncrementalNestedloop",
+      "@id": "urn:comunica:default:rdf-join/actors#inner-nestedloop",
+      "@type": "ActorRdfJoinInnerNestedloop",
       "mediatorJoinSelectivity": { "@id": "urn:comunica:default:rdf-join-selectivity/mediators#main" }
     }
   ]

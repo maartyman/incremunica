@@ -18,7 +18,7 @@ import type * as RDF from '@rdfjs/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import { ActorRdfJoinOptionalHash } from '../lib';
 
 const DF = new DataFactory();

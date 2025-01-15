@@ -8,7 +8,7 @@
     "packages/context-entries",
     "packages/data-factory",
     "packages/jest",
-    "packages/incremental-jest",
+    "packages/jest",
     "packages/dev-tools",
     "packages/inner-join",
     "packages/packager",

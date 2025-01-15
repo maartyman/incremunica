@@ -24,7 +24,7 @@ import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerMemoryBind } from '../lib';
 import '@comunica/utils-jest';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 
 const DF = new DataFactory();
 const FACTORY = new Factory(DF);

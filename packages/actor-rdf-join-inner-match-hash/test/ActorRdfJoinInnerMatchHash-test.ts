@@ -18,7 +18,7 @@ import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerMatchHash } from '../lib';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
 import '@comunica/utils-jest';
 
 const DF = new DataFactory();

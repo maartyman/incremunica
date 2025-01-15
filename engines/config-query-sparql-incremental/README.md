@@ -1,8 +1,8 @@
-# Comunica SPARQL Config
+# Incremunica incremental SPARQL Config
 
 [![npm version](https://badge.fury.io/js/%40comunica%2Fconfig-query-sparql.svg)](https://www.npmjs.com/package/@comunica/config-query-sparql-incremental)
 
-The default configuration files for [Comunica SPARQL Incremental](https://github.com/maartyman/incremental/tree/master/packages/incremental#readme).
+The default configuration files for [Incremunica SPARQL Incremental](https://github.com/maartyman/incremental/tree/master/packages/incremental#readme).
 
 ## Installation
 

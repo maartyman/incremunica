@@ -1,6 +1,6 @@
 # Incremunica Jest helpers
 
-[![npm version](https://badge.fury.io/js/@incremunica%2Fincremental-jest.svg)](https://badge.fury.io/js/@incremunica%2Fincremental-jest)
+[![npm version](https://badge.fury.io/js/@incremunica%2Fjest.svg)](https://badge.fury.io/js/@incremunica%2Fjest)
 
 Jest test helpers for Comunica.
 This package is similar to the original one,
@@ -20,7 +20,7 @@ This can be done by adding the following entry to your Jest configuration:
 ```json
 {
   "jest": {
-    "setupFilesAfterEnv": ["@comunica/incremental-jest"]
+    "setupFilesAfterEnv": ["@incremunica/jest"]
   }
 }
 ```
@@ -28,7 +28,7 @@ This can be done by adding the following entry to your Jest configuration:
 If you are already using an existing test framework script file,
 make sure to add @comunica/jest as follows to your file:
 ```javascript
-require('@comunica/incremental-jest');
+require('@incremunica/jest');
 ```
 
 ## _Optional: Typescript typings configuration_
@@ -38,7 +38,7 @@ you will need to import the typings of this package to make the TS compiler reco
 
 For this, include the following import at the top of each applicable test file:
 ```
-import "@comunica/incremental-jest";
+import "@incremunica/jest";
 ```
 
 ## API
@@ -46,7 +46,7 @@ import "@comunica/incremental-jest";
 All examples below make use of these helpers:
 
 ```js
-import { BindingsFactory } from '@comunica/incremental-bindings-factory';
+import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { DataFactory } from 'rdf-data-factory';
 
 const BF = new BindingsFactory();
