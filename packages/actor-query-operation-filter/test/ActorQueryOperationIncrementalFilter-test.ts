@@ -1,7 +1,4 @@
 import {
-  ActorExpressionEvaluatorFactoryDefault,
-} from '@comunica/actor-expression-evaluator-factory-default';
-import {
   ActorFunctionFactoryExpressionConcat,
 } from '@comunica/actor-function-factory-expression-concat';
 import { ActorFunctionFactoryTermAddition } from '@comunica/actor-function-factory-term-addition';
@@ -10,134 +7,34 @@ import { ActorFunctionFactoryTermIri } from '@comunica/actor-function-factory-te
 import { ActorFunctionFactoryTermStr } from '@comunica/actor-function-factory-term-str';
 import type {
   MediatorExpressionEvaluatorFactory,
-  ActorExpressionEvaluatorFactory,
-  IActorExpressionEvaluatorFactoryArgs,
 } from '@comunica/bus-expression-evaluator-factory';
-import { BusFunctionFactory } from '@comunica/bus-function-factory';
-import type {
-  IActorFunctionFactoryArgs,
-  MediatorFunctionFactory,
-  ActorFunctionFactory,
-} from '@comunica/bus-function-factory';
 import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
-import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
 import { ActorQueryOperation } from '@comunica/bus-query-operation';
-import { KeysExpressionEvaluator, KeysInitQuery } from '@comunica/context-entries';
+import { KeysInitQuery } from '@comunica/context-entries';
 import { ActionContext, Bus } from '@comunica/core';
-import { MediatorRace } from '@comunica/mediator-race';
 import type {
   IQueryOperationResultBindings,
   Bindings,
   IActionContext,
-  ISuperTypeProvider,
-  GeneralSuperTypeDict,
 } from '@comunica/types';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import * as sparqlee from '@comunica/utils-expression-evaluator';
 import { isExpressionError } from '@comunica/utils-expression-evaluator';
 import { KeysBindings } from '@incremunica/context-entries';
 import {
+  createFuncMediator,
   createTestMediatorHashBindings,
   createTestMediatorMergeBindingsContext,
+  getMockEEActionContext,
+  getMockMediatorExpressionEvaluatorFactory,
 } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
-import { LRUCache } from 'lru-cache';
 import { DataFactory } from 'rdf-data-factory';
 import type { Algebra } from 'sparqlalgebrajs';
 import { translate } from 'sparqlalgebrajs';
 import { ActorQueryOperationFilter } from '../lib';
 import '@comunica/utils-jest';
-
-// TODO [2025-02-01]: The following functions are not accessible for incremunica, maybe fix this in comunica
-interface RunFuncTestTableArgs extends IActorFunctionFactoryArgs {
-  mediatorFunctionFactory: MediatorFunctionFactory;
-}
-
-function createFuncMediator<E extends object>(
-  registeredActors: ((arg: RunFuncTestTableArgs & E) => ActorFunctionFactory)[],
-  additionalArgs: E,
-): MediatorFunctionFactory {
-  const bus = new BusFunctionFactory({ name: 'test-bus-function-factory' });
-  const mediatorFunctionFactory = <MediatorFunctionFactory> new MediatorRace({
-    name: 'test-mediator-function-factory',
-    bus,
-  });
-  for (const constructor of registeredActors) {
-    constructor({
-      mediatorFunctionFactory,
-      bus,
-      name: 'test',
-      ...additionalArgs,
-    });
-  }
-  return mediatorFunctionFactory;
-}
-
-function getMockSuperTypeProvider(): ISuperTypeProvider {
-  return {
-    // @ts-expect-error
-    cache: new LRUCache<string, GeneralSuperTypeDict>({ max: 1_000 }),
-    discoverer: _ => 'term',
-  };
-}
-
-function getMockEEActionContext(actionContext?: IActionContext): IActionContext {
-  return new ActionContext({
-    [KeysInitQuery.queryTimestamp.name]: new Date(Date.now()),
-    [KeysInitQuery.functionArgumentsCache.name]: {},
-    [KeysExpressionEvaluator.superTypeProvider.name]: getMockSuperTypeProvider(),
-    [KeysInitQuery.dataFactory.name]: DF,
-  }).merge(actionContext ?? new ActionContext());
-}
-
-function getMockMediatorQueryOperation(): MediatorQueryOperation {
-  return <any>{
-    async mediate(_: any) {
-      throw new Error('mediatorQueryOperation mock not implemented');
-    },
-  };
-}
-
-function getMockMediatorFunctionFactory(): MediatorFunctionFactory {
-  return <any>{
-    async mediate(_: any) {
-      throw new Error('mediatorFunctionFactory mock not implemented');
-    },
-  };
-}
-
-function getMockMediatorMergeBindingsContext(): MediatorMergeBindingsContext {
-  return <any>{
-    async mediate(_: any) {
-      return BF;
-    },
-  };
-}
-
-function getMockEEFactory({
-  mediatorQueryOperation,
-  mediatorFunctionFactory,
-  mediatorMergeBindingsContext,
-}: Partial<IActorExpressionEvaluatorFactoryArgs> = {}): ActorExpressionEvaluatorFactory {
-  return new ActorExpressionEvaluatorFactoryDefault({
-    bus: new Bus({ name: 'testBusMock' }),
-    name: 'mockEEFactory',
-    mediatorQueryOperation: mediatorQueryOperation ?? getMockMediatorQueryOperation(),
-    mediatorFunctionFactory: mediatorFunctionFactory ?? getMockMediatorFunctionFactory(),
-    mediatorMergeBindingsContext: mediatorMergeBindingsContext ?? getMockMediatorMergeBindingsContext(),
-  });
-}
-
-function getMockMediatorExpressionEvaluatorFactory(
-  args: Partial<IActorExpressionEvaluatorFactoryArgs> = {},
-): MediatorExpressionEvaluatorFactory {
-  return <any>{
-    async mediate(arg: any) {
-      return getMockEEFactory(args).run(arg, undefined);
-    },
-  };
-}
 
 const DF = new DataFactory();
 const BF = new BindingsFactory(DF, {});
