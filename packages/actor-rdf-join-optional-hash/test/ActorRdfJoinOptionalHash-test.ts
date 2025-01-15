@@ -19,11 +19,11 @@ import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import '@incremunica/incremental-jest';
-import { ActorRdfJoinIncrementalOptionalHash } from '../lib/ActorRdfJoinIncrementalOptionalHash';
+import { ActorRdfJoinOptionalHash } from '../lib';
 
 const DF = new DataFactory();
 
-describe('ActorRdfJoinIncrementalOptionalHash', () => {
+describe('ActorRdfJoinOptionalHash', () => {
   let bus: any;
   let context: IActionContext;
   let BF: BindingsFactory;
@@ -34,33 +34,33 @@ describe('ActorRdfJoinIncrementalOptionalHash', () => {
     BF = await createTestBindingsFactory(DF);
   });
 
-  describe('The ActorRdfJoinIncrementalOptionalHash module', () => {
+  describe('The ActorRdfJoinOptionalHash module', () => {
     it('should be a function', () => {
-      expect(ActorRdfJoinIncrementalOptionalHash).toBeInstanceOf(Function);
+      expect(ActorRdfJoinOptionalHash).toBeInstanceOf(Function);
     });
 
-    it('should be a ActorRdfJoinIncrementalOptionalHash constructor', () => {
-      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus }))
-        .toBeInstanceOf(ActorRdfJoinIncrementalOptionalHash);
-      expect(new (<any> ActorRdfJoinIncrementalOptionalHash)({ name: 'actor', bus }))
+    it('should be a ActorRdfJoinOptionalHash constructor', () => {
+      expect(new (<any> ActorRdfJoinOptionalHash)({ name: 'actor', bus }))
+        .toBeInstanceOf(ActorRdfJoinOptionalHash);
+      expect(new (<any> ActorRdfJoinOptionalHash)({ name: 'actor', bus }))
         .toBeInstanceOf(ActorRdfJoin);
     });
 
-    it('should not be able to create new ActorRdfJoinIncrementalOptionalHash objects without \'new\'', () => {
+    it('should not be able to create new ActorRdfJoinOptionalHash objects without \'new\'', () => {
       expect(() => {
-        (<any> ActorRdfJoinIncrementalOptionalHash)();
-      }).toThrow('Class constructor ActorRdfJoinIncrementalOptionalHash cannot be invoked without \'new\'');
+        (<any> ActorRdfJoinOptionalHash)();
+      }).toThrow('Class constructor ActorRdfJoinOptionalHash cannot be invoked without \'new\'');
     });
   });
 
-  describe('An ActorRdfJoinIncrementalOptionalHash instance', () => {
+  describe('An ActorRdfJoinOptionalHash instance', () => {
     let mediatorJoinSelectivity: Mediator<
       Actor<IActionRdfJoinSelectivity, IActorTest, IActorRdfJoinSelectivityOutput>,
       IActionRdfJoinSelectivity,
 IActorTest,
 IActorRdfJoinSelectivityOutput
 >;
-    let actor: ActorRdfJoinIncrementalOptionalHash;
+    let actor: ActorRdfJoinOptionalHash;
     let action: IActionRdfJoin;
     let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
     let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
@@ -71,7 +71,7 @@ IActorRdfJoinSelectivityOutput
         mediate: async() => ({ selectivity: 1 }),
       };
       mediatorHashBindings = createTestMediatorHashBindings();
-      actor = new ActorRdfJoinIncrementalOptionalHash({
+      actor = new ActorRdfJoinOptionalHash({
         name: 'actor',
         bus,
         mediatorJoinSelectivity,

@@ -3,7 +3,7 @@ import { KeysBindings } from '@incremunica/context-entries';
 import { IncrementalInnerJoin } from '@incremunica/incremental-inner-join';
 import type { AsyncIterator } from 'asynciterator';
 
-export class IncrementalOptionalHash extends IncrementalInnerJoin {
+export class OptionalHash extends IncrementalInnerJoin {
   private readonly rightMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
   private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
   private activeElement: Bindings | null = null;

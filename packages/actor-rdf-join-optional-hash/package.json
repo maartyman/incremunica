@@ -1,14 +1,14 @@
 {
-  "name": "@incremunica/actor-rdf-join-incremental-optional-hash",
+  "name": "@incremunica/actor-rdf-join-optional-hash",
   "version": "1.3.0",
-  "description": "An incremental-optional-hash rdf-join actor",
+  "description": "An optional-hash rdf-join actor",
   "lsd:module": true,
   "license": "MIT",
   "homepage": "https://maartyman.github.io/incremunica/",
   "repository": {
     "type": "git",
     "url": "https://github.com/maartyman/incremunica.git",
-    "directory": "packages/actor-rdf-join-incremental-optional-hash"
+    "directory": "packages/actor-rdf-join-optional-hash"
   },
   "bugs": {
     "url": "https://github.com/maartyman/incremunica/issues"
@@ -17,7 +17,7 @@
     "comunica",
     "actor",
     "rdf-join",
-    "incremental-optional-hash"
+    "optional-hash"
   ],
   "sideEffects": false,
   "main": "lib/index.js",

@@ -274,7 +274,7 @@
     "@incremunica/actor-query-source-identify-hypermedia-none": "^1.3.0",
     "@incremunica/actor-query-source-identify-stream": "^1.3.0",
     "@incremunica/actor-query-source-identify-streaming-rdfjs": "^1.3.0",
-    "@incremunica/actor-rdf-join-incremental-optional-hash": "^1.3.0",
+    "@incremunica/actor-rdf-join-optional-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-inner-incremental-full-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-minus-hash": "^1.3.0",
     "@incremunica/actor-rdf-metadata-extract-determine-changes-data": "^1.3.0",
