@@ -14,8 +14,8 @@ import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { StreamingQuerySourceRdfJs } from '@incremunica/actor-query-source-identify-streaming-rdfjs';
 import type { MediatorDetermineChanges } from '@incremunica/bus-determine-changes';
 import { KeysDetermineChanges } from '@incremunica/context-entries';
-import type { Quad } from '@incremunica/incremental-types';
 import { StreamingStore } from '@incremunica/streaming-store';
+import type { Quad } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
 
 /**

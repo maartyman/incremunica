@@ -16,7 +16,7 @@ import type {
 import type { Bindings } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, getSafeQuads } from '@comunica/utils-query-operation';
 import { KeysBindings } from '@incremunica/context-entries';
-import type { Quad } from '@incremunica/incremental-types';
+import type { Quad } from '@incremunica/types';
 import type { AsyncIterator } from 'asynciterator';
 import type * as RDF from 'rdf-js';
 import type { Algebra } from 'sparqlalgebrajs';

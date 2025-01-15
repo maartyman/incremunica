@@ -9,8 +9,8 @@ import type { Bindings, BindingsStream, QueryStringContext } from '@comunica/typ
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
 import { createTestBindingsFactory } from '@incremunica/dev-tools';
-import type { Quad } from '@incremunica/incremental-types';
 import { StreamingStore } from '@incremunica/streaming-store';
+import type { Quad } from '@incremunica/types';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { PassThrough } from 'readable-stream';

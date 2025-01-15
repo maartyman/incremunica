@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import type { Quad } from '@incremunica/incremental-types';
+import type { Quad } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
 import { Store } from 'n3';

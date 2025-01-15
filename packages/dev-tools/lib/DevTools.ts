@@ -25,7 +25,7 @@ import {
   ActorMergeBindingsContextIsAddition,
 } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysBindings } from '@incremunica/context-entries';
-import type { Quad } from '@incremunica/incremental-types';
+import type { Quad } from '@incremunica/types';
 import MurmurHash3 from 'imurmurhash';
 import { LRUCache } from 'lru-cache';
 import { DataFactory } from 'rdf-data-factory';

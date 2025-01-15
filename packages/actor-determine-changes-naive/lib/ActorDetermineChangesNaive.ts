@@ -10,8 +10,8 @@ import type {
 } from '@incremunica/bus-determine-changes';
 import { ActorDetermineChanges } from '@incremunica/bus-determine-changes';
 import type { MediatorSourceWatch } from '@incremunica/bus-source-watch';
-import type { IDetermineChangesEvents, Quad } from '@incremunica/incremental-types';
 import { StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
+import type { IDetermineChangesEvents, Quad } from '@incremunica/types';
 
 /**
  * A comunica Naive Determine Changes Actor.

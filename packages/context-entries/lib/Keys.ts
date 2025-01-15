@@ -1,6 +1,6 @@
 import { ActionContextKey } from '@comunica/core';
 import type { ISourceWatchEventEmitter } from '@incremunica/bus-source-watch';
-import type { IDetermineChangesEvents } from '@incremunica/incremental-types';
+import type { IDetermineChangesEvents } from '@incremunica/types';
 
 /**
  * When adding entries to this file, also add a shortcut for them in the contextKeyShortcuts TSDoc comment in

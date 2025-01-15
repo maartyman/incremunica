@@ -10,8 +10,8 @@ import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
-import type { Quad } from '@incremunica/incremental-types';
 import type { StreamingStore } from '@incremunica/streaming-store';
+import type { Quad } from '@incremunica/types';
 import { StreamingQuerySourceRdfJs } from './StreamingQuerySourceRdfJs';
 
 /**

@@ -62,7 +62,7 @@ store.remove(otherQuadStream); // Remove it from the store
 
 store.removeQuad(quad('s4', 'p4', 'o4')); // singular quad deletions
 
-const IncrementalQuad = require("@incremunica/incremental-types").Quad;
+const IncrementalQuad = require("@incremunica/types").Quad;
 let deletionQuad = <IncrementalQuad> quad('s5', 'p5', 'o5'); // Make an incremental quad
 deletionQuad.diff = false; // Set diff as false (marks the quad as deleted)
 store.addQuad(deletionQuad); // Will remove the quad from the store

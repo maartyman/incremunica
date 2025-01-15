@@ -1,7 +1,7 @@
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
-import type { IDetermineChangesEvents } from '@incremunica/incremental-types';
 import type { StreamingQuerySource } from '@incremunica/streaming-query-source';
+import type { IDetermineChangesEvents } from '@incremunica/types';
 
 /**
  * A comunica actor for determine-changes events.
