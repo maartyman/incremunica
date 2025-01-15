@@ -5,10 +5,13 @@ import { AggregateEvaluator } from '@incremunica/bus-bindings-aggregator-factory
 import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 
+interface IGroupConcatStateValue {
+  term: RDF.Term;
+  count: number;
+}
+
 export class GroupConcatAggregator extends AggregateEvaluator implements IBindingsAggregator {
-  private state: Map<string, number> | Set<string> | undefined = undefined;
-  private lastLanguageValid = true;
-  private lastLanguage: string | undefined = undefined;
+  private state: Map<string, IGroupConcatStateValue> | undefined = undefined;
   private readonly separator: string;
 
   public constructor(
@@ -26,63 +29,73 @@ export class GroupConcatAggregator extends AggregateEvaluator implements IBindin
     return Eval.typedLiteral('', Eval.TypeURL.XSD_STRING);
   }
 
-  public putTerm(term: RDF.Term): void {
+  protected putTerm(term: RDF.Term): void {
+    const hash = termToString(term);
     if (this.state === undefined) {
-      if (this.distinct) {
-        this.state = new Set<string>([ term.value ]);
-      } else {
-        this.state = new Map<string, number>([[ term.value, 1 ]]);
-      }
-      if (term.termType === 'Literal') {
-        this.lastLanguage = term.language;
-      }
+      this.state = new Map<string, IGroupConcatStateValue>([[ hash, { term, count: 1 }]]);
+      return;
+    }
+    const stateValue = this.state.get(hash);
+    if (stateValue === undefined) {
+      this.state.set(hash, { term, count: 1 });
     } else {
-      if (this.distinct) {
-        (<Set<string>> this.state).add(term.value);
-      } else {
-        (<Map<string, number>> this.state)
-          .set(term.value, ((<Map<string, number>> this.state).get(term.value) ?? 0) + 1);
-      }
-      if (this.lastLanguageValid && term.termType === 'Literal' && this.lastLanguage !== term.language) {
-        this.lastLanguageValid = false;
-        this.lastLanguage = undefined;
-      }
+      stateValue.count++;
     }
   }
 
   protected removeTerm(term: RDF.Term): void {
+    const hash = termToString(term);
     if (this.state === undefined) {
       throw new Error(`Cannot remove term ${termToString(term)} from empty concat aggregator`);
     }
-    if (this.distinct) {
-      const count = (<Map<string, number>> this.state).get(term.value);
-      if (count === undefined) {
-        throw new Error(`Cannot remove term ${termToString(term)} that was not added to concat aggregator`);
-      }
-      if (count === 1) {
-        this.state.delete(term.value);
-      } else {
-        (<Map<string, number>> this.state).set(term.value, count - 1);
-      }
-    } else if (!this.state.delete(term.value)) {
+    const stateValue = this.state.get(hash);
+    if (stateValue === undefined) {
       throw new Error(`Cannot remove term ${termToString(term)} that was not added to concat aggregator`);
     }
+    if (stateValue.count === 1) {
+      this.state.delete(hash);
+      if (this.state.size === 0) {
+        this.state = undefined;
+      }
+      return;
+    }
+    stateValue.count--;
   }
 
-  public termResult(): RDF.Term | undefined {
+  protected termResult(): RDF.Term | undefined {
     if (this.state === undefined) {
       return this.emptyValue();
     }
     let resultString: string;
     if (this.distinct) {
-      resultString = [ ...(<Map<string, number>> this.state)
-        .entries() ].map(([ value, count ]) => value.repeat(count)).join(this.separator);
+      resultString = [ ...this.state.values() ].map(stateValue => stateValue.term.value).join(this.separator);
     } else {
-      resultString = [ ...this.state.keys() ].join(this.separator);
+      resultString = '';
+      for (const stateValue of this.state.values()) {
+        for (let i = 0; i < stateValue.count; i++) {
+          if (resultString.length > 0) {
+            resultString += this.separator;
+          }
+          resultString += stateValue.term.value;
+        }
+      }
     }
-    if (this.lastLanguageValid && this.lastLanguage) {
-      return Eval.langString(resultString, this.lastLanguage).toRDF(this.dataFactory);
+    let language = '';
+    for (const stateValue of this.state.values()) {
+      if (stateValue.term.termType !== 'Literal') {
+        return Eval.typedLiteral(resultString, Eval.TypeURL.XSD_STRING);
+      }
+      if (!language) {
+        language = stateValue.term.language;
+        continue;
+      }
+      if (language !== stateValue.term.language) {
+        return Eval.typedLiteral(resultString, Eval.TypeURL.XSD_STRING);
+      }
     }
-    return Eval.typedLiteral(resultString, Eval.TypeURL.XSD_STRING);
+    if (!language) {
+      return Eval.typedLiteral(resultString, Eval.TypeURL.XSD_STRING);
+    }
+    return Eval.langString(resultString, language).toRDF(this.dataFactory);
   }
 }

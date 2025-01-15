@@ -8,14 +8,14 @@ import type * as RDF from '@rdfjs/types';
 import * as RdfString from 'rdf-string';
 
 export class WildcardCountAggregator extends AggregateEvaluator implements IBindingsAggregator {
-  private readonly bindingValues: Map<string, Set<string>> = new Map();
-  private state: number | undefined = undefined;
+  private readonly bindingValues: Map<string, Map<string, number>> = new Map();
+  private state = 0;
 
   public constructor(evaluator: IExpressionEvaluator, distinct: boolean, throwError?: boolean) {
     super(evaluator, distinct, throwError);
   }
 
-  public putTerm(_term: RDF.Term): void {
+  protected putTerm(_term: RDF.Term): void {
     // Do nothing, not needed
   }
 
@@ -24,17 +24,11 @@ export class WildcardCountAggregator extends AggregateEvaluator implements IBind
   }
 
   public override async putBindings(bindings: Bindings): Promise<void> {
-    if (!this.handleDistinct(bindings)) {
+    if (!this.skipDistinctBindings(bindings)) {
       if (bindings.getContextEntry(KeysBindings.isAddition)) {
-        if (this.state === undefined) {
-          this.state = 0;
-        }
-        this.state += 1;
+        this.state++;
       } else {
-        if (this.state === undefined) {
-          throw new Error(`Cannot remove bindings ${bindings.toString()} to empty wildcard-count aggregator`);
-        }
-        this.state -= 1;
+        this.state--;
       }
     }
   }
@@ -43,8 +37,8 @@ export class WildcardCountAggregator extends AggregateEvaluator implements IBind
     return typedLiteral('0', TypeURL.XSD_INTEGER);
   }
 
-  public termResult(): RDF.Term | undefined {
-    if (this.state === undefined) {
+  protected termResult(): RDF.Term | undefined {
+    if (this.state === 0) {
       return this.emptyValue();
     }
     return typedLiteral(String(this.state), TypeURL.XSD_INTEGER);
@@ -55,24 +49,44 @@ export class WildcardCountAggregator extends AggregateEvaluator implements IBind
    * @param bindings
    * @private
    */
-  private handleDistinct(bindings: RDF.Bindings): boolean {
-    if (this.distinct) {
-      const bindingList: [RDF.Variable, RDF.Term][] = [ ...bindings ];
-      bindingList.sort((first, snd) => first[0].value.localeCompare(snd[0].value));
-      const variables = bindingList.map(([ variable ]) => variable.value).join(',');
-      const terms = bindingList.map(([ , term ]) => RdfString.termToString(term)).join(',');
+  private skipDistinctBindings(bindings: Bindings): boolean {
+    const bindingList: [RDF.Variable, RDF.Term][] = [ ...bindings ];
+    bindingList.sort((first, snd) => first[0].value.localeCompare(snd[0].value));
+    const variables = bindingList.map(([ variable ]) => variable.value).join(',');
+    const terms = bindingList.map(([ , term ]) => RdfString.termToString(term)).join(',');
+    let termsMap = this.bindingValues.get(variables);
 
-      const set = this.bindingValues.get(variables);
-      const result = set !== undefined && set.has(terms);
-
-      // Add to the set:
-      if (!set) {
-        this.bindingValues.set(variables, new Set());
+    if (bindings.getContextEntry(KeysBindings.isAddition)) {
+      if (termsMap === undefined) {
+        termsMap = new Map([[ terms, 1 ]]);
+        this.bindingValues.set(variables, termsMap);
+        return false;
       }
-      this.bindingValues.get(variables)!.add(terms);
-
-      return result;
+      const count = termsMap.get(terms);
+      if (count === undefined) {
+        termsMap.set(terms, 1);
+        return false;
+      }
+      termsMap.set(terms, count + 1);
+      // Return true if we are in distinct mode otherwise return false
+      return this.distinct;
     }
-    return false;
+    if (termsMap === undefined) {
+      throw new Error(`Cannot remove bindings ${bindings.toString()} that was not added to wildcard-count aggregator`);
+    }
+    const count = termsMap.get(terms);
+    if (count === undefined) {
+      throw new Error(`Cannot remove bindings ${bindings.toString()} that was not added to wildcard-count aggregator`);
+    }
+    if (count === 1) {
+      termsMap.delete(terms);
+      if (termsMap.size === 0) {
+        this.bindingValues.delete(variables);
+      }
+      // Return true if we are in distinct mode otherwise return false
+      return false;
+    }
+    termsMap.set(terms, count - 1);
+    return this.distinct;
   }
 }

@@ -11,7 +11,7 @@ export class SampleAggregator extends AggregateEvaluator implements IBindingsAgg
     super(evaluator, distinct, throwError);
   }
 
-  public putTerm(term: RDF.Term): void {
+  protected putTerm(term: RDF.Term): void {
     if (this.state === undefined) {
       this.state = new Map<string, { value: RDF.Term; count: number }>([[ term.value, { value: term, count: 1 }]]);
       return;
@@ -19,13 +19,13 @@ export class SampleAggregator extends AggregateEvaluator implements IBindingsAgg
     this.state.set(term.value, { value: term, count: (this.state.get(term.value)?.count ?? 0) + 1 });
   }
 
-  public removeTerm(term: RDF.Term): void {
+  protected removeTerm(term: RDF.Term): void {
     if (this.state === undefined) {
       throw new Error(`Cannot remove term ${termToString(term)} from empty sample aggregator`);
     }
     const count = this.state.get(term.value);
     if (count === undefined) {
-      throw new Error(`Cannot remove term ${termToString(term)}, it was not added`);
+      throw new Error(`Cannot remove term ${termToString(term)} that was not added to sample aggregator`);
     }
     if (count.count === 1) {
       this.state.delete(term.value);
@@ -34,7 +34,7 @@ export class SampleAggregator extends AggregateEvaluator implements IBindingsAgg
     }
   }
 
-  public termResult(): RDF.Term | undefined {
+  protected termResult(): RDF.Term | undefined {
     if (this.state === undefined) {
       return this.emptyValue();
     }

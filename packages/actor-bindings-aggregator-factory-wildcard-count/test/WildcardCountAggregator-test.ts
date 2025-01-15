@@ -1,5 +1,8 @@
 import type { ActorExpressionEvaluatorFactory } from '@comunica/bus-expression-evaluator-factory';
 import type { IActionContext } from '@comunica/types';
+import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { AggregateEvaluator, IBindingsAggregator } from '@incremunica/bus-bindings-aggregator-factory';
+import { KeysBindings } from '@incremunica/context-entries';
 import {
   BF,
   DF,
@@ -7,12 +10,11 @@ import {
   getMockEEFactory,
   int,
   makeAggregate,
-} from '@comunica/utils-expression-evaluator/test/util/helpers';
-import type { IBindingsAggregator } from '@incremunica/bus-bindings-aggregator-factory';
+} from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
-import { WildcardCountAggregator } from '../lib/WildcardCountAggregator';
+import { WildcardCountAggregator } from '../lib';
 
-async function runAggregator(aggregator: IBindingsAggregator, input: RDF.Bindings[]): Promise<RDF.Term | undefined> {
+async function runAggregator(aggregator: IBindingsAggregator, input: Bindings[]): Promise<RDF.Term | undefined> {
   for (const bindings of input) {
     await aggregator.putBindings(bindings);
   }
@@ -30,6 +32,7 @@ async function createAggregator({ expressionEvaluatorFactory, context, distinct 
       context,
     }, undefined),
     distinct,
+    true,
   );
 }
 
@@ -50,26 +53,88 @@ describe('WildcardCountAggregator', () => {
       aggregator = await createAggregator({ expressionEvaluatorFactory, context, distinct: false });
     });
 
-    it('a list of bindings', async() => {
+    it('a list of bindings 1', async() => {
       const input = [
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('y'), int('2') ]]),
-        BF.bindings([[ DF.variable('x'), int('3') ]]),
-        BF.bindings([]),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('y'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
       ];
 
       await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));
+    });
+
+    it('a list of bindings 2', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('y'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('y'), int('2') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('1'));
+    });
+
+    it('a list of bindings 3', async() => {
+      const input = [
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('2'));
     });
 
     it('with respect to empty input', async() => {
       await expect(runAggregator(aggregator, [])).resolves.toEqual(int('0'));
     });
 
+    it('should error on a deletion if aggregator empty', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).rejects.toThrow(
+        new Error('Cannot remove bindings {\n  "x": "\\"2\\"^^http://www.w3.org/2001/XMLSchema#integer"\n} that was not added to wildcard-count aggregator'),
+      );
+    });
+
+    it('should error on a deletion that has not been added', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).rejects.toThrow(
+        new Error('Cannot remove bindings {\n  "x": "\\"2\\"^^http://www.w3.org/2001/XMLSchema#integer"\n} that was not added to wildcard-count aggregator'),
+      );
+    });
+
+    it('delete everything', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves
+        .toEqual((<AggregateEvaluator>aggregator).emptyValueTerm());
+    });
+
     it('extends the AggregateEvaluator', () => {
-      expect((<WildcardCountAggregator> aggregator).termResult).toBeInstanceOf(Function);
-      expect((<WildcardCountAggregator> aggregator).putTerm).toBeInstanceOf(Function);
-      // Put term does nothing
-      expect(() => (<WildcardCountAggregator> aggregator).putTerm(<any> undefined)).not.toThrow();
+      expect((<any> aggregator).termResult).toBeInstanceOf(Function);
+      expect((<any> aggregator).putTerm).toBeInstanceOf(Function);
+      expect((<any> aggregator).removeTerm).toBeInstanceOf(Function);
+      expect(() => (<any> aggregator).putTerm(<any> undefined)).not.toThrow();
+      expect(() => (<any> aggregator).removeTerm(<any> undefined)).not.toThrow();
     });
   });
 
@@ -80,25 +145,16 @@ describe('WildcardCountAggregator', () => {
       aggregator = await createAggregator({ expressionEvaluatorFactory, context, distinct: true });
     });
 
-    it('a list of bindings', async() => {
+    it('a list of bindings 1', async() => {
       const input = [
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('2') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ], [ DF.variable('y'), int('1') ]]),
-        BF.bindings([]),
-      ];
-
-      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));
-    });
-
-    it('a list of bindings containing 2 empty', async() => {
-      const input = [
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('y'), int('2') ]]),
-        BF.bindings([[ DF.variable('x'), int('3') ]]),
-        BF.bindings([]),
-        BF.bindings([]),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('x'), int('1') ],
+          [ DF.variable('y'), int('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
       ];
 
       await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));
@@ -106,26 +162,83 @@ describe('WildcardCountAggregator', () => {
 
     it('a list of bindings 2', async() => {
       const input = [
-        BF.bindings([]),
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('2') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ], [ DF.variable('y'), int('1') ]]),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('x'), int('1') ],
+          [ DF.variable('y'), int('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('x'), int('1') ],
+          [ DF.variable('y'), int('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('2'));
+    });
+
+    it('a list of bindings 3', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('x'), int('1') ],
+          [ DF.variable('y'), int('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([
+          [ DF.variable('x'), int('1') ],
+          [ DF.variable('y'), int('1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('1'));
+    });
+
+    it('a list of bindings containing 2 empty 1', async() => {
+      const input = [
+        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('y'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
       ];
 
       await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));
     });
 
-    it('a list of bindings 3', async() => {
+    it('a list of bindings containing 3 empty 1', async() => {
       const input = [
-        BF.bindings([[ DF.variable('x'), int('1') ], [ DF.variable('y'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([[ DF.variable('x'), int('2') ]]),
-        BF.bindings([[ DF.variable('x'), int('1') ]]),
-        BF.bindings([]),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
       ];
 
-      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('1'));
+    });
+
+    it('a list of bindings containing 3 empty 2', async() => {
+      const input = [
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+        BF.bindings([]).setContextEntry(KeysBindings.isAddition, false),
+      ];
+
+      await expect(runAggregator(aggregator, input)).resolves.toEqual(int('0'));
     });
 
     it('with respect to empty input', async() => {

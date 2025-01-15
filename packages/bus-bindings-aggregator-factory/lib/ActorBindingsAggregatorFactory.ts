@@ -31,7 +31,6 @@ TS
    *  \ @defaultNested {<default_bus> a <cc:components/Bus.jsonld#Bus>} bus
    *  \ @defaultNested {Creation of Aggregator failed: none of the configured actors were able to handle ${action.expr.aggregator}} busFailMessage
    */
-  /* eslint-enable max-len */
   protected constructor(args: IActorBindingsAggregatorFactoryArgs<TS>) {
     super(args);
     this.mediatorExpressionEvaluatorFactory = args.mediatorExpressionEvaluatorFactory;

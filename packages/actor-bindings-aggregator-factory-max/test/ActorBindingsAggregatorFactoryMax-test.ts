@@ -1,16 +1,22 @@
-import { createTermCompMediator } from '@comunica/actor-term-comparator-factory-expression-evaluator/test/util';
+import { ActorFunctionFactoryTermEquality } from '@comunica/actor-function-factory-term-equality';
+import { ActorFunctionFactoryTermLesserThan } from '@comunica/actor-function-factory-term-lesser-than';
+import {
+  ActorTermComparatorFactoryExpressionEvaluator,
+} from '@comunica/actor-term-comparator-factory-expression-evaluator';
 import type { MediatorExpressionEvaluatorFactory } from '@comunica/bus-expression-evaluator-factory';
-
 import type { MediatorTermComparatorFactory } from '@comunica/bus-term-comparator-factory';
 import { Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import {
   BF,
+  createFuncMediator,
   DF,
   getMockEEActionContext,
   getMockMediatorExpressionEvaluatorFactory,
+  getMockMediatorMergeBindingsContext,
+  getMockMediatorQueryOperation,
   makeAggregate,
-} from '@comunica/utils-expression-evaluator/test/util/helpers';
+} from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
 import { ActorBindingsAggregatorFactoryMax } from '../lib';
 import '@comunica/utils-jest';
@@ -41,7 +47,21 @@ describe('ActorBindingsAggregatorFactoryMax', () => {
     mediatorExpressionEvaluatorFactory = getMockMediatorExpressionEvaluatorFactory({
       mediatorQueryOperation,
     });
-    mediatorTermComparatorFactory = createTermCompMediator();
+    // TODO [2025-02-01]: This can be replaced with createTermCompMediator in comunica
+    mediatorTermComparatorFactory = <MediatorTermComparatorFactory> {
+      async mediate(action) {
+        return await new ActorTermComparatorFactoryExpressionEvaluator({
+          name: 'actor',
+          bus: new Bus({ name: 'bus' }),
+          mediatorFunctionFactory: createFuncMediator([
+            args => new ActorFunctionFactoryTermEquality(args),
+            args => new ActorFunctionFactoryTermLesserThan(args),
+          ], {}),
+          mediatorQueryOperation: getMockMediatorQueryOperation(),
+          mediatorMergeBindingsContext: getMockMediatorMergeBindingsContext(),
+        }).run(action);
+      },
+    };
 
     context = getMockEEActionContext();
   });

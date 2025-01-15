@@ -6,10 +6,13 @@ import { AggregateEvaluator } from '@incremunica/bus-bindings-aggregator-factory
 import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 
-type SumState = NumericLiteral;
+interface ISumState {
+  index: Map<string, number>;
+  sum: NumericLiteral;
+}
 
 export class SumAggregator extends AggregateEvaluator {
-  private state: SumState | undefined = undefined;
+  private state: ISumState | undefined = undefined;
 
   public constructor(
     evaluator: IExpressionEvaluator,
@@ -26,28 +29,55 @@ export class SumAggregator extends AggregateEvaluator {
     return typedLiteral('0', TypeURL.XSD_INTEGER);
   }
 
-  public putTerm(term: RDF.Term): void {
+  protected putTerm(term: RDF.Term): void {
+    const hash = termToString(term);
+    const value = this.termToNumericOrError(term);
     if (this.state === undefined) {
-      this.state = this.termToNumericOrError(term);
-    } else {
-      const internalTerm = this.termToNumericOrError(term);
-      this.state = <NumericLiteral> this.additionFunction.applyOnTerms([ this.state, internalTerm ], this.evaluator);
+      this.state = {
+        index: new Map<string, number>([[ hash, 1 ]]),
+        sum: value,
+      };
+      return;
+    }
+    let count = this.state.index.get(hash);
+    if (count === undefined) {
+      count = 0;
+    }
+    this.state.index.set(hash, count + 1);
+    if (!this.distinct || count === 0) {
+      this.state.sum = <NumericLiteral> this.additionFunction.applyOnTerms([ this.state.sum, value ], this.evaluator);
     }
   }
 
-  public removeTerm(term: RDF.Term): void {
+  protected removeTerm(term: RDF.Term): void {
+    const hash = termToString(term);
+    const value = this.termToNumericOrError(term);
     if (this.state === undefined) {
-      throw new Error(`Cannot remove term ${termToString(term)} from empty sum aggregator`);
+      throw new Error(`Cannot remove term ${hash} from empty sum aggregator`);
+    }
+    const count = this.state.index.get(hash);
+    if (count === undefined) {
+      throw new Error(`Cannot remove term ${hash} that was not added to sum aggregator`);
+    }
+    if (count === 1) {
+      this.state.index.delete(hash);
+      if (this.state.index.size === 0) {
+        this.state = undefined;
+        return;
+      }
     } else {
-      const internalTerm = this.termToNumericOrError(term);
-      this.state = <NumericLiteral> this.subtractionFunction.applyOnTerms([ this.state, internalTerm ], this.evaluator);
+      this.state.index.set(hash, count - 1);
+    }
+    if (!this.distinct || count === 1) {
+      this.state.sum = <NumericLiteral> this.subtractionFunction
+        .applyOnTerms([ this.state.sum, value ], this.evaluator);
     }
   }
 
-  public termResult(): RDF.Term | undefined {
+  protected termResult(): RDF.Term | undefined {
     if (this.state === undefined) {
       return this.emptyValue();
     }
-    return this.state.toRDF(this.dataFactory);
+    return this.state.sum.toRDF(this.dataFactory);
   }
 }

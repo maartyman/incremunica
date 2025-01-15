@@ -19,12 +19,12 @@ export class MinAggregator extends AggregateEvaluator implements IBindingsAggreg
     super(evaluator, distinct, throwError);
   }
 
-  public putTerm(term: RDF.Term): void {
+  protected putTerm(term: RDF.Term): void {
     if (term.termType !== 'Literal') {
       throw new Error(`Term with value ${term.value} has type ${term.termType} and is not a literal`);
     }
     if (this.state === undefined) {
-      this.state = new AVLTree<RDF.Term, RDF.Term>((a, b) => this.orderByEvaluator.orderTypes(a, b), this.distinct);
+      this.state = new AVLTree<RDF.Term, RDF.Term>((a, b) => this.orderByEvaluator.orderTypes(a, b));
     }
     this.state.insert(term, term);
   }
@@ -33,10 +33,12 @@ export class MinAggregator extends AggregateEvaluator implements IBindingsAggreg
     if (this.state === undefined) {
       throw new Error(`Cannot remove term ${termToString(term)} from empty min aggregator`);
     }
-    this.state.remove(term);
+    if (!this.state.remove(term)) {
+      throw new Error(`Cannot remove term ${termToString(term)} that was not added to min aggregator`);
+    }
   }
 
-  public termResult(): RDF.Term | undefined {
+  protected termResult(): RDF.Term | undefined {
     if (this.state === undefined) {
       return this.emptyValue();
     }

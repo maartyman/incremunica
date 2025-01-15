@@ -1,18 +1,19 @@
 import { ActorFunctionFactoryTermAddition } from '@comunica/actor-function-factory-term-addition';
+import { ActorFunctionFactoryTermSubtraction } from '@comunica/actor-function-factory-term-subtraction';
 import type {
   MediatorExpressionEvaluatorFactory,
 } from '@comunica/bus-expression-evaluator-factory';
 import type { MediatorFunctionFactory } from '@comunica/bus-function-factory';
-import { createFuncMediator } from '@comunica/bus-function-factory/test/util';
 import { Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import {
+  createFuncMediator,
   BF,
   DF,
   getMockEEActionContext,
   getMockMediatorExpressionEvaluatorFactory,
   makeAggregate,
-} from '@comunica/utils-expression-evaluator/test/util/helpers';
+} from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
 import { ActorBindingsAggregatorFactorySum } from '../lib';
 import '@comunica/utils-jest';
@@ -44,6 +45,7 @@ describe('ActorBindingsAggregatorFactorySum', () => {
     });
     mediatorFunctionFactory = createFuncMediator([
       args => new ActorFunctionFactoryTermAddition(args),
+      args => new ActorFunctionFactoryTermSubtraction(args),
     ], {});
   });
 

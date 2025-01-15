@@ -4,7 +4,6 @@ import type { Bindings } from '@comunica/utils-bindings-factory';
 import * as Eval from '@comunica/utils-expression-evaluator';
 import { KeysBindings } from '@incremunica/context-entries';
 import type * as RDF from '@rdfjs/types';
-import * as RdfString from 'rdf-string';
 
 /**
  * This is the base class for all aggregators.
@@ -13,8 +12,6 @@ import * as RdfString from 'rdf-string';
 export abstract class AggregateEvaluator {
   private errorOccurred = false;
   private lastResult: undefined | null | RDF.Term = undefined;
-
-  protected readonly variableValues: Map<string, number>;
 
   protected readonly superTypeProvider: ISuperTypeProvider;
   protected readonly termTransformer: Eval.TermTransformer;
@@ -27,8 +24,6 @@ export abstract class AggregateEvaluator {
     this.errorOccurred = false;
     this.superTypeProvider = evaluator.context.getSafe(KeysExpressionEvaluator.superTypeProvider);
     this.termTransformer = new Eval.TermTransformer(this.superTypeProvider);
-
-    this.variableValues = new Map();
   }
 
   protected abstract putTerm(term: RDF.Term): void;
@@ -69,30 +64,7 @@ export abstract class AggregateEvaluator {
       }
 
       if (bindings.getContextEntry(KeysBindings.isAddition)) {
-        // Handle DISTINCT before putting the term
-        if (this.distinct) {
-          const hash = RdfString.termToString(term);
-          let count = this.variableValues.get(hash);
-          if (!count) {
-            this.putTerm(term);
-            count = 0;
-          }
-          this.variableValues.set(hash, count + 1);
-        } else {
-          this.putTerm(term);
-        }
-      } else if (this.distinct) {
-        // Handle DISTINCT before putting the term
-        const hash = RdfString.termToString(term);
-        const count = this.variableValues.get(hash);
-        if (count === 1) {
-          this.removeTerm(term);
-          this.variableValues.delete(hash);
-        } else if (count === undefined) {
-          this.safeThrow('count is undefined, this shouldn\'t happen');
-        } else {
-          this.variableValues.set(hash, count - 1);
-        }
+        this.putTerm(term);
       } else {
         this.removeTerm(term);
       }

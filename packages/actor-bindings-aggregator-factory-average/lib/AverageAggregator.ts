@@ -7,6 +7,7 @@ import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 
 interface IAverageState {
+  index: Map<string, number>;
   sum: Eval.NumericLiteral;
   count: number;
 }
@@ -30,29 +31,44 @@ export class AverageAggregator extends AggregateEvaluator implements IBindingsAg
     return Eval.typedLiteral('0', Eval.TypeURL.XSD_INTEGER);
   }
 
-  public putTerm(term: RDF.Term): void {
+  protected putTerm(term: RDF.Term): void {
+    const hash = termToString(term);
+    const value = this.termToNumericOrError(term);
     if (this.state === undefined) {
-      const sum = this.termToNumericOrError(term);
-      this.state = { sum, count: 1 };
-    } else {
-      const internalTerm = this.termToNumericOrError(term);
-      this.state.sum = <Eval.NumericLiteral> this.additionFunction
-        .applyOnTerms([ this.state.sum, internalTerm ], this.evaluator);
-      this.state.count++;
+      this.state = { index: new Map<string, number>([[ hash, 1 ]]), sum: value, count: 1 };
+      return;
     }
+    this.state.index.set(hash, (this.state.index.get(hash) ?? 0) + 1);
+    this.state.sum = <Eval.NumericLiteral> this.additionFunction
+      .applyOnTerms([ this.state.sum, value ], this.evaluator);
+    this.state.count++;
   }
 
   protected removeTerm(term: RDF.Term): void {
+    const hash = termToString(term);
+    const value = this.termToNumericOrError(term);
     if (this.state === undefined) {
       throw new Error(`Cannot remove term ${termToString(term)} from empty average aggregator`);
     }
-    const internalTerm = this.termToNumericOrError(term);
+    const count = this.state.index.get(hash);
+    if (count === undefined) {
+      throw new Error(`Cannot remove term ${termToString(term)} that was not added to average aggregator`);
+    }
+    if (count === 1) {
+      this.state.index.delete(hash);
+      if (this.state.count === 1) {
+        this.state = undefined;
+        return;
+      }
+    } else {
+      this.state.index.set(hash, count - 1);
+    }
     this.state.sum = <Eval.NumericLiteral> this.subtractionFunction
-      .applyOnTerms([ this.state.sum, internalTerm ], this.evaluator);
+      .applyOnTerms([ this.state.sum, value ], this.evaluator);
     this.state.count--;
   }
 
-  public termResult(): RDF.Term | undefined {
+  protected termResult(): RDF.Term | undefined {
     if (this.state === undefined) {
       return this.emptyValue();
     }
