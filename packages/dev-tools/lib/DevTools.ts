@@ -1,3 +1,4 @@
+import type { EventEmitter } from 'node:events';
 import {
   ActorExpressionEvaluatorFactoryDefault,
 } from '@comunica/actor-expression-evaluator-factory-default';
@@ -26,15 +27,44 @@ import {
 } from '@incremunica/actor-merge-bindings-context-is-addition';
 import { KeysBindings } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/types';
+import type { AsyncIterator } from 'asynciterator';
 import MurmurHash3 from 'imurmurhash';
 import { LRUCache } from 'lru-cache';
 import { DataFactory } from 'rdf-data-factory';
 import type * as RDF from 'rdf-js';
-import { Algebra } from 'sparqlalgebrajs';
+import { Algebra, Factory } from 'sparqlalgebrajs';
 import { Wildcard } from 'sparqljs';
 
 export const DF = new DataFactory();
 export const BF = new BindingsFactory(DF, {});
+export const AF = new Factory();
+
+export async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
+  const array: any[] = [];
+  for (let i = 0; i < num; i++) {
+    await new Promise<void>(resolve => stream.once('data', (data: any) => {
+      array.push(data);
+      resolve();
+    }));
+  }
+  return array;
+}
+
+async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterator<T>, num: number): Promise<T[]> {
+  const array: T[] = [];
+  for (let i = 0; i < num; i++) {
+    await new Promise<void>((resolve) => {
+      asyncIterator.once('readable', resolve);
+    });
+    const element = asyncIterator.read();
+    if (!element) {
+      i--;
+      continue;
+    }
+    array.push(element);
+  }
+  return array;
+}
 
 export function bindingsToString(bindings: Bindings): string {
   let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;

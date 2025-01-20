@@ -5,7 +5,7 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { getSafeBindings, getSafeQuads } from '@comunica/utils-query-operation';
 import { KeysBindings } from '@incremunica/context-entries';
 import { createTestMediatorHashBindings, createTestBindingsFactory, quad } from '@incremunica/dev-tools';
-import { arrayifyStream } from 'arrayify-stream';
+import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import type { Quad } from 'rdf-data-factory';
 import { DataFactory } from 'rdf-data-factory';

@@ -8,7 +8,7 @@ import { quad, createTestContextWithDataFactory, createTestBindingsFactory } fro
 import { StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/types';
-import { arrayifyStream } from 'arrayify-stream';
+import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { PassThrough } from 'readable-stream';

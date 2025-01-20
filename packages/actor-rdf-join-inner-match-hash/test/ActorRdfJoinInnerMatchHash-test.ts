@@ -14,7 +14,7 @@ import {
   createTestMediatorHashBindings,
 } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
-import { arrayifyStream } from 'arrayify-stream';
+import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { ActorRdfJoinInnerMatchHash } from '../lib';

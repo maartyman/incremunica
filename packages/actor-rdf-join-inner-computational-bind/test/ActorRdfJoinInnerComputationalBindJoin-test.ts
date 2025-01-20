@@ -1,4 +1,3 @@
-import type { EventEmitter } from 'node:events';
 import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { IActionQueryOperation } from '@comunica/bus-query-operation';
@@ -18,8 +17,9 @@ import {
   createTestMediatorMergeBindingsContext,
   createTestMediatorHashBindings,
   createTestContextWithDataFactory,
+  partialArrayifyStream,
 } from '@incremunica/dev-tools';
-import { arrayifyStream } from 'arrayify-stream';
+import arrayifyStream from 'arrayify-stream';
 import { ArrayIterator, WrappingIterator } from 'asynciterator';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
 import { DataFactory } from 'rdf-data-factory';
@@ -36,17 +36,6 @@ const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
 const FACTORY = new Factory(DF);
-
-async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  const array: any[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>(resolve => stream.once('data', (bindings: any) => {
-      array.push(bindings);
-      resolve();
-    }));
-  }
-  return array;
-}
 
 describe('ActorRdfJoinComputationalBind', () => {
   let bus: any;
