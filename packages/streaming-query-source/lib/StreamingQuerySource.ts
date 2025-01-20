@@ -7,8 +7,8 @@ import type {
   IQueryBindingsOptions,
   QuerySourceReference,
 } from '@comunica/types';
+import type { Quad } from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
-import type { Quad } from 'rdf-js';
 import type { Ask, Operation, Update } from 'sparqlalgebrajs/lib/algebra';
 
 export enum StreamingQuerySourceStatus {

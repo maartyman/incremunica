@@ -24,13 +24,13 @@ import type { Bindings } from '@comunica/utils-bindings-factory';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { materializeOperation, getSafeBindings } from '@comunica/utils-query-operation';
 import { KeysBindings } from '@incremunica/context-entries';
+import type * as RDF from '@rdfjs/types';
 import {
   ArrayIterator,
   EmptyIterator,
   UnionIterator,
 } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
-import type * as RDF from 'rdf-js';
 import { Factory, Algebra, Util } from 'sparqlalgebrajs';
 
 /**

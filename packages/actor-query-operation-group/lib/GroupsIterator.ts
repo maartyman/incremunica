@@ -5,8 +5,8 @@ import type {
   MediatorBindingsAggregatorFactory,
 } from '@incremunica/bus-bindings-aggregator-factory';
 import { KeysBindings } from '@incremunica/context-entries';
+import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
-import type * as RDF from 'rdf-js';
 import type { Algebra } from 'sparqlalgebrajs';
 
 type IGroupObject = {
