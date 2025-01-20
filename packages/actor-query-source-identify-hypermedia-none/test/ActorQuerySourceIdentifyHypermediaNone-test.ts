@@ -10,7 +10,7 @@ import {
 import type { IActionDetermineChanges, MediatorDetermineChanges } from '@incremunica/bus-determine-changes';
 import { KeysBindings, KeysDetermineChanges } from '@incremunica/context-entries';
 import { createTestBindingsFactory, createTestContextWithDataFactory } from '@incremunica/dev-tools';
-import arrayifyStream from 'arrayify-stream';
+import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
 import { ActorQuerySourceIdentifyHypermediaNone } from '../lib';

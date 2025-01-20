@@ -19,7 +19,7 @@ import {
   createTestContextWithDataFactory,
   partialArrayifyStream,
 } from '@incremunica/dev-tools';
-import arrayifyStream from 'arrayify-stream';
+import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator, WrappingIterator } from 'asynciterator';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
 import { DataFactory } from 'rdf-data-factory';
