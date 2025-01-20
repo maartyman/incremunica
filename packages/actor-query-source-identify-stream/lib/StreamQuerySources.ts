@@ -180,12 +180,12 @@ export class StreamQuerySources implements IQuerySource {
     }
 
     const variables = getVariables(<Algebra.Pattern>operation);
-    // TODO [2025-01-01]: how to handle metadata correctly
+    // TODO [2025-04-01]: how to handle metadata correctly
     let accumulatedMetadata: MetadataBindings = {
       state: new MetadataValidationState(),
       cardinality: { type: 'estimate', value: 1 },
       variables: variables.map(variable =>
-        // TODO [2025-01-01]: make sure canBeUndef is set correctly
+        // TODO [2025-04-01]: make sure canBeUndef is set correctly
         ({ variable, canBeUndef: false })),
     };
     let first = true;

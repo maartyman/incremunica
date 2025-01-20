@@ -6,9 +6,9 @@ import { Actor } from '@comunica/core';
  * An incremunica actor for source-watch events.
  *
  * Actor types:
- * * Input:  IActionSourceWatch:      // TODO: fill in.
+ * * Input:  IActionSourceWatch:      // TODO [2024-12-01]: fill in.
  * * Test:   <none>
- * * Output: IActorSourceWatchOutput: // TODO: fill in.
+ * * Output: IActorSourceWatchOutput: // TODO [2024-12-01]: fill in.
  *
  * @see IActionSourceWatch
  * @see IActorSourceWatchOutput

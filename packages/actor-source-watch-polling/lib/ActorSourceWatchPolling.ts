@@ -47,7 +47,7 @@ export class ActorSourceWatchPolling extends ActorSourceWatch {
 
     let etag = action.metadata.etag;
     const checkForChanges = (): void => {
-      // TODO [2024-12-19]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
+      // TODO [2024-03-01]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
       this.mediatorHttp.mediate(
         {
           context: action.context,
@@ -61,7 +61,7 @@ export class ActorSourceWatchPolling extends ActorSourceWatch {
           pollingStartTime = Date.now() + (pollingPeriod - Number.parseInt(action.metadata.age, 10)) * 1000;
         }
 
-        // TODO [2024-12-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
+        // TODO [2024-08-01]: have more specific error handling for example 304: Not Modified should not emit 'delete'
         if (!responseHead.ok) {
           events.emit('delete');
         }

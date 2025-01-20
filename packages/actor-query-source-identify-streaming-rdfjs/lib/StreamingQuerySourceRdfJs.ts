@@ -34,7 +34,6 @@ import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
 
 export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
-  // TODO [2025-01-01]: generalize store type
   public store: StreamingStore<Quad>;
   private registeredQueries: number;
   protected readonly selectorShape: FragmentSelectorShape;
