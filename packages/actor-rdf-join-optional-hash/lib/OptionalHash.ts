@@ -37,7 +37,8 @@ export class OptionalHash extends InnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.getContextEntry(KeysBindings.isAddition)) {
+    const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
+    if (isAddition) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);
@@ -123,12 +124,13 @@ export class OptionalHash extends InnerJoin {
         if (this.addOrDeleteFromMemory(item, hash, this.rightMemory)) {
           const otherArray = this.leftMemory.get(hash);
           if (otherArray !== undefined) {
+            const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
             if (
-              item.getContextEntry(KeysBindings.isAddition) &&
+              isAddition &&
               (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
-            if (!item.getContextEntry(KeysBindings.isAddition) && this.rightMemory.get(hash)?.length === 1) {
+            if (!isAddition && this.rightMemory.get(hash)?.length === 1) {
               this.appendArray = true;
             }
             this.activeElement = item;

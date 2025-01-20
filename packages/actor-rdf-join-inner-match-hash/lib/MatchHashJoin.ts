@@ -35,7 +35,8 @@ export class MatchHashJoin extends InnerJoin {
 
   private addOrDeleteFromMemory(item: Bindings, hash: number, memory: Map<number, Bindings[]>): boolean {
     let array = memory.get(hash);
-    if (item.getContextEntry(KeysBindings.isAddition)) {
+    const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
+    if (isAddition) {
       if (array === undefined) {
         array = [];
         memory.set(hash, array);

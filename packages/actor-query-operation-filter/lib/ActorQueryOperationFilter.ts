@@ -66,7 +66,8 @@ export class ActorQueryOperationFilter extends ActorQueryOperationTypedMediated<
       ): Promise<void> => {
         const hash = hashFunction(bindings, variables);
         let hashData = transformMap.get(hash);
-        if (bindings.getContextEntry(KeysBindings.isAddition)) {
+        const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+        if (isAddition) {
           if (hashData === undefined) {
             hashData = {
               count: 1,
@@ -106,7 +107,8 @@ export class ActorQueryOperationFilter extends ActorQueryOperationTypedMediated<
               doneTransform: () => void,
               pushTransform: (val: Bindings) => void,
             ): void => {
-              if (item.getContextEntry(KeysBindings.isAddition)) {
+              const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
+              if (isAddition) {
                 if (count === 0) {
                   constHashData.currentState = !operation.expression.not;
                   for (let i = 0; i < constHashData.count; i++) {

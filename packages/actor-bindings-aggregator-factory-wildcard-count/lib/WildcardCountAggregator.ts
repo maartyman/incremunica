@@ -25,7 +25,8 @@ export class WildcardCountAggregator extends AggregateEvaluator implements IBind
 
   public override async putBindings(bindings: Bindings): Promise<void> {
     if (!this.skipDistinctBindings(bindings)) {
-      if (bindings.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         this.state++;
       } else {
         this.state--;
@@ -56,7 +57,8 @@ export class WildcardCountAggregator extends AggregateEvaluator implements IBind
     const terms = bindingList.map(([ , term ]) => RdfString.termToString(term)).join(',');
     let termsMap = this.bindingValues.get(variables);
 
-    if (bindings.getContextEntry(KeysBindings.isAddition)) {
+    const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+    if (isAddition) {
       if (termsMap === undefined) {
         termsMap = new Map([[ terms, 1 ]]);
         this.bindingValues.set(variables, termsMap);

@@ -63,7 +63,8 @@ export abstract class AggregateEvaluator {
         return;
       }
 
-      if (bindings.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         this.putTerm(term);
       } else {
         this.removeTerm(term);

@@ -84,7 +84,8 @@ export class ActorQueryOperationDistinctHash extends ActorQueryOperationTypedMed
     return (bindings: Bindings) => {
       const hash = hashFunction(bindings, variables);
       const hasMapValue = hashes.get(hash);
-      if (bindings.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;

@@ -103,7 +103,8 @@ export class ActorRdfJoinInnerComputationalBind extends ActorRdfJoin {
     ): Promise<void> => {
       const hash = hashBindings(bindings);
       let hashData = transformMap.get(hash);
-      if (bindings.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         if (hashData === undefined) {
           hashData = {
             elements: [],

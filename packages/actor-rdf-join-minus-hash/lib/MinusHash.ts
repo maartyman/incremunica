@@ -81,7 +81,8 @@ export class MinusHash extends AsyncIterator<Bindings> {
     let element = this.rightIterator.read();
     if (element) {
       const hash = this.joinHash(element);
-      if (element.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = element.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         let currentCount = this.rightMemory.get(hash);
         if (currentCount === undefined) {
           currentCount = 0;
@@ -123,7 +124,8 @@ export class MinusHash extends AsyncIterator<Bindings> {
     element = this.leftIterator.read();
     if (element) {
       const hash = this.joinHash(element);
-      if (element.getContextEntry(KeysBindings.isAddition)) {
+      const isAddition = element.getContextEntry(KeysBindings.isAddition) ?? true;
+      if (isAddition) {
         let currentArray = this.leftMemory.get(hash);
         if (currentArray === undefined) {
           currentArray = [];
