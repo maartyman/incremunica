@@ -1561,6 +1561,22 @@
     "@comunica/utils-query-operation" "^4.0.2"
     sparqlalgebrajs "^4.3.8"
 
+"@comunica/actor-query-operation-nop@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-nop/-/actor-query-operation-nop-4.0.2.tgz#1108b9a146c3ed99721cfa79594210fdd3ccf6b4"
+  integrity sha512-Y2viVLHS5mRMrq0UIt0vEOYNJe8n7D0Ato53a7cNIZFQZHz1AYcTxWlYkab3ctjtIwlgvmMuvcD1dACgGD3eDQ==
+  dependencies:
+    "@comunica/bus-merge-bindings-context" "^4.0.2"
+    "@comunica/bus-query-operation" "^4.0.2"
+    "@comunica/context-entries" "^4.0.2"
+    "@comunica/core" "^4.0.2"
+    "@comunica/types" "^4.0.2"
+    "@comunica/utils-bindings-factory" "^4.0.2"
+    "@comunica/utils-metadata" "^4.0.2"
+    "@rdfjs/types" "*"
+    asynciterator "^3.9.0"
+    sparqlalgebrajs "^4.3.8"
+
 "@comunica/actor-query-operation-path-alt@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-path-alt/-/actor-query-operation-path-alt-4.0.2.tgz#1ed98814dc103bad1b2b8b747b18090ffb0a9536"
