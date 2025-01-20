@@ -1,8 +1,8 @@
+import type { MediatorContextPreprocess } from '@comunica/bus-context-preprocess';
 import type {
   IActionQuerySourceIdentify,
   IActorQuerySourceIdentifyOutput,
   IActorQuerySourceIdentifyArgs,
-  MediatorQuerySourceIdentify,
 } from '@comunica/bus-query-source-identify';
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
 import type { MediatorRdfMetadataAccumulate } from '@comunica/bus-rdf-metadata-accumulate';
@@ -10,21 +10,22 @@ import { KeysInitQuery } from '@comunica/context-entries';
 import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
+import type { QuerySourceStream, QuerySourceUnidentifiedExpanded } from '@incremunica/types';
 import { StreamQuerySources } from './StreamQuerySources';
 
 /**
  * An incremunica Stream Sources Query Source Identify Actor.
  */
 export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
-  public readonly mediatorQuerySourceIdentify: MediatorQuerySourceIdentify;
   public readonly mediatorRdfMetadataAccumulate: MediatorRdfMetadataAccumulate;
+  public readonly mediatorContextPreprocess: MediatorContextPreprocess;
 
   public constructor(args: IActorQuerySourceIdentifyStreamSourcesArgs) {
     super(args);
   }
 
   public async test(action: IActionQuerySourceIdentify): Promise<TestResult<IActorTest>> {
-    const source = action.querySourceUnidentified;
+    const source = <QuerySourceUnidentifiedExpanded>action.querySourceUnidentified;
     if (source.type !== 'stream') {
       return failTest(`${this.name} requires a single query source with stream type to be present in the context.`);
     }
@@ -36,10 +37,10 @@ export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
     return {
       querySource: {
         source: new StreamQuerySources(
-          <any>action.querySourceUnidentified.value,
+          <QuerySourceStream><any>action.querySourceUnidentified.value,
           dataFactory,
-          this.mediatorQuerySourceIdentify,
           this.mediatorRdfMetadataAccumulate,
+          this.mediatorContextPreprocess,
           action.context,
         ),
         context: action.querySourceUnidentified.context ?? new ActionContext(),
@@ -50,11 +51,11 @@ export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
 
 export interface IActorQuerySourceIdentifyStreamSourcesArgs extends IActorQuerySourceIdentifyArgs {
   /**
-   * A mediator for identifying query sources.
+   * A mediator for accumulating metadata.
    */
-  mediatorQuerySourceIdentify: MediatorQuerySourceIdentify;
+  mediatorRdfMetadataAccumulate: MediatorRdfMetadataAccumulate;
   /**
-   * A mediator for identifying query sources.
+   * A mediator for preprocessing the context.
    */
-  mediatorRdfMetadataAccumulate: MediatorQuerySourceIdentify;
+  mediatorContextPreprocess: MediatorContextPreprocess;
 }

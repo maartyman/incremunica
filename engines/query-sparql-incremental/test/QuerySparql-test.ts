@@ -383,11 +383,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
       const sourcesStream = new PassThrough({ objectMode: true });
       sourcesStream.push({
-        value: 'http://localhost:8787',
-        isAddition: true,
-      });
-      sourcesStream.push({
-        value: streamingStore,
+        querySource: 'http://localhost:8787',
         isAddition: true,
       });
 
@@ -395,7 +391,7 @@ describe('System test: QuerySparql (without polly)', () => {
     ?s ?p ?o.
   }`, {
         // @ts-expect-error
-        sources: [ sourcesStream ],
+        sources: [ streamingStore, sourcesStream ],
         pollingPeriod: 1000,
       });
 
@@ -416,7 +412,7 @@ describe('System test: QuerySparql (without polly)', () => {
       ]).setContextEntry(KeysBindings.isAddition, true));
 
       sourcesStream.push({
-        value: 'http://localhost:8787',
+        querySource: 'http://localhost:8787',
         isAddition: false,
       });
 
@@ -563,7 +559,7 @@ describe('System test: QuerySparql (with polly)', () => {
         // @ts-expect-error
         sources: [ new ArrayIterator([
           {
-            value: 'https://www.rubensworks.net/',
+            querySource: 'https://www.rubensworks.net/',
             isAddition: true,
           },
         ]) ],

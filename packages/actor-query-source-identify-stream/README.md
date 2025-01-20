@@ -24,7 +24,7 @@ After installing, this package can be added to your engine's configuration as fo
     {
       "@id": "urn:comunica:default:query-source-identify/actors#stream",
       "@type": "ActorQuerySourceIdentifyStream",
-      "mediatorQuerySourceIdentify": { "@id": "urn:comunica:default:query-source-identify/mediators#main" },
+      "mediatorContextPreprocess": { "@id": "urn:comunica:default:context-preprocess/mediators#main" },
       "mediatorRdfMetadataAccumulate": { "@id": "urn:comunica:default:rdf-metadata-accumulate/mediators#main" }
     }
   ]
