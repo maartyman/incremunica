@@ -17,12 +17,12 @@ describe('ActorSourceWatchDeferred', () => {
     let actor: ActorSourceWatchDeferred;
     let priority: number;
     let action: IActionSourceWatch;
-    let deferredEventEmitter: EventEmitter;
+    let deferredEvaluationTrigger: EventEmitter;
     let mediatorHttp: any;
 
     beforeEach(() => {
-      deferredEventEmitter = new EventEmitter();
-      const context = new ActionContext().set(KeysSourceWatch.deferredEvaluationEventEmitter, deferredEventEmitter);
+      deferredEvaluationTrigger = new EventEmitter();
+      const context = new ActionContext().set(KeysSourceWatch.deferredEvaluationTrigger, deferredEvaluationTrigger);
       priority = 0;
       mediatorHttp = <any> { mediate: jest.fn(() => Promise.resolve({ ok: true, headers: { get: () => '0' }})) };
 
@@ -51,10 +51,10 @@ describe('ActorSourceWatchDeferred', () => {
         });
       });
 
-      it('should not test if context doesn\'t have deferredEvaluationEventEmitter', async() => {
+      it('should not test if context doesn\'t have deferredEvaluationTrigger', async() => {
         action.context = new ActionContext();
         await expect(actor.test(action)).resolves
-          .toFailTest('Context does not have \'deferredEvaluationEventEmitter\'');
+          .toFailTest('Context does not have \'deferredEvaluationTrigger\'');
       });
 
       it('should not test if source doesn\'t support HEAD requests', async() => {
@@ -79,32 +79,32 @@ describe('ActorSourceWatchDeferred', () => {
       it('should start and stop', async() => {
         const result = await actor.run(action);
         result.start();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(1);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(1);
         result.stop();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(0);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(0);
       });
 
       it('should start and stop multiple times', async() => {
         const result = await actor.run(action);
         result.start();
         result.start();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(1);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(1);
         result.stop();
         result.stop();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(0);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(0);
         result.start();
         result.start();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(1);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(1);
         result.stop();
         result.stop();
-        expect(deferredEventEmitter.listenerCount('update')).toBe(0);
+        expect(deferredEvaluationTrigger.listenerCount('update')).toBe(0);
       });
 
       it('should not emit update events if not started', async() => {
         const result = await actor.run(action);
         const listener = jest.fn();
         result.events.on('update', listener);
-        deferredEventEmitter.emit('update');
+        deferredEvaluationTrigger.emit('update');
         expect(listener).toHaveBeenCalledTimes(0);
       });
 
@@ -113,7 +113,7 @@ describe('ActorSourceWatchDeferred', () => {
         const listener = jest.fn();
         result.events.on('update', listener);
         result.start();
-        deferredEventEmitter.emit('update');
+        deferredEvaluationTrigger.emit('update');
         expect(mediatorHttp.mediate).toHaveBeenCalledTimes(1);
         // Make sure the promise the mediator promise is resolved
         await new Promise(resolve => setImmediate(resolve));
@@ -126,7 +126,7 @@ describe('ActorSourceWatchDeferred', () => {
         result.events.on('update', listener);
         jest.spyOn(mediatorHttp, 'mediate').mockResolvedValue({ ok: true, headers: { get: () => '1' }});
         result.start();
-        deferredEventEmitter.emit('update');
+        deferredEvaluationTrigger.emit('update');
         expect(mediatorHttp.mediate).toHaveBeenCalledTimes(1);
         // Make sure the promise the mediator promise is resolved
         await new Promise(resolve => setImmediate(resolve));
@@ -139,7 +139,7 @@ describe('ActorSourceWatchDeferred', () => {
         result.events.on('update', listener);
         result.start();
         result.stop();
-        deferredEventEmitter.emit('update');
+        deferredEvaluationTrigger.emit('update');
         expect(listener).toHaveBeenCalledTimes(0);
       });
     });

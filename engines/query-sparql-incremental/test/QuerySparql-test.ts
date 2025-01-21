@@ -337,7 +337,7 @@ describe('System test: QuerySparql (without polly)', () => {
       fetchData.dataString = '<http://localhost:8787/s1> <http://localhost:8787/p1> <http://localhost:8787/o1> .';
       fetchData.etag = '0';
 
-      const deferredEventEmitter = new EventEmitter();
+      const deferredEvaluationTrigger = new EventEmitter();
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
           ?s ?p ?o.
           }`, {
@@ -345,7 +345,7 @@ describe('System test: QuerySparql (without polly)', () => {
           'http://localhost:8787',
         ],
         pollingPeriod: 100,
-        deferredEvaluationEventEmitter: deferredEventEmitter,
+        deferredEvaluationTrigger,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -364,7 +364,7 @@ describe('System test: QuerySparql (without polly)', () => {
         fetchData.dataString += '<http://localhost:8787/s2> <http://localhost:8787/p2> <http://localhost:8787/o2> .';
         fetchData.etag = '2';
       }, 500);
-      setTimeout(() => deferredEventEmitter.emit('update'), 1000);
+      setTimeout(() => deferredEvaluationTrigger.emit('update'), 1000);
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
         resolve(bindings);

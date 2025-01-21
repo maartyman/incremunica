@@ -25,6 +25,6 @@ export const KeysBindings = {
 
 export const KeysSourceWatch = {
   pollingPeriod: new ActionContextKey<number>('@incremunica/source-watch:pollingPeriod'),
-  deferredEvaluationEventEmitter:
-    new ActionContextKey<ISourceWatchEventEmitter>('@incremunica/resource-watch:deferredEvaluationEventEmitter'),
+  deferredEvaluationTrigger:
+    new ActionContextKey<ISourceWatchEventEmitter>('@incremunica/resource-watch:deferredEvaluationTrigger'),
 };

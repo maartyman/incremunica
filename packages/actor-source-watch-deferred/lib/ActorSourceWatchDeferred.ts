@@ -23,8 +23,8 @@ export class ActorSourceWatchDeferred extends ActorSourceWatch {
   }
 
   public async test(action: IActionSourceWatch): Promise<TestResult<IActorTest>> {
-    if (!action.context.has(KeysSourceWatch.deferredEvaluationEventEmitter)) {
-      return failTest('Context does not have \'deferredEvaluationEventEmitter\'');
+    if (!action.context.has(KeysSourceWatch.deferredEvaluationTrigger)) {
+      return failTest('Context does not have \'deferredEvaluationTrigger\'');
     }
     const responseHead = await this.mediatorHttp.mediate(
       {
@@ -46,7 +46,7 @@ export class ActorSourceWatchDeferred extends ActorSourceWatch {
 
   public async run(action: IActionSourceWatch): Promise<IActorSourceWatchOutput> {
     const eventsSource: ISourceWatchEventEmitter = action.context
-      .getSafe(KeysSourceWatch.deferredEvaluationEventEmitter);
+      .getSafe(KeysSourceWatch.deferredEvaluationTrigger);
     eventsSource.setMaxListeners(eventsSource.getMaxListeners() + 1);
     const outputEvents: ISourceWatchEventEmitter = new EventEmitter();
 
