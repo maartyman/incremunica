@@ -52,6 +52,7 @@ export class StreamingStore<Q extends Quad>
   }
 
   private handleQuad(quad: Q): void {
+    quad.isAddition = quad.isAddition ?? true;
     if (quad.isAddition ? this.store.has(quad) : !this.store.has(quad)) {
       return;
     }
@@ -97,9 +98,7 @@ export class StreamingStore<Q extends Quad>
     }
 
     stream.on('data', (quad: Q) => {
-      if (quad.isAddition === undefined) {
-        quad.isAddition = false;
-      }
+      quad.isAddition = quad.isAddition ?? false;
       if (this.halted) {
         this.haltBuffer.push(quad);
       } else {
@@ -115,9 +114,7 @@ export class StreamingStore<Q extends Quad>
     }
 
     stream.on('data', (quad: Q) => {
-      if (quad.isAddition === undefined) {
-        quad.isAddition = true;
-      }
+      quad.isAddition = quad.isAddition ?? true;
       if (this.halted) {
         this.haltBuffer.push(quad);
       } else {
@@ -131,9 +128,7 @@ export class StreamingStore<Q extends Quad>
     if (this.ended) {
       throw new Error('Attempted to add a quad into an ended StreamingStore.');
     }
-    if (quad.isAddition === undefined) {
-      quad.isAddition = true;
-    }
+    quad.isAddition = quad.isAddition ?? true;
     if (this.halted) {
       this.haltBuffer.push(quad);
     } else {
@@ -146,9 +141,7 @@ export class StreamingStore<Q extends Quad>
     if (this.ended) {
       throw new Error('Attempted to remove a quad of an ended StreamingStore.');
     }
-    if (quad.isAddition === undefined) {
-      quad.isAddition = false;
-    }
+    quad.isAddition = quad.isAddition ?? false;
     if (this.halted) {
       this.haltBuffer.push(quad);
     } else {
