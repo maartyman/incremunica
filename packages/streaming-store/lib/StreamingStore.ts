@@ -3,7 +3,7 @@ import type { Quad } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
 import type { Term } from 'n3';
 import { Store } from 'n3';
-import { Readable, PassThrough } from 'readable-stream';
+import { PassThrough } from 'readable-stream';
 import { PendingStreamsIndex } from './PendingStreamsIndex';
 
 /**
@@ -177,30 +177,20 @@ export class StreamingStore<Q extends Quad>
   ): RDF.Stream<Q> {
     const unionStream = new PassThrough({ objectMode: true });
 
-    const storedQuads = this.store.getQuads(
+    const storedQuads: Quad[] = this.store.getQuads(
       subject,
       predicate,
       object,
       graph,
     );
-    const storeResult = new Readable({
-      objectMode: true,
-      read() {
-        if (storedQuads.length > 0) {
-          storeResult.push(storedQuads.pop());
-        }
-        if (storedQuads.length === 0) {
-          storeResult.push(null);
-        }
-      },
-    });
-    storeResult.pipe(unionStream, { end: false });
+    for (const quad of storedQuads) {
+      quad.isAddition = true;
+      unionStream.push(quad);
+    }
 
     // If the store hasn't ended yet, also create a new pendingStream
     if (this.ended) {
-      storeResult.on('close', () => {
-        unionStream.end();
-      });
+      unionStream.end();
     } else {
       // The new pendingStream remains open, until the store is ended.
       const pendingStream = new PassThrough({ objectMode: true });
@@ -224,24 +214,7 @@ export class StreamingStore<Q extends Quad>
         };
       }
       this.pendingStreams.addPatternListener(pendingStream, subject, predicate, object, graph);
-      pendingStream.pipe(unionStream, { end: false });
-
-      let pendingStreamEnded = false;
-      let storeResultEnded = false;
-
-      pendingStream.on('close', () => {
-        pendingStreamEnded = true;
-        if (storeResultEnded) {
-          unionStream.end();
-        }
-      });
-
-      storeResult.on('close', () => {
-        storeResultEnded = true;
-        if (pendingStreamEnded) {
-          unionStream.end();
-        }
-      });
+      pendingStream.pipe(unionStream);
     }
     return unionStream;
   }

@@ -1010,6 +1010,36 @@ describe('StreamStore', () => {
     ]);
   });
 
+  it('deleteStream should first propagate everything as deletions and then stop 2', async() => {
+    store.addQuad(
+      quad('s1', 'p1', 'o1', 'g1'),
+    );
+
+    const options = {
+      deleteStream: () => {},
+    };
+
+    const matchStream = store.match(
+      null,
+      null,
+      null,
+      null,
+      options,
+    );
+
+    options.deleteStream();
+
+    const array = await arrayifyStream(matchStream);
+    expect(array[0]).toEqualRdfQuad(
+      quad('s1', 'p1', 'o1', 'g1'),
+    );
+    expect(array[1]).toEqualRdfQuad(
+      quad('s1', 'p1', 'o1', 'g1'),
+    );
+    expect(array[0].isAddition).toBeTruthy();
+    expect(array[1].isAddition).toBeFalsy();
+  });
+
   it('closeStream should stop match with multiple match 2', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
