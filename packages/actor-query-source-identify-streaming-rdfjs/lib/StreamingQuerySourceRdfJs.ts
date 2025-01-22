@@ -18,7 +18,7 @@ import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingQuerySource, StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
 import type { StreamingStore } from '@incremunica/streaming-store';
-import type { Quad } from '@incremunica/types';
+import type { MatchOptions, Quad } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
 import type { AsyncIterator } from 'asynciterator';
 import { wrap as wrapAsyncIterator } from 'asynciterator';
@@ -26,6 +26,10 @@ import type {
   QuadTermName,
 } from 'rdf-terms';
 import {
+  filterTermsNested,
+  someTerms,
+  uniqTerms,
+
   getValueNestedPath,
   reduceTermsNested,
   someTermsNested,
@@ -81,6 +85,11 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
       term;
   }
 
+  public static hasDuplicateVariables(pattern: RDF.BaseQuad): boolean {
+    const variables = filterTermsNested(pattern, term => term.termType === 'Variable');
+    return variables.length > 1 && uniqTerms(variables).length < variables.length;
+  }
+
   public override async getSelectorShape(): Promise<FragmentSelectorShape> {
     return this.selectorShape;
   }
@@ -114,7 +123,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     );
 
     if (context) {
-      const matchOptionsArray: ({ closeStream: () => void })[] | undefined = context.get(
+      const matchOptionsArray: MatchOptions[] | undefined = context.get(
         KeysStreamingSource.matchOptions,
       );
       if (matchOptionsArray !== undefined) {
@@ -158,9 +167,6 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
       },
     );
 
-    it.setProperty('delete', () => {
-      matchOptions.deleteStream();
-    });
     return it;
   }
 
@@ -168,9 +174,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     it: AsyncIterator<RDF.Quad>,
     operation: Algebra.Pattern,
   ): Promise<void> {
-    // TODO [2025-01-01]:Check if the source supports quoted triple filtering
-    // const quotedTripleFiltering = Boolean(this.store.features?.quotedTripleFiltering);
-    const quotedTripleFiltering = false;
+    const quotedTripleFiltering = Boolean((<any> this.store).features?.quotedTripleFiltering);
     let cardinality: number;
     if (this.store.countQuads) {
       // If the source provides a dedicated method for determining cardinality, use that.
@@ -198,9 +202,14 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
       });
     }
 
+    // If `match` would require filtering afterwards, our count will be an over-estimate.
+    const wouldRequirePostFiltering = (!quotedTripleFiltering &&
+        someTerms(operation, term => term.termType === 'Quad')) ||
+      StreamingQuerySourceRdfJs.hasDuplicateVariables(operation);
+
     it.setProperty('metadata', {
       state: new MetadataValidationState(),
-      cardinality: { type: 'exact', value: cardinality },
+      cardinality: { type: wouldRequirePostFiltering ? 'estimate' : 'exact', value: cardinality },
     });
   }
 

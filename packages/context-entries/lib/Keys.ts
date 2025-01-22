@@ -1,6 +1,6 @@
 import { ActionContextKey } from '@comunica/core';
 import type { ISourceWatchEventEmitter } from '@incremunica/bus-source-watch';
-import type { IDetermineChangesEvents } from '@incremunica/types';
+import type { IDetermineChangesEvents, MatchOptions } from '@incremunica/types';
 
 /**
  * When adding entries to this file, also add a shortcut for them in the contextKeyShortcuts TSDoc comment in
@@ -16,7 +16,7 @@ export const KeysDetermineChanges = {
 };
 
 export const KeysStreamingSource = {
-  matchOptions: new ActionContextKey<({ closeStream: () => void })[]>('@incremunica/streaming-source:matchOptions'),
+  matchOptions: new ActionContextKey<MatchOptions[]>('@incremunica/streaming-source:matchOptions'),
 };
 
 export const KeysBindings = {

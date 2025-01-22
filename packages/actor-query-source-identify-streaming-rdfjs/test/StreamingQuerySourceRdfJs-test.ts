@@ -93,6 +93,130 @@ describe('StreamingQuerySourceRdfJs', () => {
         .toThrow(new Error('closeStream function has not been replaced in streaming store.'));
     });
 
+    it('should close the stream if closeStream is called', async() => {
+      const closeFn = jest.fn();
+      store = <any>{
+        match: (s, p, o, g, matchoptions) => {
+          closeFn();
+          const stream = new PassThrough({ objectMode: true });
+          matchoptions.closeStream = () => {
+            stream.end();
+          };
+          stream.push(quad('s1', 'p1', 'o1'));
+          return stream;
+        },
+        countQuads: () => 1,
+      };
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      const data = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      ctx.get(KeysStreamingSource.matchOptions)[0].closeStream();
+      await expect(data).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+      expect(closeFn).toHaveBeenCalledTimes(1);
+      expect(data.closed).toBeTruthy();
+    });
+
+    it('should close the stream if closeStream is called (with real store)', async() => {
+      store.addQuad(quad('s1', 'p1', 'o1'));
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      const data = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      ctx.get(KeysStreamingSource.matchOptions)[0].closeStream();
+      await expect(data).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+      expect(data.closed).toBeTruthy();
+    });
+
+    it('should throw when the store doesn\'t replace the deleteStream', async() => {
+      store = <any> {
+        match: () => streamifyArray([]),
+        countQuads: () => 1,
+      };
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      const data = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
+        ctx,
+      );
+      await expect(data).toEqualBindingsStream([]);
+      expect(ctx.get(KeysStreamingSource.matchOptions)[0].deleteStream)
+        .toThrow(new Error('deleteStream function has not been replaced in streaming store.'));
+    });
+
+    it('should delete the stream if deleteStream is called', async() => {
+      const deleteFn = jest.fn();
+      store = <any>{
+        match: (s, p, o, g, matchoptions) => {
+          deleteFn();
+          const stream = new PassThrough({ objectMode: true });
+          matchoptions.deleteStream = () => {
+            stream.push(quad('s1', 'p1', 'o1', 'g', false));
+            stream.end();
+          };
+          stream.push(quad('s1', 'p1', 'o1', 'g', true));
+          return stream;
+        },
+        countQuads: () => 1,
+      };
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      const data = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      ctx.get(KeysStreamingSource.matchOptions)[0].deleteStream();
+      await expect(data).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      expect(deleteFn).toHaveBeenCalledTimes(1);
+      expect(data.closed).toBeTruthy();
+    });
+
+    it('should delete the stream if deleteStream is called (with real store)', async() => {
+      store.addQuad(quad('s1', 'p1', 'o1'));
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      const data = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      ctx.get(KeysStreamingSource.matchOptions)[0].deleteStream();
+      await expect(data).toEqualBindingsStream([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      expect(data.closed).toBeTruthy();
+    });
+
     it('should destroy stream if setMetadata function throws', async() => {
       (<any>source).setMetadata = async() => {
         throw new Error('setMetadata error');
@@ -116,12 +240,12 @@ describe('StreamingQuerySourceRdfJs', () => {
       );
       await expect(data).toEqualBindingsStream([
         BF.fromRecord({
-          s: DF.namedNode('s2'),
-          o: DF.namedNode('o2'),
-        }).setContextEntry(KeysBindings.isAddition, true),
-        BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          s: DF.namedNode('s2'),
+          o: DF.namedNode('o2'),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
@@ -213,14 +337,14 @@ describe('StreamingQuerySourceRdfJs', () => {
       );
       await expect(data).toEqualBindingsStream([
         BF.fromRecord({
-          s: DF.namedNode('s2'),
-          o: DF.namedNode('o2'),
-          g: DF.defaultGraph(),
-        }).setContextEntry(KeysBindings.isAddition, true),
-        BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
           g: DF.namedNode('g1'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          s: DF.namedNode('s2'),
+          o: DF.namedNode('o2'),
+          g: DF.defaultGraph(),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
       //
@@ -248,12 +372,12 @@ describe('StreamingQuerySourceRdfJs', () => {
       );
       await expect(data).toEqualBindingsStream([
         BF.fromRecord({
-          s: DF.namedNode('s2'),
-          o: DF.namedNode('o2'),
-        }).setContextEntry(KeysBindings.isAddition, true),
-        BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          s: DF.namedNode('s2'),
+          o: DF.namedNode('o2'),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
@@ -289,12 +413,12 @@ describe('StreamingQuerySourceRdfJs', () => {
       );
       await expect(data).toEqualBindingsStream([
         BF.fromRecord({
-          s: DF.namedNode('s2'),
-          o: DF.namedNode('o2'),
-        }).setContextEntry(KeysBindings.isAddition, true),
-        BF.fromRecord({
           s: DF.namedNode('s1'),
           o: DF.namedNode('o1'),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          s: DF.namedNode('s2'),
+          o: DF.namedNode('o2'),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
@@ -404,20 +528,20 @@ describe('StreamingQuerySourceRdfJs', () => {
           );
           await expect(data).toEqualBindingsStream([
             BF.fromRecord({
-              s: DF.namedNode('s3'),
-              o: DF.quad(
-                DF.namedNode('sa3'),
-                DF.namedNode('pax'),
-                DF.namedNode('oa3'),
-              ),
+              s: DF.namedNode('s1'),
+              o: DF.namedNode('o1'),
             }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s2'),
               o: DF.namedNode('o2'),
             }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
-              s: DF.namedNode('s1'),
-              o: DF.namedNode('o1'),
+              s: DF.namedNode('s3'),
+              o: DF.quad(
+                DF.namedNode('sa3'),
+                DF.namedNode('pax'),
+                DF.namedNode('oa3'),
+              ),
             }).setContextEntry(KeysBindings.isAddition, true),
           ]);
 
@@ -473,7 +597,7 @@ describe('StreamingQuerySourceRdfJs', () => {
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
               state: expect.any(MetadataValidationState),
-              cardinality: { type: 'exact', value: 1 },
+              cardinality: { type: 'estimate', value: 3 },
               variables: [{
                 canBeUndef: false,
                 variable: DF.variable('s'),
@@ -525,7 +649,7 @@ describe('StreamingQuerySourceRdfJs', () => {
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
               state: expect.any(MetadataValidationState),
-              cardinality: { type: 'exact', value: 1 },
+              cardinality: { type: 'estimate', value: 5 },
               variables: [{
                 canBeUndef: false,
                 variable: DF.variable('s'),
@@ -591,7 +715,7 @@ describe('StreamingQuerySourceRdfJs', () => {
           ]);
           await expect(new Promise(resolve => data.getProperty('metadata', resolve))).resolves
             .toEqual({
-              cardinality: { type: 'exact', value: 1 },
+              cardinality: { type: 'estimate', value: 6 },
               state: expect.any(MetadataValidationState),
               variables: [{
                 canBeUndef: false,
@@ -644,20 +768,20 @@ describe('StreamingQuerySourceRdfJs', () => {
           );
           await expect(data).toEqualBindingsStream([
             BF.fromRecord({
-              s: DF.namedNode('s3'),
-              o: DF.quad(
-                DF.namedNode('sa3'),
-                DF.namedNode('pax'),
-                DF.namedNode('oa3'),
-              ),
+              s: DF.namedNode('s1'),
+              o: DF.namedNode('o1'),
             }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
               s: DF.namedNode('s2'),
               o: DF.namedNode('o2'),
             }).setContextEntry(KeysBindings.isAddition, true),
             BF.fromRecord({
-              s: DF.namedNode('s1'),
-              o: DF.namedNode('o1'),
+              s: DF.namedNode('s3'),
+              o: DF.quad(
+                DF.namedNode('sa3'),
+                DF.namedNode('pax'),
+                DF.namedNode('oa3'),
+              ),
             }).setContextEntry(KeysBindings.isAddition, true),
           ]);
 

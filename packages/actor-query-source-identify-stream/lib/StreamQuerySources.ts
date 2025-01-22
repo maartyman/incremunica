@@ -19,6 +19,7 @@ import type {
   MetadataBindings,
 } from '@comunica/types';
 import { MetadataValidationState } from '@comunica/utils-metadata';
+import { KeysStreamingSource } from '@incremunica/context-entries';
 import type { IQuerySourceStreamElement, QuerySourceStream } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
 import { AsyncIterator, UnionIterator } from 'asynciterator';
@@ -202,7 +203,8 @@ export class StreamQuerySources implements IQuerySource {
       if (sourceWrapper.state === SourceState.deleted) {
         return iterator.read();
       }
-      const bindingsStream = sourceWrapper.source!.queryBindings(operation, context, options);
+      const currentContext = context.set(KeysStreamingSource.matchOptions, []);
+      const bindingsStream = sourceWrapper.source!.queryBindings(operation, currentContext, options);
       bindingsStream.getProperty('metadata', (metadata: MetadataBindings) => {
         if (first) {
           accumulatedMetadata.state.invalidate();
@@ -238,10 +240,16 @@ export class StreamQuerySources implements IQuerySource {
         if (linkedRdfSourcesAsyncRdfIterator) {
           // TODO [2025-01-01]: make sure LinkedRdfSourcesAsyncRdfIterator is also destroyed
           stopStreamFn = () => {
-            for (const currentIterator of (<any>linkedRdfSourcesAsyncRdfIterator).currentIterators) {
-              const fn = (<BindingsStream>currentIterator).getProperty<() => void>('delete');
-              if (fn) {
-                fn();
+            const matchOptions = currentContext.get(KeysStreamingSource.matchOptions);
+            if (matchOptions === undefined) {
+              throw new Error('matchOptions is not set, this shouldn\'t happen');
+            }
+            if (matchOptions.length === 0) {
+              throw new Error('matchOptions is empty, this shouldn\'t happen');
+            }
+            for (const matchOption of matchOptions) {
+              if (matchOption.deleteStream) {
+                matchOption.deleteStream();
               } else {
                 iterator.destroy(new Error('No delete function found'));
               }
