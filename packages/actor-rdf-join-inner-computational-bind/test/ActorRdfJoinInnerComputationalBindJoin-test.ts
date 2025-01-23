@@ -25,7 +25,7 @@ import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
 import { DataFactory } from 'rdf-data-factory';
 import type { Stream } from 'readable-stream';
 import { PassThrough } from 'readable-stream';
-import { Factory } from 'sparqlalgebrajs';
+import { Algebra, Factory } from 'sparqlalgebrajs';
 import {
   ActorRdfJoinInnerComputationalBind,
 } from '../lib';
@@ -236,190 +236,238 @@ describe('ActorRdfJoinComputationalBind', () => {
         }]);
       });
 
-      // TODO [2024-12-01]: re-enable these tests
-      // eslint-disable-next-line jest/no-commented-out-tests
-      // it('should handle three entries with a lower variable overlap', async() => {
-      // expect(await actor.getJoinCoefficients(
-      //     {
-      //       type: 'inner',
-      //       entries: [
-      //         {
-      //           output: <any>{},
-      //           operation: <any>{},
-      //         },
-      //         {
-      //           output: <any>{},
-      //           operation: <any>{},
-      //         },
-      //         {
-      //           output: <any>{},
-      //           operation: <any>{},
-      //         },
-      //       ],
-      //       context: new ActionContext(),
-      //     },
-      //     [
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 3 },
-      //         pageSize: 100,
-      //         requestTime: 10,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a'), DF.variable('b') ],
-      //       },
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 2 },
-      //         pageSize: 100,
-      //         requestTime: 20,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a'), DF.variable('b') ],
-      //       },
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 5 },
-      //         pageSize: 100,
-      //         requestTime: 30,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a'), DF.variable('b') ],
-      //       },
-      //     ],
-      // )).toEqual({
-      //     iterations: 1.280_000_000_000_000_2,
-      //     persistedItems: 0,
-      //     blockingItems: 0,
-      //     requestTime: 0.440_96,
-      // });
-      // });
-      // eslint-disable-next-line jest/no-commented-out-tests
-      // it('should reject on a right stream of type extend', async() => {
-      // await expect(actor.getJoinCoefficients(
-      //     {
-      //       type: 'inner',
-      //       entries: [
-      //         {
-      //           output: <any>{
-      //             metadata: () => Promise.resolve({
-      //               state: new MetadataValidationState(),
-      //               cardinality: { type: 'estimate', value: 3 },
-      //               canContainUndefs: false,
-      //             }),
-      //
-      //           },
-      //           operation: <any>{ type: Algebra.types.EXTEND },
-      //         },
-      //         {
-      //           output: <any>{
-      //             metadata: () => Promise.resolve({
-      //               state: new MetadataValidationState(),
-      //               cardinality: { type: 'estimate', value: 2 },
-      //               canContainUndefs: false,
-      //             }),
-      //           },
-      //           operation: <any>{},
-      //         },
-      //       ],
-      //       context: new ActionContext(),
-      //     },
-      //     [
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 3 },
-      //         pageSize: 100,
-      //         requestTime: 10,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ],
-      //       },
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 2 },
-      //         pageSize: 100,
-      //         requestTime: 20,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ],
-      //       },
-      //     ],
-      // )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      // });
-      // eslint-disable-next-line jest/no-commented-out-tests
-      // it('should reject on a right stream of type group', async() => {
-      // await expect(actor.getJoinCoefficients(
-      //     {
-      //       type: 'inner',
-      //       entries: [
-      //         {
-      //           output: <any> {},
-      //           operation: <any> { type: Algebra.types.GROUP },
-      //         },
-      //         {
-      //           output: <any> {},
-      //           operation: <any> {},
-      //         },
-      //       ],
-      //       context: new ActionContext(),
-      //     },
-      //     [
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 3 },
-      //         pageSize: 100,
-      //         requestTime: 10,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ],
-      //       },
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 2 },
-      //         pageSize: 100,
-      //         requestTime: 20,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ]},
-      //     ],
-      // )).rejects.toThrowError('Actor actor can not bind on Extend and Group operations');
-      // });
-      // eslint-disable-next-line jest/no-commented-out-tests
-      // it('should not reject on a left stream of type group', async() => {
-      // expect(await actor.getJoinCoefficients(
-      //     {
-      //       type: 'inner',
-      //       entries: [
-      //         {
-      //           output: <any> {},
-      //           operation: <any> {},
-      //         },
-      //         {
-      //           output: <any> {},
-      //           operation: <any> { type: Algebra.types.GROUP },
-      //         },
-      //       ],
-      //       context: new ActionContext(),
-      //     },
-      //     [
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 3 },
-      //         pageSize: 100,
-      //         requestTime: 10,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ],
-      //       },
-      //       {
-      //         state: new MetadataValidationState(),
-      //         cardinality: { type: 'estimate', value: 2 },
-      //         pageSize: 100,
-      //         requestTime: 20,
-      //         canContainUndefs: false,
-      //         variables: [ DF.variable('a') ],
-      //       },
-      //     ],
-      // )).toEqual({
-      //     iterations: 0.480_000_000_000_000_1,
-      //     persistedItems: 0,
-      //     blockingItems: 0,
-      //     requestTime: 0.403_840_000_000_000_03,
-      // });
-      // });
-      //
+      it('should handle three entries with a lower variable overlap', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any>{},
+                operation: FACTORY.createNop(),
+              },
+              {
+                output: <any>{},
+                operation: FACTORY.createNop(),
+              },
+              {
+                output: <any>{},
+                operation: FACTORY.createNop(),
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  },
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('b'),
+                  },
+                ],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  },
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('b'),
+                  },
+                ],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 5 },
+                pageSize: 100,
+                requestTime: 30,
+                variables: [
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('a'),
+                  },
+                  {
+                    canBeUndef: false,
+                    variable: DF.variable('b'),
+                  },
+                ],
+              },
+            ],
+          },
+        )).resolves.toPassTest({
+          iterations: 0,
+          persistedItems: 0,
+          blockingItems: 0,
+          requestTime: 0,
+        });
+      });
+
+      it('should reject on a right stream of type extend', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any>{
+                  metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
+                    cardinality: { type: 'estimate', value: 3 },
+                    variables: [{
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    }],
+                  }),
+                },
+                operation: <any>{ type: Algebra.types.EXTEND },
+              },
+              {
+                output: <any>{
+                  metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
+                    cardinality: { type: 'estimate', value: 2 },
+                    variables: [{
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    }],
+                  }),
+                },
+                operation: <any>{},
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toFailTest('Actor actor can not bind on Extend and Group operations');
+      });
+
+      it('should reject on a right stream of type group', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any> {},
+                operation: <any> { type: Algebra.types.GROUP },
+              },
+              {
+                output: <any> {},
+                operation: <any> {},
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toFailTest('Actor actor can not bind on Extend and Group operations');
+      });
+
+      it('should not reject on a left stream of type group', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any> {},
+                operation: FACTORY.createNop(),
+              },
+              {
+                output: <any> {},
+                operation: <any> { type: Algebra.types.GROUP },
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toPassTest({
+          iterations: 0,
+          persistedItems: 0,
+          blockingItems: 0,
+          requestTime: 0,
+        });
+      });
     });
 
     describe('sortJoinEntries', () => {

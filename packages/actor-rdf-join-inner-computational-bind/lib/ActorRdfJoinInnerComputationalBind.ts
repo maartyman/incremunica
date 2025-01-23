@@ -27,8 +27,7 @@ import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries'
 import type { StreamingQuerySource } from '@incremunica/streaming-query-source';
 import { TransformIterator, UnionIterator } from 'asynciterator';
 import type { AsyncIterator } from 'asynciterator';
-import type { Algebra } from 'sparqlalgebrajs';
-import { Factory } from 'sparqlalgebrajs';
+import { Algebra, Util, Factory } from 'sparqlalgebrajs';
 
 /**
  * An Incremunica computational Bind RDF Join Actor.
@@ -329,6 +328,22 @@ export class ActorRdfJoinInnerComputationalBind extends ActorRdfJoin {
     };
   }
 
+  public canBindWithOperation(operation: Algebra.Operation): boolean {
+    let valid = true;
+    Util.recurseOperation(operation, {
+      [Algebra.types.EXTEND](): boolean {
+        valid = false;
+        return false;
+      },
+      [Algebra.types.GROUP](): boolean {
+        valid = false;
+        return false;
+      },
+    });
+
+    return valid;
+  }
+
   public async getJoinCoefficients(
     action: IActionRdfJoin,
     sideData: IActorRdfJoinTestSideData,
@@ -344,6 +359,12 @@ export class ActorRdfJoinInnerComputationalBind extends ActorRdfJoin {
     const entriesSorted = entriesTest.get();
     const remainingEntries = [ ...entriesSorted ];
     remainingEntries.splice(0, 1);
+
+    // Reject binding on some operation types
+    if (remainingEntries
+      .some(entry => !this.canBindWithOperation(entry.operation))) {
+      return failTest(`Actor ${this.name} can not bind on Extend and Group operations`);
+    }
 
     const sources = action.context.getSafe(KeysQueryOperation.querySources).map(sourceWrapper => sourceWrapper.source);
     for (const source of sources) {
