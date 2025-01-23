@@ -9,7 +9,7 @@ import type { Quad } from '@incremunica/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { ActorQueryOperationSlice } from '../lib/ActorQueryOperationSlice';
+import { ActorQueryOperationSlice } from '../lib';
 import '@comunica/utils-jest';
 import '@incremunica/jest';
 
@@ -652,7 +652,7 @@ describe('ActorQueryOperationSlice', () => {
           });
           const op: any = {
             operation: { type: 'project', start, length },
-            context: createTestContextWithDataFactory(DF),
+            context: createTestContextWithDataFactory(),
           };
           const output = getSafeQuads(await actor.run(op, undefined));
           expect(output.type).toBe('quads');

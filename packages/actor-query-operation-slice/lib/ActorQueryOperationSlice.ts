@@ -179,12 +179,13 @@ export class ActorQueryOperationSlice extends ActorQueryOperationTypedMediated<A
         done();
         return;
       }
-      done();
       stream.destroy(new Error(`Deletion ${hash}, has not been added.`));
+      done();
     };
 
     return stream.transform({
       transform,
+      autoStart: false,
     });
   }
 
