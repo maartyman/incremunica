@@ -5,6 +5,8 @@ import type * as RDF from '@rdfjs/types';
 import { ActorQuerySourceIdentifyStreamingRdfJs, StreamingQuerySourceRdfJs } from '..';
 import 'jest-rdf';
 import '@comunica/utils-jest';
+import {StreamingStore} from "@incremunica/streaming-store";
+import {Store} from "n3";
 
 const mediatorMergeBindingsContext: any = {
   mediate(arg: any) {
@@ -44,7 +46,7 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
 
     beforeEach(() => {
       actor = new ActorQuerySourceIdentifyStreamingRdfJs({ name: 'actor', bus, mediatorMergeBindingsContext });
-      source = { match: () => <any> null };
+      source = new StreamingStore();
     });
 
     describe('test', () => {
@@ -52,7 +54,14 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
         await expect(actor.test({
           querySourceUnidentified: { type: 'rdfjs', value: source },
           context: new ActionContext(),
-        })).resolves.toBeTruthy();
+        })).resolves.toPassTestVoid();
+      });
+
+      it('should not test with a normal Store', async() => {
+        await expect(actor.test({
+          querySourceUnidentified: { type: 'rdfjs', value: new Store() },
+          context: new ActionContext(),
+        })).resolves.toFailTest("actor didn't receive a StreamingStore.");
       });
 
       it('should not test with sparql type', async() => {

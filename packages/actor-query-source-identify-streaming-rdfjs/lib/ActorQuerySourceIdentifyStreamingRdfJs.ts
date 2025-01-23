@@ -10,7 +10,7 @@ import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
 import { BindingsFactory } from '@comunica/utils-bindings-factory';
-import type { StreamingStore } from '@incremunica/streaming-store';
+import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/types';
 import { StreamingQuerySourceRdfJs } from './StreamingQuerySourceRdfJs';
 
@@ -32,11 +32,9 @@ export class ActorQuerySourceIdentifyStreamingRdfJs extends ActorQuerySourceIden
     if (typeof source.value === 'string' || !('match' in source.value)) {
       return failTest(`${this.name} actor received an invalid streaming rdfjs query source.`);
     }
-    // TODO [2024-12-01]: add check to make sure the store is a streaming store
-    // if (!(source.value instanceof StreamingStore)
-    // && !(!('match' in source) && (source.value instanceof StreamingStore))) {
-    //  throw new Error(`${this.name} didn't receive a StreamingStore.`);
-    // }
+    if (!(source.value instanceof StreamingStore)) {
+      return failTest(`${this.name} didn't receive a StreamingStore.`);
+    }
     return passTestVoid();
   }
 
