@@ -12,6 +12,7 @@
     "ccqs:config/query-operation/actors/query/minus.json",
     "ccqs:config/query-operation/actors/query/nop.json",
     "icqsi:config/query-operation/actors/query/slice.json",
+    "icqsi:config/query-operation/actors/query/reduced.json",
     "ccqs:config/query-operation/actors/query/leftjoin.json",
     "ccqs:config/query-operation/actors/query/values.json",
     "ccqs:config/query-operation/actors/query/bgp.json",
