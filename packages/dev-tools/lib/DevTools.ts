@@ -39,30 +39,45 @@ export const DF = new DataFactory();
 export const BF = new BindingsFactory(DF, {});
 export const AF = new Factory();
 
-export async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  const array: any[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>(resolve => stream.once('data', (data: any) => {
+export async function partialArrayifyStream<T>(stream: EventEmitter, num: number): Promise<T[]> {
+  const array: T[] = [];
+  let count = 0;
+  await new Promise<void>((resolve) => {
+    const countFunction = (data: T): void => {
       array.push(data);
-      resolve();
-    }));
-  }
+      count++;
+      if (count === num) {
+        stream.removeListener('data', countFunction);
+        resolve();
+      }
+    };
+    stream.on('data', countFunction);
+  });
   return array;
 }
 
-async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterator<T>, num: number): Promise<T[]> {
+export async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterator<T>, num: number): Promise<T[]> {
   const array: T[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>((resolve) => {
-      asyncIterator.once('readable', resolve);
-    });
-    const element = asyncIterator.read();
-    if (!element) {
-      i--;
-      continue;
-    }
-    array.push(element);
-  }
+  let count = 0;
+  await new Promise<void>((resolve) => {
+    const countFunction = (): void => {
+      while (asyncIterator.readable) {
+        const data = asyncIterator.read();
+        if (!data) {
+          break;
+        }
+        array.push(data);
+        count++;
+        if (count === num) {
+          asyncIterator.removeListener('readable', countFunction);
+          resolve();
+          break;
+        }
+      }
+    };
+    countFunction();
+    asyncIterator.on('readable', countFunction);
+  });
   return array;
 }
 

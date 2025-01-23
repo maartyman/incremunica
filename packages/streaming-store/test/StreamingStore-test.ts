@@ -1,5 +1,5 @@
 import 'jest-rdf';
-import { quad } from '@incremunica/dev-tools';
+import { partialArrayifyStream, quad } from '@incremunica/dev-tools';
 import type { Quad } from '@incremunica/types';
 import { arrayifyStream } from 'arrayify-stream';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
@@ -9,22 +9,6 @@ import { Readable } from 'readable-stream';
 import { StreamingStore } from '../lib';
 
 const streamifyArray = require('streamify-array');
-
-async function partialArrayifyStream(stream: Readable, num: number): Promise<any[]> {
-  const array: any[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>((resolve) => {
-      stream.once('readable', resolve);
-    });
-    const element = stream.read();
-    if (!element) {
-      i--;
-      continue;
-    }
-    array.push(element);
-  }
-  return array;
-}
 
 const DF = new DataFactory();
 
@@ -675,7 +659,7 @@ describe('StreamStore', () => {
 
     const matchStream = store.match(null, null, null, null);
 
-    await expect(partialArrayifyStream(<Readable>matchStream, 2)).resolves.toBeRdfIsomorphic([
+    await expect(partialArrayifyStream(matchStream, 2)).resolves.toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
     ]);

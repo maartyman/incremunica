@@ -5,7 +5,7 @@ import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
 import { ActionContext, Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import { KeysBindings } from '@incremunica/context-entries';
-import { createTestContextWithDataFactory, AF, DF, BF, partialArrayifyStream } from '@incremunica/dev-tools';
+import { createTestContextWithDataFactory, AF, DF, BF, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
 import type { IQuerySourceStreamElement } from '@incremunica/types';
 import { ArrayIterator, AsyncIterator } from 'asynciterator';
 import { ActorQuerySourceIdentifyStream } from '../lib';
@@ -173,7 +173,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
           new ActionContext(),
         );
-        await expect(partialArrayifyStream(bindings, 5)).resolves.toEqualBindingsArray([
+        await expect(partialArrayifyAsyncIterator(bindings, 5)).resolves.toEqualBindingsArray([
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, true),
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, true),
@@ -255,7 +255,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
           new ActionContext(),
         );
-        await expect(partialArrayifyStream(bindings, 1)).resolves.toEqualBindingsArray([
+        await expect(partialArrayifyAsyncIterator(bindings, 1)).resolves.toEqualBindingsArray([
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         expect(deleteCallback).toHaveBeenCalledTimes(0);
@@ -300,11 +300,11 @@ describe('ActorQuerySourceIdentifyStream', () => {
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
           new ActionContext(),
         );
-        await expect(partialArrayifyStream(bindings, 1)).resolves.toEqualBindingsArray([
+        await expect(partialArrayifyAsyncIterator(bindings, 1)).resolves.toEqualBindingsArray([
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, true),
         ]);
         source.readable = true;
-        await expect(partialArrayifyStream(bindings, 1)).resolves.toEqualBindingsArray([
+        await expect(partialArrayifyAsyncIterator(bindings, 1)).resolves.toEqualBindingsArray([
           BF.bindings([[ DF.variable('v'), DF.namedNode('a') ]]).setContextEntry(KeysBindings.isAddition, false),
         ]);
         expect(deleteCallback).toHaveBeenCalledTimes(1);

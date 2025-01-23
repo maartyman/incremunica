@@ -3,27 +3,15 @@
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
 import '@incremunica/jest';
-import type { EventEmitter } from 'events';
 import type { BindingsStream, QueryStringContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
-import { createTestBindingsFactory } from '@incremunica/dev-tools';
+import { createTestBindingsFactory, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/types';
 import { DataFactory } from 'rdf-data-factory';
 import { QueryEngine } from '../lib';
 import { usePolly } from '../test/util';
-
-async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  const array: any[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>(resolve => stream.once('data', (bindings: any) => {
-      array.push(bindings);
-      resolve();
-    }));
-  }
-  return array;
-}
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
@@ -60,7 +48,7 @@ describe('System test: QuerySparql (without polly)', () => {
         pollingPeriod: 500,
       });
 
-      expect(await partialArrayifyStream(bindingStream, 2)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 2)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s1') ],
           [ DF.variable('p'), DF.namedNode('p1') ],
@@ -75,7 +63,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
       streamingStore.addQuad(quad('s3', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s3') ],
           [ DF.variable('p'), DF.namedNode('p3') ],
@@ -85,7 +73,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
       streamingStore.removeQuad(quad('s3', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s3') ],
           [ DF.variable('p'), DF.namedNode('p3') ],
@@ -108,7 +96,7 @@ describe('System test: QuerySparql (without polly)', () => {
         pollingPeriod: 500,
       });
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s1'), DF.namedNode('s1') ],
           [ DF.variable('p1'), DF.namedNode('p1') ],
@@ -120,7 +108,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
       streamingStore.addQuad(quad('o1', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s1'), DF.namedNode('s1') ],
           [ DF.variable('p1'), DF.namedNode('p1') ],
@@ -132,7 +120,7 @@ describe('System test: QuerySparql (without polly)', () => {
 
       streamingStore.removeQuad(quad('o1', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s1'), DF.namedNode('s1') ],
           [ DF.variable('p1'), DF.namedNode('p1') ],
@@ -170,7 +158,7 @@ describe('System test: QuerySparql (with polly)', () => {
         pollingPeriod: 500,
       });
 
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine', async() => {
@@ -183,22 +171,22 @@ describe('System test: QuerySparql (with polly)', () => {
       };
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine and wait a bit until the polling is removed', async() => {
@@ -211,12 +199,12 @@ describe('System test: QuerySparql (with polly)', () => {
       };
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
       await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
 
       bindingStream = await engine.queryBindings(query, context);
-      expect(await partialArrayifyStream(bindingStream, 100)).toHaveLength(100);
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     describe('simple SPS', () => {
@@ -228,7 +216,7 @@ describe('System test: QuerySparql (with polly)', () => {
           pollingPeriod: 500,
         });
 
-        expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
+        expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
       });
     });
 
@@ -242,7 +230,7 @@ describe('System test: QuerySparql (with polly)', () => {
           pollingPeriod: 500,
         });
 
-        expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
+        expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
       });
 
       it('for the single source entry', async() => {
@@ -254,7 +242,7 @@ describe('System test: QuerySparql (with polly)', () => {
           pollingPeriod: 1000,
         });
 
-        expect(await partialArrayifyStream(bindingStream, 20)).toHaveLength(20);
+        expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
       });
 
       describe('SHACL Compact Syntax Serialisation', () => {
@@ -269,7 +257,7 @@ describe('System test: QuerySparql (with polly)', () => {
             pollingPeriod: 1000,
           });
 
-          expect(await partialArrayifyStream(bindingStream, 1)).toHaveLength(1);
+          expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
         });
       });
     });
