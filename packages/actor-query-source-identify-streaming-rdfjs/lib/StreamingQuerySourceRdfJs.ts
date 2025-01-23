@@ -301,11 +301,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
         const variable = elementVariables[key];
         const term = getValueNestedPath(quad, keys);
         return [ dataFactory.variable(variable), term ];
-        // TODO [2024-12-01]: write a test for this
-      })).setContextEntry(
-        KeysBindings.isAddition,
-        ((<any>quad).isAddition === undefined) ? true : (<any>quad).isAddition,
-      )), {
+      })).setContextEntry(KeysBindings.isAddition, (<any>quad).isAddition ?? true)), {
       onClose: () => {
         quads.destroy();
         onClose();

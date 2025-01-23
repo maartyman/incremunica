@@ -1217,11 +1217,10 @@ describe('StreamingQuerySourceRdfJs', () => {
     });
 
     it('converts quads with union default graph', async() => {
-      // Prepare data
       const quadStream = new ArrayIterator([
-        quad('s1', 'p1', 'o1'),
-        quad('s2', 'p2', 'o2', 'g1'),
-        quad('s3', 'p3', 'o3', 'g2'),
+        quad('s1', 'p', 'o1', 'g1'),
+        quad('s2', 'p', 'o2'),
+        quad('s3', 'px', 'o3'),
       ], { autoStart: false });
       quadStream.setProperty('metadata', {
         cardinality: { type: 'exact', value: 3 },
@@ -1233,48 +1232,55 @@ describe('StreamingQuerySourceRdfJs', () => {
         ],
       });
       const pattern = AF.createPattern(
-        DF.namedNode('s'),
-        DF.variable('p'),
-        DF.namedNode('o'),
+        DF.variable('s'),
+        DF.namedNode('p'),
+        DF.variable('o'),
         DF.variable('g'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, true, () => {});
 
-      // TODO [2024-12-01]: check if the default graph should be included or not
-      // should the following be added:
-      //         BF.fromRecord({
-      //           p: DF.namedNode('p1'),
-      //           g: DF.defaultGraph(),
-      //         }).setContextEntry(KeysBindings.isAddition, true),
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
-          p: DF.namedNode('p2'),
+          s: DF.namedNode('s1'),
+          o: DF.namedNode('o1'),
           g: DF.namedNode('g1'),
         }).setContextEntry(KeysBindings.isAddition, true),
         BF.fromRecord({
-          p: DF.namedNode('p3'),
-          g: DF.namedNode('g2'),
+          s: DF.namedNode('s2'),
+          o: DF.namedNode('o2'),
+          g: DF.defaultGraph(),
+        }).setContextEntry(KeysBindings.isAddition, true),
+        BF.fromRecord({
+          s: DF.namedNode('s3'),
+          o: DF.namedNode('o3'),
+          g: DF.defaultGraph(),
         }).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
-      //
-      // const metadata = await new Promise(resolve => bindingsStream.getProperty('metadata', resolve));
-      // expect(metadata).toEqual({
-      // cardinality: { type: 'exact', value: 3 },
-      // order: [
-      //     { term: DF.variable('p'), direction: 'asc' },
-      //     { term: DF.variable('g'), direction: 'asc' },
-      // ],
-      // variables: [{
-      //     canBeUndef: false,
-      //     variable: DF.variable('p'),
-      // }, {
-      //     canBeUndef: false,
-      //     variable: DF.variable('g'),
-      // }],
-      // });
-      //
+      const metadata = await new Promise(resolve => bindingsStream.getProperty('metadata', resolve));
+      expect(metadata).toEqual({
+        cardinality: { type: 'exact', value: 3 },
+        order: [
+          { term: DF.variable('s'), direction: 'asc' },
+          { term: DF.variable('o'), direction: 'asc' },
+          { term: DF.variable('g'), direction: 'asc' },
+        ],
+        variables: [
+          {
+            canBeUndef: false,
+            variable: DF.variable('s'),
+          },
+          {
+            canBeUndef: false,
+            variable: DF.variable('o'),
+          },
+          {
+            canBeUndef: false,
+            variable: DF.variable('g'),
+          },
+        ],
+      });
     });
 
     it('converts triples with duplicate variables', async() => {
