@@ -1523,6 +1523,18 @@
     "@comunica/utils-query-operation" "^4.0.2"
     sparqlalgebrajs "^4.3.8"
 
+"@comunica/actor-query-operation-from-quad@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-from-quad/-/actor-query-operation-from-quad-4.0.2.tgz#721cb631a9c545bce1e7bbe2f289d49745f65fed"
+  integrity sha512-HkwhPVt9rzGUBMx6Zqb8uA5FLpVkqE1iK3QA8TumE19rK7DGUhG5jpaZr2/UMwdVefaWS0NrRh7bOWOC56UjuA==
+  dependencies:
+    "@comunica/bus-query-operation" "^4.0.2"
+    "@comunica/context-entries" "^4.0.2"
+    "@comunica/core" "^4.0.2"
+    "@comunica/types" "^4.0.2"
+    "@rdfjs/types" "*"
+    sparqlalgebrajs "^4.3.8"
+
 "@comunica/actor-query-operation-join@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@comunica/actor-query-operation-join/-/actor-query-operation-join-4.0.2.tgz#eff1b27e44aa07c648f27111fbdfeeb0e656d84e"
