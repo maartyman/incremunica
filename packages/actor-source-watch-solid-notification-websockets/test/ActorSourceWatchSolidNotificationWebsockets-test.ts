@@ -310,7 +310,7 @@ IActorHttpOutput
       result.stop();
     });
 
-    // TODO [2024-09-01]: re-enable these tests
+    // TODO [2025-09-01]: re-enable these tests
     // eslint-disable-next-line jest/no-commented-out-tests
     // it('should support Buffer messages', async () => {
     // createResourceRequestFn = createResourceRequest;

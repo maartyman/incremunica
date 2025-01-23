@@ -27,7 +27,7 @@ module.exports = config([
       'unicorn/no-array-callback-reference': 'off',
       'unicorn/prefer-node-protocol': 'off',
 
-      // TODO [2024-04-01]: check if these can be enabled
+      // TODO [2025-02-01]: check if these can be enabled
       'ts/naming-convention': 'off',
       'ts/no-unsafe-return': 'off',
       'ts/no-unsafe-argument': 'off',

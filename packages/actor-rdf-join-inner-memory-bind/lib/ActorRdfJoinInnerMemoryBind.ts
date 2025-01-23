@@ -152,14 +152,6 @@ export class ActorRdfJoinInnerMemoryBind extends ActorRdfJoin {
               transform: transformFunc,
             });
 
-            // Maybe by the time operationBinder has finished the current bindings already has been deleted
-            // => count should be 0 then
-            // if (data.count == 0) {
-            //  transformIterator.destroy();
-            //  done();
-            //  return;
-            // }
-
             data.iterator = transformIterator;
 
             push(transformIterator);

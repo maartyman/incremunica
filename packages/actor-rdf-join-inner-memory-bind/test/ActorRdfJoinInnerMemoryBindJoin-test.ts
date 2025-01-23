@@ -2023,23 +2023,6 @@ describe('ActorRdfJoinMemoryBind', () => {
           ]).setContextEntry(KeysBindings.isAddition, false),
         ]);
       });
-
-      // TODO [2024-12-01]: re-enable these tests
-      // eslint-disable-next-line jest/no-commented-out-tests
-      // it('should throw if operationBinder throws error', async() => {
-      // await expect(await arrayifyStream(await ActorRdfJoinInnerMemoryBind.createBindStream(
-      //       new ArrayIterator([
-      //         BF.bindings([
-      //           [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-      //         ]).setContextEntry(KeysBindings.isAddition, true),
-      //       ], { autoStart: false }),
-      //       [FACTORY.createPattern(DF.variable('a'), DF.namedNode('ex:p1'), DF.variable('b'))],
-      //       (boundOperations: Algebra.Operation[], operationBindings: Bindings) => {throw new Error("throw test")},
-      //       false
-      //     ))
-      // ).toThrow('throw test');
-      // });
-      //
     });
   });
 });

@@ -223,7 +223,6 @@ export class StreamQuerySources implements IQuerySource {
           accumulatedMetadata = <MetadataBindings>resultMetadata;
         }).catch((error: Error) => {
           throw error;
-          // TODO [2025-01-01]: handle error and write test
         });
       });
       let stopStreamFn = bindingsStream.getProperty<() => void>('delete');
@@ -238,7 +237,6 @@ export class StreamQuerySources implements IQuerySource {
           linkedRdfSourcesAsyncRdfIterator = (<any>bindingsStream)._source;
         }
         if (linkedRdfSourcesAsyncRdfIterator) {
-          // TODO [2025-01-01]: make sure LinkedRdfSourcesAsyncRdfIterator is also destroyed
           stopStreamFn = () => {
             const matchOptions = currentContext.get(KeysStreamingSource.matchOptions);
             if (matchOptions === undefined) {

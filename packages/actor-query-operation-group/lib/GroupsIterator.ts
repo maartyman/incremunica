@@ -50,7 +50,7 @@ export class GroupIterator extends AsyncIterator<Bindings> {
     this.context = context;
     this.mediatorBindingsAggregatorFactory = mediatorBindingsAggregatorFactory;
 
-    // TODO [2024-06-01]: this is a bit of a hack, we should not be listening to the data event
+    // TODO [2025-06-01]: this is a bit of a hack, we should not be listening to the data event
     let dataCounter = 0;
     inputBindings.on('data', (bindings: Bindings) => {
       dataCounter++;
@@ -90,7 +90,7 @@ export class GroupIterator extends AsyncIterator<Bindings> {
       this.nextBindings = null;
       return bindings;
     }
-    // TODO [2024-09-01]: maybe make sure this is done in round robin fashion
+    // TODO [2025-09-01]: maybe make sure this is done in round robin fashion
     for (const group of this.groups.values()) {
       if (group.groupBuffer) {
         continue;
