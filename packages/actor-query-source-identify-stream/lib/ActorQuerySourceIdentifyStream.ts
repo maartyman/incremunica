@@ -11,7 +11,7 @@ import type { IActorTest, TestResult } from '@comunica/core';
 import { failTest, passTestVoid, ActionContext } from '@comunica/core';
 import type { ComunicaDataFactory } from '@comunica/types';
 import type { QuerySourceStream, QuerySourceUnidentifiedExpanded } from '@incremunica/types';
-import { StreamQuerySources } from './StreamQuerySources';
+import { StreamingQuerySourceStream } from './StreamingQuerySourceStream';
 
 /**
  * An incremunica Stream Sources Query Source Identify Actor.
@@ -36,7 +36,7 @@ export class ActorQuerySourceIdentifyStream extends ActorQuerySourceIdentify {
     const dataFactory: ComunicaDataFactory = action.context.getSafe(KeysInitQuery.dataFactory);
     return {
       querySource: {
-        source: new StreamQuerySources(
+        source: new StreamingQuerySourceStream(
           <QuerySourceStream><any>action.querySourceUnidentified.value,
           dataFactory,
           this.mediatorRdfMetadataAccumulate,

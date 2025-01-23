@@ -11,7 +11,7 @@ import { ArrayIterator, AsyncIterator } from 'asynciterator';
 import { ActorQuerySourceIdentifyStream } from '../lib';
 import 'jest-rdf';
 import '@comunica/utils-jest';
-import { StreamQuerySources } from '../lib/StreamQuerySources';
+import { StreamingQuerySourceStream } from '../lib/StreamingQuerySourceStream';
 
 describe('ActorQuerySourceIdentifyStream', () => {
   let bus: any;
@@ -127,7 +127,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source },
           context,
         });
-        expect(result.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(result.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(result.querySource.context).not.toBe(context);
       });
 
@@ -167,7 +167,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source },
           context,
         });
-        expect(result.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(result.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(result.querySource.context).not.toBe(context);
         const bindings = result.querySource.source.queryBindings(
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
@@ -207,7 +207,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source },
           context,
         });
-        expect(result.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(result.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(result.querySource.context).not.toBe(context);
         const bindings = result.querySource.source.queryBindings(
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
@@ -249,7 +249,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source },
           context,
         });
-        expect(result.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(result.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(result.querySource.context).not.toBe(context);
         const bindings = result.querySource.source.queryBindings(
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
@@ -294,7 +294,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source },
           context,
         });
-        expect(result.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(result.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(result.querySource.context).not.toBe(context);
         const bindings = result.querySource.source.queryBindings(
           AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o')),
@@ -372,7 +372,7 @@ describe('ActorQuerySourceIdentifyStream', () => {
           querySourceUnidentified: { type: 'stream', value: <any>source, context: contextSource },
           context,
         });
-        expect(ret.querySource.source).toBeInstanceOf(StreamQuerySources);
+        expect(ret.querySource.source).toBeInstanceOf(StreamingQuerySourceStream);
         expect(ret.querySource.context).not.toBe(context);
         expect(ret.querySource.context).toBe(contextSource);
       });

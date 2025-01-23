@@ -40,7 +40,7 @@ type ISourceWrapper = {
   identifiedEvent: EventEmitter;
 };
 
-export class StreamQuerySources implements IQuerySource {
+export class StreamingQuerySourceStream implements IQuerySource {
   public referenceValue: string;
   public context: IActionContext;
   private readonly sources: Map<string, ISourceWrapper[]> = new Map();
