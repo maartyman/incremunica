@@ -12,17 +12,17 @@ export class FullHashJoin extends InnerJoin {
   private otherArray: IterableIterator<IMapObject<Bindings>> = [][Symbol.iterator]();
   private otherElement: IMapObject<Bindings> | null = null;
   private count = 0;
-  private readonly joinHash: (entry: Bindings) => number;
-  private readonly leftHash: (entry: Bindings) => number;
-  private readonly rightHash: (entry: Bindings) => number;
+  private readonly joinHash: (entry: Bindings) => string;
+  private readonly leftHash: (entry: Bindings) => string;
+  private readonly rightHash: (entry: Bindings) => string;
 
   public constructor(
     left: AsyncIterator<Bindings>,
     right: AsyncIterator<Bindings>,
     funJoin: (...bindings: Bindings[]) => Bindings | null,
-    joinHash: (entry: Bindings) => number,
-    leftHash: (entry: Bindings) => number,
-    rightHash: (entry: Bindings) => number,
+    joinHash: (entry: Bindings) => string,
+    leftHash: (entry: Bindings) => string,
+    rightHash: (entry: Bindings) => string,
   ) {
     super(left, right, funJoin);
     this.joinHash = joinHash;
@@ -44,9 +44,9 @@ export class FullHashJoin extends InnerJoin {
 
   private addOrDeleteFromMemory(
     item: Bindings,
-    joinHash: number,
+    joinHash: string,
     memory: DualKeyHashMap<Bindings>,
-    hash: number,
+    hash: string,
   ): boolean {
     const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
     if (isAddition) {

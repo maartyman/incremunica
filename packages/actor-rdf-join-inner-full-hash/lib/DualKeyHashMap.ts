@@ -4,9 +4,9 @@ export interface IMapObject<T> {
 }
 
 export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
-  private readonly map = new Map<number, Map<number, IMapObject<O>>>();
+  private readonly map = new Map<string, Map<string, IMapObject<O>>>();
 
-  public set(mainKey: number, secondaryKey: number, value: O): void {
+  public set(mainKey: string, secondaryKey: string, value: O): void {
     const mainMap = this.map.get(secondaryKey);
     if (mainMap) {
       const mapObject = mainMap.get(mainKey);
@@ -14,20 +14,19 @@ export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
         if (value.equals(mapObject.value)) {
           mapObject.count++;
         } else {
-          // TODO [2025-01-01]: this can happen when using clashing hash functions
           throw new Error(`Current value: ${JSON.stringify(mapObject.value)} and given value: ${JSON.stringify(value)} are different. With hash functions mainKey: ${mainKey}, secondary key: ${secondaryKey}!`);
         }
       } else {
         mainMap.set(mainKey, { value, count: 1 });
       }
     } else {
-      const newMap = new Map<number, IMapObject<O>>();
+      const newMap = new Map<string, IMapObject<O>>();
       newMap.set(mainKey, { value, count: 1 });
       this.map.set(secondaryKey, newMap);
     }
   }
 
-  public delete(mainKey: number, secondaryKey: number): boolean {
+  public delete(mainKey: string, secondaryKey: string): boolean {
     const mainMap = this.map.get(secondaryKey);
     if (mainMap) {
       const mapObject = mainMap.get(mainKey);
@@ -47,11 +46,11 @@ export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
     return false;
   }
 
-  public get(mainKey: number, secondaryKey: number): IMapObject<O> | undefined {
+  public get(mainKey: string, secondaryKey: string): IMapObject<O> | undefined {
     return this.map.get(secondaryKey)?.get(mainKey);
   }
 
-  public getAll(secondaryKey: number): IterableIterator<IMapObject<O>> {
+  public getAll(secondaryKey: string): IterableIterator<IMapObject<O>> {
     const mainMap = this.map.get(secondaryKey);
     if (mainMap) {
       return mainMap.values();
@@ -59,7 +58,7 @@ export class DualKeyHashMap<O extends { equals: (item: O) => boolean }> {
     return [][Symbol.iterator]();
   }
 
-  public has(secondaryKey: number): boolean {
+  public has(secondaryKey: string): boolean {
     return this.map.has(secondaryKey);
   }
 
