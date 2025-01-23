@@ -3,12 +3,13 @@ import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@co
 import { Actor } from '@comunica/core';
 
 /**
- * An incremunica actor for source-watch events.
+ * An Incremunica actor for source-watch events.
  *
  * Actor types:
- * * Input:  IActionSourceWatch:      // TODO [2024-12-01]: fill in.
- * * Test:   <none>
- * * Output: IActorSourceWatchOutput: // TODO [2024-12-01]: fill in.
+ * * Input:   IActionSourceWatch: The url and metadata of the source to watch.
+ * * Test:    IActionSourceWatch: The url and metadata of the source to watch.
+ * * Output:  IActorSourceWatchOutput: start and stop functions for the source watch,
+ * and an event emitter for 'update' and 'delete' events.
  *
  * @see IActionSourceWatch
  * @see IActorSourceWatchOutput

@@ -7,9 +7,9 @@ import type { IDetermineChangesEvents } from '@incremunica/types';
  * A comunica actor for determine-changes events.
  *
  * Actor DetermineChanges:
- * * Input:  IActionDetermineChanges:      // TODO [2024-12-01]: fill in.
- * * Test:   <none>
- * * Output: IActorDetermineChangesOutput: // TODO [2024-12-01]: fill in.
+ * * Input:  IActionDetermineChanges: The streaming query source, url, and metadata to determine changes.
+ * * Test:   IActionDetermineChanges: The streaming query source, url, and metadata to determine changes.
+ * * Output: IActorDetermineChangesOutput: The determine-changes events.
  *
  * @see IActionDetermineChanges
  * @see IActorDetermineChangesOutput
