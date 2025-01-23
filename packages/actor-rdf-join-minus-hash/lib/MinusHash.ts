@@ -5,15 +5,15 @@ import { AsyncIterator } from 'asynciterator';
 export class MinusHash extends AsyncIterator<Bindings> {
   private readonly leftIterator: AsyncIterator<Bindings>;
   private readonly rightIterator: AsyncIterator<Bindings>;
-  private readonly leftMemory: Map<number, Bindings[]> = new Map<number, Bindings[]>();
-  private readonly rightMemory: Map<number, number> = new Map<number, number>();
+  private readonly leftMemory: Map<string, Bindings[]> = new Map<string, Bindings[]>();
+  private readonly rightMemory: Map<string, number> = new Map<string, number>();
   private readonly bindingBuffer: Bindings[] = [];
-  private readonly joinHash: (entry: Bindings) => number;
+  private readonly joinHash: (entry: Bindings) => string;
 
   public constructor(
     leftIterator: AsyncIterator<Bindings>,
     rightIterator: AsyncIterator<Bindings>,
-    joinHash: (entry: Bindings) => number,
+    joinHash: (entry: Bindings) => string,
   ) {
     super();
 
@@ -94,7 +94,6 @@ export class MinusHash extends AsyncIterator<Bindings> {
           const matchingBindings = this.leftMemory.get(hash);
           if (matchingBindings !== undefined) {
             for (let matchingBinding of matchingBindings) {
-              // TODO [2024-12-01]: check if the 2 bindings are equal for common variables
               matchingBinding = matchingBinding.setContextEntry(KeysBindings.isAddition, false);
               this.bindingBuffer.push(matchingBinding);
             }

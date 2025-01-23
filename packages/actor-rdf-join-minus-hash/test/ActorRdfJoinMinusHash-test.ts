@@ -1,4 +1,3 @@
-import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { IActionRdfJoin } from '@comunica/bus-rdf-join';
 import type { IActionRdfJoinSelectivity, IActorRdfJoinSelectivityOutput } from '@comunica/bus-rdf-join-selectivity';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
@@ -7,7 +6,7 @@ import type { IActionContext } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings } from '@incremunica/context-entries';
-import { createTestMediatorHashBindings, createTestBindingsFactory } from '@incremunica/dev-tools';
+import { createTestBindingsFactory } from '@incremunica/dev-tools';
 import type * as RDF from '@rdfjs/types';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
@@ -35,7 +34,6 @@ IActorTest,
 IActorRdfJoinSelectivityOutput
 >;
     let actor: ActorRdfJoinMinusHash;
-    let mediatorHashBindings: MediatorHashBindings;
     let action: IActionRdfJoin;
     let variables0: { variable: RDF.Variable; canBeUndef: boolean }[];
     let variables1: { variable: RDF.Variable; canBeUndef: boolean }[];
@@ -44,12 +42,10 @@ IActorRdfJoinSelectivityOutput
       mediatorJoinSelectivity = <any>{
         mediate: async() => ({ selectivity: 1 }),
       };
-      mediatorHashBindings = createTestMediatorHashBindings();
       actor = new ActorRdfJoinMinusHash({
         name: 'actor',
         bus,
         mediatorJoinSelectivity,
-        mediatorHashBindings,
       });
       variables0 = [];
       variables1 = [];
