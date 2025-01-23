@@ -6,7 +6,6 @@ import { DataFactory } from 'rdf-data-factory';
 
 const DF = new DataFactory();
 
-// TODO [2024-12-01]: check if all test still do what they are supposed to do
 describe('toEqualBindings', () => {
   let BF: BindingsFactory;
 
@@ -42,9 +41,9 @@ describe('toEqualBindings', () => {
     expect(() => expect(BF.bindings()).not.toEqualBindings(BF.bindings()))
       .toThrow(`
 Expected:
-{}, isAddition: undefined
+{}, isAddition: true
 Received:
-{}, isAddition: undefined`);
+{}, isAddition: true`);
   });
 
   it('should not fail for equal non-empty bindings', () => {

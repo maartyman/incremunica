@@ -67,7 +67,7 @@ async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterator<T>, 
 }
 
 export function bindingsToString(bindings: Bindings): string {
-  let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
+  let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition) ?? true} :`;
   for (const [ key, value ] of bindings) {
     string += `\n\t${key.value}: ${value.value}`;
   }
@@ -75,7 +75,7 @@ export function bindingsToString(bindings: Bindings): string {
 }
 
 export function printBindings(bindings: Bindings): void {
-  let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition)} :`;
+  let string = `bindings, ${bindings.getContextEntry<boolean>(KeysBindings.isAddition) ?? true} :`;
   for (const [ key, value ] of bindings) {
     string += `\n\t${key.value}: ${value.value}`;
   }
