@@ -120,6 +120,32 @@ describe('ActorSourceWatchDeferred', () => {
         expect(listener).toHaveBeenCalledTimes(0);
       });
 
+      it('should emit delete if resource doesn\'t return a 200 code', async() => {
+        mediatorHttp.mediate = jest.fn(() => Promise.resolve({ ok: false, headers: { get: () => '0' }}));
+        const result = await actor.run(action);
+        const listener = jest.fn();
+        result.events.on('delete', listener);
+        result.start();
+        deferredEvaluationTrigger.emit('update');
+        expect(mediatorHttp.mediate).toHaveBeenCalledTimes(1);
+        // Make sure the promise the mediator promise is resolved
+        await new Promise(resolve => setImmediate(resolve));
+        expect(listener).toHaveBeenCalledTimes(1);
+      });
+
+      it('should emit delete if resource fetch fails', async() => {
+        mediatorHttp.mediate = jest.fn(() => Promise.reject(new Error('This is an error.')));
+        const result = await actor.run(action);
+        const listener = jest.fn();
+        result.events.on('delete', listener);
+        result.start();
+        deferredEvaluationTrigger.emit('update');
+        expect(mediatorHttp.mediate).toHaveBeenCalledTimes(1);
+        // Make sure the promise the mediator promise is resolved
+        await new Promise(resolve => setImmediate(resolve));
+        expect(listener).toHaveBeenCalledTimes(1);
+      });
+
       it('should emit update events if started and changes', async() => {
         const result = await actor.run(action);
         const listener = jest.fn();
