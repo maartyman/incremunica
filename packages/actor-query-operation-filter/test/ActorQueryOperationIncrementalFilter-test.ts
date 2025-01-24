@@ -211,7 +211,7 @@ describe('ActorQueryOperationFilter', () => {
       });
       await new Promise<void>(resolve => output.bindingsStream.on('end', resolve));
       expect(logWarnSpy).toHaveBeenCalledTimes(3);
-      // @ts-ignore
+      // @ts-expect-error
       for (const [ index, call ] of logWarnSpy.mock.calls.entries()) {
         if (index === 0) {
           const dataCB = <() => { error: any; bindings: Bindings }>call[2];

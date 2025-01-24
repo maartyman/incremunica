@@ -21,7 +21,7 @@ import {
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import {Algebra, Factory} from 'sparqlalgebrajs';
+import { Algebra, Factory } from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerMemoryBind } from '../lib';
 import '@comunica/utils-jest';
 import '@incremunica/jest';

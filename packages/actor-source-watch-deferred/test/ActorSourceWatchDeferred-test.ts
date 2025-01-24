@@ -121,7 +121,7 @@ describe('ActorSourceWatchDeferred', () => {
       });
 
       it('should emit delete if resource doesn\'t return a 200 code', async() => {
-        mediatorHttp.mediate = jest.fn(() => Promise.resolve({ ok: false, headers: { get: () => '0' }}));
+        jest.spyOn(mediatorHttp, 'mediate').mockResolvedValue({ ok: false, headers: { get: () => '0' }});
         const result = await actor.run(action);
         const listener = jest.fn();
         result.events.on('delete', listener);
@@ -134,7 +134,7 @@ describe('ActorSourceWatchDeferred', () => {
       });
 
       it('should emit delete if resource fetch fails', async() => {
-        mediatorHttp.mediate = jest.fn(() => Promise.reject(new Error('This is an error.')));
+        jest.spyOn(mediatorHttp, 'mediate').mockRejectedValue(new Error('This is an error.'));
         const result = await actor.run(action);
         const listener = jest.fn();
         result.events.on('delete', listener);

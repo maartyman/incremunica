@@ -1,12 +1,12 @@
 import { ActorQuerySourceIdentify } from '@comunica/bus-query-source-identify';
 import { ActionContext, Bus } from '@comunica/core';
 import { createTestContextWithDataFactory } from '@incremunica/dev-tools';
+import { StreamingStore } from '@incremunica/streaming-store';
 import type * as RDF from '@rdfjs/types';
+import { Store } from 'n3';
 import { ActorQuerySourceIdentifyStreamingRdfJs, StreamingQuerySourceRdfJs } from '..';
 import 'jest-rdf';
 import '@comunica/utils-jest';
-import {StreamingStore} from "@incremunica/streaming-store";
-import {Store} from "n3";
 
 const mediatorMergeBindingsContext: any = {
   mediate(arg: any) {
@@ -61,7 +61,7 @@ describe('ActorQuerySourceIdentifyStreamingRdfJs', () => {
         await expect(actor.test({
           querySourceUnidentified: { type: 'rdfjs', value: new Store() },
           context: new ActionContext(),
-        })).resolves.toFailTest("actor didn't receive a StreamingStore.");
+        })).resolves.toFailTest('actor didn\'t receive a StreamingStore.');
       });
 
       it('should not test with sparql type', async() => {

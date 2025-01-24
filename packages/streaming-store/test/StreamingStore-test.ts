@@ -5,16 +5,16 @@ import { arrayifyStream } from 'arrayify-stream';
 import { promisifyEventEmitter } from 'event-emitter-promisify/dist';
 import { Store } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
+import { termToString } from 'rdf-string';
 import { Readable } from 'readable-stream';
 import { StreamingStore } from '../lib';
-import {termToString} from "rdf-string";
 
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
 
 function stringifyQuadArray(quads: Quad[]): string {
-  return quads.map(quad => `${(quad.isAddition ?? true)? "+" : "-"} ${termToString(quad.subject)} ${termToString(quad.predicate)} ${termToString(quad.object)} ${termToString(quad.graph)}`).join('. ');
+  return quads.map(quad => `${(quad.isAddition ?? true) ? '+' : '-'} ${termToString(quad.subject)} ${termToString(quad.predicate)} ${termToString(quad.object)} ${termToString(quad.graph)}`).join('. ');
 }
 
 describe('StreamingStore', () => {
