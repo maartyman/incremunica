@@ -21,7 +21,7 @@ import {
 import { arrayifyStream } from 'arrayify-stream';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
-import { Factory } from 'sparqlalgebrajs';
+import {Algebra, Factory} from 'sparqlalgebrajs';
 import { ActorRdfJoinInnerMemoryBind } from '../lib';
 import '@comunica/utils-jest';
 import '@incremunica/jest';
@@ -137,6 +137,90 @@ describe('ActorRdfJoinMemoryBind', () => {
         });
         expect(actor.sortJoinEntries).toHaveBeenCalledTimes(1);
         expect(joinCoefficients).toFailTest('test message');
+      });
+
+      it('should fail if streams are of similar size', async() => {
+        await expect(actor.getJoinCoefficients({
+          type: 'inner',
+          entries: [
+            {
+              output: <any>{},
+              operation: FACTORY.createNop(),
+            },
+            {
+              output: <any>{},
+              operation: FACTORY.createNop(),
+            },
+          ],
+          context: new ActionContext(),
+        }, {
+          metadatas: [
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 100 },
+              pageSize: 100,
+              requestTime: 10,
+              variables: [{
+                canBeUndef: false,
+                variable: DF.variable('a'),
+              }],
+            },
+            {
+              state: new MetadataValidationState(),
+              cardinality: { type: 'estimate', value: 100 },
+              pageSize: 100,
+              requestTime: 10,
+              variables: [{
+                canBeUndef: false,
+                variable: DF.variable('a'),
+              }],
+            },
+          ],
+        })).resolves.toFailTest('Actor actor can only run if the smallest stream is much smaller than largest stream');
+      });
+
+      it('should reject on a stream containing a modified operation', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any> {},
+                operation: FACTORY.createNop(),
+                operationModified: true,
+              },
+              {
+                output: <any> {},
+                operation: FACTORY.createNop(),
+              },
+            ],
+            context: new ActionContext(),
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+
+                variables: [
+                  { variable: DF.variable('a'), canBeUndef: false },
+                ],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+
+                variables: [
+                  { variable: DF.variable('a'), canBeUndef: false },
+                ],
+              },
+            ],
+          },
+        )).resolves.toFailTest('Actor actor can not be used over remaining entries with modified operations');
       });
 
       it('should handle three entries', async() => {
@@ -282,6 +366,159 @@ describe('ActorRdfJoinMemoryBind', () => {
           .toEqual([ 3, 2, 500 ]);
         expect(joinCoeficients.getSideData().entriesSorted.map(entry => entry.metadata.cardinality.value))
           .toEqual([ 2, 3, 500 ]);
+      });
+
+      it('should reject on a right stream of type extend', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any>{
+                  metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
+                    cardinality: { type: 'estimate', value: 3 },
+                    variables: [{
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    }],
+                  }),
+                },
+                operation: <any>{ type: Algebra.types.EXTEND },
+              },
+              {
+                output: <any>{
+                  metadata: () => Promise.resolve({
+                    state: new MetadataValidationState(),
+                    cardinality: { type: 'estimate', value: 2 },
+                    variables: [{
+                      canBeUndef: false,
+                      variable: DF.variable('a'),
+                    }],
+                  }),
+                },
+                operation: <any>{},
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toFailTest('Actor actor can not bind on Extend and Group operations');
+      });
+
+      it('should reject on a right stream of type group', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any> {},
+                operation: <any> { type: Algebra.types.GROUP },
+              },
+              {
+                output: <any> {},
+                operation: <any> {},
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 3 },
+                pageSize: 100,
+                requestTime: 10,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 2 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toFailTest('Actor actor can not bind on Extend and Group operations');
+      });
+
+      it('should not reject on a left stream of type group', async() => {
+        await expect(actor.getJoinCoefficients(
+          {
+            type: 'inner',
+            entries: [
+              {
+                output: <any> {},
+                operation: FACTORY.createNop(),
+              },
+              {
+                output: <any> {},
+                operation: <any> { type: Algebra.types.GROUP },
+              },
+            ],
+            context,
+          },
+          {
+            metadatas: [
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 100 },
+                pageSize: 100,
+                requestTime: 10,
+                canContainUndefs: false,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+              {
+                state: new MetadataValidationState(),
+                cardinality: { type: 'estimate', value: 1 },
+                pageSize: 100,
+                requestTime: 20,
+                variables: [{
+                  canBeUndef: false,
+                  variable: DF.variable('a'),
+                }],
+              },
+            ],
+          },
+        )).resolves.toPassTest({
+          iterations: 8.000000000000002,
+          persistedItems: 0,
+          blockingItems: 0,
+          requestTime: 1.0000000000000002,
+        });
       });
     });
 
@@ -902,13 +1139,13 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -933,10 +1170,10 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1068,10 +1305,10 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1237,13 +1474,13 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]),
+                  ]).setContextEntry(KeysBindings.isAddition, true),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
