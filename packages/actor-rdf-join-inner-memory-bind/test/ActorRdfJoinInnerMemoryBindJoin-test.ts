@@ -75,10 +75,10 @@ describe('ActorRdfJoinMemoryBind', () => {
             bindingsStream: new ArrayIterator([
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound1') ],
-              ]).setContextEntry(KeysBindings.isAddition, true),
+              ]),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound2') ],
-              ]).setContextEntry(KeysBindings.isAddition, true),
+              ]),
               BF.bindings([
                 [ DF.variable('bound'), DF.namedNode('ex:bound3') ],
               ]).setContextEntry(KeysBindings.isAddition, true),
@@ -1068,10 +1068,10 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a1') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('a'), DF.namedNode('ex:a2') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),
@@ -1237,13 +1237,13 @@ describe('ActorRdfJoinMemoryBind', () => {
                 bindingsStream: new ArrayIterator([
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b1') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b2') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                   BF.bindings([
                     [ DF.variable('b'), DF.namedNode('ex:b3') ],
-                  ]).setContextEntry(KeysBindings.isAddition, true),
+                  ]),
                 ], { autoStart: false }),
                 metadata: () => Promise.resolve({
                   state: new MetadataValidationState(),

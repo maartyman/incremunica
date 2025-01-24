@@ -61,8 +61,7 @@ export class ActorQueryOperationReducedHash extends ActorQueryOperationTypedMedi
     return (bindings: Bindings) => {
       const hash = hashFunction(bindings, variables);
       const hasMapValue = hashes.get(hash);
-      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
-      if (isAddition) {
+      if (bindings.getContextEntry(KeysBindings.isAddition) ?? true) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;

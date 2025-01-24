@@ -349,11 +349,11 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('3') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
@@ -566,15 +566,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('3') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('b'), DF.literal('2') ],
@@ -597,15 +597,15 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('1') ],
           [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
         BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },

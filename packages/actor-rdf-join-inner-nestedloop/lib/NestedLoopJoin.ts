@@ -20,8 +20,7 @@ export class NestedLoopJoin extends InnerJoin {
   }
 
   private addOrDeleteFromMemory(item: Bindings, memory: Bindings[]): boolean {
-    const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
-    if (isAddition) {
+    if (item.getContextEntry(KeysBindings.isAddition) ?? true) {
       memory.push(item);
       return true;
     }

@@ -291,7 +291,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('b'), DF.literal('b') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
       ]);
       variables0 = [
         { variable: DF.variable('a'), canBeUndef: false },
@@ -301,7 +301,7 @@ IActorRdfJoinSelectivityOutput
         BF.bindings([
           [ DF.variable('a'), DF.literal('a') ],
           [ DF.variable('c'), DF.literal('c') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
+        ]),
       ]);
       variables1 = [
         { variable: DF.variable('a'), canBeUndef: false },

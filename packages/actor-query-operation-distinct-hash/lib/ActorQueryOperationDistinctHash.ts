@@ -84,8 +84,7 @@ export class ActorQueryOperationDistinctHash extends ActorQueryOperationTypedMed
     return (bindings: Bindings) => {
       const hash = hashFunction(bindings, variables);
       const hasMapValue = hashes.get(hash);
-      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
-      if (isAddition) {
+      if (bindings.getContextEntry(KeysBindings.isAddition) ?? true) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;
@@ -119,8 +118,7 @@ export class ActorQueryOperationDistinctHash extends ActorQueryOperationTypedMed
       const quad = <Quad>rdfQuad;
       const hash = hashFunction(quad);
       const hasMapValue = hashes.get(hash);
-      quad.isAddition = quad.isAddition ?? true;
-      if (quad.isAddition) {
+      if (quad.isAddition ?? true) {
         if (hasMapValue) {
           hashes.set(hash, hasMapValue + 1);
           return false;

@@ -97,7 +97,7 @@ describe('MinAggregator', () => {
 
     it('a list of bindings 1', async() => {
       const input = [
-        BF.bindings([[ DF.variable('x'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('2') ]]),
         BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([[ DF.variable('x'), int('4') ]]).setContextEntry(KeysBindings.isAddition, true),

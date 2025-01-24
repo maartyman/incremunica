@@ -74,8 +74,8 @@ describe('ActorQueryOperationFilter', () => {
     mediatorQueryOperation = {
       mediate: (arg: any) => Promise.resolve({
         bindingsStream: new ArrayIterator([
-          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
-          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+          BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+          BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
           BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
         ], { autoStart: false }),
         metadata: () => Promise.resolve({
@@ -165,8 +165,8 @@ describe('ActorQueryOperationFilter', () => {
       };
       const output: IQueryOperationResultBindings = <any> await actor.run(op, undefined);
       await expect(output.bindingsStream).toEqualBindingsStream([
-        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]).setContextEntry(KeysBindings.isAddition, true),
-        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('a'), DF.literal('1') ]]),
+        BF.bindings([[ DF.variable('a'), DF.literal('2') ]]),
         BF.bindings([[ DF.variable('a'), DF.literal('3') ]]).setContextEntry(KeysBindings.isAddition, true),
       ]);
       expect(output.type).toBe('bindings');
@@ -211,6 +211,7 @@ describe('ActorQueryOperationFilter', () => {
       });
       await new Promise<void>(resolve => output.bindingsStream.on('end', resolve));
       expect(logWarnSpy).toHaveBeenCalledTimes(3);
+      // @ts-ignore
       for (const [ index, call ] of logWarnSpy.mock.calls.entries()) {
         if (index === 0) {
           const dataCB = <() => { error: any; bindings: Bindings }>call[2];

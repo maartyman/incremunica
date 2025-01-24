@@ -7,12 +7,17 @@ import { Store } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import { Readable } from 'readable-stream';
 import { StreamingStore } from '../lib';
+import {termToString} from "rdf-string";
 
 const streamifyArray = require('streamify-array');
 
 const DF = new DataFactory();
 
-describe('StreamStore', () => {
+function stringifyQuadArray(quads: Quad[]): string {
+  return quads.map(quad => `${(quad.isAddition ?? true)? "+" : "-"} ${termToString(quad.subject)} ${termToString(quad.predicate)} ${termToString(quad.object)} ${termToString(quad.graph)}`).join('. ');
+}
+
+describe('StreamingStore', () => {
   let store: StreamingStore<Quad>;
 
   beforeEach(() => {
@@ -66,19 +71,14 @@ describe('StreamStore', () => {
 
   it('handle deletion of quads', async() => {
     await promisifyEventEmitter(store.import(streamifyArray([
-      quad('s1', 'p1', 'o1', 'g1'),
-      quad('s2', 'p2', 'o2', 'g2'),
-      quad('s3', 'p3', 'o3', 'g3'),
+      quad('s1', 'p1', 'o1', 'g1', true),
+      quad('s2', 'p2', 'o2', 'g2', true),
+      quad('s3', 'p3', 'o3', 'g3', true),
     ])));
 
-    const quad1 = quad('s1', 'p1', 'o1', 'g1');
-    const quad2 = quad('s2', 'p2', 'o2', 'g2');
-    quad1.isAddition = false;
-    quad2.isAddition = false;
-
     await promisifyEventEmitter(store.import(streamifyArray([
-      quad1,
-      quad2,
+      quad('s1', 'p1', 'o1', 'g1', false),
+      quad('s2', 'p2', 'o2', 'g2', false),
     ])));
 
     await expect(
@@ -524,10 +524,11 @@ describe('StreamStore', () => {
     await promisifyEventEmitter(store.remove(streamifyArray([
       quad('s1', 'p1', 'o1', 'g1'),
     ])));
+    await new Promise(resolve => setImmediate(resolve));
+
     const match1 = store.match(null, null, null, null);
     const match2 = store.match(null, null, null, null);
-    const posQuad = quad('s5', 'p5', 'o5', 'g5');
-    posQuad.isAddition = true;
+    const posQuad = quad('s5', 'p5', 'o5', 'g5', true);
 
     await promisifyEventEmitter(store.remove(streamifyArray([
       quad('s2', 'p2', 'o2', 'g2'),
@@ -541,26 +542,24 @@ describe('StreamStore', () => {
 
     store.end();
 
-    await expect(arrayifyStream(match1)).resolves
-      .toBeRdfIsomorphic([
-        quad('s2', 'p2', 'o2', 'g2'),
-        quad('s3', 'p3', 'o3', 'g3'),
-        quad('s4', 'p4', 'o4', 'g4'),
-        quad('s5', 'p5', 'o5', 'g5'),
-        quad('s2', 'p2', 'o2', 'g2'),
-        quad('s3', 'p3', 'o3', 'g3'),
-        quad('s4', 'p4', 'o4', 'g4'),
-      ]);
-    await expect(arrayifyStream(match2)).resolves
-      .toBeRdfIsomorphic([
-        quad('s2', 'p2', 'o2', 'g2'),
-        quad('s3', 'p3', 'o3', 'g3'),
-        quad('s4', 'p4', 'o4', 'g4'),
-        quad('s5', 'p5', 'o5', 'g5'),
-        quad('s2', 'p2', 'o2', 'g2'),
-        quad('s3', 'p3', 'o3', 'g3'),
-        quad('s4', 'p4', 'o4', 'g4'),
-      ]);
+    expect(stringifyQuadArray(await arrayifyStream(match1))).toEqual(stringifyQuadArray([
+      quad('s2', 'p2', 'o2', 'g2', true),
+      quad('s3', 'p3', 'o3', 'g3', true),
+      quad('s4', 'p4', 'o4', 'g4', true),
+      quad('s2', 'p2', 'o2', 'g2', false),
+      quad('s3', 'p3', 'o3', 'g3', false),
+      quad('s4', 'p4', 'o4', 'g4', false),
+      quad('s5', 'p5', 'o5', 'g5', true),
+    ]));
+    expect(stringifyQuadArray(await arrayifyStream(match2))).toEqual(stringifyQuadArray([
+      quad('s2', 'p2', 'o2', 'g2', true),
+      quad('s3', 'p3', 'o3', 'g3', true),
+      quad('s4', 'p4', 'o4', 'g4', true),
+      quad('s2', 'p2', 'o2', 'g2', false),
+      quad('s3', 'p3', 'o3', 'g3', false),
+      quad('s4', 'p4', 'o4', 'g4', false),
+      quad('s5', 'p5', 'o5', 'g5', true),
+    ]));
   });
 
   it('handles multiple async matches with removes before and after end', async() => {
@@ -659,7 +658,7 @@ describe('StreamStore', () => {
 
     const matchStream = store.match(null, null, null, null);
 
-    await expect(partialArrayifyStream(matchStream, 2)).resolves.toBeRdfIsomorphic([
+    await expect(partialArrayifyStream<Quad>(matchStream, 2)).resolves.toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1', 'g1'),
       quad('s2', 'p2', 'o2', 'g2'),
     ]);
@@ -674,7 +673,7 @@ describe('StreamStore', () => {
 
     store.resume();
 
-    let actualArray = await partialArrayifyStream(<Readable>matchStream, 3);
+    let actualArray = await partialArrayifyStream<Quad>(<Readable>matchStream, 3);
     expect(actualArray).toBeRdfIsomorphic([
       quad('s3', 'p3', 'o3', 'g3'),
       quad('s4', 'p4', 'o4', 'g4'),
@@ -693,7 +692,7 @@ describe('StreamStore', () => {
 
     store.resume();
 
-    actualArray = await partialArrayifyStream(<Readable>matchStream, 2);
+    actualArray = await partialArrayifyStream<Quad>(<Readable>matchStream, 2);
     expect(actualArray).toBeRdfIsomorphic([
       quad('s3', 'p3', 'o3', 'g3'),
       quad('s4', 'p4', 'o4', 'g4'),
@@ -930,15 +929,9 @@ describe('StreamStore', () => {
     store.halt();
     options.closeStream();
 
-    const quad1 = quad('s1', 'p1', 'o1', 'g1');
-    const quad2 = quad('s2', 'p2', 'o2', 'g2');
-
-    quad1.isAddition = false;
-    quad2.isAddition = false;
-
     await promisifyEventEmitter(store.import(streamifyArray([
-      quad1,
-      quad2,
+      quad('s1', 'p1', 'o1', 'g1', false),
+      quad('s2', 'p2', 'o2', 'g2', false),
     ])));
 
     await expect(arrayifyStream(matchStream)).resolves.toBeRdfIsomorphic(
@@ -1234,10 +1227,7 @@ describe('StreamStore', () => {
     ).resolves.toBeRdfIsomorphic([
       quad('s1', 'p1', 'o1', 'g1'),
     ]);
-
-    const quad1 = quad('s2', 'p2', 'o2', 'g2');
-    quad1.isAddition = true;
-    store.addQuad(quad1);
+    store.addQuad(quad('s2', 'p2', 'o2', 'g2', true));
 
     await expect(
       arrayifyStream(store.copyOfStore().match(null, null, null, null)),
@@ -1246,9 +1236,7 @@ describe('StreamStore', () => {
       quad('s2', 'p2', 'o2', 'g2'),
     ]);
 
-    const quad2 = quad('s2', 'p2', 'o2', 'g2');
-    quad2.isAddition = false;
-    store.addQuad(quad2);
+    store.addQuad(quad('s2', 'p2', 'o2', 'g2', false));
 
     await expect(
       arrayifyStream(store.copyOfStore().match(null, null, null, null)),
@@ -1266,13 +1254,8 @@ describe('StreamStore', () => {
   });
 
   it('should handle single quad removals', async() => {
-    const quad1 = quad('s1', 'p1', 'o1', 'g1');
-    quad1.isAddition = true;
-    store.removeQuad(quad1);
-
-    const quad2 = quad('s2', 'p2', 'o2', 'g2');
-    quad2.isAddition = true;
-    store.removeQuad(quad2);
+    store.removeQuad(quad('s1', 'p1', 'o1', 'g1', true));
+    store.removeQuad(quad('s2', 'p2', 'o2', 'g2', true));
 
     const match = store.match(null, null, null, null);
 
@@ -1291,9 +1274,7 @@ describe('StreamStore', () => {
       quad('s2', 'p2', 'o2', 'g2'),
     ]);
 
-    const quad3 = quad('s2', 'p2', 'o2', 'g2');
-    quad3.isAddition = false;
-    store.addQuad(quad3);
+    store.addQuad(quad('s2', 'p2', 'o2', 'g2', false));
 
     await expect(
       arrayifyStream(store.copyOfStore().match(null, null, null, null)),

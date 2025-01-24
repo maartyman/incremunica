@@ -27,6 +27,37 @@ describe('toEqualBindings', () => {
     ]).setContextEntry(KeysBindings.isAddition, true));
   });
 
+  it('should succeed for equal non-empty bindings even is the context is not set', () => {
+    expect(BF.bindings([
+      [ DF.variable('a'), DF.namedNode('a1') ],
+      [ DF.variable('b'), DF.namedNode('b1') ],
+    ])).toEqualBindings(BF.bindings([
+      [ DF.variable('a'), DF.namedNode('a1') ],
+      [ DF.variable('b'), DF.namedNode('b1') ],
+    ]).setContextEntry(KeysBindings.isAddition, true));
+  });
+
+  it('should add the isAddition even is it isn\'t added', () => {
+    expect(() => expect(BF.bindings([
+      [ DF.variable('a'), DF.namedNode('a1') ],
+      [ DF.variable('b'), DF.namedNode('b1') ],
+    ])).toEqualBindings(BF.bindings([
+      [ DF.variable('a'), DF.namedNode('a2') ],
+      [ DF.variable('b'), DF.namedNode('b2') ],
+    ])))
+      .toThrow(`
+Expected:
+{
+  "a": "a2",
+  "b": "b2"
+}, isAddition: true
+Received:
+{
+  "a": "a1",
+  "b": "b1"
+}, isAddition: true`);
+  });
+
   it('should not succeed for non-equal bindings', () => {
     expect(BF.bindings([
       [ DF.variable('a'), DF.namedNode('a1') ],

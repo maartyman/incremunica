@@ -78,13 +78,13 @@ describe('ActorQueryOperationDistinctHash', () => {
 
     it('should create a filter that only returns true once for equal objects', async() => {
       const filter = await actor.newHashFilterQuads(<any>{});
-      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(true);
-      expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'a', undefined))).toBe(true);
+      expect(filter(quad('a', 'p', 'a', undefined))).toBe(false);
       expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
       expect(filter(quad('a', 'p', 'a', undefined, true))).toBe(false);
 
-      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(true);
-      expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
+      expect(filter(quad('a', 'p', 'b', undefined))).toBe(true);
+      expect(filter(quad('a', 'p', 'b', undefined))).toBe(false);
       expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
       expect(filter(quad('a', 'p', 'b', undefined, true))).toBe(false);
     });
@@ -182,10 +182,10 @@ describe('ActorQueryOperationDistinctHash', () => {
       const filter = await actor.newHashFilterBindings(<any>{}, [ DF.variable('a') ]);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
+      ]))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
-      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
+      ]))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('a') ],
       ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
@@ -195,10 +195,10 @@ describe('ActorQueryOperationDistinctHash', () => {
 
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(true);
+      ]))).toBe(true);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
-      ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);
+      ]))).toBe(false);
       expect(filter(BF.bindings([
         [ DF.variable('a'), DF.literal('b') ],
       ]).setContextEntry(KeysBindings.isAddition, true))).toBe(false);

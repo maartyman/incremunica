@@ -114,7 +114,6 @@ export class StreamingStore<Q extends Quad>
     }
 
     stream.on('data', (quad: Q) => {
-      quad.isAddition = quad.isAddition ?? true;
       if (this.halted) {
         this.haltBuffer.push(quad);
       } else {
@@ -128,7 +127,6 @@ export class StreamingStore<Q extends Quad>
     if (this.ended) {
       throw new Error('Attempted to add a quad into an ended StreamingStore.');
     }
-    quad.isAddition = quad.isAddition ?? true;
     if (this.halted) {
       this.haltBuffer.push(quad);
     } else {

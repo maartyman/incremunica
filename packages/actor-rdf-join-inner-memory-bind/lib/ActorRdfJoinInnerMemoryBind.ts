@@ -93,8 +93,7 @@ export class ActorRdfJoinInnerMemoryBind extends ActorRdfJoin {
     // Create bindings function
     const binder = (bindings: Bindings, done: () => void, push: (i: AsyncIterator<Bindings>) => void): void => {
       const hash = hashInputBindings(bindings);
-      const isAddition = bindings.getContextEntry(KeysBindings.isAddition) ?? true;
-      if (isAddition) {
+      if (bindings.getContextEntry(KeysBindings.isAddition) ?? true) {
         const hashData = transformMap.get(hash);
         if (hashData === undefined) {
           const data = {
@@ -123,8 +122,7 @@ export class ActorRdfJoinInnerMemoryBind extends ActorRdfJoin {
             }
             const bindingsHash = hashOutputBindings(newBindings);
             const bindingsData = data.memory.get(bindingsHash);
-            const isAddition = newBindings.getContextEntry(KeysBindings.isAddition) ?? true;
-            if (isAddition) {
+            if (newBindings.getContextEntry(KeysBindings.isAddition) ?? true) {
               if (bindingsData === undefined) {
                 data.memory.set(bindingsHash, { bindings: newBindings, count: 1 });
               } else {

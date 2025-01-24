@@ -54,8 +54,7 @@ export class DeleteHashJoin extends InnerJoin {
   ): boolean {
     const hash = hashFunc(item);
     const el = memory.get(hash);
-    const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
-    if (isAddition) {
+    if (item.getContextEntry(KeysBindings.isAddition) ?? true) {
       if (el === undefined) {
         memory.set(hash, { bindings: item, count: 1 });
       } else {

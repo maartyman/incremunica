@@ -55,10 +55,10 @@ describe('WildcardCountAggregator', () => {
 
     it('a list of bindings 1', async() => {
       const input = [
-        BF.bindings([[ DF.variable('x'), int('1') ]]).setContextEntry(KeysBindings.isAddition, true),
-        BF.bindings([[ DF.variable('y'), int('2') ]]).setContextEntry(KeysBindings.isAddition, true),
-        BF.bindings([[ DF.variable('x'), int('3') ]]).setContextEntry(KeysBindings.isAddition, true),
-        BF.bindings([]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([[ DF.variable('x'), int('1') ]]),
+        BF.bindings([[ DF.variable('y'), int('2') ]]),
+        BF.bindings([[ DF.variable('x'), int('3') ]]),
+        BF.bindings([]),
       ];
 
       await expect(runAggregator(aggregator, input)).resolves.toEqual(int('4'));

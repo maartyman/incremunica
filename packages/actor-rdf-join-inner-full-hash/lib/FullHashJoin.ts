@@ -48,8 +48,7 @@ export class FullHashJoin extends InnerJoin {
     memory: DualKeyHashMap<Bindings>,
     hash: string,
   ): boolean {
-    const isAddition = item.getContextEntry(KeysBindings.isAddition) ?? true;
-    if (isAddition) {
+    if (item.getContextEntry(KeysBindings.isAddition) ?? true) {
       memory.set(hash, joinHash, item);
       return true;
     }
