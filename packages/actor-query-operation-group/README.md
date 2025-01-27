@@ -26,7 +26,6 @@ After installing, this package can be added to your engine's configuration as fo
       "@type": "ActorQueryOperationGroup",
       "mediatorQueryOperation": { "@id": "#mediatorQueryOperation" },
       "mediatorMergeBindingsContext": { "@id": "urn:comunica:default:merge-bindings-context/mediators#main" },
-      "mediatorHashBindings": { "@id": "#mediatorHashBindings" },
       "expressionEvaluatorFactory": { "@id": "urn:comunica:default:expression-evaluator/evaluators#main" }
     }
   ]

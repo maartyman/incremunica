@@ -6695,6 +6695,11 @@ data-structure-typed@^1.53.2:
   resolved "https://registry.yarnpkg.com/data-structure-typed/-/data-structure-typed-1.53.2.tgz#f86a2f3ec7f70b39f7572518570f5be98b3b3d21"
   integrity sha512-TOPCOnFk3JPYiAdMJ+3VXRq4YR7MWtuZZzQJilV4lsBxlc1d50CA1kisic0YikKri3TT3YRmzRjaFfRAJh6big==
 
+data-structure-typed@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/data-structure-typed/-/data-structure-typed-2.0.1.tgz#b1751b2e197df987f2c1d4140279e1173de824fc"
+  integrity sha512-mP9MyEiTAYfcm1SO89DuE5wosBQDcsVnFI+VxJiS03mFu9hMe7kJ9IMabnAN5wdqK2pB0+eQhUJVkgfniOJuLA==
+
 data-view-buffer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/data-view-buffer/-/data-view-buffer-1.0.1.tgz#8ea6326efec17a2e42620696e671d7d5a8bc66b2"

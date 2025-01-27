@@ -2,6 +2,11 @@ import type { EventEmitter } from 'node:events';
 import {
   ActorExpressionEvaluatorFactoryDefault,
 } from '@comunica/actor-expression-evaluator-factory-default';
+import { ActorFunctionFactoryTermEquality } from '@comunica/actor-function-factory-term-equality';
+import { ActorFunctionFactoryTermLesserThan } from '@comunica/actor-function-factory-term-lesser-than';
+import {
+  ActorTermComparatorFactoryExpressionEvaluator,
+} from '@comunica/actor-term-comparator-factory-expression-evaluator';
 import type {
   MediatorExpressionEvaluatorFactory,
   ActorExpressionEvaluatorFactory,
@@ -16,6 +21,7 @@ import type {
 import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { MediatorQueryOperation } from '@comunica/bus-query-operation';
+import type { MediatorTermComparatorFactory } from '@comunica/bus-term-comparator-factory';
 import { KeysInitQuery, KeysExpressionEvaluator } from '@comunica/context-entries';
 import { ActionContext, Bus } from '@comunica/core';
 import { MediatorRace } from '@comunica/mediator-race';
@@ -61,11 +67,8 @@ export async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterat
   let count = 0;
   await new Promise<void>((resolve) => {
     const countFunction = (): void => {
-      while (asyncIterator.readable) {
-        const data = asyncIterator.read();
-        if (!data) {
-          break;
-        }
+      let data = asyncIterator.read();
+      while (data) {
         array.push(data);
         count++;
         if (count === num) {
@@ -73,6 +76,7 @@ export async function partialArrayifyAsyncIterator<T>(asyncIterator: AsyncIterat
           resolve();
           break;
         }
+        data = asyncIterator.read();
       }
     };
     countFunction();
@@ -171,6 +175,32 @@ export function createTestContextWithDataFactory(dataFactory?: DataFactory, cont
 }
 
 // TODO [2025-02-01]: The following functions are not accessible for incremunica, maybe fix this in comunica
+export function createTermCompMediator(): MediatorTermComparatorFactory {
+  return <MediatorTermComparatorFactory> {
+    async mediate(action) {
+      return createTermCompActor().actor.run(action);
+    },
+  };
+}
+
+export function createTermCompActor(): {
+  actor: ActorTermComparatorFactoryExpressionEvaluator;
+  bus: Bus<any, any, any, any>;
+} {
+  const bus: any = new Bus({ name: 'bus' });
+  const actor = new ActorTermComparatorFactoryExpressionEvaluator({
+    name: 'actor',
+    bus,
+    mediatorFunctionFactory: createFuncMediator([
+      args => new ActorFunctionFactoryTermEquality(args),
+      args => new ActorFunctionFactoryTermLesserThan(args),
+    ], {}),
+    mediatorQueryOperation: getMockMediatorQueryOperation(),
+    mediatorMergeBindingsContext: getMockMediatorMergeBindingsContext(),
+  });
+  return { actor, bus };
+}
+
 export function makeAggregate(aggregator: string, distinct = false, separator?: string, wildcard = false):
 Algebra.AggregateExpression {
   const inner: Algebra.Expression = wildcard ?

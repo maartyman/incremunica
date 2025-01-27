@@ -1,5 +1,5 @@
-import type { BindingsStream, ComunicaDataFactory, IActionContext } from '@comunica/types';
-import type { Bindings } from '@comunica/utils-bindings-factory';
+import type { ComunicaDataFactory, IActionContext } from '@comunica/types';
+import type { Bindings, BindingsFactory } from '@comunica/utils-bindings-factory';
 import type {
   IActorBindingsAggregatorFactoryOutput,
   MediatorBindingsAggregatorFactory,
@@ -7,13 +7,16 @@ import type {
 import { KeysBindings } from '@incremunica/context-entries';
 import type * as RDF from '@rdfjs/types';
 import { AsyncIterator } from 'asynciterator';
+import { Queue } from 'data-structure-typed';
 import type { Algebra } from 'sparqlalgebrajs';
 
 type IGroupObject = {
   groupBindings: Bindings;
   aggregators: Record<string, IActorBindingsAggregatorFactoryOutput>;
-  groupBuffer: Bindings[] | undefined;
+  // When waiting on the aggregators we put incoming bindings in the groupBuffer
+  groupBuffer: Queue<Bindings, Bindings> | undefined;
   previousBindings: Bindings | undefined;
+  count: number;
 };
 
 /**
@@ -22,56 +25,73 @@ type IGroupObject = {
 export class GroupIterator extends AsyncIterator<Bindings> {
   private readonly pattern: Algebra.Group;
   private readonly dataFactory: ComunicaDataFactory;
-  private readonly groups: Map<number, IGroupObject>;
+  private readonly groups: Map<string, IGroupObject>;
   private readonly groupVariables: Set<string>;
   private variablesInner: RDF.Variable[];
-  private readonly hashFunction: (bindings: Bindings, variables: RDF.Variable[]) => number;
+  private readonly hashFunction: (bindings: Bindings, variables: RDF.Variable[]) => string;
   private readonly context: IActionContext;
   private readonly mediatorBindingsAggregatorFactory: MediatorBindingsAggregatorFactory;
   private nextBindings: Bindings | null = null;
+  private readonly source: AsyncIterator<Bindings>;
+  private started = false;
+  private emptyResult: Bindings | undefined = undefined;
+  private emptyResultEmitted = false;
+  private readonly bindingsFactory: BindingsFactory;
+  private readCount = 0;
 
   public constructor(
-    inputBindings: BindingsStream,
+    source: AsyncIterator<Bindings>,
     context: IActionContext,
     pattern: Algebra.Group,
     dataFactory: ComunicaDataFactory,
+    bindingsFactory: BindingsFactory,
     mediatorBindingsAggregatorFactory: MediatorBindingsAggregatorFactory,
     groupVariables: Set<string>,
     variablesInner: RDF.Variable[],
-    hashFunction: (bindings: Bindings, variables: RDF.Variable[]) => number,
+    hashFunction: (bindings: Bindings, variables: RDF.Variable[]) => string,
   ) {
     super();
     this.dataFactory = dataFactory;
     this.pattern = pattern;
-    this.groups = new Map<number, IGroupObject>();
+    this.groups = new Map<string, IGroupObject>();
     this.variablesInner = variablesInner;
     this.groupVariables = groupVariables;
     this.hashFunction = hashFunction;
     this.context = context;
     this.mediatorBindingsAggregatorFactory = mediatorBindingsAggregatorFactory;
+    this.source = source;
+    this.bindingsFactory = bindingsFactory;
 
-    // TODO [2025-06-01]: this is a bit of a hack, we should not be listening to the data event
-    let dataCounter = 0;
-    inputBindings.on('data', (bindings: Bindings) => {
-      dataCounter++;
-      this.putBindings(bindings)
-        .then(() => {
-          dataCounter--;
-          if (dataCounter === 0) {
-            this.readable = true;
-          }
-        })
-        .catch(() => {
-          dataCounter--;
-          if (dataCounter === 0) {
-            this.readable = true;
-          }
-        });
-    });
+    this.source.on('readable', this._readBindings.bind(this));
+    this.source.on('error', (error: Error) => this.destroy(error));
+    // TODO [2025-09-01]: if source is ended we should end this iterator as well
 
     this.on('end', () => {
       this._cleanup();
     });
+  }
+
+  private _readBindings(): void {
+    let bindings = this.source.read();
+    // It's possible the source has no elements, and then we need to possibly emit an empty value
+    if (!bindings) {
+      this.readable = true;
+      return;
+    }
+    while (bindings) {
+      this.readCount++;
+      this.putBindings(bindings)
+        .then(() => {
+          this.readCount--;
+          if (this.readCount === 0) {
+            this.readable = true;
+          }
+        })
+        .catch((e) => {
+          this.destroy(e);
+        });
+      bindings = this.source.read();
+    }
   }
 
   protected _cleanup(): void {
@@ -85,6 +105,26 @@ export class GroupIterator extends AsyncIterator<Bindings> {
   }
 
   public override read(): Bindings | null {
+    if (!this.started) {
+      this._readBindings();
+      this.readable = false;
+      this.started = true;
+      return null;
+    }
+    if (this.emptyResult) {
+      if (this.groups.size === 0) {
+        if (!this.emptyResultEmitted) {
+          this.readable = false;
+          this.emptyResultEmitted = true;
+          return this.emptyResult;
+        }
+      } else if (this.emptyResultEmitted) {
+        const result = this.emptyResult.setContextEntry(KeysBindings.isAddition, false);
+        this.emptyResultEmitted = false;
+        this.emptyResult = undefined;
+        return result;
+      }
+    }
     if (this.nextBindings) {
       const bindings = this.nextBindings;
       this.nextBindings = null;
@@ -106,6 +146,24 @@ export class GroupIterator extends AsyncIterator<Bindings> {
           returnBindings = returnBindings.set(this.dataFactory.variable(variable), value);
         }
       }
+      // If the groupBuffer is undefined and there are no aggregators we can return the resultBindings once
+      // We do this by setting the previous result to the returned bindings
+      if (Object.keys(group.aggregators).length === 0) {
+        if (group.previousBindings === undefined && group.count > 0) {
+          group.previousBindings = returnBindings;
+          return returnBindings;
+        }
+        if (group.previousBindings !== undefined && group.count === 0) {
+          this.groups.delete(this.hashFunction(group.groupBindings, this.variablesInner));
+          return group.previousBindings.setContextEntry(KeysBindings.isAddition, false);
+        }
+      }
+      if (group.count === 0) {
+        this.groups.delete(this.hashFunction(group.groupBindings, this.variablesInner));
+        if (group.previousBindings !== undefined) {
+          return group.previousBindings.setContextEntry(KeysBindings.isAddition, false);
+        }
+      }
       if (hasResult) {
         if (group.previousBindings === undefined) {
           // This will be the first result from this group, this will be an addition
@@ -122,6 +180,27 @@ export class GroupIterator extends AsyncIterator<Bindings> {
         return returnBindings;
       }
     }
+    // Case: No Input
+    // Some aggregators still define an output on the empty input
+    // Result is a single Bindings
+    // TODO [2025-09-01]: only do tis once when the iterator is started and keep the result for the future
+    if (this.groupVariables.size === 0 && this.groups.size === 0) {
+      const single: [RDF.Variable, RDF.Term][] = [];
+      Promise.all(this.pattern.aggregates.map(async(aggregate) => {
+        const key = aggregate.variable;
+        const aggregator = await this.mediatorBindingsAggregatorFactory
+          .mediate({ expr: aggregate, context: this.context });
+        const value = aggregator.result();
+        if (value !== undefined && value !== null) {
+          single.push([ key, value ]);
+        }
+      })).then(() => {
+        this.emptyResult = this.bindingsFactory.bindings(single);
+        this.readable = true;
+      }).catch((e) => {
+        this.destroy(e);
+      });
+    }
     this.readable = false;
     return null;
   }
@@ -132,36 +211,51 @@ export class GroupIterator extends AsyncIterator<Bindings> {
     const groupHash = this.hashFunction(grouper, this.variablesInner);
 
     const group = this.groups.get(groupHash);
-    if (group === undefined) {
-      const initializeGroup: IGroupObject = {
-        groupBindings: grouper,
-        aggregators: {},
-        groupBuffer: [ bindings ],
-        previousBindings: undefined,
-      };
-      this.groups.set(groupHash, initializeGroup);
-      await Promise.all(this.pattern.aggregates.map(async(aggregate) => {
-        const key = aggregate.variable.value;
-        initializeGroup.aggregators[key] = await this.mediatorBindingsAggregatorFactory
-          .mediate({ expr: aggregate, context: this.context });
-      }));
-      const localGroupBuffer = initializeGroup.groupBuffer!;
-      initializeGroup.groupBuffer = undefined;
-      for (const bindings of localGroupBuffer) {
-        for (const aggregate of this.pattern.aggregates) {
-          const variable = aggregate.variable.value;
-          await initializeGroup.aggregators[variable].putBindings(bindings);
+    if (bindings.getContextEntry(KeysBindings.isAddition) ?? true) {
+      if (group === undefined) {
+        const initializeGroup: IGroupObject = {
+          groupBindings: grouper,
+          aggregators: {},
+          groupBuffer: new Queue([ bindings ]),
+          previousBindings: undefined,
+          count: 0,
+        };
+        this.groups.set(groupHash, initializeGroup);
+        await Promise.all(this.pattern.aggregates.map(async(aggregate) => {
+          const key = aggregate.variable.value;
+          initializeGroup.aggregators[key] = await this.mediatorBindingsAggregatorFactory
+            .mediate({ expr: aggregate, context: this.context });
+        }));
+        while (initializeGroup.groupBuffer!.length > 0) {
+          const bufferedBindings = initializeGroup.groupBuffer!.shift()!;
+          if (bufferedBindings.getContextEntry(KeysBindings.isAddition) ?? true) {
+            initializeGroup.count++;
+          } else {
+            initializeGroup.count--;
+          }
+          await Promise.all(this.pattern.aggregates.map(async(aggregate) => {
+            const variable = aggregate.variable.value;
+            return initializeGroup.aggregators[variable].putBindings(bufferedBindings);
+          }));
         }
+        initializeGroup.groupBuffer = undefined;
+        return;
       }
-      return;
+    } else if (group === undefined) {
+      throw new Error('Received deletion for non-existing addition');
     }
     if (group.groupBuffer) {
       group.groupBuffer.push(bindings);
       return;
     }
-    for (const aggregate of this.pattern.aggregates) {
-      const variable = aggregate.variable.value;
-      await group.aggregators[variable].putBindings(bindings);
+    if (bindings.getContextEntry(KeysBindings.isAddition) ?? true) {
+      group.count++;
+    } else {
+      group.count--;
     }
+    await Promise.all(this.pattern.aggregates.map(async(aggregate) => {
+      const variable = aggregate.variable.value;
+      return group.aggregators[variable].putBindings(bindings);
+    }));
   }
 }

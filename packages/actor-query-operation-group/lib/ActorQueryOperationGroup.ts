@@ -1,4 +1,3 @@
-import type { MediatorHashBindings } from '@comunica/bus-hash-bindings';
 import type { MediatorMergeBindingsContext } from '@comunica/bus-merge-bindings-context';
 import type { IActorQueryOperationTypedMediatedArgs } from '@comunica/bus-query-operation';
 import { ActorQueryOperationTypedMediated } from '@comunica/bus-query-operation';
@@ -12,8 +11,11 @@ import type {
   IQueryOperationResult,
   MetadataVariable,
 } from '@comunica/types';
+import { BindingsFactory, bindingsToCompactString } from '@comunica/utils-bindings-factory';
+import type { Bindings } from '@comunica/utils-bindings-factory';
 import { getSafeBindings } from '@comunica/utils-query-operation';
 import type { MediatorBindingsAggregatorFactory } from '@incremunica/bus-bindings-aggregator-factory';
+import type { AsyncIterator } from 'asynciterator';
 import type { Algebra } from 'sparqlalgebrajs';
 import { GroupIterator } from './GroupsIterator';
 
@@ -23,12 +25,10 @@ import { GroupIterator } from './GroupsIterator';
 export class ActorQueryOperationGroup extends ActorQueryOperationTypedMediated<Algebra.Group> {
   public readonly mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   public readonly mediatorBindingsAggregatorFactory: MediatorBindingsAggregatorFactory;
-  public readonly mediatorHashBindings: MediatorHashBindings;
 
   public constructor(args: IActorQueryOperationGroupArgs) {
     super(args, 'group');
     this.mediatorBindingsAggregatorFactory = args.mediatorBindingsAggregatorFactory;
-    this.mediatorHashBindings = args.mediatorHashBindings;
     this.mediatorMergeBindingsContext = args.mediatorMergeBindingsContext;
   }
 
@@ -38,13 +38,12 @@ export class ActorQueryOperationGroup extends ActorQueryOperationTypedMediated<A
 
   public async runOperation(operation: Algebra.Group, context: IActionContext): Promise<IQueryOperationResult> {
     const dataFactory: ComunicaDataFactory = context.getSafe(KeysInitQuery.dataFactory);
+    const bindingsFactory = await BindingsFactory.create(this.mediatorMergeBindingsContext, context, dataFactory);
 
     // Get result stream for the input query
     const { input, aggregates } = operation;
     const outputRaw = await this.mediatorQueryOperation.mediate({ operation: input, context });
     const output = getSafeBindings(outputRaw);
-
-    const { hashFunction } = await this.mediatorHashBindings.mediate({ context });
 
     // The variables in scope are the variables on which we group, i.e. pattern.variables.
     // For 'GROUP BY ?x, ?z', this is [?x, ?z], for 'GROUP by expr(?x) as ?e' this is [?e].
@@ -58,14 +57,15 @@ export class ActorQueryOperationGroup extends ActorQueryOperationTypedMediated<A
     const variablesInner = (await output.metadata()).variables.map(v => v.variable);
 
     const bindingsStream = <BindingsStream><any> new GroupIterator(
-      output.bindingsStream,
+      <AsyncIterator<Bindings>><any>output.bindingsStream,
       context,
       operation,
       dataFactory,
+      bindingsFactory,
       this.mediatorBindingsAggregatorFactory,
       groupVariables,
       variablesInner,
-      hashFunction,
+      bindingsToCompactString,
     );
 
     return {
@@ -82,5 +82,4 @@ export interface IActorQueryOperationGroupArgs extends IActorQueryOperationTyped
    */
   mediatorMergeBindingsContext: MediatorMergeBindingsContext;
   mediatorBindingsAggregatorFactory: MediatorBindingsAggregatorFactory;
-  mediatorHashBindings: MediatorHashBindings;
 }
