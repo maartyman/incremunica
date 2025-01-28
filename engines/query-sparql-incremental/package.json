@@ -278,6 +278,7 @@
     "@incremunica/actor-query-source-identify-streaming-rdfjs": "^1.3.0",
     "@incremunica/actor-rdf-join-inner-match-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-inner-memory-bind": "^1.3.0",
+    "@incremunica/actor-rdf-join-inner-nestedloop": "^1.3.0",
     "@incremunica/actor-rdf-join-minus-hash": "^1.3.0",
     "@incremunica/actor-rdf-join-optional-hash": "^1.3.0",
     "@incremunica/actor-rdf-metadata-extract-determine-changes-data": "^1.3.0",
