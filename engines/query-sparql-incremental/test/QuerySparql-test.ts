@@ -384,34 +384,34 @@ describe('System test: QuerySparql (without polly)', () => {
         pollingPeriod: 1000,
       });
 
-      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
-        resolve(bindings);
-      }))).resolves.toEqualBindings(BF.bindings([
-        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
-        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
-        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
-      ]).setContextEntry(KeysBindings.isAddition, true));
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
+          [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
+          [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
 
-      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
-        resolve(bindings);
-      }))).resolves.toEqualBindings(BF.bindings([
-        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
-        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
-        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
-      ]).setContextEntry(KeysBindings.isAddition, true));
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+          [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+          [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
 
       sourcesStream.push({
         querySource: 'http://localhost:8787',
         isAddition: false,
       });
 
-      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
-        resolve(bindings);
-      }))).resolves.toEqualBindings(BF.bindings([
-        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
-        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
-        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
-      ]).setContextEntry(KeysBindings.isAddition, false));
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+          [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+          [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
     });
 
     it('simple addition update query', async() => {
