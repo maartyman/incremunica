@@ -79,23 +79,22 @@ export class StreamingQuerySourceStream implements IQuerySource {
           mediatorContextPreprocess
             .mediate({ context: context.set(KeysInitQuery.querySourcesUnidentified, [ item.querySource ]) })
             .then((contextPreprocessResult) => {
-              if (sourceWrapper.state !== SourceState.deleted) {
-                const sources = contextPreprocessResult.context.get(KeysQueryOperation.querySources);
-                if (sources === undefined || sources.length !== 1) {
-                  this.error = new Error('Expected a single query source.');
-                  this.sourcesEventEmitter.emit('error', this.error);
-                  return;
-                }
-                sourceWrapper.source = sources[0].source;
-                // Don't set the state to done if it is deleted
-                if (sourceWrapper.state === SourceState.identify) {
-                  sourceWrapper.state = SourceState.done;
-                }
-                sourceWrapper.identifiedEvent.emit('identified');
+              const sources = contextPreprocessResult.context.get(KeysQueryOperation.querySources);
+              if (sources === undefined || sources.length !== 1) {
+                this.error = new Error('Expected a single query source in the context.');
+                this.sourcesEventEmitter.emit('error', this.error);
+                return;
               }
+              sourceWrapper.source = sources[0].source;
+              // Don't set the state to done if it is deleted
+              if (sourceWrapper.state === SourceState.identify) {
+                sourceWrapper.state = SourceState.done;
+              }
+              sourceWrapper.identifiedEvent.emit('identified');
             })
             .catch((error: Error) => {
               this.error = error;
+              this.sourcesEventEmitter.emit('error', this.error);
             });
           this.sourcesEventEmitter.emit('data', sourceWrapper);
           this.sources.set(hash, [ sourceWrapper ]);
@@ -132,6 +131,10 @@ export class StreamingQuerySourceStream implements IQuerySource {
         }
       }
     });
+    stream.on('error', (error: Error) => {
+      this.error = error;
+      this.sourcesEventEmitter.emit('error', error);
+    });
     this.referenceValue = 'StreamingQuerySources';
     this.dataFactory = dataFactory;
     const AF = new Factory(<RDF.DataFactory> this.dataFactory);
@@ -153,7 +156,7 @@ export class StreamingQuerySourceStream implements IQuerySource {
     };
   }
 
-  public async getSelectorShape(): Promise<FragmentSelectorShape> {
+  public async getSelectorShape(_context: IActionContext): Promise<FragmentSelectorShape> {
     return this.selectorShape;
   }
 
@@ -181,20 +184,15 @@ export class StreamingQuerySourceStream implements IQuerySource {
     }
 
     const variables = getVariables(<Algebra.Pattern>operation);
-    // TODO [2025-04-01]: how to handle metadata correctly
+    // TODO [2025-06-01]: We need to first read the sources and then start the iterator with a more accurate metadata
+    // Furthermore the cardinality value should not start at 1 but it does not work otherwise
     let accumulatedMetadata: MetadataBindings = {
       state: new MetadataValidationState(),
-      cardinality: { type: 'estimate', value: 1 },
-      variables: variables.map(variable =>
-        // TODO [2025-04-01]: make sure canBeUndef is set correctly
-        ({ variable, canBeUndef: false })),
+      cardinality: { type: 'exact', value: 1 },
+      variables: variables.map(variable => ({ variable, canBeUndef: false })),
     };
-    let first = true;
     const iterator = new AsyncIterator<BindingsStream>();
     iterator.read = (): BindingsStream | null => {
-      if (this.error) {
-        return null;
-      }
       const sourceWrapper = buffer.shift();
       if (sourceWrapper === undefined) {
         iterator.readable = false;
@@ -206,11 +204,6 @@ export class StreamingQuerySourceStream implements IQuerySource {
       const currentContext = context.set(KeysStreamingSource.matchOptions, []);
       const bindingsStream = sourceWrapper.source!.queryBindings(operation, currentContext, options);
       bindingsStream.getProperty('metadata', (metadata: MetadataBindings) => {
-        if (first) {
-          accumulatedMetadata.state.invalidate();
-          accumulatedMetadata = metadata;
-          first = false;
-        }
         this.mediatorRdfMetadataAccumulate.mediate({
           mode: 'append',
           accumulatedMetadata,
@@ -219,10 +212,11 @@ export class StreamingQuerySourceStream implements IQuerySource {
         }).then((result) => {
           const resultMetadata = result.metadata;
           resultMetadata.state = new MetadataValidationState();
-          accumulatedMetadata?.state.invalidate();
+          accumulatedMetadata.state.invalidate();
           accumulatedMetadata = <MetadataBindings>resultMetadata;
-        }).catch((error: Error) => {
-          throw error;
+          unionIterator.setProperty('metadata', accumulatedMetadata);
+        }).catch(() => {
+          // We ignore errors in the metadata as this would not change the results
         });
       });
       let stopStreamFn = bindingsStream.getProperty<() => void>('delete');
@@ -238,24 +232,21 @@ export class StreamingQuerySourceStream implements IQuerySource {
         }
         if (linkedRdfSourcesAsyncRdfIterator) {
           stopStreamFn = () => {
-            const matchOptions = currentContext.get(KeysStreamingSource.matchOptions);
-            if (matchOptions === undefined) {
-              throw new Error('matchOptions is not set, this shouldn\'t happen');
-            }
+            const matchOptions = currentContext.get(KeysStreamingSource.matchOptions)!;
             if (matchOptions.length === 0) {
-              throw new Error('matchOptions is empty, this shouldn\'t happen');
+              iterator.destroy(new Error('matchOptions are not set, this should not happen.'));
             }
             for (const matchOption of matchOptions) {
               if (matchOption.deleteStream) {
                 matchOption.deleteStream();
               } else {
-                iterator.destroy(new Error('No delete function found'));
+                iterator.destroy(new Error('No delete function found.'));
               }
             }
           };
         } else {
           stopStreamFn = () => {
-            iterator.destroy(new Error('No delete function found'));
+            iterator.destroy(new Error('No delete function found.'));
           };
         }
       }
@@ -302,14 +293,14 @@ export class StreamingQuerySourceStream implements IQuerySource {
     _operation: Algebra.Ask,
     _context: IActionContext,
   ): Promise<boolean> {
-    throw new Error('queryBoolean is not implemented in StreamingQuerySourceRdfJs');
+    return Promise.reject(new Error('queryBoolean is not implemented in StreamingQuerySourceRdfJs'));
   }
 
   public queryVoid(
     _operation: Algebra.Update,
     _context: IActionContext,
   ): Promise<void> {
-    throw new Error('queryVoid is not implemented in StreamingQuerySourceRdfJs');
+    return Promise.reject(new Error('queryVoid is not implemented in StreamingQuerySourceRdfJs'));
   }
 
   public toString(): string {

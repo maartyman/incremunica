@@ -34,7 +34,7 @@ import {
 import { KeysBindings } from '@incremunica/context-entries';
 import type { Quad } from '@incremunica/types';
 import type * as RDF from '@rdfjs/types';
-import type { AsyncIterator } from 'asynciterator';
+import { AsyncIterator } from 'asynciterator';
 import MurmurHash3 from 'imurmurhash';
 import { LRUCache } from 'lru-cache';
 import { DataFactory } from 'rdf-data-factory';
@@ -44,6 +44,21 @@ import { Wildcard } from 'sparqljs';
 export const DF = new DataFactory();
 export const BF = new BindingsFactory(DF, {});
 export const AF = new Factory();
+
+export function testBufferIterator<T>(buffer: (T | null)[]): AsyncIterator<T> {
+  const iterator = new AsyncIterator<T>();
+  iterator.read = (): T | null => {
+    if (iterator.readable) {
+      const element = buffer.shift() ?? null;
+      if (element === null) {
+        iterator.readable = false;
+      }
+      return element;
+    }
+    return null;
+  };
+  return iterator;
+}
 
 export async function partialArrayifyStream<T>(stream: EventEmitter, num: number): Promise<T[]> {
   const array: T[] = [];
