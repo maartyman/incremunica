@@ -3,17 +3,10 @@
     "github>rubensworks/renovate-presets:js",
     "docker:disable"
   ],
-  "rangeStrategy": "replace",
   "packageRules": [
     {
-      "matchSourceUrlPrefixes": ["https://github.com/comunica/comunica"],
-      "groupName": "Comunica monorepo packages",
-      "rangeStrategy": "bump",
-      "automerge": false,
-      "stabilityDays": 0,
-      "schedule": null,
-      "prConcurrentLimit": 0,
-      "branchConcurrentLimit": 0
+      "matchPackageNames": ["*"],
+      "automerge": false
     }
   ]
 }
