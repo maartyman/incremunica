@@ -1,0 +1,48 @@
+{
+  "name": "@incremunica/actor-source-watch-solid-notification-websockets",
+  "version": "2.0.0",
+  "description": "An incremunica solid notification source watch actor",
+  "lsd:module": true,
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/actor-source-watch-solid-notification-websockets"
+  },
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "keywords": [
+    "comunica",
+    "actor",
+    "source-watch",
+    "solid-notification-websockets"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/bus-http": "^4.0.1",
+    "@comunica/core": "^4.0.1",
+    "@incremunica/bus-source-watch": "^2.0.0",
+    "@solid-notifications/subscription": "^0.1.0",
+    "@solid-notifications/types": "^0.1.0",
+    "tstl": "^3.0.0",
+    "ws": "^8.18.0"
+  }
+}

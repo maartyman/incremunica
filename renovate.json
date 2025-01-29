@@ -1,67 +1,19 @@
 {
   "extends": [
-    "config:base",
+    "github>rubensworks/renovate-presets:js",
     "docker:disable"
   ],
-  "description": "Based on: https://github.com/rubensworks/renovate-presets.",
-
-  "prCreation": "not-pending",
-  "stabilityDays": 1,
-  "statusCheckVerify": true,
-  "schedule": "before 7am every weekday",
-  "timezone": "Europe/Brussels",
-  "unicodeEmoji": true,
-  "vulnerabilityAlerts": {
-    "enabled": false
-  },
   "rangeStrategy": "replace",
-  "ignoreDeps": [
-    "eslint",
-    "eslint-config-es",
-    "eslint-import-resolver-typescript",
-    "eslint-plugin-eslint-comments",
-    "eslint-plugin-extended",
-    "eslint-plugin-import",
-    "eslint-plugin-jest",
-    "eslint-plugin-mocha",
-    "eslint-plugin-react",
-    "eslint-plugin-react-hooks",
-    "eslint-plugin-tsdoc",
-    "eslint-plugin-unicorn",
-    "eslint-plugin-unused-imports"
-  ],
-
   "packageRules": [
     {
       "matchSourceUrlPrefixes": ["https://github.com/comunica/comunica"],
-      "groupName": "Comunica monorepo packages"
-    },
-    {
-      "matchSourceUrlPrefixes": ["https://github.com/LinkedDataFragments/Server.js"],
-      "groupName": "LDF server monorepo packages"
-    },
-    {
-      "matchDepTypes": ["dependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "matchCurrentVersion": "!/^0/",
+      "groupName": "Comunica monorepo packages",
+      "rangeStrategy": "bump",
       "automerge": false,
-      "automergeType": "branch"
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": false,
-      "automergeType": "branch"
+      "stabilityDays": 0,
+      "schedule": null,
+      "prConcurrentLimit": 0,
+      "branchConcurrentLimit": 0
     }
-  ],
-
-  "devDependencies": {
-    "rangeStrategy": "replace"
-  },
-
-  "dockerfile": {
-    "enabled": false
-  },
-  "github-actions": {
-    "enabled": false
-  }
+  ]
 }

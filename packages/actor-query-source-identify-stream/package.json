@@ -1,0 +1,55 @@
+{
+  "name": "@incremunica/actor-query-source-identify-stream",
+  "version": "2.0.0",
+  "description": "A Streaming query-source-identify actor",
+  "lsd:module": true,
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/actor-query-source-identify-stream"
+  },
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "keywords": [
+    "comunica",
+    "actor",
+    "query-source-identify",
+    "stream"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/actor-query-source-identify-hypermedia": "^4.0.2",
+    "@comunica/bus-context-preprocess": "^4.0.2",
+    "@comunica/bus-query-source-identify": "^4.0.1",
+    "@comunica/bus-rdf-metadata-accumulate": "^4.0.2",
+    "@comunica/context-entries": "^4.0.1",
+    "@comunica/core": "^4.0.1",
+    "@comunica/types": "^4.0.1",
+    "@comunica/utils-metadata": "^4.0.1",
+    "@incremunica/context-entries": "^2.0.0",
+    "@incremunica/types": "^2.0.0",
+    "@rdfjs/types": "*",
+    "asynciterator": "^3.9.0",
+    "data-structure-typed": "^1.53.2",
+    "sparqlalgebrajs": "^4.3.8"
+  }
+}

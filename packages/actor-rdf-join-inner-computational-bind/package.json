@@ -1,0 +1,56 @@
+{
+  "name": "@incremunica/actor-rdf-join-inner-computational-bind",
+  "version": "2.0.0",
+  "description": "A inner-computational-bind rdf-join actor",
+  "lsd:module": true,
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/actor-rdf-join-inner-computational-bind"
+  },
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "keywords": [
+    "comunica",
+    "actor",
+    "rdf-join",
+    "inner-computational-bind"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "components",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/bus-hash-bindings": "^4.0.2",
+    "@comunica/bus-merge-bindings-context": "^4.0.2",
+    "@comunica/bus-query-operation": "^4.0.1",
+    "@comunica/bus-rdf-join": "^4.0.1",
+    "@comunica/bus-rdf-join-entries-sort": "^4.0.1",
+    "@comunica/context-entries": "^4.0.1",
+    "@comunica/core": "^4.0.2",
+    "@comunica/mediatortype-join-coefficients": "^4.0.1",
+    "@comunica/types": "^4.0.1",
+    "@comunica/utils-bindings-factory": "^4.0.1",
+    "@comunica/utils-query-operation": "^4.0.2",
+    "@incremunica/context-entries": "^2.0.0",
+    "@incremunica/streaming-query-source": "^2.0.0",
+    "asynciterator": "^3.9.0",
+    "sparqlalgebrajs": "^4.3.8"
+  }
+}

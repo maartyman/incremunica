@@ -2,143 +2,132 @@
 
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
-import '@incremunica/incremental-jest';
+import '@incremunica/jest';
+import type { BindingsStream, QueryStringContext } from '@comunica/types';
+import type { BindingsFactory } from '@comunica/utils-bindings-factory';
+import { KeysBindings } from '@incremunica/context-entries';
+import { createTestBindingsFactory, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
+import { StreamingStore } from '@incremunica/streaming-store';
+import type { Quad } from '@incremunica/types';
 import { DataFactory } from 'rdf-data-factory';
-import type { BindingsStream, QueryStringContext} from '@comunica/types';
-import {Factory} from 'sparqlalgebrajs';
-import {QueryEngine} from '../lib/QueryEngine';
-import {usePolly} from '../test/util';
-import {EventEmitter} from "events";
-import {StreamingStore} from "@incremunica/incremental-rdf-streaming-store";
-import {Quad} from "@incremunica/incremental-types";
-import {BindingsFactory} from "@incremunica/incremental-bindings-factory";
-
-async function partialArrayifyStream(stream: EventEmitter, num: number): Promise<any[]> {
-  let array: any[] = [];
-  for (let i = 0; i < num; i++) {
-    await new Promise<void>((resolve) => stream.once("data", (bindings: any) => {
-      array.push(bindings);
-      resolve();
-    }));
-  }
-  return array;
-}
-
-const BF = new BindingsFactory();
+import { QueryEngine } from '../lib';
+import { usePolly } from '../test/util';
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
 }
 
 const quad = require('rdf-quad');
-const stringifyStream = require('stream-to-string');
 
 const DF = new DataFactory();
-const factory = new Factory();
 
 describe('System test: QuerySparql (without polly)', () => {
+  let BF: BindingsFactory;
   let engine: QueryEngine;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     engine = new QueryEngine();
+    BF = await createTestBindingsFactory(DF);
   });
 
-  describe("using Streaming Store", () => {
+  describe('using Streaming Store', () => {
     let streamingStore: StreamingStore<Quad>;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       streamingStore = new StreamingStore<Quad>();
-    })
+    });
 
-    it('simple query', async () => {
-      streamingStore.addQuad(quad("s1", "p1", "o1"));
-      streamingStore.addQuad(quad("s2", "p2", "o2"));
+    it('simple query', async() => {
+      streamingStore.addQuad(quad('s1', 'p1', 'o1'));
+      streamingStore.addQuad(quad('s2', 'p2', 'o2'));
 
-      let bindingStream = await engine.queryBindings(`SELECT * WHERE {
+      const bindingStream = await engine.queryBindings(`SELECT * WHERE {
           ?s ?p ?o.
           }`, {
-        sources: [streamingStore]
+        sources: [ streamingStore ],
+        pollingPeriod: 500,
       });
 
-      expect(await partialArrayifyStream(bindingStream, 2)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 2)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s'), DF.namedNode('s1')],
-          [DF.variable('p'), DF.namedNode('p1')],
-          [DF.variable('o'), DF.namedNode('o1')],
-        ]),
+          [ DF.variable('s'), DF.namedNode('s1') ],
+          [ DF.variable('p'), DF.namedNode('p1') ],
+          [ DF.variable('o'), DF.namedNode('o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
-          [DF.variable('s'), DF.namedNode('s2')],
-          [DF.variable('p'), DF.namedNode('p2')],
-          [DF.variable('o'), DF.namedNode('o2')],
-        ]),
+          [ DF.variable('s'), DF.namedNode('s2') ],
+          [ DF.variable('p'), DF.namedNode('p2') ],
+          [ DF.variable('o'), DF.namedNode('o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
-      streamingStore.addQuad(quad("s3", "p3", "o3"));
+      streamingStore.addQuad(quad('s3', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s'), DF.namedNode('s3')],
-          [DF.variable('p'), DF.namedNode('p3')],
-          [DF.variable('o'), DF.namedNode('o3')],
-        ])
+          [ DF.variable('s'), DF.namedNode('s3') ],
+          [ DF.variable('p'), DF.namedNode('p3') ],
+          [ DF.variable('o'), DF.namedNode('o3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
-      streamingStore.removeQuad(quad("s3", "p3", "o3"));
+      streamingStore.removeQuad(quad('s3', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s'), DF.namedNode('s3')],
-          [DF.variable('p'), DF.namedNode('p3')],
-          [DF.variable('o'), DF.namedNode('o3')],
-        ], false)
+          [ DF.variable('s'), DF.namedNode('s3') ],
+          [ DF.variable('p'), DF.namedNode('p3') ],
+          [ DF.variable('o'), DF.namedNode('o3') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       streamingStore.end();
     });
 
-    it('query with joins', async () => {
-      streamingStore.addQuad(quad("s1", "p1", "o1"));
-      streamingStore.addQuad(quad("o1", "p2", "o2"));
+    it('query with joins', async() => {
+      streamingStore.addQuad(quad('s1', 'p1', 'o1'));
+      streamingStore.addQuad(quad('o1', 'p2', 'o2'));
 
-      let bindingStream = await engine.queryBindings(`SELECT * WHERE {
+      const bindingStream = await engine.queryBindings(`SELECT * WHERE {
           ?s1 ?p1 ?o1.
           ?o1 ?p2 ?o2.
           }`, {
-        sources: [streamingStore]
+        sources: [ streamingStore ],
+        pollingPeriod: 500,
       });
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s1'), DF.namedNode('s1')],
-          [DF.variable('p1'), DF.namedNode('p1')],
-          [DF.variable('o1'), DF.namedNode('o1')],
-          [DF.variable('p2'), DF.namedNode('p2')],
-          [DF.variable('o2'), DF.namedNode('o2')],
-        ]),
+          [ DF.variable('s1'), DF.namedNode('s1') ],
+          [ DF.variable('p1'), DF.namedNode('p1') ],
+          [ DF.variable('o1'), DF.namedNode('o1') ],
+          [ DF.variable('p2'), DF.namedNode('p2') ],
+          [ DF.variable('o2'), DF.namedNode('o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
-      streamingStore.addQuad(quad("o1", "p3", "o3"));
+      streamingStore.addQuad(quad('o1', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s1'), DF.namedNode('s1')],
-          [DF.variable('p1'), DF.namedNode('p1')],
-          [DF.variable('o1'), DF.namedNode('o1')],
-          [DF.variable('p2'), DF.namedNode('p3')],
-          [DF.variable('o2'), DF.namedNode('o3')],
-        ])
+          [ DF.variable('s1'), DF.namedNode('s1') ],
+          [ DF.variable('p1'), DF.namedNode('p1') ],
+          [ DF.variable('o1'), DF.namedNode('o1') ],
+          [ DF.variable('p2'), DF.namedNode('p3') ],
+          [ DF.variable('o2'), DF.namedNode('o3') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
 
-      streamingStore.removeQuad(quad("o1", "p3", "o3"));
+      streamingStore.removeQuad(quad('o1', 'p3', 'o3'));
 
-      expect(await partialArrayifyStream(bindingStream, 1)).toBeIsomorphicBindingsArray([
+      expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
         BF.bindings([
-          [DF.variable('s1'), DF.namedNode('s1')],
-          [DF.variable('p1'), DF.namedNode('p1')],
-          [DF.variable('o1'), DF.namedNode('o1')],
-          [DF.variable('p2'), DF.namedNode('p3')],
-          [DF.variable('o2'), DF.namedNode('o3')],
-        ], false)
+          [ DF.variable('s1'), DF.namedNode('s1') ],
+          [ DF.variable('p1'), DF.namedNode('p1') ],
+          [ DF.variable('o1'), DF.namedNode('o1') ],
+          [ DF.variable('p2'), DF.namedNode('p3') ],
+          [ DF.variable('o2'), DF.namedNode('o3') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
       ]);
 
       streamingStore.end();
@@ -151,147 +140,83 @@ describe('System test: QuerySparql (with polly)', () => {
 
   let bindingStream: BindingsStream;
   let engine: QueryEngine;
-  beforeEach(() => {
+  beforeEach(async() => {
     engine = new QueryEngine();
-    engine.invalidateHttpCache();
+    await engine.invalidateHttpCache();
   });
 
   afterEach(() => {
     bindingStream.destroy();
-  })
+  });
 
   describe('simple SPO on a raw RDF document', () => {
     it('with results', async() => {
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
     ?s ?p ?o.
-  }`, { sources: [ 'https://www.rubensworks.net/' ]});
-      let count = 0;
+  }`, {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingPeriod: 500,
+      });
 
-      await new Promise<void>((resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine', async() => {
       const query = `SELECT * WHERE {
      ?s ?p ?o.
      }`;
-      const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
+      const context: QueryStringContext = {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingPeriod: 500,
+      };
 
-      let count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     it('repeated with the same engine and wait a bit until the polling is removed', async() => {
       const query = `SELECT * WHERE {
      ?s ?p ?o.
      }`;
-      const context: QueryStringContext = { sources: [ 'https://www.rubensworks.net/' ]};
+      const context: QueryStringContext = {
+        sources: [ 'https://www.rubensworks.net/' ],
+        pollingPeriod: 500,
+      };
 
-      let count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
 
-      await new Promise<void>((resolve) => setTimeout(()=>resolve(),10000));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
 
-      count = 0;
       bindingStream = await engine.queryBindings(query, context);
-      await new Promise<void>(async (resolve) => bindingStream.on("data", async () => {
-        count++;
-        if (count > 100) {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }
-      }));
+      expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
     });
 
     describe('simple SPS', () => {
       it('Raw Source', async() => {
         bindingStream = await engine.queryBindings(`SELECT * WHERE {
         ?s ?p ?s.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingPeriod: 500,
+        });
 
-        await new Promise<void>((resolve) => bindingStream.on("data", async () => {
-          expect(true).toEqual(true);
-          bindingStream.destroy();
-          resolve();
-        }));
+        expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
       });
     });
 
@@ -300,56 +225,39 @@ describe('System test: QuerySparql (with polly)', () => {
         bindingStream = await engine.queryBindings(`SELECT ?name WHERE {
         <https://www.rubensworks.net/#me> <http://xmlns.com/foaf/0.1/knows> ?v0.
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingPeriod: 500,
+        });
 
-        let count = 0;
-        await new Promise<void>((resolve) => bindingStream.on("data", async () => {
-          count++;
-          if (count > 20) {
-            expect(true).toEqual(true);
-            bindingStream.destroy();
-            resolve();
-          }
-        }));
+        expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
       });
 
       it('for the single source entry', async() => {
         bindingStream = await engine.queryBindings(`SELECT ?name WHERE {
         <https://www.rubensworks.net/#me> <http://xmlns.com/foaf/0.1/knows> ?v0.
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
-        }`, { sources: [ 'https://www.rubensworks.net/' ]});
+        }`, {
+          sources: [ 'https://www.rubensworks.net/' ],
+          pollingPeriod: 1000,
+        });
 
-        let count = 0;
-        await new Promise<void>((resolve) => bindingStream.on("data", async () => {
-          count++;
-          if (count > 20) {
-            expect(true).toEqual(true);
-            bindingStream.destroy();
-            resolve();
-          }
-        }));
+        expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
       });
 
       describe('SHACL Compact Syntax Serialisation', () => {
-        it('handles the query with SHACL compact syntax as a source', async () => {
+        it('handles the query with SHACL compact syntax as a source', async() => {
           bindingStream = await engine.queryBindings(`SELECT * WHERE {
         ?s a <http://www.w3.org/2002/07/owl#Ontology>.
         }`, {
             sources: [
               'https://raw.githubusercontent.com/w3c/data-shapes/gh-pages/shacl-compact-syntax/' +
               'tests/valid/basic-shape-iri.shaclc',
-            ]
+            ],
+            pollingPeriod: 1000,
           });
 
-          let count = 0;
-          await new Promise<void>((resolve) => bindingStream.on("data", async () => {
-            count++;
-            if (count > 0) {
-              expect(true).toEqual(true);
-              bindingStream.destroy();
-              resolve();
-            }
-          }));
+          expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
         });
       });
     });

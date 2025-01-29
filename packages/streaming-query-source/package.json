@@ -1,0 +1,43 @@
+{
+  "name": "@incremunica/streaming-query-source",
+  "version": "2.0.0",
+  "description": "A base class for streaming query sources",
+  "lsd:module": true,
+  "license": "MIT",
+  "homepage": "https://maartyman.github.io/incremunica/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/streaming-query-source"
+  },
+  "bugs": {
+    "url": "https://github.com/maartyman/incremunica/issues"
+  },
+  "keywords": [
+    "incremunica",
+    "streaming",
+    "query source"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/types": "^4.0.2",
+    "@rdfjs/types": "*",
+    "asynciterator": "^3.9.0",
+    "sparqlalgebrajs": "^4.3.8"
+  }
+}

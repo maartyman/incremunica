@@ -1,6 +1,6 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^2.0.0/components/context.jsonld"
   ],
   "import": [
     "icqsi:config/rdf-join/actors-inner.json",

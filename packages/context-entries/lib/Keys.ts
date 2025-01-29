@@ -1,5 +1,5 @@
 import { ActionContextKey } from '@comunica/core';
-import type { IGuardEvents } from '@incremunica/incremental-types';
+import type { IDetermineChangesEvents, ISourceWatchEventEmitter, MatchOptions } from '@incremunica/types';
 
 /**
  * When adding entries to this file, also add a shortcut for them in the contextKeyShortcuts TSDoc comment in
@@ -7,17 +7,23 @@ import type { IGuardEvents } from '@incremunica/incremental-types';
  * Also, add this shortcut to IQueryContextCommon in @comunica/types.
  */
 
-export const KeysGuard = {
+export const KeysDetermineChanges = {
   /**
-   * Events sent by the guard.
+   * Events sent by the determine-changes actor.
    */
-  events: new ActionContextKey<IGuardEvents>('@incremunica/guard:events'),
+  events: new ActionContextKey<IDetermineChangesEvents>('@incremunica/determine-changes:events'),
 };
 
 export const KeysStreamingSource = {
-  matchOptions: new ActionContextKey<({ stopMatch: () => void })[]>('@incremunica/streaming-source:matchOptions'),
+  matchOptions: new ActionContextKey<MatchOptions[]>('@incremunica/streaming-source:matchOptions'),
 };
 
-export const KeysDeltaQueryJoin = {
-  fromDeltaQuery: new ActionContextKey('@incremunica/delta-query-join:fromDeltaQuery'),
+export const KeysBindings = {
+  isAddition: new ActionContextKey<boolean>('@incremunica/bindings:isAddition'),
+};
+
+export const KeysSourceWatch = {
+  pollingPeriod: new ActionContextKey<number>('@incremunica/source-watch:pollingPeriod'),
+  deferredEvaluationTrigger:
+    new ActionContextKey<ISourceWatchEventEmitter>('@incremunica/resource-watch:deferredEvaluationTrigger'),
 };
