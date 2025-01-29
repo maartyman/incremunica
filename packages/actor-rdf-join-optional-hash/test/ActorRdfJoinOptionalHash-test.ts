@@ -991,14 +991,14 @@ IActorRdfJoinSelectivityOutput
           [ DF.variable('c'), DF.literal('4') ],
         ]).setContextEntry(KeysBindings.isAddition, true),
         BF.bindings([
-          [ DF.variable('a'), DF.literal('1') ],
-          [ DF.variable('b'), DF.literal('b') ],
-          [ DF.variable('c'), DF.literal('4') ],
-        ]).setContextEntry(KeysBindings.isAddition, true),
-        BF.bindings([
           [ DF.variable('a'), DF.literal('2') ],
           [ DF.variable('b'), DF.literal('2') ],
           [ DF.variable('c'), DF.literal('6') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('a'), DF.literal('1') ],
+          [ DF.variable('b'), DF.literal('b') ],
+          [ DF.variable('c'), DF.literal('4') ],
         ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       expect((await output.metadata()).variables).toEqual([
