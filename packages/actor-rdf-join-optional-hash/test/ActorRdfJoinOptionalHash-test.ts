@@ -454,7 +454,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(
+      await expect((arrayifyStream(output.bindingsStream))).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -551,7 +551,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -649,7 +649,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -726,7 +726,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -870,7 +870,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -936,7 +936,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -1007,7 +1007,7 @@ IActorRdfJoinSelectivityOutput
         { variable: DF.variable('c'), canBeUndef: false },
       ]);
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect(arrayifyStream(output.bindingsStream)).resolves.toBeIsomorphicBindingsArray(
+      await expect(arrayifyStream(output.bindingsStream)).resolves.toEqualBindingsArray(
         expected,
       );
     });
@@ -1060,7 +1060,7 @@ IActorRdfJoinSelectivityOutput
         ]).setContextEntry(KeysBindings.isAddition, true),
       ];
       // Mapping to string and sorting since we don't know order (well, we sort of know, but we might not!)
-      await expect((arrayifyStream(output.bindingsStream))).resolves.toBeIsomorphicBindingsArray(
+      await expect((arrayifyStream(output.bindingsStream))).resolves.toEqualBindingsArray(
         expected,
       );
     });

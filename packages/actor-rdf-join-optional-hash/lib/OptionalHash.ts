@@ -129,7 +129,7 @@ export class OptionalHash extends InnerJoin {
               (rightMemEl === undefined || rightMemEl.length === 0)) {
               this.prependArray = true;
             }
-            if (!isAddition && this.rightMemory.get(hash)?.length === 1) {
+            if (!isAddition && !this.rightMemory.has(hash)) {
               this.appendArray = true;
             }
             this.activeElement = item;
