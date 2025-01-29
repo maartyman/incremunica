@@ -379,7 +379,6 @@ describe('System test: QuerySparql (without polly)', () => {
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
     ?s ?p ?o.
   }`, {
-        // @ts-expect-error
         sources: [ streamingStore, sourcesStream ],
         pollingPeriod: 1000,
       });
@@ -545,8 +544,8 @@ describe('System test: QuerySparql (with polly)', () => {
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
     ?s ?p ?o.
   }`, {
-        // @ts-expect-error
         sources: [ new ArrayIterator([
+          'https://www.rubensworks.net/',
           {
             querySource: 'https://www.rubensworks.net/',
             isAddition: true,

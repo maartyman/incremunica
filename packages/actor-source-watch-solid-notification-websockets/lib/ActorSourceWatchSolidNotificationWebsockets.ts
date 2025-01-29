@@ -6,11 +6,11 @@ import type {
   IActionSourceWatch,
   IActorSourceWatchArgs,
   IActorSourceWatchOutput,
-  ISourceWatchEventEmitter,
 } from '@incremunica/bus-source-watch';
 import {
   ActorSourceWatch,
 } from '@incremunica/bus-source-watch';
+import type { ISourceWatchEventEmitter } from '@incremunica/types';
 import { SubscriptionClient } from '@solid-notifications/subscription';
 import type { NotificationChannel } from '@solid-notifications/types';
 import { ChannelType } from '@solid-notifications/types';

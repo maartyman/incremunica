@@ -6,12 +6,12 @@ import type {
   IActionSourceWatch,
   IActorSourceWatchArgs,
   IActorSourceWatchOutput,
-  ISourceWatchEventEmitter,
 } from '@incremunica/bus-source-watch';
 import {
   ActorSourceWatch,
 } from '@incremunica/bus-source-watch';
 import { KeysSourceWatch } from '@incremunica/context-entries';
+import type { ISourceWatchEventEmitter } from '@incremunica/types';
 
 /**
  * An incremunica Deferred Source Watch Actor.

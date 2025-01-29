@@ -1,6 +1,6 @@
-import type { EventEmitter } from 'events';
 import type { IAction, IActorArgs, IActorOutput, IActorTest, Mediate } from '@comunica/core';
 import { Actor } from '@comunica/core';
+import type { ISourceWatchEventEmitter } from '@incremunica/types';
 
 /**
  * An Incremunica actor for source-watch events.
@@ -27,11 +27,6 @@ export abstract class ActorSourceWatch<TS = undefined> extends Actor<
   public constructor(args: IActorSourceWatchArgs<TS>) {
     super(args);
   }
-}
-
-export declare interface ISourceWatchEventEmitter extends EventEmitter {
-  emit: ((event: 'update') => boolean) & ((event: 'delete') => boolean);
-  on: ((event: 'update', listener: () => void) => this) & ((event: 'delete', listener: () => void) => this);
 }
 
 export interface IActionSourceWatch extends IAction {

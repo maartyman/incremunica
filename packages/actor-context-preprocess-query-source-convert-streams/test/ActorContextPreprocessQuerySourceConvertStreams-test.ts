@@ -3,7 +3,9 @@ import '@comunica/utils-jest';
 import { KeysInitQuery } from '@comunica/context-entries';
 import type { IAction } from '@comunica/core';
 import { ActionContext, Bus } from '@comunica/core';
-import { AsyncIterator, UnionIterator, WrappingIterator } from 'asynciterator';
+import type { QuerySourceStreamExpanded } from '@incremunica/types';
+import { arrayifyStream } from 'arrayify-stream';
+import { ArrayIterator, AsyncIterator, UnionIterator, WrappingIterator } from 'asynciterator';
 import { Store } from 'n3';
 import { Readable } from 'readable-stream';
 import { ActorContextPreprocessQuerySourceConvertStreams } from '../lib';
@@ -68,7 +70,7 @@ describe('ActorContextPreprocessQuerySourceConvertStreams', () => {
     expect((await actor.run(action)).context.get(KeysInitQuery.querySourcesUnidentified)).toEqual([
       {
         type: 'stream',
-        value: expect.any(WrappingIterator),
+        value: expect.any(AsyncIterator),
       },
     ]);
   });
@@ -98,6 +100,64 @@ describe('ActorContextPreprocessQuerySourceConvertStreams', () => {
       {
         type: 'stream',
         value: expect.any(AsyncIterator),
+      },
+    ]);
+  });
+
+  it('should run with multiple source types in streaming sources', async() => {
+    const sources: any = [
+      new ArrayIterator([
+        'http://example.org/',
+        '<a1> <b1> <c1>.',
+        {
+          querySource: 'http://example.org/',
+        },
+        {
+          querySource: '<a1> <b1> <c1>.',
+        },
+        {
+          isAddition: false,
+          querySource: 'http://example.org/',
+        },
+        {
+          isAddition: false,
+          querySource: '<a1> <b1> <c1>.',
+        },
+      ]),
+    ];
+    action.context = action.context.set(KeysInitQuery.querySourcesUnidentified, sources);
+
+    const result = (await actor.run(action)).context.get(KeysInitQuery.querySourcesUnidentified);
+    expect(result).toEqual([
+      {
+        type: 'stream',
+        value: expect.any(AsyncIterator),
+      },
+    ]);
+    await expect(arrayifyStream((<QuerySourceStreamExpanded><any>result[0]).value)).resolves.toEqual([
+      {
+        isAddition: true,
+        querySource: 'http://example.org/',
+      },
+      {
+        isAddition: true,
+        querySource: '<a1> <b1> <c1>.',
+      },
+      {
+        isAddition: true,
+        querySource: 'http://example.org/',
+      },
+      {
+        isAddition: true,
+        querySource: '<a1> <b1> <c1>.',
+      },
+      {
+        isAddition: false,
+        querySource: 'http://example.org/',
+      },
+      {
+        isAddition: false,
+        querySource: '<a1> <b1> <c1>.',
       },
     ]);
   });
