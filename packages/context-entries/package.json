@@ -33,7 +33,7 @@
     "build": "node \"../../node_modules/typescript/bin/tsc\""
   },
   "dependencies": {
-    "@comunica/core": "^4.0.1",
+    "@comunica/core": "^4.0.2",
     "@incremunica/types": "^2.0.0"
   }
 }
