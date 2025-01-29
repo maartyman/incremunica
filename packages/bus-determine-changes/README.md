@@ -14,7 +14,7 @@ $ yarn add @comunica/bus-determine-changes
 
 ## Bus usage
 
-* **Context**: `"https://linkedsoftwaredependencies.org/bundles/npm/@comunica/bus-determine-changes/^1.0.0/components/context.jsonld"`
+* **Context**: `"https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/bus-determine-changes/^2.0.0/components/context.jsonld"`
 * **Bus name**: `ActorDetermineChanges:_default_bus`
 
 ## Creating actors on this bus

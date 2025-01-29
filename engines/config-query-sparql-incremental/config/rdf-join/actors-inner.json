@@ -1,8 +1,8 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-match-hash/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-memory-bind/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-nestedloop/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-match-hash/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-memory-bind/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-rdf-join-inner-nestedloop/^2.0.0/components/context.jsonld",
 
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-rdf-join-inner-multi-smallest/^4.0.0/components/context.jsonld",

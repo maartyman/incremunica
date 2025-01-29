@@ -17,11 +17,11 @@ If using TypeScript, it is recommended to use this in conjunction with [`@rdfjs/
 ## Installation
 
 ```bash
-$ npm install @comunica/streaming-store
+$ npm install @incremunica/streaming-store
 ```
 or
 ```bash
-$ yarn add @comunica/streaming-store
+$ yarn add @incremunica/streaming-store
 ```
 
 This package also works out-of-the-box in browsers via tools such as [webpack](https://webpack.js.org/) and [browserify](http://browserify.org/).
@@ -31,7 +31,7 @@ This package also works out-of-the-box in browsers via tools such as [webpack](h
 A new `StreamingStore` can be created as follows:
 
 ```typescript
-import { StreamingStore } from '@comunica/streaming-store';
+import { StreamingStore } from '@incremunica/streaming-store';
 
 const store = new StreamingStore();
 ```

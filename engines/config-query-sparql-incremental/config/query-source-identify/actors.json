@@ -3,9 +3,9 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/config-query-sparql/^4.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
 
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-source-identify-streaming-rdfjs/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-source-identify-stream/^1.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/config-query-sparql-incremental/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-source-identify-streaming-rdfjs/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-source-identify-stream/^2.0.0/components/context.jsonld"
   ],
   "@graph": [
     {

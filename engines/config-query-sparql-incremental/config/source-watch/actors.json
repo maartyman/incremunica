@@ -2,9 +2,9 @@
   "@context": [
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
 
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-polling/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-deferred/^1.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-solid-notification-websockets/^1.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-polling/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-deferred/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-source-watch-solid-notification-websockets/^2.0.0/components/context.jsonld"
   ],
   "@id": "urn:comunica:default:Runner",
   "@type": "Runner",

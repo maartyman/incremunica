@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-query-operation-reduced-hash",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "A reduced-hash query-operation actor",
   "lsd:module": true,
   "license": "MIT",
@@ -43,7 +43,7 @@
     "@comunica/types": "^4.0.2",
     "@comunica/utils-bindings-factory": "^4.0.2",
     "@comunica/utils-query-operation": "^4.0.2",
-    "@incremunica/context-entries": "^1.3.0",
+    "@incremunica/context-entries": "^2.0.0",
     "@rdfjs/types": "*",
     "sparqlalgebrajs": "^4.3.8"
   }

@@ -14,7 +14,7 @@ $ yarn add @incremunica/bus-source-watch
 
 ## Bus usage
 
-* **Context**: `"https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/bus-source-watch/^1.0.0/components/context.jsonld"`
+* **Context**: `"https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/bus-source-watch/^2.0.0/components/context.jsonld"`
 * **Bus name**: `ActorSourceWatch:_default_bus`
 
 ## Creating actors on this bus
