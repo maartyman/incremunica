@@ -5,7 +5,7 @@
       "ignoreChanges": [
         "*.md"
       ],
-      "message": "Bump to release version %s",
+      "message": "chore: bump to release version %s",
       "allowBranch": [
         "master",
         "next/major"
