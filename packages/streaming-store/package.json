@@ -42,7 +42,7 @@
     "@types/n3": "^1.10.4",
     "@types/readable-stream": "^4.0.0",
     "n3": "^1.16.3",
-    "rdf-string": "^1.6.2",
+    "rdf-string": "^2.0.0",
     "rdf-terms": "^1.9.1",
     "readable-stream": "^4.3.0"
   },
