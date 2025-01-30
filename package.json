@@ -44,7 +44,7 @@
     "@pollyjs/persister-fs": "^6.0.5",
     "@rubensworks/eslint-config": "^3.0.0",
     "@types/jest": "^29.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.0.0",
     "@types/readable-stream": "^4.0.0",
     "@types/setup-polly-jest": "^0.5.2",
     "@types/ws": "^8.5.10",
