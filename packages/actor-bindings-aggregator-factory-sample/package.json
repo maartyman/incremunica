@@ -41,6 +41,6 @@
     "@comunica/types": "^4.0.2",
     "@incremunica/bus-bindings-aggregator-factory": "^2.0.0",
     "@rdfjs/types": "*",
-    "rdf-string": "^1.6.3"
+    "rdf-string": "^2.0.0"
   }
 }
