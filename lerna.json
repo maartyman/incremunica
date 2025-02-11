@@ -8,7 +8,8 @@
       "message": "chore: bump to release version %s",
       "allowBranch": [
         "master",
-        "next/major"
+        "next/major",
+        "next/minor"
       ],
       "npmClient": "npm"
     }
