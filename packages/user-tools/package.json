@@ -1,0 +1,45 @@
+{
+  "name": "@incremunica/user-tools",
+  "version": "2.0.0",
+  "description": "A collection of functions to help use Incremunica.",
+  "lsd:module": true,
+  "license": "MIT",
+  "homepage": "https://github.com/comunica",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maartyman/incremunica.git",
+    "directory": "packages/user-tools"
+  },
+  "bugs": {
+    "url": "https://github.com/comunica/issues"
+  },
+  "keywords": [
+    "user",
+    "utils",
+    "tools"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.js.map"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:ts": "node \"../../node_modules/typescript/bin/tsc\"",
+    "build:components": "componentsjs-generator"
+  },
+  "dependencies": {
+    "@comunica/types": "^4.0.2",
+    "@incremunica/context-entries": "^2.0.0",
+    "@incremunica/types": "^2.0.0",
+    "@rdfjs/types": "*",
+    "asynciterator": "^3.9.0",
+    "data-structure-typed": "^2.0.1"
+  }
+}
