@@ -23,9 +23,11 @@ Incremunica can be used in JavaScript/TypeScript applications and from the comma
 ### Usage within application
 
 This engine can be used in JavaScript/TypeScript applications as follows:
+To help develop with Incremunica we provide a collection of helper functions/classes in the [@incremunica/user-tools](https://www.npmjs.com/package/@incremunica/user-tools) package.
 
 ```javascript
 const QueryEngine = require('@incremunica/query-sparql-incremental').QueryEngine;
+const isAddition = require('@incremunica/user-tools').isAddition;
 const myEngine = new QueryEngine();
 
 async function main() {
@@ -42,16 +44,16 @@ async function main() {
     });
 
     // Consume results as a stream
-    bindingsStream.on('data', (binding) => {
-        console.log("Is addition:", binding.diff); // If true: addition, if false: deletion.
+    bindingsStream.on('data', (bindings) => {
+        console.log("Is addition:", isAddition(bindings));
 
-        console.log(binding.toString()); // Quick way to print bindings for testing
+        console.log(bindings.toString()); // Quick way to print bindings for testing
 
-        console.log("Has variable 'interest':", binding.has('interest')); // Will be true
+        console.log("Has variable 'interest':", bindings.has('interest')); // Will be true
 
         // Obtaining values
-        console.log(binding.get('interest').value);
-        console.log(binding.get('interest').termType);
+        console.log(bindings.get('interest').value);
+        console.log(bindings.get('interest').termType);
     });
 
     bindingsStream.on('end', () => {
