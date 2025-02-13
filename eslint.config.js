@@ -31,7 +31,9 @@ module.exports = config([
       'ts/no-unsafe-return': 'off',
       'ts/no-unsafe-argument': 'off',
       'ts/no-unsafe-assignment': 'off',
-      'import/no-nodejs-modules': 'off',
+      'import/no-nodejs-modules': [ 'error', { allow: [
+        'events',
+      ]}],
 
       'ts/no-require-imports': [ 'error', { allow: [
         'process/',
@@ -54,6 +56,7 @@ module.exports = config([
     files: [
       '**/test/**/*.ts',
       '**/test-browser/*-test.ts',
+      '**/dev-tools/**/*.ts',
     ],
     rules: {
       'import/no-nodejs-modules': 'off',
