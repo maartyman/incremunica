@@ -17,8 +17,8 @@ import { ChannelType } from '@solid-notifications/types';
 import { is_node } from 'tstl';
 if (is_node()) {
   // Polyfill for WebSocket in Node.js
-  // eslint-disable-next-line ts/no-require-imports
-  (<any>globalThis).WebSocket ??= require('ws');
+  // eslint-disable-next-line ts/no-require-imports, no-global-assign
+  WebSocket = require('ws');
 }
 
 /**
@@ -97,7 +97,15 @@ export class ActorSourceWatchSolidNotificationWebsockets extends ActorSourceWatc
       events,
       stop() {
         if (socket) {
-          socket.close();
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.close();
+          }
+          if (socket.readyState === WebSocket.CONNECTING) {
+            const constSocket = socket;
+            constSocket.onopen = () => {
+              constSocket.close();
+            };
+          }
         }
         socket = undefined;
       },

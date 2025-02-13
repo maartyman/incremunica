@@ -9,6 +9,7 @@ import { KeysBindings } from '@incremunica/context-entries';
 import { createTestBindingsFactory, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/types';
+import { DeferredEvaluation } from '@incremunica/user-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { QueryEngine } from '../lib';
 import { usePolly } from '../test/util';
@@ -20,6 +21,10 @@ if (!globalThis.window) {
 const quad = require('rdf-quad');
 
 const DF = new DataFactory();
+
+async function setServerData(testUuid: string, data: string): Promise<void> {
+  await fetch(`http://localhost:3000/reset/${testUuid}`, { method: 'POST', body: data });
+}
 
 describe('System test: QuerySparql (without polly)', () => {
   let BF: BindingsFactory;
@@ -131,6 +136,99 @@ describe('System test: QuerySparql (without polly)', () => {
       ]);
 
       streamingStore.end();
+    });
+  });
+
+  describe('with localhost', () => {
+    let testUuid: string;
+    beforeEach(async() => {
+      testUuid = `test-${Date.now()}`;
+      await setServerData(testUuid, `
+@prefix : <http://example.org/> .
+@prefix schema: <http://schema.org/> .
+:alice a schema:Person ;
+  schema:name "Alice" .`);
+    });
+
+    it('should do simple queries', async() => {
+      const deferredEvaluation = new DeferredEvaluation();
+      const bindingsStream = await engine.queryBindings(`SELECT * WHERE { ?s ?p ?o. }`, {
+        sources: [ `http://localhost:3000/${testUuid}` ],
+        deferredEvaluation: deferredEvaluation.events,
+      });
+
+      expect(await partialArrayifyAsyncIterator(bindingsStream, 2)).toEqualBindingsArray([
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+          o: DF.namedNode('http://schema.org/Person'),
+        }),
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://schema.org/name'),
+          o: DF.literal('Alice'),
+        }),
+      ]);
+
+      await setServerData(testUuid, `
+@prefix : <http://example.org/> .
+@prefix schema: <http://schema.org/> .
+
+:alice a schema:Person ;
+  schema:name "Alice" ;
+  schema:birthDate "1990-01-01" .`);
+
+      const start = performance.now();
+      deferredEvaluation.triggerUpdate();
+      expect(await partialArrayifyAsyncIterator(bindingsStream, 1)).toEqualBindingsArray([
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://schema.org/birthDate'),
+          o: DF.literal('1990-01-01'),
+        }),
+      ]);
+      const end = performance.now();
+      expect(end - start).toBeLessThan(100);
+    });
+
+    it('should do simple queries with websockets', async() => {
+      const start = performance.now();
+      const bindingsStream = await engine.queryBindings(`SELECT * WHERE { ?s ?p ?o. }`, {
+        sources: [ `http://localhost:3000/${testUuid}` ],
+      });
+
+      expect(await partialArrayifyAsyncIterator(bindingsStream, 2)).toEqualBindingsArray([
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+          o: DF.namedNode('http://schema.org/Person'),
+        }),
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://schema.org/name'),
+          o: DF.literal('Alice'),
+        }),
+      ]);
+
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 200));
+      await setServerData(testUuid, `
+@prefix : <http://example.org/> .
+@prefix schema: <http://schema.org/> .
+
+:alice a schema:Person ;
+  schema:name "Alice" ;
+  schema:birthDate "1990-01-01" .`);
+
+      expect(await partialArrayifyAsyncIterator(bindingsStream, 1)).toEqualBindingsArray([
+        BF.fromRecord({
+          s: DF.namedNode('http://example.org/alice'),
+          p: DF.namedNode('http://schema.org/birthDate'),
+          o: DF.literal('1990-01-01'),
+        }),
+      ]);
+      const end = performance.now();
+      expect(end - start).toBeGreaterThan(500);
+      expect(end - start).toBeLessThan(1000);
     });
   });
 });

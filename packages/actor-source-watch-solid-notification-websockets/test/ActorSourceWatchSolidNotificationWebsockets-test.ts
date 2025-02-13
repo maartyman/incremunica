@@ -226,6 +226,20 @@ IActorHttpOutput
       result.stop();
     });
 
+    it('should handle immediate stop after start', async() => {
+      createResourceRequestFn = createResourceRequest;
+      createDescriptionResourceRequestFn = createDescriptionResourceRequest;
+      createChannelDescriptionRequestFn = createChannelDescriptionRequest;
+
+      message.type = 'Add';
+      const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
+      result.start();
+      result.stop();
+
+      expect(onConnectionFn).toHaveBeenCalledTimes(0);
+      expect(onCloseFn).toHaveBeenCalledTimes(0);
+    });
+
     it('should support ADD', async() => {
       createResourceRequestFn = createResourceRequest;
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
