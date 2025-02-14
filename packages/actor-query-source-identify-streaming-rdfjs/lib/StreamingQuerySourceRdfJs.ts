@@ -96,6 +96,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
 
   public override queryBindings(operation: Algebra.Operation, context: IActionContext): BindingsStream {
     this.registeredQueries++;
+    // TODO [2025-03-01]: only set to running if the iterator is being read
     if (this.registeredQueries === 1) {
       this.status = StreamingQuerySourceStatus.Running;
     }

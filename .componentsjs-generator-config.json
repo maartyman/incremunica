@@ -14,7 +14,8 @@
     "packages/packager",
     "packages/runner-cli",
     "packages/streaming-store",
-    "packages/types"
+    "packages/types",
+    "packages/user-tools"
   ],
   "ignoreComponents": [
     "Error",

@@ -1,20 +1,13 @@
-import { ActorFunctionFactoryTermEquality } from '@comunica/actor-function-factory-term-equality';
-import { ActorFunctionFactoryTermLesserThan } from '@comunica/actor-function-factory-term-lesser-than';
-import {
-  ActorTermComparatorFactoryExpressionEvaluator,
-} from '@comunica/actor-term-comparator-factory-expression-evaluator';
 import type { MediatorExpressionEvaluatorFactory } from '@comunica/bus-expression-evaluator-factory';
 import type { MediatorTermComparatorFactory } from '@comunica/bus-term-comparator-factory';
 import { Bus } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import {
   BF,
-  createFuncMediator,
+  createTermCompMediator,
   DF,
   getMockEEActionContext,
   getMockMediatorExpressionEvaluatorFactory,
-  getMockMediatorMergeBindingsContext,
-  getMockMediatorQueryOperation,
   makeAggregate,
 } from '@incremunica/dev-tools';
 import { ArrayIterator } from 'asynciterator';
@@ -46,21 +39,8 @@ describe('ActorBindingsAggregatorFactoryMin', () => {
     mediatorExpressionEvaluatorFactory = getMockMediatorExpressionEvaluatorFactory({
       mediatorQueryOperation,
     });
-    // TODO [2025-02-01]: This can be replaced with createTermCompMediator in comunica
-    mediatorTermComparatorFactory = <MediatorTermComparatorFactory> {
-      async mediate(action) {
-        return await new ActorTermComparatorFactoryExpressionEvaluator({
-          name: 'actor',
-          bus: new Bus({ name: 'bus' }),
-          mediatorFunctionFactory: createFuncMediator([
-            args => new ActorFunctionFactoryTermEquality(args),
-            args => new ActorFunctionFactoryTermLesserThan(args),
-          ], {}),
-          mediatorQueryOperation: getMockMediatorQueryOperation(),
-          mediatorMergeBindingsContext: getMockMediatorMergeBindingsContext(),
-        }).run(action);
-      },
-    };
+
+    mediatorTermComparatorFactory = createTermCompMediator();
   });
 
   describe('An ActorBindingsAggregatorFactoryMin instance', () => {

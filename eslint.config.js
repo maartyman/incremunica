@@ -27,12 +27,13 @@ module.exports = config([
       'unicorn/no-array-callback-reference': 'off',
       'unicorn/prefer-node-protocol': 'off',
 
-      // TODO [2025-02-01]: check if these can be enabled
       'ts/naming-convention': 'off',
       'ts/no-unsafe-return': 'off',
       'ts/no-unsafe-argument': 'off',
       'ts/no-unsafe-assignment': 'off',
-      'import/no-nodejs-modules': 'off',
+      'import/no-nodejs-modules': [ 'error', { allow: [
+        'events',
+      ]}],
 
       'ts/no-require-imports': [ 'error', { allow: [
         'process/',
@@ -55,6 +56,7 @@ module.exports = config([
     files: [
       '**/test/**/*.ts',
       '**/test-browser/*-test.ts',
+      '**/dev-tools/**/*.ts',
     ],
     rules: {
       'import/no-nodejs-modules': 'off',

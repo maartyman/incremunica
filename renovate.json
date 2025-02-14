@@ -3,10 +3,21 @@
     "github>rubensworks/renovate-presets:js",
     "docker:disable"
   ],
+  "baseBranches": ["next/minor"],
   "packageRules": [
     {
-      "matchPackageNames": ["*"],
-      "automerge": false
+      "matchSourceUrlPrefixes": ["https://github.com/comunica/comunica"],
+      "groupName": "Comunica monorepo packages"
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
     }
   ]
 }

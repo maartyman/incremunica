@@ -1,10 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.1.0"></a>
+## [v2.1.0](https://github.com/maartyman/incremunica/compare/v2.0.0...v2.1.0) - 2025-02-14
+
+* [chore: update ci actions/cache to v4](https://github.com/maartyman/incremunica/commit/e5829d5593fbd677ae186d8b27f2673f94894482)
+* [fix: node v22 + more extensive browser testing framework](https://github.com/maartyman/incremunica/commit/75e5c4afaf6c17fbb03899b245ab4e9615b927d5)
+* [fix: browser broke on DefferedEvaluation in user tools](https://github.com/maartyman/incremunica/commit/9a9d167c80f2ea64cd6c6bb544543403894d41bb)
+* [chore: update packages](https://github.com/maartyman/incremunica/commit/c0ed2c0a3d924df6f575f9c350f9598ebbebe4d0)
+* [chore: fix TODO's](https://github.com/maartyman/incremunica/commit/5778e4b83e7b914a8c511bd18d32a7352588df76)
+* [chore: create next/major branch](https://github.com/maartyman/incremunica/commit/8b64c1c3f7527894f04030f557c913aa58bc055b)
+* [Merge pull request #125 from maartyman/feature/user-tools](https://github.com/maartyman/incremunica/commit/97a3c4401e1a203423d8d6352fb669aef9bfdc80)
+* [feat: add user-tools](https://github.com/maartyman/incremunica/commit/a2e0575648cdb7963df16536cca7c9642b5df770)
+* [Merge pull request #114 from maartyman/fix-dev-environment](https://github.com/maartyman/incremunica/commit/114557e72f6ba3097eb26c95f56018a96ab7bffd)
+* [chore: update lerna publish message](https://github.com/maartyman/incremunica/commit/b450f7939388740c72f41f049ef9acf198fed8a6)
+* [chore: fix renovate automerge](https://github.com/maartyman/incremunica/commit/40b5df35ac62931af83941eeaf8fb0672acea326)
+* [chore: revert lerna bump](https://github.com/maartyman/incremunica/commit/3443637542395f2ad874fb4bcf84946a6f996555)
+* [chore(deps): update dependency lerna to v8 (#55)](https://github.com/maartyman/incremunica/commit/6150a71b2b113bc87bbc771d660c9af5f9847b38)
+* [chore(deps): update dependency typedoc to ^0.27.0 (#106)](https://github.com/maartyman/incremunica/commit/0756b478cd438c90c407cf2327de6abaea9c112c)
+* [Merge pull request #111 from maartyman/next/major](https://github.com/maartyman/incremunica/commit/4da6d23b908dcd1e50b12d3703c9a76ccfa053a0)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/maartyman/incremunica/compare/v1.3.0...v2.0.0) - 2025-01-29
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [chore: changes to types and add context entries to QueryEngine](https://github.com/maartyman/incremunica/commit/6a6b61317d475ff0299e38d4101a044ec8581b2e)
 * [chore: change order in result for optional-hash](https://github.com/maartyman/incremunica/commit/8d215b817c7fb99a4e056de4513153b168163824)
 * [fix: bug in order of OPTIONAL result](https://github.com/maartyman/incremunica/commit/3fb9b6441514bf49dc28106d5ff64f9e76121719)
@@ -115,7 +133,6 @@ All notable changes to this project will be documented in this file.
 <a name="v1.3.0"></a>
 ## [v1.3.0](https://github.com/maartyman/incremunica/compare/v1.2.2...v1.3.0) - 2024-04-23
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [add new packages to package.json](https://github.com/maartyman/incremunica/commit/9eb8d4c2523be342d08739f7fff1ecc097a12821)
 * [Merge pull request #100 from maartyman/add-incremental-filter](https://github.com/maartyman/incremunica/commit/4f571d5884508525b9fcd42038347d0e24d8b554)
 * [partial implementation of the FILTER operator](https://github.com/maartyman/incremunica/commit/42be10d516645b9198795377b5991cf3df45b0cf)
@@ -139,7 +156,6 @@ All notable changes to this project will be documented in this file.
 <a name="v1.2.2"></a>
 ## [v1.2.2](https://github.com/maartyman/incremunica/compare/v1.2.1...v1.2.2) - 2023-12-06
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [Merge pull request #81 from maartyman/fix-browser-websockets](https://github.com/maartyman/incremunica/commit/ed18be6268ae001875e4d70c8ab2f8fb0129dbd8)
 * [use the 'websocket-polyfill' package to support browser and nodejs](https://github.com/maartyman/incremunica/commit/081e288f38b27bbeab4596900b1f0ca4a06aaaf6)
 * [added nessecary 'ws' package](https://github.com/maartyman/incremunica/commit/3c1ef25ca41adb340d5cbfe63fb4e3ad798b2ebb)
@@ -148,7 +164,6 @@ All notable changes to this project will be documented in this file.
 <a name="v1.2.1"></a>
 ## [v1.2.1](https://github.com/maartyman/incremunica/compare/v1.2.0...v1.2.1) - 2023-12-06
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [Merge pull request #79 from maartyman/fix-browser-websockets](https://github.com/maartyman/incremunica/commit/0812a6de5e42aae7e18905d53f0a42b9ace8abac)
 * [Fixed package 'ws' not working in the browser](https://github.com/maartyman/incremunica/commit/cc9cf5a9d12645b44bcc39d04bbf69941574fc2c)
 * [Merge pull request #78 from maartyman/fix-automerge-renovate](https://github.com/maartyman/incremunica/commit/cbb6b6a4ec95743602dbfc523f387495a76463e5)
@@ -160,7 +175,6 @@ All notable changes to this project will be documented in this file.
 <a name="v1.2.0"></a>
 ## [v1.2.0](https://github.com/maartyman/incremunica/compare/v1.1.0...v1.2.0) - 2023-11-29
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [updated packages and lock file](https://github.com/maartyman/incremunica/commit/47fca971a07daeb3c729a1743e8d0be7602b5d42)
 * [Merge pull request #65 from maartyman/bindingstream-up-to-date-feature](https://github.com/maartyman/incremunica/commit/cbd84ede2a29928138f5294e5ab2f67149a8f68e)
 * [add up-to-date field to lowest iterators](https://github.com/maartyman/incremunica/commit/98f4b1b76f325d54610dcac91a2cd7a0dcadaa74)
@@ -206,7 +220,6 @@ All notable changes to this project will be documented in this file.
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/maartyman/incremunica/compare/v1.0.3...v1.1.0) - 2023-11-15
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [add hash-bindings to package.json](https://github.com/maartyman/incremunica/commit/e49300883973053ea532e3d50e85ae698b189b87)
 * [Merge pull request #44 from maartyman/master](https://github.com/maartyman/incremunica/commit/7f5553da1c725a039d1283cfb725c2768d532531)
 * [Merge pull request #43 from maartyman/fix-set-semantics-streaming-store](https://github.com/maartyman/incremunica/commit/7648ac0a9a6495e45477ba441ee138e6eff635de)
@@ -232,26 +245,22 @@ All notable changes to this project will be documented in this file.
 <a name="v1.0.3"></a>
 ## [v1.0.3](https://github.com/maartyman/incremunica/compare/v1.0.2...v1.0.3) - 2023-09-05
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [fixed join config](https://github.com/maartyman/incremunica/commit/d978cc273596504e3713af1f6bf627c9b0df70a1)
 
 <a name="v1.0.2"></a>
 ## [v1.0.2](https://github.com/maartyman/incremunica/compare/v1.0.1...v1.0.2) - 2023-09-04
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [updated README files](https://github.com/maartyman/incremunica/commit/582592357cd96c1a4769b55850fd3bf45299229d)
 * [update join config](https://github.com/maartyman/incremunica/commit/84149986000a950a4f1fd61ffda5699726cb3c33)
 
 <a name="v1.0.1"></a>
 ## [v1.0.1](https://github.com/maartyman/incremunica/compare/v1.0.0...v1.0.1) - 2023-08-30
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [lock versions in package.json in query-sparql-incremental](https://github.com/maartyman/incremunica/commit/5412c01a178ee45be13e0751968300c36e6cc2fe)
 
 <a name="v1.0.0"></a>
 ## [v1.0.0](https://github.com/maartyman/incremunica/compare/v0.0.0...v1.0.0) - 2023-08-29
 
-### TODO: categorize commits, choose titles from: Added, Changed, Deprecated, Removed, Fixed, Security.
 * [Merge pull request #33 from maartyman/setup-for-publishing-to-npm](https://github.com/maartyman/incremunica/commit/a6480eb9eff763eba9f5a164e483ca1b44884e83)
 * [Merge branch 'master' into setup-for-publishing-to-npm](https://github.com/maartyman/incremunica/commit/cc18db28e95f89a62476d74f3c1b4b64fc2791e2)
 * [Cleanup + changed from @comunica to @incremunica](https://github.com/maartyman/incremunica/commit/c4081587d7970da59c88e773a4a794cdcec42d09)
