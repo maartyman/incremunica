@@ -46,7 +46,7 @@ const deferredEvaluation = new DeferredEvaluation();
 const queryEngine = new QueryEngine();
 const bindingsStream = queryEngine.queryBindings("SELECT * WHERE { ?s ?p ?o }", {
     sources: [ "https://www.rubensworks.net/" ],
-    deferredEvaluation: deferredEvaluation.events
+    deferredEvaluationTrigger: deferredEvaluation.events
 });
 
 // Trigger the deferred evaluation

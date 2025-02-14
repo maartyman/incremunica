@@ -154,7 +154,7 @@ describe('System test: QuerySparql (without polly)', () => {
       const deferredEvaluation = new DeferredEvaluation();
       const bindingsStream = await engine.queryBindings(`SELECT * WHERE { ?s ?p ?o. }`, {
         sources: [ `http://localhost:3000/${testUuid}` ],
-        deferredEvaluation: deferredEvaluation.events,
+        deferredEvaluationTrigger: deferredEvaluation.events,
       });
 
       expect(await partialArrayifyAsyncIterator(bindingsStream, 2)).toEqualBindingsArray([
