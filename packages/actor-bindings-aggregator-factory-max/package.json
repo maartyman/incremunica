@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/actor-bindings-aggregator-factory-max",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "An Incremunica max actor for bindings aggregator factory bus.",
   "lsd:module": true,
   "license": "MIT",
@@ -40,7 +40,7 @@
     "@comunica/bus-term-comparator-factory": "^4.0.2",
     "@comunica/core": "^4.0.1",
     "@comunica/types": "^4.0.2",
-    "@incremunica/bus-bindings-aggregator-factory": "^2.0.0",
+    "@incremunica/bus-bindings-aggregator-factory": "^2.1.0",
     "@rdfjs/types": "*",
     "avl": "^1.5.3",
     "n3": "^1.23.0",
