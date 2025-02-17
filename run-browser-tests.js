@@ -1,8 +1,14 @@
+const crypto = require('crypto');
 const http = require('http');
 const { spawn } = require('node:child_process');
 const WebSocket = require('ws');
 
 const sourceData = {};
+
+function hashString(str) {
+  const hash = crypto.createHash('sha256').update(str).digest('hex');
+  return hash;
+}
 
 const server = http.createServer((req, res) => {
   if (req.url.startsWith('/reset')) {
@@ -14,14 +20,10 @@ const server = http.createServer((req, res) => {
       sourceData[req.url.slice(6)] = body;
       res.statusCode = 200;
 
-      res.setHeader('vary', 'Accept,Authorization,Origin');
-      res.setHeader('x-powered-by', 'Community Solid Server');
       res.setHeader('access-control-allow-origin', '*');
       res.setHeader('access-control-allow-credentials', 'true');
       res.setHeader('access-control-expose-headers', 'Accept-Patch,Accept-Post,Accept-Put,Allow,Content-Range,ETag,Last-Modified,Link,Location,Updates-Via,WAC-Allow,Www-Authenticate');
       res.setHeader('content-type', 'text/turtle');
-      res.setHeader('etag', '1700215601000-text/turtle');
-      res.setHeader('date', 'Fri, 17 Nov 2023 17:15:00 GMT');
       res.setHeader('connection', 'close');
       res.setHeader('transfer-encoding', 'chunked');
 
@@ -103,6 +105,8 @@ notify:state .`);
   } else {
     res.statusCode = 200;
 
+    const responseData = sourceData[req.url] || JSON.stringify(sourceData);
+
     res.setHeader('vary', 'Accept,Authorization,Origin');
     res.setHeader('x-powered-by', 'Community Solid Server');
     res.setHeader('access-control-allow-origin', '*');
@@ -115,12 +119,12 @@ notify:state .`);
     res.setHeader('content-type', 'text/turtle');
     res.setHeader('link', '<http://www.w3.org/ns/pim/space#Storage>; rel="type", <http://www.w3.org/ns/ldp#Container>; rel="type", <http://www.w3.org/ns/ldp#BasicContainer>; rel="type", <http://www.w3.org/ns/ldp#Resource>; rel="type", <http://localhost:3000/pod1/.meta>; rel="describedby", <http://localhost:3000/pod1/.acl>; rel="acl", <http://localhost:3000/.well-known/solid>; rel="http://www.w3.org/ns/solid/terms#storageDescription"');
     res.setHeader('last-modified', 'Fri, 17 Nov 2023 10:06:41 GMT');
-    res.setHeader('etag', '1700215601000-text/turtle');
+    res.setHeader('etag', hashString(responseData));
     res.setHeader('date', 'Fri, 17 Nov 2023 17:15:00 GMT');
     res.setHeader('connection', 'close');
     res.setHeader('cache-control', 'no-cache');
 
-    res.end(sourceData[req.url] || JSON.stringify(sourceData));
+    res.end(responseData);
   }
 });
 
@@ -158,7 +162,7 @@ function endServers() {
 
 // eslint-disable-next-line no-console
 console.log('Starting Karma tests:');
-const lsProcess = spawn('karma', [ 'start', 'karma.config.js', '--single-run' ]);
+const lsProcess = spawn('karma', [ 'start', 'karma.config.js', '--single-run', ...process.argv.splice(2) ]);
 lsProcess.stdout.on('data', (data) => {
   process.stdout.write(data);
 });

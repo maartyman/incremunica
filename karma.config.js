@@ -1,10 +1,12 @@
-const Path = require('node:path');
+const webkit = require('@playwright/test').webkit;
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
 
 const testFiles = [
   'engines/query-sparql-incremental/test-browser/QuerySparql-test.ts',
 ];
+
+process.env.WEBKIT_HEADLESS_BIN = webkit.executablePath();
 
 // Based on https://github.com/tom-sherman/blog/blob/main/posts/02-running-jest-tests-in-a-browser.md
 module.exports = function(config) {
@@ -15,6 +17,7 @@ module.exports = function(config) {
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-webkit-launcher',
       'karma-sourcemap-loader',
       'karma-jasmine-html-reporter',
     ],
@@ -36,7 +39,6 @@ module.exports = function(config) {
         alias: {
           fs: false,
           module: false,
-          [Path.resolve(__dirname, 'engines/query-sparql-incremental/test/util.js')]: Path.resolve(__dirname, 'engines/query-sparql-incremental/test-browser/util-browser.js'),
           'jest.unmock': false,
         },
         extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
@@ -91,6 +93,7 @@ module.exports = function(config) {
     browsers: [
       'ChromeHeadless',
       'FirefoxHeadless',
+      'WebkitHeadless',
     ],
   });
 };

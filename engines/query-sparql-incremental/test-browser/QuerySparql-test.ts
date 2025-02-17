@@ -1,5 +1,3 @@
-/** @jest-environment setup-polly-jest/jest-environment-node */
-
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
 import '@incremunica/jest';
@@ -12,7 +10,6 @@ import type { Quad } from '@incremunica/types';
 import { DeferredEvaluation } from '@incremunica/user-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { QueryEngine } from '../lib';
-import { usePolly } from '../test/util';
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
@@ -26,7 +23,7 @@ async function setServerData(testUuid: string, data: string): Promise<void> {
   await fetch(`http://localhost:3000/reset/${testUuid}`, { method: 'POST', body: data });
 }
 
-describe('System test: QuerySparql (without polly)', () => {
+describe('System test: QuerySparql (without external network)', () => {
   let BF: BindingsFactory;
   let engine: QueryEngine;
 
@@ -50,7 +47,6 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ streamingStore ],
-        pollingPeriod: 500,
       });
 
       expect(await partialArrayifyAsyncIterator(bindingStream, 2)).toBeIsomorphicBindingsArray([
@@ -98,7 +94,6 @@ describe('System test: QuerySparql (without polly)', () => {
           ?o1 ?p2 ?o2.
           }`, {
         sources: [ streamingStore ],
-        pollingPeriod: 500,
       });
 
       expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toBeIsomorphicBindingsArray([
@@ -154,7 +149,7 @@ describe('System test: QuerySparql (without polly)', () => {
       const deferredEvaluation = new DeferredEvaluation();
       const bindingsStream = await engine.queryBindings(`SELECT * WHERE { ?s ?p ?o. }`, {
         sources: [ `http://localhost:3000/${testUuid}` ],
-        deferredEvaluation: deferredEvaluation.events,
+        deferredEvaluationTrigger: deferredEvaluation.events,
       });
 
       expect(await partialArrayifyAsyncIterator(bindingsStream, 2)).toEqualBindingsArray([
@@ -233,9 +228,7 @@ describe('System test: QuerySparql (without polly)', () => {
   });
 });
 
-describe('System test: QuerySparql (with polly)', () => {
-  usePolly();
-
+describe('System test: QuerySparql (with external network)', () => {
   let bindingStream: BindingsStream;
   let engine: QueryEngine;
   beforeEach(async() => {
@@ -253,7 +246,6 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingPeriod: 500,
       });
 
       expect(await partialArrayifyAsyncIterator(bindingStream, 100)).toHaveLength(100);
@@ -265,7 +257,6 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingPeriod: 500,
       };
 
       bindingStream = await engine.queryBindings(query, context);
@@ -293,7 +284,7 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingPeriod: 500,
+        pollingPeriod: 1,
       };
 
       bindingStream = await engine.queryBindings(query, context);
@@ -311,7 +302,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 500,
         });
 
         expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
@@ -325,7 +315,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 500,
         });
 
         expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
@@ -337,7 +326,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 1000,
         });
 
         expect(await partialArrayifyAsyncIterator(bindingStream, 20)).toHaveLength(20);
@@ -352,7 +340,6 @@ describe('System test: QuerySparql (with polly)', () => {
               'https://raw.githubusercontent.com/w3c/data-shapes/gh-pages/shacl-compact-syntax/' +
               'tests/valid/basic-shape-iri.shaclc',
             ],
-            pollingPeriod: 1000,
           });
 
           expect(await partialArrayifyAsyncIterator(bindingStream, 1)).toHaveLength(1);
