@@ -30,14 +30,10 @@ jobs:
             .rdf-test-suite-cache
             .rdf-test-suite-ldf-cache
           key: ${{ runner.os }}-test-modules-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
+      - name: Install dependencies & build
         run: yarn install --pure-lockfile
-      - name: Build project
-        run: yarn run build
       - name: Run depcheck
         run: yarn run depcheck
-      - name: Run browser-tests
-        run: yarn run test-browser
       - name: Run tests
         run: yarn run test-ci
       - name: Submit coverage results
@@ -46,6 +42,47 @@ jobs:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
           parallel: true
+
+  test-browser:
+    name: Browser tests
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - Chrome
+          - Firefox
+          - Webkit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure line endings are consistent
+        run: git config --global core.autocrlf input
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Load cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-test-modules-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies & build
+        run: yarn install --pure-lockfile
+      - name: Install ${{ matrix.browser }} via Playwright
+        if: startsWith(matrix.browser, 'Webkit')
+        # The @L will convert 'Webkit' into lowercase 'webkit' which is the name Playwright expects.
+        run: yarn playwright install --with-deps ${BROWSER_NAME@L}
+        env:
+          BROWSER_NAME: ${{ matrix.browser }}
+      - name: Run browser tests
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 2
+          max_attempts: 3
+          # The tests will run on 'WebkitHeadless', 'FirefoxHeadless' and 'ChromeHeadless'
+          command: yarn run test-browser --browsers ${{ matrix.browser }}Headless
 
   coveralls:
     needs: test
@@ -78,6 +115,7 @@ jobs:
   docs:
     needs:
       - test
+      - test-browser
       - lint
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest

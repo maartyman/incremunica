@@ -162,7 +162,7 @@ function endServers() {
 
 // eslint-disable-next-line no-console
 console.log('Starting Karma tests:');
-const lsProcess = spawn('karma', [ 'start', 'karma.config.js', '--single-run' ]);
+const lsProcess = spawn('karma', [ 'start', 'karma.config.js', '--single-run', ...process.argv.splice(2) ]);
 lsProcess.stdout.on('data', (data) => {
   process.stdout.write(data);
 });

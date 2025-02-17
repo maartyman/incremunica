@@ -40,6 +40,7 @@
   "devDependencies": {
     "@comunica/utils-jest": "^4.0.1",
     "@comunica/utils-monorepo": "^4.0.1",
+    "@playwright/test": "^1.47.2",
     "@rubensworks/eslint-config": "^3.0.0",
     "@types/jest": "^29.0.0",
     "@types/md5": "^2.3.5",
@@ -60,6 +61,7 @@
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.0.0",
     "karma-sourcemap-loader": "^0.4.0",
+    "karma-webkit-launcher": "^2.6.0",
     "karma-webpack": "^5.0.0",
     "lerna": "^7.4.2",
     "lerna-script": "^1.4.0",
