@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/maartyman/incremunica/actions?query=workflow%3ACI"><img src="https://github.com/maartyman/incremunica/workflows/CI/badge.svg" alt="Build Status"></a>
+<a href="https://github.com/maartyman/incremunica/actions/workflows/CI.yml?query=branch%3Amaster"><img src="https://github.com/maartyman/incremunica/actions/workflows/CI.yml/badge.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/maartyman/incremunica?branch=master"><img src="https://coveralls.io/repos/github/maartyman/incremunica/badge.svg?branch=master" alt="Coverage Status"></a>
 <a href="https://maartyman.github.io/incremunica/"><img src="https://img.shields.io/badge/doc-code_documentation-blueviolet"/></a>
 </p>
