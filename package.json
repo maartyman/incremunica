@@ -73,7 +73,7 @@
     "pre-commit": "^1.2.2",
     "rdf-data-factory": "^1.1.1",
     "rdf-quad": "^2.0.0",
-    "rdf-terms": "^1.9.1",
+    "rdf-terms": "^2.0.0",
     "readable-stream": "^4.3.0",
     "sparqlalgebrajs": "^4.3.8",
     "streamify-array": "^1.0.1",
