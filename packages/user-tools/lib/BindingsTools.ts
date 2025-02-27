@@ -9,3 +9,11 @@ import { KeysBindings } from '@incremunica/context-entries';
 export function isAddition(bindings: Bindings): boolean {
   return (<BindingsFromBindingsFactory>bindings).getContextEntry(KeysBindings.isAddition) ?? true;
 }
+
+/**
+ * Get the index of the given bindings.
+ * @param bindings
+ */
+export function getBindingsIndex(bindings: Bindings): number {
+  return (<BindingsFromBindingsFactory>bindings).getContextEntry(KeysBindings.order)?.index ?? -1;
+}

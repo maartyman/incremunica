@@ -11,6 +11,7 @@ import { KeysBindings } from '@incremunica/context-entries';
 import { createTestBindingsFactory, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/streaming-store';
 import type { Quad } from '@incremunica/types';
+import { getBindingsIndex } from '@incremunica/user-tools';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { PassThrough } from 'readable-stream';
@@ -79,6 +80,54 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('interestCount'), DF.literal('1', integerNamedNode) ],
         ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
+
+      streamingStore.end();
+    });
+
+    it('simple query with ORDERBY', async() => {
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+      streamingStore.addQuad(quad('Bob', 'http://test/hasInterest', 'Sports'));
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Reading'));
+
+      const bindingStream = await engine.queryBindings(`PREFIX test: <http://test/>
+        SELECT ?subject ?interest
+        WHERE {
+          ?subject test:hasInterest ?interest .
+        }
+        ORDER BY ?subject ?interest`, {
+        sources: [ streamingStore ],
+      });
+
+      const result1 = await partialArrayifyAsyncIterator(bindingStream, 3);
+      const expectedResult1 = [
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Cooking') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Reading') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Bob') ],
+          [ DF.variable('interest'), DF.namedNode('Sports') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect(result1).toBeIsomorphicBindingsArray(expectedResult1);
+      for (const result of result1) {
+        expect(result).toEqualBindings(expectedResult1[getBindingsIndex(result)]);
+      }
+
+      streamingStore.removeQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+
+      const result2 = await partialArrayifyAsyncIterator(bindingStream, 1);
+      expect(result2).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Cooking') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      expect(getBindingsIndex(result2[0])).toBe(0);
 
       streamingStore.end();
     });

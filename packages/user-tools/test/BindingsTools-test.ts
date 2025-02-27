@@ -1,7 +1,7 @@
 import 'jest';
 import { KeysBindings } from '@incremunica/context-entries';
-import { BF } from '@incremunica/dev-tools';
-import { isAddition } from '../lib';
+import { BF, DF } from '@incremunica/dev-tools';
+import { getBindingsIndex, isAddition } from '../lib';
 
 describe('BindingsTools', () => {
   describe('isAddition', () => {
@@ -15,6 +15,20 @@ describe('BindingsTools', () => {
 
     it('should return false for bindings with isAddition context false', async() => {
       expect(isAddition(BF.bindings().setContextEntry(KeysBindings.isAddition, true))).toBeTruthy();
+    });
+  });
+
+  describe('getBindingsIndex', () => {
+    it('should return -1 for bindings with no context', async() => {
+      expect(getBindingsIndex(BF.bindings())).toBe(-1);
+    });
+
+    it('should return the index for bindings with a order context', async() => {
+      expect(getBindingsIndex(BF.bindings().setContextEntry(KeysBindings.order, {
+        hash: 'abc',
+        result: DF.literal('abc'),
+        index: 5,
+      }))).toBe(5);
     });
   });
 });
