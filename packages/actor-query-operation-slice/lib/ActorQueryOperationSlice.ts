@@ -4,7 +4,7 @@ import {
 } from '@comunica/bus-query-operation';
 import { KeysInitQuery, KeysQueryOperation } from '@comunica/context-entries';
 import type { IActorTest, TestResult } from '@comunica/core';
-import { passTestVoid } from '@comunica/core';
+import { failTest, passTestVoid } from '@comunica/core';
 import type {
   IQueryOperationResult,
   IQueryOperationResultBindings,
@@ -30,7 +30,19 @@ export class ActorQueryOperationSlice extends ActorQueryOperationTypedMediated<A
     super(args, 'slice');
   }
 
-  public async testOperation(_operation: Algebra.Slice, _context: IActionContext): Promise<TestResult<IActorTest>> {
+  public async testOperation(operation: Algebra.Slice, _context: IActionContext): Promise<TestResult<IActorTest>> {
+    if (operation.input === undefined) {
+      return passTestVoid();
+    }
+    if (operation.input.type === 'orderby') {
+      return failTest('This actor can only handle slices without an order operation.');
+    }
+    if (operation.input.input === undefined) {
+      return passTestVoid();
+    }
+    if (operation.input.type === 'project' && operation.input.input.type === 'orderby') {
+      return failTest('This actor can only handle slices without an order operation.');
+    }
     return passTestVoid();
   }
 
