@@ -1,5 +1,10 @@
 import { ActionContextKey } from '@comunica/core';
-import type { IDetermineChangesEvents, ISourceWatchEventEmitter, MatchOptions } from '@incremunica/types';
+import type {
+  BindingsOrder,
+  IDetermineChangesEvents,
+  ISourceWatchEventEmitter,
+  MatchOptions,
+} from '@incremunica/types';
 
 /**
  * When adding entries to this file, also add a shortcut for them in the contextKeyShortcuts TSDoc comment in
@@ -20,6 +25,7 @@ export const KeysStreamingSource = {
 
 export const KeysBindings = {
   isAddition: new ActionContextKey<boolean>('@incremunica/bindings:isAddition'),
+  order: new ActionContextKey<BindingsOrder>('@incremunica/bindings:order'),
 };
 
 export const KeysSourceWatch = {
