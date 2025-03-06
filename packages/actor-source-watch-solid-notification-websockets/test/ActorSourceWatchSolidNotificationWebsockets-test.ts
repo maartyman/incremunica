@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import type { IActionHttp, IActorHttpOutput } from '@comunica/bus-http';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { Bus } from '@comunica/core';
@@ -179,7 +180,10 @@ IActorHttpOutput
 
   describe('ActorSourceWatchSolidNotificationWebsockets run', () => {
     let websocket: Server<typeof import('ws')>;
-    const onCloseFn = jest.fn();
+    const closeEvents = new EventEmitter();
+    const onCloseFn = jest.fn(() => {
+      closeEvents.emit('close');
+    });
     const onConnectionFn = jest.fn((ws: WebSocket) => {
       ws.send(JSON.stringify(message));
       ws.onclose = onCloseFn;
@@ -217,9 +221,12 @@ IActorHttpOutput
       result.start();
       result.start();
       result.start();
-      await expect(new Promise<void>(resolve => result.events.once('update', () => {
-        resolve();
-      }))).resolves.toBeUndefined();
+      await expect(Promise.all([
+        new Promise<void>(resolve => result.events.once('update', () => {
+          resolve();
+        })),
+        new Promise<void>(resolve => closeEvents.once('close', resolve)),
+      ])).resolves.toEqual([ undefined, undefined ]);
       expect(onConnectionFn).toHaveBeenCalledTimes(2);
       expect(onCloseFn).toHaveBeenCalledTimes(1);
 
