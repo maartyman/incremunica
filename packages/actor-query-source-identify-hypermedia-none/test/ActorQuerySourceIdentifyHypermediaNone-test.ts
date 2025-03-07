@@ -9,15 +9,18 @@ import {
 } from '@incremunica/actor-merge-bindings-context-is-addition';
 import type { IActionDetermineChanges, MediatorDetermineChanges } from '@incremunica/bus-determine-changes';
 import { KeysBindings, KeysDetermineChanges } from '@incremunica/context-entries';
-import { createTestBindingsFactory, createTestContextWithDataFactory } from '@incremunica/dev-tools';
-import { arrayifyStream } from 'arrayify-stream';
+import {
+  createTestBindingsFactory,
+  createTestContextWithDataFactory,
+  partialArrayifyAsyncIterator,
+  quad,
+} from '@incremunica/dev-tools';
 import { DataFactory } from 'rdf-data-factory';
 import { Factory } from 'sparqlalgebrajs';
 import { ActorQuerySourceIdentifyHypermediaNone } from '../lib';
 
 const DF = new DataFactory();
 const AF = new Factory();
-const quad = require('rdf-quad');
 const streamifyArray = require('streamify-array');
 
 function captureEvents(item: EventEmitter, ...events: string[]) {
@@ -81,15 +84,13 @@ describe('ActorRdfResolveHypermediaNone', () => {
     });
 
     it('should run and make a streaming store', async() => {
-      const deletedQuad = quad('s1', 'p1', 'o1');
-      deletedQuad.isAddition = false;
       const action = <any> {
         context,
         url: 'http://test.com',
         quads: streamifyArray([
           quad('s1', 'p1', 'o1'),
           quad('s2', 'p2', 'o2'),
-          deletedQuad,
+          quad('s1', 'p1', 'o1', undefined, false),
         ]),
       };
       const result = (await actor.run(action));
@@ -97,14 +98,7 @@ describe('ActorRdfResolveHypermediaNone', () => {
         AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
         new ActionContext(),
       );
-      let number = 2;
-      stream.on('data', () => {
-        number--;
-        if (number === 0) {
-          stream.close();
-        }
-      });
-      await expect(arrayifyStream(stream)).resolves.toBeIsomorphicBindingsArray([
+      await expect(partialArrayifyAsyncIterator(stream, 3)).resolves.toBeIsomorphicBindingsArray([
         BF.bindings([
           [ DF.variable('s'), DF.namedNode('s1') ],
           [ DF.variable('p'), DF.namedNode('p1') ],
