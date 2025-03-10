@@ -40,6 +40,30 @@ describe('System test: QuerySparql (without external network)', () => {
       streamingStore = new StreamingStore<Quad>();
     });
 
+    it('simple query that starts with empty store', async() => {
+      const bindingStream = await engine.queryBindings(`
+        SELECT ?s ?p1 ?o1 ?p2 ?o2 WHERE {
+        ?s ?p1 ?o1 .
+        ?o1 ?p2 ?o2 . }`, {
+        sources: [ streamingStore ],
+      });
+
+      streamingStore.addQuad(quad('s', 'p1', 'o1'));
+      streamingStore.addQuad(quad('o1', 'p2', 'o2'));
+
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s') ],
+          [ DF.variable('p1'), DF.namedNode('p1') ],
+          [ DF.variable('o1'), DF.namedNode('o1') ],
+          [ DF.variable('p2'), DF.namedNode('p2') ],
+          [ DF.variable('o2'), DF.namedNode('o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.end();
+    });
+
     it('simple query with GROUPBY', async() => {
       streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
       streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Reading'));
