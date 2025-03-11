@@ -47,7 +47,7 @@ export class ActorSourceWatchPolling extends ActorSourceWatch {
 
     let etag = action.metadata.etag;
     const checkForChanges = (): void => {
-      // TODO [2025-03-01]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
+      // TODO [2025-08-01]: what if the source doesn't support HEAD requests, if it's a SPARQL endpoint for example?
       this.mediatorHttp.mediate(
         {
           context: action.context,

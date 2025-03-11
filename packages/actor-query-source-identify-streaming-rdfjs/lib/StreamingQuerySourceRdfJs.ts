@@ -9,11 +9,9 @@ import type {
   BindingsStream,
   IActionContext,
   FragmentSelectorShape,
-  Bindings,
   ComunicaDataFactory,
 } from '@comunica/types';
 import type { BindingsFactory } from '@comunica/utils-bindings-factory';
-import { ClosableIterator } from '@comunica/utils-iterator';
 import { MetadataValidationState } from '@comunica/utils-metadata';
 import { KeysBindings, KeysStreamingSource } from '@incremunica/context-entries';
 import { StreamingQuerySource, StreamingQuerySourceStatus } from '@incremunica/streaming-query-source';
@@ -26,16 +24,16 @@ import type {
   QuadTermName,
 } from 'rdf-terms';
 import {
-  filterTermsNested,
   someTerms,
+  filterTermsNested,
   uniqTerms,
-
   getValueNestedPath,
   reduceTermsNested,
   someTermsNested,
 } from 'rdf-terms';
 import { Factory } from 'sparqlalgebrajs';
 import type { Algebra } from 'sparqlalgebrajs';
+import { StartClosableMappingIterator } from './StartClosableMappingIterator';
 
 export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
   public store: StreamingStore<Quad>;
@@ -95,12 +93,6 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
   }
 
   public override queryBindings(operation: Algebra.Operation, context: IActionContext): BindingsStream {
-    this.registeredQueries++;
-    // TODO [2025-03-01]: only set to running if the iterator is being read
-    if (this.registeredQueries === 1) {
-      this.status = StreamingQuerySourceStatus.Running;
-    }
-
     if (operation.type !== 'pattern') {
       throw new Error(`Attempted to pass non-pattern operation '${operation.type}' to StreamingQuerySourceRdfJs`);
     }
@@ -154,6 +146,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
         .catch(error => quads.destroy(error));
     }
 
+    let started = false;
     const it = StreamingQuerySourceRdfJs.quadsToBindings(
       quads,
       operation,
@@ -161,9 +154,18 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
       this.bindingsFactory,
       Boolean(context.get(KeysQueryOperation.unionDefaultGraph)),
       () => {
-        this.registeredQueries--;
-        if (this.registeredQueries === 0) {
-          this.status = StreamingQuerySourceStatus.Idle;
+        if (started) {
+          this.registeredQueries--;
+          if (this.registeredQueries === 0) {
+            this.status = StreamingQuerySourceStatus.Idle;
+          }
+        }
+      },
+      () => {
+        started = true;
+        this.registeredQueries++;
+        if (this.status !== StreamingQuerySourceStatus.Running) {
+          this.status = StreamingQuerySourceStatus.Running;
         }
       },
     );
@@ -246,6 +248,7 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     bindingsFactory: BindingsFactory,
     unionDefaultGraph: boolean,
     onClose: () => void,
+    onStart: () => void,
   ): BindingsStream {
     const variables = getVariables(pattern);
 
@@ -296,18 +299,22 @@ export class StreamingQuerySourceRdfJs extends StreamingQuerySource {
     }
 
     // Wrap it in a ClosableIterator, so we can propagate destroy calls
-    const bindingsStream = new ClosableIterator(filteredOutput.map<Bindings>(quad => bindingsFactory
-      .bindings(Object.keys(elementVariables).map((key) => {
+    const bindingsStream = <BindingsStream><any> new StartClosableMappingIterator(
+      filteredOutput,
+      quad => bindingsFactory.bindings(Object.keys(elementVariables).map((key) => {
         const keys: QuadTermName[] = <any>key.split('_');
         const variable = elementVariables[key];
         const term = getValueNestedPath(quad, keys);
         return [ dataFactory.variable(variable), term ];
-      })).setContextEntry(KeysBindings.isAddition, (<any>quad).isAddition ?? true)), {
-      onClose: () => {
-        quads.destroy();
-        onClose();
+      })).setContextEntry(KeysBindings.isAddition, (<any>quad).isAddition ?? true),
+      {
+        onStart,
+        onClose: () => {
+          quads.destroy();
+          onClose();
+        },
       },
-    });
+    );
 
     // Set the metadata property
     setMetadata(

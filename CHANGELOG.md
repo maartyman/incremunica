@@ -1,6 +1,31 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.2.0"></a>
+## [v2.2.0](https://github.com/maartyman/incremunica/compare/v2.1.0...v2.2.0) - 2025-03-11
+
+* [chore: only run chrome browser tests locally](https://github.com/maartyman/incremunica/commit/2069160f4c42eda0e8169e724a319e6782f04150)
+* [chore: update comunica to v2.1.0](https://github.com/maartyman/incremunica/commit/762b9289ec46d6ed9eaf5c1132520f705fb82579)
+* [fix: starting with an empty store](https://github.com/maartyman/incremunica/commit/bde15f4c2473c6491e05d24cb360c4501dab4579)
+* [fix: websockets](https://github.com/maartyman/incremunica/commit/cfc5c040f0a8c5d92b7a19f045f310b39089eec2)
+* [fix: premature start of the source watch](https://github.com/maartyman/incremunica/commit/b52e3b2dccf35c2c213ebb1d44a5d0b7a3206bc7)
+* [Merge pull request #136 from maartyman/feat/order-by](https://github.com/maartyman/incremunica/commit/8ab8a902e711fcf9119a454030f4a3c6ae883b77)
+* [Merge branch 'next/minor' into feat/order-by](https://github.com/maartyman/incremunica/commit/eadb2c3f7310f47c81a0e790110f719f5797c467)
+* [feat: add slice-ordered query operator](https://github.com/maartyman/incremunica/commit/dcdb6a90308210792d931d5909d398f08df5b1d8)
+* [feat: add support for ORDER BY](https://github.com/maartyman/incremunica/commit/1001c6c033f178cc60dcf407eb151bb292e950f3)
+* [chore: change CI name and fix badge](https://github.com/maartyman/incremunica/commit/526d1d182ca2f903614bd27782a9ab3990a363c6)
+* [Merge pull request #127 from maartyman/renovate/rdf-terms-2.x](https://github.com/maartyman/incremunica/commit/7d2881a4892fab92cdb8caf5b44d827693a07eb1)
+* [fix(deps): update dependency rdf-terms to v2](https://github.com/maartyman/incremunica/commit/073f00d4e4434482bd82f1d5d0586d059e2e7018)
+* [chore: fix test too wait for ws connection to close](https://github.com/maartyman/incremunica/commit/7670ccf946840dfd8f47e0859f4d815383aaf397)
+* [chore: add multi platform browser tests](https://github.com/maartyman/incremunica/commit/32d40926b8aff60757b2bfc55df828f5dd19e77e)
+* [fix: remove polly in integration tests + cleanup tests](https://github.com/maartyman/incremunica/commit/378894dc5d7d0ce929f2e9bd752f2a570bac65c1)
+* [fix: context shortcut for deferredEvaluation](https://github.com/maartyman/incremunica/commit/e1d7754c162502d323ccc796ac8e69167de0988d)
+* [chore: extend clean-monorepo command](https://github.com/maartyman/incremunica/commit/84aee4c15d5a5fdcdfa5f7d5fce8daea8ba6a6a3)
+* [chore: add CI tests for different oses](https://github.com/maartyman/incremunica/commit/06816d7f525cf8be4a63e61c4d1eadb292d9345c)
+* [chore: update main repo readme](https://github.com/maartyman/incremunica/commit/058de9fde48a800b96753089f473ff1bceeef4bc)
+* [chore(deps): update dependency webpack-cli to v6 (#120)](https://github.com/maartyman/incremunica/commit/9383942af13a2d6cc0acbc253cfbed5b83c7f08a)
+* [Merge pull request #126 from maartyman/next/minor](https://github.com/maartyman/incremunica/commit/7106eee71b30d0ec6d315216b0c4548f276b811a)
+
 <a name="v2.1.0"></a>
 ## [v2.1.0](https://github.com/maartyman/incremunica/compare/v2.0.0...v2.1.0) - 2025-02-14
 

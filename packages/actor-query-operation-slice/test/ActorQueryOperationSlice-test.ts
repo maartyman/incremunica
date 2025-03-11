@@ -122,6 +122,38 @@ describe('ActorQueryOperationSlice', () => {
       await expect(actor.test(op)).resolves.toPassTestVoid();
     });
 
+    it('should test on only slices', async() => {
+      const op: any = {
+        operation: { type: 'slice', start: 0, length: 100, input: { type: 'project' }},
+        context: new ActionContext(),
+      };
+      await expect(actor.test(op)).resolves.toPassTestVoid();
+    });
+
+    it('should fail on slices with an orderby', async() => {
+      const op: any = {
+        operation: { type: 'slice', start: 0, length: 100, input: { type: 'orderby' }},
+        context: new ActionContext(),
+      };
+      await expect(actor.test(op)).resolves.toFailTest('This actor can only handle slices without an order operation.');
+    });
+
+    it('should fail on slices with a projection and then orderby', async() => {
+      const op: any = {
+        operation: { type: 'slice', start: 0, length: 100, input: { type: 'project', input: { type: 'orderby' }}},
+        context: new ActionContext(),
+      };
+      await expect(actor.test(op)).resolves.toFailTest('This actor can only handle slices without an order operation.');
+    });
+
+    it('should test on slices with a projection and then a bgp', async() => {
+      const op: any = {
+        operation: { type: 'slice', start: 0, length: 100, input: { type: 'project', input: { type: 'bgp' }}},
+        context: new ActionContext(),
+      };
+      await expect(actor.test(op)).resolves.toPassTestVoid();
+    });
+
     it('should not test on non-slices', async() => {
       const op: any = { operation: { type: 'no-slice' }};
       await expect(actor.test(op)).resolves.toFailTest(`Actor actor only supports slice operations, but got no-slice`);
@@ -583,7 +615,7 @@ describe('ActorQueryOperationSlice', () => {
         });
       });
 
-      const testCases = [
+      const testCases: { start: number; length: number; result: [string, boolean][] }[] = [
         { start: 0, length: 1, result: [[ '1', true ], [ '1', false ], [ '2', true ], [ '2', false ]]},
         { start: 0, length: 2, result: [[ '1', true ], [ '2', true ], [ '1', false ], [ '2', false ]]},
         { start: 0, length: 3, result: [

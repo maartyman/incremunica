@@ -4,3 +4,4 @@ export * from './ISourceWatchEventEmitter';
 export * from './Quad';
 export * from './QuerySource';
 export * from './StreamingStore';
+export * from './BindingsOrder';

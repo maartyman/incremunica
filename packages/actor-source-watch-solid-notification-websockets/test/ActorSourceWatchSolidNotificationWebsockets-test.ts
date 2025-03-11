@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import type { IActionHttp, IActorHttpOutput } from '@comunica/bus-http';
 import type { Actor, IActorTest, Mediator } from '@comunica/core';
 import { Bus } from '@comunica/core';
@@ -179,9 +180,18 @@ IActorHttpOutput
 
   describe('ActorSourceWatchSolidNotificationWebsockets run', () => {
     let websocket: Server<typeof import('ws')>;
-    const onCloseFn = jest.fn();
+    const closeEvents = new EventEmitter();
+    let openConnections = 0;
+    const onCloseFn = jest.fn(() => {
+      openConnections--;
+      closeEvents.emit('close');
+    });
+    let send: () => void | undefined;
     const onConnectionFn = jest.fn((ws: WebSocket) => {
-      ws.send(JSON.stringify(message));
+      openConnections++;
+      send = () => {
+        ws.send(JSON.stringify(message));
+      };
       ws.onclose = onCloseFn;
     });
 
@@ -190,7 +200,11 @@ IActorHttpOutput
       websocket.on('connection', onConnectionFn);
     });
 
-    afterEach(() => {
+    afterEach(async() => {
+      // eslint-disable-next-line no-unmodified-loop-condition
+      while (openConnections > 0) {
+        await new Promise<void>(resolve => closeEvents.once('close', resolve));
+      }
       websocket.close();
       jest.clearAllMocks();
     });
@@ -200,7 +214,6 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      message.type = 'Add';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
       result.start();
       result.start();
@@ -217,9 +230,12 @@ IActorHttpOutput
       result.start();
       result.start();
       result.start();
-      await expect(new Promise<void>(resolve => result.events.once('update', () => {
-        resolve();
-      }))).resolves.toBeUndefined();
+      await expect(Promise.all([
+        new Promise<void>(resolve => result.events.once('update', () => {
+          resolve();
+        })),
+        new Promise<void>(resolve => closeEvents.once('close', resolve)),
+      ])).resolves.toEqual([ undefined, undefined ]);
       expect(onConnectionFn).toHaveBeenCalledTimes(2);
       expect(onCloseFn).toHaveBeenCalledTimes(1);
 
@@ -231,13 +247,14 @@ IActorHttpOutput
       createDescriptionResourceRequestFn = createDescriptionResourceRequest;
       createChannelDescriptionRequestFn = createChannelDescriptionRequest;
 
-      message.type = 'Add';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
       result.start();
       result.stop();
 
-      expect(onConnectionFn).toHaveBeenCalledTimes(0);
-      expect(onCloseFn).toHaveBeenCalledTimes(0);
+      await new Promise<void>(resolve => closeEvents.once('close', resolve));
+
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
+      expect(onCloseFn).toHaveBeenCalledTimes(1);
     });
 
     it('should support ADD', async() => {
@@ -247,8 +264,14 @@ IActorHttpOutput
 
       message.type = 'Add';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
-      result.start();
 
+      result.start();
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
+      expect(onConnectionFn).toHaveBeenCalledTimes(1);
+
+      send();
       await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
       }))).resolves.toBeUndefined();
@@ -270,6 +293,11 @@ IActorHttpOutput
       }))).resolves.toBeUndefined();
       expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
+      send();
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
+
       result.stop();
     });
 
@@ -286,6 +314,11 @@ IActorHttpOutput
         resolve();
       }))).resolves.toBeUndefined();
       expect(onConnectionFn).toHaveBeenCalledTimes(1);
+
+      send();
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
 
       result.stop();
     });
@@ -304,6 +337,11 @@ IActorHttpOutput
       }))).resolves.toBeUndefined();
       expect(onConnectionFn).toHaveBeenCalledTimes(1);
 
+      send();
+      await expect(new Promise<void>(resolve => result.events.once('update', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
+
       result.stop();
     });
 
@@ -315,11 +353,15 @@ IActorHttpOutput
       message.type = 'Delete';
       const result = await actor.run(action, { notificationChannel: 'ws://localhost:4015' });
       result.start();
-
       await expect(new Promise<void>(resolve => result.events.once('update', () => {
         resolve();
       }))).resolves.toBeUndefined();
       expect(onConnectionFn).toHaveBeenCalledTimes(1);
+
+      send();
+      await expect(new Promise<void>(resolve => result.events.once('delete', () => {
+        resolve();
+      }))).resolves.toBeUndefined();
 
       result.stop();
     });

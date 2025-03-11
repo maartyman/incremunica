@@ -93,6 +93,42 @@ describe('StreamingQuerySourceRdfJs', () => {
         .toThrow(new Error('closeStream function has not been replaced in streaming store.'));
     });
 
+    it('should change status when the stream is read', async() => {
+      store = <any>{
+        match: (s, p, o, g, matchoptions) => {
+          const stream = new PassThrough({ objectMode: true });
+          matchoptions.closeStream = () => {
+            stream.end();
+          };
+          stream.push(quad('s1', 'p1', 'o1'));
+          return stream;
+        },
+        countQuads: () => 1,
+      };
+      source = new StreamingQuerySourceRdfJs(store, DF, BF);
+      expect(source.status).toBe(StreamingQuerySourceStatus.Initializing);
+      const data1 = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      expect(source.status).toBe(StreamingQuerySourceStatus.Initializing);
+      const data2 = source.queryBindings(
+        AF.createPattern(DF.variable('s'), DF.variable('p'), DF.variable('o')),
+        ctx,
+      );
+      expect(source.status).toBe(StreamingQuerySourceStatus.Initializing);
+      data1.read();
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+      data1.close();
+      await new Promise(resolve => setImmediate(resolve));
+      expect(source.status).toBe(StreamingQuerySourceStatus.Idle);
+      data2.read();
+      expect(source.status).toBe(StreamingQuerySourceStatus.Running);
+      data2.close();
+      await new Promise(resolve => setImmediate(resolve));
+      expect(source.status).toBe(StreamingQuerySourceStatus.Idle);
+    });
+
     it('should close the stream if closeStream is called', async() => {
       const closeFn = jest.fn();
       store = <any>{
@@ -469,6 +505,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
         ctx,
       );
+      data1.read();
       expect(source.status).toBe(StreamingQuerySourceStatus.Running);
 
       data1.destroy();
@@ -481,6 +518,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
         ctx,
       );
+      data2.read();
       expect(source.status).toBe(StreamingQuerySourceStatus.Running);
       const quadsStream3 = new PassThrough({ objectMode: true });
       store.match = () => quadsStream3;
@@ -488,6 +526,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         AF.createPattern(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g1')),
         ctx,
       );
+      data3.read();
       expect(source.status).toBe(StreamingQuerySourceStatus.Running);
 
       data2.destroy();
@@ -945,12 +984,38 @@ describe('StreamingQuerySourceRdfJs', () => {
 
       const onCloseFn = jest.fn();
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, onCloseFn);
+        .quadsToBindings(quadStream, pattern, DF, BF, false, onCloseFn, () => {});
 
       bindingsStream.destroy();
 
       expect(quadStream.destroyed).toBe(true);
       expect(onCloseFn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onStart when the stream is read', async() => {
+      // Prepare data
+      const quadStream = new ArrayIterator([], { autoStart: false });
+      quadStream.setProperty('metadata', {
+        cardinality: { type: 'exact', value: 1 },
+        order: [
+          { term: 'subject', direction: 'asc' },
+          { term: 'predicate', direction: 'asc' },
+          { term: 'object', direction: 'asc' },
+          { term: 'graph', direction: 'asc' },
+        ],
+      });
+      const pattern = AF.createPattern(
+        DF.namedNode('s'),
+        DF.variable('p'),
+        DF.namedNode('o'),
+      );
+
+      const onStartFn = jest.fn();
+      const bindingsStream = (<any>StreamingQuerySourceRdfJs)
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, onStartFn);
+
+      bindingsStream.read();
+      expect(onStartFn).toHaveBeenCalledTimes(1);
     });
 
     it('converts triples', async() => {
@@ -976,7 +1041,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1024,7 +1089,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1094,7 +1159,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1180,7 +1245,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('g'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1238,7 +1303,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('g'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, true, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, true, () => {}, () => {});
 
       await expect(bindingsStream).toEqualBindingsStream([
         BF.fromRecord({
@@ -1306,7 +1371,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.namedNode('o'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([
@@ -1347,7 +1412,7 @@ describe('StreamingQuerySourceRdfJs', () => {
         DF.variable('x'),
       );
       const bindingsStream = (<any>StreamingQuerySourceRdfJs)
-        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {});
+        .quadsToBindings(quadStream, pattern, DF, BF, false, () => {}, () => {});
 
       // Check results
       await expect(bindingsStream).toEqualBindingsStream([

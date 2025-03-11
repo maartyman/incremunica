@@ -2,7 +2,8 @@
   "@context": [
     "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/runner/^4.0.0/components/context.jsonld",
 
-    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-operation-slice/^2.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-operation-slice/^2.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@incremunica/actor-query-operation-slice-ordered/^2.0.0/components/context.jsonld"
   ],
   "@id": "urn:comunica:default:Runner",
   "@type": "Runner",
@@ -10,6 +11,11 @@
     {
       "@id": "urn:comunica:default:query-operation/actors#slice",
       "@type": "ActorQueryOperationSlice",
+      "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
+    },
+    {
+      "@id": "urn:comunica:default:query-operation/actors#slice-ordered",
+      "@type": "ActorQueryOperationSliceOrdered",
       "mediatorQueryOperation": { "@id": "urn:comunica:default:query-operation/mediators#main" }
     }
   ]

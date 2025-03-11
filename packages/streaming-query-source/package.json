@@ -1,6 +1,6 @@
 {
   "name": "@incremunica/streaming-query-source",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A base class for streaming query sources",
   "lsd:module": true,
   "license": "MIT",
@@ -35,7 +35,7 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/types": "^4.0.2",
+    "@comunica/types": "^4.1.0",
     "@rdfjs/types": "*",
     "asynciterator": "^3.9.0",
     "sparqlalgebrajs": "^4.3.8"

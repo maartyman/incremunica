@@ -1,5 +1,3 @@
-/** @jest-environment setup-polly-jest/jest-environment-node */
-
 // Needed to undo automock from actor-http-native, cleaner workarounds do not appear to be working.
 import 'jest-rdf';
 import '@incremunica/jest';
@@ -10,12 +8,13 @@ import type { BindingsFactory } from '@comunica/utils-bindings-factory';
 import { KeysBindings } from '@incremunica/context-entries';
 import { createTestBindingsFactory, partialArrayifyAsyncIterator } from '@incremunica/dev-tools';
 import { StreamingStore } from '@incremunica/streaming-store';
-import type { Quad } from '@incremunica/types';
+import type { ContextQuerySourceStream, Quad } from '@incremunica/types';
+import { getBindingsIndex } from '@incremunica/user-tools';
 import { ArrayIterator } from 'asynciterator';
 import { DataFactory } from 'rdf-data-factory';
 import { PassThrough } from 'readable-stream';
 import { QueryEngine, QueryEngineFactory } from '../lib';
-import { usePolly } from './util';
+import { fetch as cachedFetch } from './util';
 
 if (!globalThis.window) {
   jest.unmock('follow-redirects');
@@ -25,7 +24,7 @@ const quad = require('rdf-quad');
 
 const DF = new DataFactory();
 
-describe('System test: QuerySparql (without polly)', () => {
+describe('System test: QuerySparql (without external network)', () => {
   let BF: BindingsFactory;
   let engine: QueryEngine;
 
@@ -39,6 +38,30 @@ describe('System test: QuerySparql (without polly)', () => {
 
     beforeEach(async() => {
       streamingStore = new StreamingStore<Quad>();
+    });
+
+    it('simple query that starts with empty store', async() => {
+      const bindingStream = await engine.queryBindings(`
+        SELECT ?s ?p1 ?o1 ?p2 ?o2 WHERE {
+        ?s ?p1 ?o1 .
+        ?o1 ?p2 ?o2 . }`, {
+        sources: [ streamingStore ],
+      });
+
+      streamingStore.addQuad(quad('s', 'p1', 'o1'));
+      streamingStore.addQuad(quad('o1', 'p2', 'o2'));
+
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('s') ],
+          [ DF.variable('p1'), DF.namedNode('p1') ],
+          [ DF.variable('o1'), DF.namedNode('o1') ],
+          [ DF.variable('p2'), DF.namedNode('p2') ],
+          [ DF.variable('o2'), DF.namedNode('o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
+
+      streamingStore.end();
     });
 
     it('simple query with GROUPBY', async() => {
@@ -79,6 +102,54 @@ describe('System test: QuerySparql (without polly)', () => {
           [ DF.variable('interestCount'), DF.literal('1', integerNamedNode) ],
         ]).setContextEntry(KeysBindings.isAddition, true),
       ]);
+
+      streamingStore.end();
+    });
+
+    it('simple query with ORDERBY', async() => {
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+      streamingStore.addQuad(quad('Bob', 'http://test/hasInterest', 'Sports'));
+      streamingStore.addQuad(quad('Alice', 'http://test/hasInterest', 'Reading'));
+
+      const bindingStream = await engine.queryBindings(`PREFIX test: <http://test/>
+        SELECT ?subject ?interest
+        WHERE {
+          ?subject test:hasInterest ?interest .
+        }
+        ORDER BY ?subject ?interest`, {
+        sources: [ streamingStore ],
+      });
+
+      const result1 = await partialArrayifyAsyncIterator(bindingStream, 3);
+      const expectedResult1 = [
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Cooking') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Reading') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Bob') ],
+          [ DF.variable('interest'), DF.namedNode('Sports') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ];
+      expect(result1).toBeIsomorphicBindingsArray(expectedResult1);
+      for (const result of result1) {
+        expect(result).toEqualBindings(expectedResult1[getBindingsIndex(result)]);
+      }
+
+      streamingStore.removeQuad(quad('Alice', 'http://test/hasInterest', 'Cooking'));
+
+      const result2 = await partialArrayifyAsyncIterator(bindingStream, 1);
+      expect(result2).toBeIsomorphicBindingsArray([
+        BF.bindings([
+          [ DF.variable('subject'), DF.namedNode('Alice') ],
+          [ DF.variable('interest'), DF.namedNode('Cooking') ],
+        ]).setContextEntry(KeysBindings.isAddition, false),
+      ]);
+      expect(getBindingsIndex(result2[0])).toBe(0);
 
       streamingStore.end();
     });
@@ -310,7 +381,6 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingPeriod: 1000,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -333,17 +403,16 @@ describe('System test: QuerySparql (without polly)', () => {
         sources: [
           'http://localhost:8787',
         ],
-        pollingPeriod: 100,
         deferredEvaluationTrigger,
       });
 
-      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
-        resolve(bindings);
-      }))).resolves.toEqualBindings(BF.bindings([
-        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
-        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
-        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
-      ]).setContextEntry(KeysBindings.isAddition, true));
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('http://localhost:8787/s1') ],
+          [ DF.variable('p'), DF.namedNode('http://localhost:8787/p1') ],
+          [ DF.variable('o'), DF.namedNode('http://localhost:8787/o1') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
 
       fetchData.dataString = '<http://localhost:8787/s3> <http://localhost:8787/p3> <http://localhost:8787/o3> .';
       fetchData.etag = '1';
@@ -355,13 +424,13 @@ describe('System test: QuerySparql (without polly)', () => {
       }, 500);
       setTimeout(() => deferredEvaluationTrigger.emit('update'), 1000);
 
-      await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
-        resolve(bindings);
-      }))).resolves.toEqualBindings(BF.bindings([
-        [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
-        [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
-        [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
-      ]).setContextEntry(KeysBindings.isAddition, true));
+      await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
+        BF.bindings([
+          [ DF.variable('s'), DF.namedNode('http://localhost:8787/s2') ],
+          [ DF.variable('p'), DF.namedNode('http://localhost:8787/p2') ],
+          [ DF.variable('o'), DF.namedNode('http://localhost:8787/o2') ],
+        ]).setContextEntry(KeysBindings.isAddition, true),
+      ]);
     });
 
     it('simple query with a streaming source, addition and deletion', async() => {
@@ -380,7 +449,7 @@ describe('System test: QuerySparql (without polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ streamingStore, sourcesStream ],
-        pollingPeriod: 1000,
+        pollingPeriod: 1,
       });
 
       await expect(partialArrayifyAsyncIterator(bindingStream, 1)).resolves.toEqualBindingsArray([
@@ -451,7 +520,7 @@ describe('System test: QuerySparql (without polly)', () => {
           ?s ?p ?o.
           }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingPeriod: 1000,
+        pollingPeriod: 1,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -482,7 +551,7 @@ describe('System test: QuerySparql (without polly)', () => {
            OPTIONAL { ?s2 <http://localhost:8787/p2> ?o2 . }
            }`, {
         sources: [ 'http://localhost:8787' ],
-        pollingPeriod: 1000,
+        pollingPeriod: 1,
       });
 
       await expect(new Promise<Bindings>(resolve => bindingStream.once('data', (bindings) => {
@@ -514,12 +583,11 @@ describe('System test: QuerySparql (without polly)', () => {
   });
 });
 
-describe('System test: QuerySparql (with polly)', () => {
-  usePolly();
-
+describe('System test: QuerySparql (with external network)', () => {
   let bindingStream: BindingsStream;
   let engine: QueryEngine;
   beforeEach(async() => {
+    globalThis.fetch = cachedFetch;
     engine = new QueryEngine();
     await engine.invalidateHttpCache();
   });
@@ -534,7 +602,6 @@ describe('System test: QuerySparql (with polly)', () => {
     ?s ?p ?o.
   }`, {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingPeriod: 1000,
       });
 
       await expect((partialArrayifyAsyncIterator(bindingStream, 100))).resolves.toHaveLength(100);
@@ -544,14 +611,13 @@ describe('System test: QuerySparql (with polly)', () => {
       bindingStream = await engine.queryBindings(`SELECT * WHERE {
     ?s ?p ?o.
   }`, {
-        sources: [ new ArrayIterator([
+        sources: [ <ContextQuerySourceStream> new ArrayIterator([
           'https://www.rubensworks.net/',
           {
             querySource: 'https://www.rubensworks.net/',
             isAddition: true,
           },
         ]) ],
-        pollingPeriod: 1000,
       });
 
       await expect((partialArrayifyAsyncIterator(bindingStream, 100))).resolves.toHaveLength(100);
@@ -562,7 +628,6 @@ describe('System test: QuerySparql (with polly)', () => {
      ?s ?p ?o.
      }`;
       const context: QueryStringContext = {
-        pollingPeriod: 1000,
         sources: [ 'https://www.rubensworks.net/' ],
       };
 
@@ -579,14 +644,14 @@ describe('System test: QuerySparql (with polly)', () => {
      }`;
       const context: QueryStringContext = {
         sources: [ 'https://www.rubensworks.net/' ],
-        pollingPeriod: 1000,
+        pollingPeriod: 1,
       };
 
       bindingStream = await engine.queryBindings(query, context);
       await expect((partialArrayifyAsyncIterator(bindingStream, 100))).resolves.toHaveLength(100);
       bindingStream.destroy();
 
-      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
 
       bindingStream = await engine.queryBindings(query, context);
       await expect((partialArrayifyAsyncIterator(bindingStream, 100))).resolves.toHaveLength(100);
@@ -599,7 +664,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?s ?p ?s.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyAsyncIterator(bindingStream, 1))).resolves.toHaveLength(1);
@@ -613,7 +677,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyAsyncIterator(bindingStream, 20))).resolves.toHaveLength(20);
@@ -625,7 +688,6 @@ describe('System test: QuerySparql (with polly)', () => {
         ?v0 <http://xmlns.com/foaf/0.1/name> ?name.
         }`, {
           sources: [ 'https://www.rubensworks.net/' ],
-          pollingPeriod: 1000,
         });
 
         await expect((partialArrayifyAsyncIterator(bindingStream, 20))).resolves.toHaveLength(20);
@@ -640,7 +702,6 @@ describe('System test: QuerySparql (with polly)', () => {
               'https://raw.githubusercontent.com/w3c/data-shapes/gh-pages/shacl-compact-syntax/' +
               'tests/valid/basic-shape-iri.shaclc',
             ],
-            pollingPeriod: 1000,
           });
 
           await expect((partialArrayifyAsyncIterator(bindingStream, 1))).resolves.toHaveLength(1);

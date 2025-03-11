@@ -1,4 +1,4 @@
-# Incremuncia Group Query Operation Actor
+# Incremunica Group Query Operation Actor
 
 [![npm version](https://badge.fury.io/js/@incremunica%2Factor-query-operation-group.svg)](https://www.npmjs.com/package/@incremunica/actor-query-operation-group)
 
