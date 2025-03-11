@@ -35,7 +35,7 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/types": "^4.0.2",
+    "@comunica/types": "^4.1.0",
     "@rdfjs/types": "*",
     "asynciterator": "^3.9.0",
     "sparqlalgebrajs": "^4.3.8"

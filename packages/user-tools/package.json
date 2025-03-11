@@ -35,7 +35,7 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/types": "^4.0.2",
+    "@comunica/types": "^4.1.0",
     "@incremunica/context-entries": "^2.1.0",
     "@incremunica/types": "^2.1.0",
     "@rdfjs/types": "*",

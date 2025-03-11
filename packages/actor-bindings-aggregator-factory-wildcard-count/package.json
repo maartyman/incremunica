@@ -37,10 +37,10 @@
     "build:components": "componentsjs-generator"
   },
   "dependencies": {
-    "@comunica/core": "^4.0.1",
-    "@comunica/types": "^4.0.2",
-    "@comunica/utils-bindings-factory": "^4.0.2",
-    "@comunica/utils-expression-evaluator": "^4.0.2",
+    "@comunica/core": "^4.1.0",
+    "@comunica/types": "^4.1.0",
+    "@comunica/utils-bindings-factory": "^4.1.0",
+    "@comunica/utils-expression-evaluator": "^4.1.0",
     "@incremunica/bus-bindings-aggregator-factory": "^2.1.0",
     "@incremunica/context-entries": "^2.1.0",
     "@rdfjs/types": "*",
